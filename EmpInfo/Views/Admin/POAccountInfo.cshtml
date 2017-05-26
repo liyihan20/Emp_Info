@@ -1,0 +1,39 @@
+﻿<script>
+    $(function () {
+        $("#searchBt").click(function () {
+            var text = $("#searchText").val();
+            if (text == "") {
+                toastr.error("请输入PO单号");
+                return;
+            }
+            $.post("@Url.Content("~/Admin/GetPOInfo")", { poNumber: text }, function (data) {
+                if (data.suc) {
+                    $("#result").removeClass("text-danger").addClass("text-primary").html(data.msg);
+                } else {
+                    $("#result").removeClass("text-primary").addClass("text-danger").html(data.msg);
+                }
+            });
+        });
+    });
+</script>
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Admin/AdminIndex")">管理员工具栏</a></li>
+            <li class="active">PO单归属</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="input-group">
+            <input type="text" class="form-control" id="searchText" placeholder="输入PO单号">
+            <span class="input-group-btn">
+                <button class="btn btn-primary" type="button" id="searchBt"><span class="glyphicon glyphicon-search"></span> Search</button>
+            </span>
+        </div><!-- /input-group -->
+        <br />
+        <h2 id="result" class="text-primary"></h2>
+    </div>
+</div>

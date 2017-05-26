@@ -1,0 +1,28 @@
+﻿
+    <script>
+        function getId() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+                console.log("enumerateDevices() not supported.");
+                return;
+            }
+
+            // List cameras and microphones.
+
+            navigator.mediaDevices.enumerateDevices()
+            .then(function (devices) {
+                devices.forEach(function (device) {
+                    $("#xs").append("<div>"+device.kind + ": " + device.label +
+                                " id = " + device.deviceId +"</div>");
+                    console.log(device.kind + ": " + device.label +
+                                " id = " + device.deviceId);
+                });
+            })
+            .catch(function (err) {
+                $("#xs").append("<div>" + err.name + ": " + err.message + "</div>");
+                console.log(err.name + ": " + err.message);
+            });
+        }
+        getId();
+    </script>
+
+<div id="xs"></div>

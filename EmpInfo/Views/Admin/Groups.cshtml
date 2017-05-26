@@ -1,0 +1,116 @@
+﻿@section Scripts {
+    <script>
+        $(function () {
+            //搜索按钮
+            $("#searchText").keyup(function () {
+                if (event.keyCode == 13) {
+                    $("#searchBt").click();
+                }
+            });
+            $("#searchBt").click(function () {
+                $.post("@Url.Content("~/Admin/GetGroups")", { searchContent: $("#searchText").val() }, function (data) {
+                    if (data.suc) {
+                        fillGroups(data.rows);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+            
+
+            $("#addGroupBt").click(function () {
+                $("#groupModal").modal("show");
+            });
+            $("#groupConfirmBt").click(function () {
+                $.post("@Url.Content("~/Admin/AddGroup")", { name: $("#group_name").val(), des: $("#group_des").val() }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        $("#groupModal").modal("hide");
+                        setTimeout("$('#searchBt').click()", 500);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                })
+            });
+
+            $("#searchBt").click();
+        });
+        //填充用户列表
+        function fillGroups(rows) {
+            //清空已有内容
+            $("#groupList a").remove();
+            //加载数据
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                var item = "<a class='list-group-item' href='@Url.Content("~/Admin/GroupDetail/")"+row.id+"'><div class='media'><div class='media-left media-middle'>";
+                item += "<img class='media-object' src='@Url.Content("~/Content/images/group_item.png")' alt='group'></div><div class='media-body'><h4 class='media-heading'>";
+                item += row.name
+                item += "</h4><div style='color:gray'>";
+                item += row.description;
+                item += "</div></div><div class='media-right media-middle'><span class='glyphicon glyphicon-menu-right' style='color:green'></span></div></div></a>";
+                $("#groupList").append(item);
+            }
+        }
+
+    </script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Admin/AdminIndex")">管理员工具栏</a></li>
+            <li class="active">组别管理</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchText" placeholder="Search for...">
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="button" id="searchBt"><span class="glyphicon glyphicon-search"></span> Search</button>
+                </span>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-block" id="addGroupBt" style="margin-top:8px;"><span class="glyphicon glyphicon-plus"></span> 增加分组</button>
+        </div>
+        </div>
+    <div class="list-group" id="groupList">
+        @*存放组别列表*@
+    </div>    
+</div>
+
+@section Modal {
+    <div class="modal fade" id="groupModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">新建组别</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="group_name" class="sr-only">名称:</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">名称:</div>
+                        <input type="text" class="form-control" id="group_name" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="group_des" class="sr-only">描述:</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">描述:</div>
+                        <input type="text" class="form-control" id="group_des" required />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove-circle"></span> 取消</button>
+                <button id="groupConfirmBt" type="button" class="btn btn-success"><span class="glyphicon glyphicon-ok-circle"></span> 确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+}

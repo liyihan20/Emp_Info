@@ -1,0 +1,261 @@
+﻿@{
+    Layout = "~/Views/Shared/_ResLayout.cshtml";
+}
+@section CSS{
+    <style type="text/css">
+        .list-group-item .media img {
+            height: 64px;
+            width: 96px;
+            cursor:pointer;
+            margin-left:30px;
+        }
+        /*.media .icheckbox_square-red {
+            position: absolute;
+            top: 30px;
+        }*/
+
+        .media .itemCheck {
+            position: absolute;
+            top: 30px;
+        }
+    </style>
+    }
+@section Scripts{
+
+    <script>  
+
+        //knockout method
+        //ko.bindingHandlers.myBindingCheckbox = {
+        //    init: function (element, valueAccessor) {
+        //        $(element).iCheck({
+        //            checkboxClass: 'icheckbox_square-red',
+        //            //increaseArea: '10%'
+        //        });
+        //        $(element).on('ifChanged', function () {
+        //            var observable = valueAccessor();
+        //            observable($(element)[0].checked);
+        //        });
+        //    },
+        //    update: function (element, valueAccessor) {
+        //        var value = ko.unwrap(valueAccessor());
+        //        if (value) {
+        //            $(element).iCheck('check');
+        //        } else {
+        //            $(element).iCheck('uncheck');
+        //        }
+        //    }
+        //};
+
+        ko.bindingHandlers.myCheckBox = {
+            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                var observable = valueAccessor();
+                $(element)[0].checked = observable();
+
+                //绑定复选框change事件
+                $(element).on("change", function () {
+                    var isChecked = $(element)[0].checked;
+                    var car = bindingContext.$data;
+                    observable(isChecked);
+                    $.post("ChangeItemCheckedInCar", { id: car.car_id, isChecked: isChecked }, function (data) {
+                        if (data.suc) {
+                            observable(isChecked);
+                        } else {
+                            toastr.error(data.msg);
+                            $(element)[0].checked = !isChecked; //失败，恢复为点击之前状态
+                        }
+                    });
+                    //console.log("doSomethingInDB which:" + car.car_id + ";checked:"+observable());
+                })
+            },
+            update: function (element, valueAccessor) {
+                var value = ko.unwrap(valueAccessor());
+                $(element)[0].checked = value;
+            }
+        }
+
+        function Car(data) {
+            this.car_id = data.car_id;
+            this.dish_id = data.dish_id;
+            this.name = data.name;
+            this.qty = ko.observable(data.qty);
+            this.price = data.price;
+            this.is_selling = data.is_selling;
+            this.is_selected = ko.observable(data.is_checked);
+            this.benefit_info = data.benefit_info;
+        }
+        function ShoppingCarModel() {
+            var self = this;
+            
+            self.cars = ko.observableArray([]);
+            //菜式总数量
+            self.totalNum = ko.computed(function () {
+                var num = 0;
+                for (var i = 0; i < self.cars().length; i++) {
+                    if (self.cars()[i].is_selected()) {
+                        num += parseInt(self.cars()[i].qty());
+                    }
+                }
+                return num;
+            });
+            //菜式总价钱
+            self.totalPrice = ko.computed(function () {
+                var total = 0;
+                for (var i = 0; i < self.cars().length; i++) {
+                    if (self.cars()[i].is_selected()) {
+                        total += parseInt(self.cars()[i].qty()) * parseFloat(self.cars()[i].price);
+                    }
+                }
+                return total.toFixed(2);
+            });
+            //选中的数量
+            self.checkedNum = ko.pureComputed(function () {
+                return ko.utils.arrayFilter(self.cars(), function (c) { return c.is_selected() }).length;
+                //var selectedNum = 0;
+                //for (var i = 0; i < self.cars().length; i++) {
+                //    if (self.cars()[i].is_selected()) {
+                //        selectedNum++;
+                //    }
+                //}
+                //return selectedNum;
+            });
+
+            //全选标识
+            self.selectAll = ko.pureComputed({
+                read: function () {                                 
+                    if (self.checkedNum() == self.cars().length) {
+                        return true;
+                    }
+                    return false;
+                },
+                write: function (value) {
+                    for (var i = 0; i < self.cars().length; i++) {
+                        self.cars()[i].is_selected(value);                        
+                    }
+                    $(".itemCheck").trigger("change");//手动触发change事件，否则点击全选按钮，明细的复选框change事件不会执行。
+                }
+            });
+            //图片点击进入详细页面
+            self.imgClick = function (car) {
+                window.location.href = "@Url.Content("~/Restaurant/DishDetail/")" + car.dish_id;
+            };
+
+            //增加数量按钮
+            self.addQty = function (car) {
+                $.post("ChangeItemQtyInCar", { id: car.car_id, qty: car.qty() + 1 }, function (data) {
+                    if (data.suc) {
+                        car.qty(car.qty() + 1);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            };
+
+            //减少数量按钮
+            self.minusQty = function (car) {
+                if (car.qty() > 1) {
+                    $.post("ChangeItemQtyInCar", { id: car.car_id, qty: car.qty() - 1 }, function (data) {
+                        if (data.suc) {
+                            car.qty(car.qty() - 1);
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                }
+            };
+            
+            //删除item
+            self.removeItem = function (car) {
+                openConfirmDialog("确定要从购物车移除吗？", function () {
+                    $.post("RemoveItemInShoppingCar", { id: car.car_id }, function (data) {
+                        if (data.suc) {
+                            self.cars.remove(car);
+                            toastr.success(data.msg);
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                });                
+            };
+
+            //进入结算
+            self.startToBalance = function () {
+                if (self.checkedNum() == 0) {
+                    toastr.error("请至少选择一项菜式后再结算");
+                    return;
+                }
+                window.location.href = "@Url.Content("~/Restaurant/MakeAnOrder")";
+            }
+
+            //获取数据
+            $.post("GetShoppingCar", {}, function (allData) {
+                var mappedCars = $.map(allData, function (item) { return new Car(item); });
+                console.log(mappedCars);
+                self.cars(mappedCars);
+                $("#carPanel").show(); //先将内容都隐藏，获取数据之后再展示，避免提前闪现购物车为空的提示
+            });
+            
+        }
+        ko.applyBindings(new ShoppingCarModel());
+                       
+    </script>
+    
+}
+
+<div class="panel panel-default" id="carPanel" style="display:none">
+    <div class="panel-heading">
+        我的购物车
+    </div>
+    <div class="panel-body" style="min-height:200px;">
+        <!-- ko if:cars().length == 0-->
+        <div style="margin:60px auto 0 auto;font-size:26px;text-align:center;">
+            <i class="fa fa-shopping-cart fa-2x" style="color: #CC0033"></i>
+            购物车里什么都没有，转到<a href="@Url.Content("~/Restaurant/ResIndex")" style="color: #CC0033">订餐主页>></a>
+        </div>
+        <!-- /ko-->
+        <!-- ko if:cars().length > 0-->
+        <div style="margin:0 0 10px 16px;"><input type="checkbox" id="allCheck" data-bind="checked:selectAll" /> <span style="color: #CC0000">全选</span></div>        
+        <div class="list-group" data-bind="foreach:cars">
+                <div class="list-group-item">                    
+                    <div class="media">
+                        <div class="media-left media-middle"> 
+                            <input type="checkbox" class="itemCheck" data-bind="myCheckBox :is_selected" />
+                            <img class="media-object lazyload" data-bind="click:$parent.imgClick, attr:{'data-src':'@Url.Content("~/Restaurant/GetThumbPic/")'+dish_id}">
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">
+                                <span data-bind="text:name"></span>
+                                    <!-- ko ifnot:is_selling-->
+                                    <span class="badge" style="background-color: #FF6666;vertical-align:top;">已下架</span>
+                                    <!-- /ko-->
+                            </h4>
+                            <div>
+                                <span style="font-size: 16px; color: #e4393c;"><i class="fa fa-rmb"></i> <span data-bind="text:price"></span></span>
+                                <div class="btn-group btn-group-sm pull-right" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default minusNumBt" data-bind="click:$parent.minusQty"><i class="fa fa-minus"></i></button>
+                                    <button type="button" class="btn btn-default numBt"><span data-bind="text:qty"></span></button>
+                                    <button type="button" class="btn btn-default addNumBt" data-bind="click:$parent.addQty"><i class="fa fa-plus"></i></button>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div data-bind="if:benefit_info != null" class="text-danger">
+                                <i class="fa fa-info-circle"></i> <span data-bind="text:benefit_info"></span>
+                            </div> 
+                            <div class="pull-right"><a class="deleteItemLink" href="#" data-bind="click:$parent.removeItem"><i class="fa fa-trash-o"></i></a></div>
+                        </div>                        
+                    </div>
+                </div>
+        </div>
+        <div style="text-align:right;padding:10px 20px 0 0;">
+            <span>已选择数量：<b style="display: inline-block; width: 80px; color: #e4393c;" data-bind="text:totalNum"></b></span><br/>
+            <span>价钱合计：<span style="display: inline-block; width: 80px; color: #e4393c;"><i class="fa fa-rmb"></i> <b data-bind="text:totalPrice"></b></span></span>
+            <div style="margin-top:8px;">
+                <button class="btn btn-success" data-bind="click:startToBalance"><i class="fa fa-mail-forward"></i> 进入结算</button> 
+            </div>
+        </div>
+        <!--/ko-->  
+    </div>
+</div>
+
+@section Modal{
+    @Html.Partial("_ConfirmDialog")
+    }

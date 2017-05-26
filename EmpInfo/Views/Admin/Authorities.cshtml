@@ -1,0 +1,226 @@
+﻿@using EmpInfo.Models;
+@{
+    List<ei_authority> list = (List<ei_authority>)ViewData["list"];
+    var count = list.Count();
+    int half = count % 2 == 0 ? count / 2 : count / 2 + 1;    
+}
+@section Scripts{
+    <script>
+        $(function () {
+            $("#athorityList a").on("click", function () {
+                $("#athorityList a").removeClass("active");
+                $(this).addClass("active");
+                //toastr.success($("#athorityList a.active").find(".a_name").html());
+            });
+            $("#searchText").keyup(function () {
+                if (event.keyCode == 13) {
+                    $("#searchBt").click();
+                }
+            });
+            $("#searchBt").click(function () {
+                window.location.href = "@Url.Content("~/Admin/Authorities?searchContent=")" + $("#searchText").val();
+            });
+            $("#addAutBt").click(function () {
+                $("#autModalTitle").html("新增权限");
+                $("#autFm input").val("");
+                $("#autModal").modal("show");
+            });
+            $("#modifyAutBt").click(function () {
+                var item = $("#athorityList a.active");
+                if (item.length < 1) {
+                    toastr.error("请先选择某行数据");
+                    return;
+                }
+                $("#autModalTitle").html("修改权限");
+                $("#aut_name").val($(item).find(".a_name").html());
+                $("#aut_en_name").val($(item).find(".a_en_name").val());
+                $("#aut_no").val($(item).find(".a_number").html());
+                $("#aut_controller").val($(item).find(".a_controller").html());
+                $("#aut_action").val($(item).find(".a_action").html());
+                $("#aut_icon").val($(item).find(".a_icon").val());
+                $("#aut_description").val($(item).find(".a_description").html());
+                $("#aut_id").val($(item).find(".a_id").val());
+                $("#autModal").modal("show");
+            });
+
+            $("#autConfirmBt").click(function () {
+                $("#autModal").modal("hide");
+                $("#autFm").submit();
+            });
+
+            $("#removeAutBt").click(function () {
+                var item = $("#athorityList a.active");
+                if (item.length < 1) {
+                    toastr.error("请先选择某行数据");
+                    return;
+                }
+                var id = $(item).find(".a_id").val();
+                var name = $(item).find(".a_name").html();
+                openConfirmDialog("确定要删除权限【" + name + "】吗?", function () {
+                    window.location.href = "@Url.Content("~/Admin/RemoveAuthority/")" + id;
+                });
+            });
+
+        });
+
+    </script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Admin/AdminIndex")">管理员工具栏</a></li>
+            <li class="active">权限管理</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="input-group">
+            <input type="text" class="form-control" id="searchText" placeholder="Search for..." value="@ViewData["searchContent"]">
+            <span class="input-group-btn">
+                <button class="btn btn-primary" type="button" id="searchBt"><span class="glyphicon glyphicon-search"></span> Search</button>
+            </span>
+        </div><!-- /input-group -->
+        <div class="btn-group btn-group-justified" role="group" aria-label="操作按钮">
+            <div class="btn-group" role="group">
+                <div style="margin-top:10px;">
+                    <button class="btn btn-primary btn-block" id="addAutBt"><i class="glyphicon glyphicon-plus"></i>&nbsp; 新增</button>
+                </div>
+            </div>
+            <div class="btn-group" role="group">
+                <div style="margin-top:10px;">
+                    <button class="btn btn-info btn-block" id="modifyAutBt"><i class="glyphicon glyphicon-edit"></i>&nbsp; 修改</button>
+                </div>
+            </div>
+            <div class="btn-group" role="group">
+                <div style="margin-top:10px;">
+                    <button class="btn btn-danger btn-block" id="removeAutBt"><i class="glyphicon glyphicon-remove"></i>&nbsp; 删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="list-group" id="athorityList">
+                @foreach (var a in list.Take(half)) {
+                    <a class="list-group-item">
+                        <div class="media">
+                            <div class="media-left media-middle">
+                                <img class="media-object" src="@Url.Content("~/Content/images/elec.png")" alt="user_friend">
+                            </div>
+                            <div class="media-body">
+                                <h4 class="media-heading"><span class="a_number">@a.number</span> <span class="a_name">@a.name</span></h4>
+                                <div>
+                                    <span class="a_controller">@a.controler_name</span>/<span class="a_action">@a.action_name</span> <br />
+                                    <span class="a_description">@a.description</span>
+                                    <input type="hidden" class="a_id" value="@a.id" />
+                                    <input type="hidden" class="a_icon" value="@a.iconcls" />
+                                    <input type="hidden" class="a_en_name" value="@a.en_name" />
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="list-group" id="athorityList">
+                @foreach (var a in list.Skip(half)) {
+                    <a class="list-group-item">
+                        <div class="media">
+                            <div class="media-left media-middle">
+                                <img class="media-object" src="@Url.Content("~/Content/images/elec.png")" alt="user_friend">
+                            </div>
+                            <div class="media-body">
+                                <h4 class="media-heading"><span class="a_number">@a.number</span> <span class="a_name">@a.name</span></h4>
+                                <div>
+                                    <span class="a_controller">@a.controler_name</span>/<span class="a_action">@a.action_name</span> <br />
+                                    <span class="a_description">@a.description</span>
+                                    <input type="hidden" class="a_id" value="@a.id" />
+                                    <input type="hidden" class="a_icon" value="@a.iconcls" />
+                                    <input type="hidden" class="a_en_name" value="@a.en_name" />
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+@section Modal {
+    <div class="modal fade" id="autModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="AutLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="autModalTitle"></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="autFm" method="post" action="@Url.Content("~/Admin/SaveAuthority")">
+                        <input type="hidden" id="aut_id" name="aut_id" />
+                        <div class="form-group">
+                            <label for="aut_no" class="sr-only">编号:</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">编号:</div>
+                                <input type="number" class="form-control" id="aut_no" name="aut_no" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="aut_name" class="sr-only">名称:</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">名称:</div>
+                                <input type="text" class="form-control" id="aut_name" name="aut_name" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="aut_en_name" class="sr-only">英文名:</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">英文名:</div>
+                                <input type="text" class="form-control" id="aut_en_name" name="aut_en_name" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="aut_controller" class="sr-only">控制器:</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">控制器:</div>
+                                <input type="text" class="form-control" id="aut_controller" name="aut_controller" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="aut_action" class="sr-only">方法:</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">方法:</div>
+                                <input type="text" class="form-control" id="aut_action" name="aut_action" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="aut_icon" class="sr-only">图标:</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">图标:</div>
+                                <input type="text" class="form-control" id="aut_icon" name="aut_icon" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="aut_description" class="sr-only">描述:</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">描述:</div>
+                                <input type="text" class="form-control" id="aut_description" name="aut_description" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove-circle"></span> 取消</button>
+                    <button id="autConfirmBt" type="button" class="btn btn-success"><span class="glyphicon glyphicon-ok-circle"></span> 确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @Html.Partial("_ConfirmDialog");
+
+}

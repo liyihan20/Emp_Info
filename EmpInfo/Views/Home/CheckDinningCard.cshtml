@@ -1,0 +1,266 @@
+﻿@using EmpInfo.Models;
+@{
+    DinningCardStatusModel ds = (DinningCardStatusModel)@ViewData["CardStatus"];
+}
+
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />    
+}
+@section Scripts{
+    @*加入以下js，使IE8支持datetimepicker组件*@
+    <script>
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function (elt /*, from*/) {
+                var len = this.length >>> 0;
+
+                var from = Number(arguments[1]) || 0;
+                from = (from < 0)
+                     ? Math.ceil(from)
+                     : Math.floor(from);
+                if (from < 0)
+                    from += len;
+
+                for (; from < len; from++) {
+                    if (from in this &&
+                        this[from] === elt)
+                        return from;
+                }
+                return -1;
+            };
+        }
+    </script>
+    @*<script src="@Url.Content("~/Scripts/moment.js")"></script>*@
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script>        
+        //日期控件设置
+        $(function () {
+            $(".form_date").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd",
+                autoclose: true,
+                todayBtn: true,
+                startView: 2,
+                minView: 2,
+                endDate: new Date()
+            });
+            //设置时间点，消费只能查最近1个月，充值只能查最近6个月
+            $('#fromDatePicker1').datetimepicker('setStartDate', new Date("@(DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"))"));
+            $('#toDatePicker1').datetimepicker('setStartDate', new Date("@(DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"))"));
+            $('#fromDatePicker2').datetimepicker('setStartDate', new Date("@(DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd"))"));
+            $('#toDatePicker2').datetimepicker('setStartDate', new Date("@(DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd"))"));
+
+            //设置日期联动，结束日期不能大于起始日期
+            $("#fromDatePicker1").on("changeDate", function (e) {
+                $('#toDatePicker1').datetimepicker('setStartDate', e.date);
+            });
+            $("#toDatePicker1").on("changeDate", function (e) {
+                $('#fromDatePicker1').datetimepicker('setEndDate', e.date);
+            });
+            $("#fromDatePicker2").on("changeDate", function (e) {
+                $('#toDatePicker2').datetimepicker('setStartDate', e.date);
+            });
+            $("#toDatePicker2").on("changeDate", function (e) {
+                $('#fromDatePicker2').datetimepicker('setEndDate', e.date);
+            });
+
+            //消费查询按钮点击
+            $("#resumneBt").click(function () {
+                var fd = $("#consume_from_date").val();
+                var td = $("#consume_to_date").val();
+                if (fd == "") {
+                    toastr.error("消费起始日期不能为空");
+                    return;
+                }
+                if (td == "") {
+                    toastr.error("消费结束日期不能为空");
+                    return;
+                }
+                //清空消费内容
+                $("#consumeContent li").remove();
+                $.post("@Url.Content("~/Home/GetConsumeRecords")", { from_date: fd, to_date: td }, function (data) {
+                    if (!data.suc) {
+                        toastr.error(data.msg);
+                    } else {
+                        var rec = data.records;
+                        
+                        for (var i = 0; i < rec.length; i++) {
+                            var li = "<li class='list-group-item text-primary'><div class='row'><div class='col-xs-8 col-sm-4'>时间:";
+                            li += rec[i].consumeTime;
+                            li += "</div><div class='col-xs-4 col-sm-2'>金额:";
+                            li += rec[i].money;
+                            li += "</div><div class='col-xs-6 col-sm-3'>餐别：";
+                            li += rec[i].diningType;
+                            li += "</div><div class='col-xs-6 col-sm-3'>地点：";
+                            li += rec[i].place;
+                            li += "</div></div></li>";
+                            $("#consumeContent").append(li);
+                        }
+                        toastr.success("消费记录读取成功");
+                    }
+                });
+            });
+
+            //充值查询按钮点击
+            $("#rechargeBt").click(function () {
+                var fd = $("#recharge_from_date").val();
+                var td = $("#recharge_to_date").val();
+                if (fd == "") {
+                    toastr.error("充值起始日期不能为空");
+                    return;
+                }
+                if (td == "") {
+                    toastr.error("充值结束日期不能为空");
+                    return;
+                }
+                //清空充值内容
+                $("#rechargeContent li").remove();
+                $.post("@Url.Content("~/Home/GetRechargeRecords")", { from_date: fd, to_date: td }, function (data) {
+                    if (!data.suc) {
+                        toastr.error(data.msg);
+                    } else {
+                        var rec = data.records;
+                        
+                        for (var i = 0; i < rec.length; i++) {
+                            var li = "<li class='list-group-item text-primary'>";
+                            li += "<div><span class='glyphicon glyphicon-time'></span> 充值时间：<span class='pull-right'>" + rec[i].rechargeTime + "</span></div>";
+                            li += "<div><span class='glyphicon glyphicon-home'></span> 充值场所：<span class='pull-right'>" + rec[i].place + "</span></div>";
+                            li += "<div><span class='glyphicon glyphicon-plus'></span> 充值金额：<span class='pull-right'>" + rec[i].rechargeSum + "</span></div>";
+                            li += "<div><span class='glyphicon glyphicon-stop'></span> 充值前金额：<span class='pull-right'>" + rec[i].beforeSum + "</span></div>";
+                            li += "<div><span class='glyphicon glyphicon-triangle-right'></span> 充值后金额：<span class='pull-right'>" + rec[i].afterSum + "</span></div>";
+                            li+="</li>"
+                            $("#rechargeContent").append(li);
+                        }
+                        toastr.success("充值记录读取成功");
+                    }
+                });
+            });
+
+            //挂失
+            $("#lockCard").click(function () {
+                openConfirmDialog("确认要申请挂失你的饭卡吗？挂失后此饭卡将不能再刷机消费。", function () { lockOrUnlockCard("2"); });
+            });
+            //解除挂失
+            $("#unLockCard").click(function () {
+                openConfirmDialog("确认要解除挂失你的饭卡吗？解除挂失后此饭卡可以继续刷机消费。", function () { lockOrUnlockCard("1"); });
+            });
+        });
+
+        //挂失、解除挂失
+        function lockOrUnlockCard(isLock) {
+            console.log(isLock);
+            $.post("@Url.Content("~/Home/LockOrUnlock")", { lockStatus: isLock }, function (data) {
+                if (data.suc) {
+                    toastr.success(data.msg);
+                    setTimeout(function () { location.reload(true); },1000);
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+        }
+
+    </script>
+    }
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h3 class="panel-title"><span class="glyphicon glyphicon-th-list"></span> 当前饭卡信息</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-6 col-md-4">
+                姓名：<strong class="text-success">@ds.username</strong>
+            </div>
+            <div class="col-xs-6 col-md-4">
+                厂牌：<strong class="text-success">@ds.cardNo</strong>
+            </div>
+            <div class="col-xs-8 col-md-4">
+                饭卡状态：<strong class="text-success">@ds.status</strong>
+                @if (ds.status.Equals("挂失")) { 
+                <a href="#" class="text-danger" id="unLockCard">&nbsp; 解除挂失？ </a>
+                }
+                else if(ds.status.Equals("正常")) {
+                    <a href="#" class="text-danger" id="lockCard">&nbsp; 申请挂失？ </a>
+                }
+            </div>
+            <div class="col-xs-4 col-md-4">余额：<strong class="text-success">@(((decimal)ds.remainingSum).ToString("0.0"))</strong> </div>
+            <div class="col-xs-12 col-md-8">最后消费时间：<strong class="text-success">@ds.lastConsumeTime</strong></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <h3 class="panel-title"><span class="glyphicon glyphicon-usd"></span> 消费&充值记录查询</h3>
+    </div>
+    <div class="panel-body">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#consumeRecord" aria-controls="consumeRecord" role="tab" data-toggle="tab">查询消费记录</a></li>
+            <li role="presentation"><a href="#rechargeRecord" aria-controls="rechargeRecord" role="tab" data-toggle="tab">查询充值记录</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <!-- 消费记录tab -->
+            <div role="tabpanel" class="tab-pane fade in active" id="consumeRecord">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6">
+                                <label for="consume_from_date" class="sr-only">起始日期</label>
+                                <div class="input-group date form_date" style="margin-top:10px;" id="fromDatePicker1">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                                    <input class="form-control" type="text" id="consume_from_date" name="consume_from_date" placeholder="请输入起始日期" readonly>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6">
+                                <label for="consume_to_date" class="sr-only">结束日期</label>
+                                <div class="input-group date form_date" style="margin-top:10px;" id="toDatePicker1">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                                    <input class="form-control" type="text" id="consume_to_date" name="consume_to_date" placeholder="请输入结束日期" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top:10px;"><button class="btn btn-success btn-block" id="resumneBt"><span class="glyphicon glyphicon-search"></span> 开始查询</button></div>
+                        <div class="small text-danger"><span class="glyphicon glyphicon-info-sign"></span> 可以查询到最近1个月以内的消费记录</div>
+                    </div>
+                    <ul class="list-group" id="consumeContent">
+                        @*此处插入消费记录*@
+                    </ul>
+                </div>
+            </div>
+            <!-- 以下是充值记录tab -->
+            <div role="tabpanel" class="tab-pane fade" id="rechargeRecord">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6">
+                                <label for="recharge_from_date" class="sr-only">起始日期</label>
+                                <div class="input-group date form_date" style="margin-top:10px;" id="fromDatePicker2">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                                    <input class="form-control" type="text" id="recharge_from_date" name="recharge_from_date" placeholder="请输入起始日期" readonly>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6">
+                                <label for="recharge_to_date" class="sr-only">结束日期</label>
+                                <div class="input-group date form_date" style="margin-top:10px;" id="toDatePicker2">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                                    <input class="form-control" type="text" id="recharge_to_date" name="recharge_to_date" placeholder="请输入结束日期" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top:10px;"><button class="btn btn-success btn-block" id="rechargeBt"><span class="glyphicon glyphicon-search"></span> 开始查询</button></div>
+                        <div class="small text-danger"><span class="glyphicon glyphicon-info-sign"></span> 可以查询到最近6个月以内的充值记录</div>
+                    </div>
+                    <ul class="list-group" id="rechargeContent">
+                        @*此处插入充值记录*@
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section modal{
+    @Html.Partial("_ConfirmDialog")
+}

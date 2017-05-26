@@ -1,0 +1,47 @@
+﻿@{
+    Layout = null;
+}
+
+<div class="modal fade" id="ResSelModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="confirmModalLabel">请选择需要进入的食堂</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" id="res_content">
+                    @*在此动态插入食堂按钮*@                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $("#res_content").on("click", "div button", function () {
+            window.location.href = "@Url.Content("~/Restaurant/SetCurrentRes?resNo=")" + $(this).attr("data-value");
+        });
+    });
+
+    function openResSelDialog() {
+        $.post("@Url.Content("~/Restaurant/GetAllRes")", "", function (data) {            
+            var result = data.result;
+            var buttons = "";
+            for (var i = 0; i < result.length; i++) {
+                buttons += "<div class='col-xs-6 col-sm-3'>";
+                buttons += "<button class='btn btn-block btn-lg ";
+                buttons += result[i].resNo == "HS" ? "btn-danger" : "btn-primary";
+                buttons += "' ";
+                buttons += "data-value='" + result[i].resNo + "' ";
+                buttons += "style='margin-bottom:8px;'><i class='fa fa-home'></i> <p>";
+                buttons += result[i].resName + "</p><p class='small'>" + "菜式数量:" + result[i].dishCount + "</p>";
+                buttons += "</button>";
+                buttons += "</div>";
+            }
+            $("#res_content").html(buttons);
+            $("#ResSelModal").modal("show");
+        });        
+    }
+</script>

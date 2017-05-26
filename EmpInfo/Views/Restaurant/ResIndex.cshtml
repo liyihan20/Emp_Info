@@ -1,0 +1,175 @@
+﻿@using EmpInfo.Models;
+@{
+    Layout = "~/Views/Shared/_ResLayout.cshtml";
+    int[] ids = (int[])ViewData["topIds"];
+    List<SimpleDishModel> list = (List<SimpleDishModel>)ViewData["dishes"];
+    string[] typs = new string[] { "套餐", "菜式", "酒水","其他" };
+}
+
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/flexslider/flexslider.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/autocomplete.css")" />
+    <style type="text/css">
+        .flexslider .slides img {
+            height: 128px;
+            width: auto;
+            margin: 0 auto;
+        }
+
+        .list-group-item .media img {
+            height: 64px;
+            width: 96px;
+        }
+
+        .badge {
+            background-color: #337ab7;
+        }
+
+        #dish_tab li a{
+            padding:10px 10px;
+        }
+
+        a img{
+            opacity:1;
+        }
+        a img:hover{
+            opacity:0.6;
+        }
+    </style>
+}
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/jquery.flexslider.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.autocomplete.min.js")"></script>
+
+    <script>
+        $(function () {
+            //轮播插件配置
+            $('.flexslider').flexslider({
+                animation: "slide",
+                animationLoop: false,
+                itemWidth: 200,
+                itemMargin: 5,
+                minItems: 2,
+                maxItems: 5
+            });                       
+
+            //激活首个tab panel
+            $(".tab-pane").eq(0).addClass("active");
+
+            //搜索菜式
+            $("#searchText").keyup(function () {
+                if (event.keyCode == 13) {
+                    $("#searchBt").trigger("click");
+                }
+            });
+
+            //快速加入购物车
+            $(".list-group").on("click", ".addInCartLink", function () {
+                var id = $(this).attr("data-id");
+                $.post("@Url.Content("~/Restaurant/AddIntoShoppingCar")", { id: id, qty: 1 }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                })
+            });
+
+            $('#searchBox').autocomplete({
+                serviceUrl: '@Url.Content("~/Restaurant/SearchThings")',
+                minChars: 1,
+                showNoSuggestionNotice:true,
+                noSuggestionNotice:'查询不到相关信息',
+                onSelect: function (suggestion) {
+                    window.location.href = "@Url.Content("~/Restaurant/DishDetail/")" + suggestion.data;
+                }
+            });
+        });
+    </script>
+
+}
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <i class="fa fa-thumbs-up"></i> 今日推荐菜式
+    </div>
+    <div class="panel-body" style="padding:10px 0;">
+        @if (ids.Count() == 0) {
+            <p class="text-center text-warning">暂没有推荐菜式</p>
+        }
+        <div class="flexslider" style="margin-bottom:25px;">
+            <ul class="slides">
+                @foreach (var id in ids) {
+                    <li>
+                        <a href="@string.Concat(Url.Content("~/Restaurant/DishDetail/"),@id)">
+                            <img data-src="@string.Concat(Url.Content("~/Restaurant/GetThumbPic/"),@id)" class="lazyload" />
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <i class="fa fa-th-list"></i> 所有菜式
+    </div>
+    <div class="panel-body">
+
+        <div style="margin:0 0 10px 0;" class="row">
+            <div class="col-xs-12 col-sm-6 col-md-4 col-sm-offset-6 col-md-offset-8">
+                <div class="input-group">
+                    <input id="searchBox" type="text" class="form-control" placeholder="输入内容进行搜索">
+                    <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                </div>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs" role="tablist" id="dish_tab">
+            <li role="presentation" class="active"><a href="#@typs[0]" aria-controls="@typs[0]" role="tab" data-toggle="tab"><i class="fa fa-cutlery"></i> @typs[0]</a></li>
+            <li role="presentation"><a href="#@typs[1]" aria-controls="@typs[1]" role="tab" data-toggle="tab"><i class="fa fa-glass"></i>  @typs[1]</a></li>
+            <li role="presentation"><a href="#@typs[2]" aria-controls="@typs[2]" role="tab" data-toggle="tab"><i class="fa fa-beer"></i> @typs[2]</a></li>
+            <li role="presentation"><a href="#@typs[3]" aria-controls="@typs[3]" role="tab" data-toggle="tab"><i class="fa fa-leaf"></i> @typs[3]</a></li>
+            @*<li role="presentation"><a href="#搜索" aria-controls="搜索" role="tab" data-toggle="tab"><i class="fa fa-search"></i> 搜索</a></li>*@
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content" style="min-height:300px;">
+            @foreach (var type in typs) {
+            <div role="tabpanel" class="tab-pane" id="@type">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        @if (list.Where(l => l.type == @type).Count() == 0) {
+                            <p class="text-center text-warning">类别【 @type 】中暂时没有任何商品</p>
+                        }
+                        <div class="list-group" style="margin-top:10px;">
+                            @foreach (var item in list.Where(l => l.type == @type)) {
+                                <div class="list-group-item">
+                                    <div class="media">
+                                        <a class="media-left media-middle" href="@string.Concat(Url.Content("~/Restaurant/DishDetail/"),@item.id)">
+                                            <img class="media-object lazyload" data-src="@string.Concat(Url.Content("~/Restaurant/GetThumbPic/"), @item.id)">
+                                        </a>
+                                        <div class="media-body">
+                                            <h4 class="media-heading">@item.name</h4>
+                                            <div>
+                                                <div style="color: #FF6666"><i class="fa fa-rmb"></i> @item.price</div>
+                                                供应日：@item.sell_weekday<br />
+                                                供应时段：@item.sell_time<br />
+                                            </div>
+                                        </div>
+                                        <div class="media-right media-middle">
+                                            <a class="addInCartLink" data-id="@item.id" style="cursor:pointer;"><span class="badge"><i class="fa fa-shopping-cart"></i></span></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+
+    </div>
+</div>

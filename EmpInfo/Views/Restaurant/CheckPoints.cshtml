@@ -1,0 +1,41 @@
+﻿@using EmpInfo.Models;
+@{
+    Layout = "~/Views/Shared/_ResLayout.cshtml";
+    List<PointsRecordModel> items = (List<PointsRecordModel>)ViewData["pointsRecord"];
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-search-plus"></i> 积分查询与收支明细</h3>
+    </div>
+    <div class="panel-body">
+        <div style="text-align:center;margin:10px 0 20px 0;">
+        当前积分：<span style="font-size:28px;color:orangered">@ViewData["currentPoint"]</span>  分
+        </div>
+
+        <div class="text-success"><i class="fa fa-list"></i> 积分收支明细（最近20条记录）：</div> 
+        @if (items.Count() == 0) {
+            <p class="text-center text-warning">暂没有积分收支记录</p>
+        }
+        <ul class="list-group">
+            @foreach (var i in items) { 
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-xs-9">
+                        <b>@i.info</b> <br />
+                        <span class="small">@i.date</span>
+                    </div>
+                    <div class="col-xs-3" style="text-align:right;font-size:large;padding-top:10px;">
+                        @if (i.income > 0) {
+                            <span style="color:green">+@i.income</span>
+                        }
+                        else {
+                            <span style="color:red">@i.income</span>
+                        }
+                    </div>
+                </div>
+            </li>
+            }
+        </ul>
+</div>
+</div>

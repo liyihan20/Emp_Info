@@ -1,0 +1,64 @@
+﻿@using EmpInfo.Models;
+@{
+    Layout = "~/Views/Shared/_ResLayout.cshtml";
+    List<PointsForDishModel> items = (List<PointsForDishModel>)ViewData["result"];
+}
+@section CSS{
+    <style type="text/css">
+        a img {
+            opacity: 1;
+        }
+
+            a img:hover {
+                opacity: 0.6;
+            }
+    </style>
+}
+@section Scripts{
+    <script>
+        function GetIt(id) {
+            openConfirmDialog("确定要换购此菜式吗？", function () {
+                $.post("@Url.Content("~/Restaurant/StartPointsForDish")", { id: id }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                })
+            });
+        }
+    </script>
+}
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-gift"> 积分换购列表</i></h3> 
+    </div>
+    <div class="panel-body">
+        @if (items.Count() == 0) {
+            <p class="text-center text-warning">暂没有可换购的商品</p>
+        }
+        <div class="row">
+            @foreach (var i in items) {
+                <div class="col-xs-12 col-md-4 col-sm-6">
+                    <div class="thumbnail">
+                        <a href="@string.Concat(Url.Content("~/Restaurant/DishDetail/"),@i.dishId)">
+                            <img src="@string.Concat(Url.Content("~/Restaurant/GetThumbPic/"),@i.dishId)" alt="dish">
+                        </a>
+                        <div class="caption">
+                            <h3>@i.dishName</h3>
+                            <p>所需积分：<span style="color:red"><b> @i.pointsNeed </b></span></p>
+                            <p>已换购数量：@i.hasFullfill</p>
+                            <p>兑换有效期：@i.fromDate ~ @i.endDate</p>
+                            <p><button class="btn btn-primary btn-block" onclick="GetIt(@i.id)"><i class="fa fa-shopping-cart"></i> 确定换购</button></p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+@section Modal{
+    @Html.Partial("_ConfirmDialog")
+}

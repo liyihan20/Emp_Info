@@ -1,0 +1,86 @@
+﻿@using EmpInfo.Models;
+@{
+    DormLivingInfo fo = (DormLivingInfo)@ViewData["dormLivingInfo"];
+    string[] yearMonthArr = (string[])@ViewData["yearMonthArr"];
+}
+
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $(".list-group-item:odd").css("background-color", "WhiteSmoke");
+
+            $("#yearMonthList li a").click(function () {
+                $("#dropdownMenu1").button("loading");
+                var year_month=$(this).html();
+                $.post("@Url.Content("~/Home/GetDormFee")", { year_month: year_month }, function (data) {
+                    $("#dropdownMenu1").button("reset");
+                    if (!data.suc) {
+                        toastr.error(data.msg);
+                    } else {
+                        var m = data.model;
+                        $("#yearMonth").html(m.yearMonth);
+                        $("#dormNumber").html(m.dormNumber);
+                        $("#rent").html(m.rent);
+                        $("#management").html(m.management);
+                        $("#elec").html(m.elec);
+                        $("#water").html(m.water);
+                        $("#repair").html(m.repair);
+                        $("#fine").html(m.fine);
+                        $("#other").html(m.others);
+                        $("#comment").html(m.comment);
+                        $("#total").html(m.total + "(元)");
+                        toastr.success("加载成功");
+                    }
+                });
+            });
+        });
+    </script>
+    }
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h3 class="panel-title"><span class="glyphicon glyphicon-home"></span> 当前住宿状态</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-6 col-md-3">是否在住：<strong>@fo.livingStatus</strong></div>
+            <div class="col-xs-6 col-md-3">入住日期：<strong>@fo.inDate</strong> </div>
+            <div class="col-xs-6 col-md-3">区号：<strong>@fo.areaNumber</strong></div>
+            <div class="col-xs-6 col-md-3">宿舍号：<strong>@fo.dormNumber</strong></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <h3 class="panel-title"><span class="glyphicon glyphicon-usd"></span> 住宿费用查询</h3>
+    </div>
+    <div class="panel-body">
+        <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-loading-text="数据读取中...">
+                选择需要查询年月份（最近6个月）
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1" id="yearMonthList">
+                @foreach (var y in yearMonthArr)
+                {
+                    <li><a href="#yearMonthList">@(y.Substring(0, 4) + "-" + y.Substring(4, 2))</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>结算年月份：</span><span class="pull-right" id="yearMonth" style="color:red"></span></li>
+        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>宿舍：</span><span class="pull-right" id="dormNumber"></span></li>
+        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>房租：</span><span class="pull-right" id="rent"></span></li>
+        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>管理费：</span><span class="pull-right" id="management"></span></li>
+        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>电费：</span><span class="pull-right" id="elec"></span></li>
+        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>水费：</span><span class="pull-right" id="water"></span></li>
+        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>维修费：</span><span class="pull-right" id="repair"></span></li>
+        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>扣分：</span><span class="pull-right" id="fine"></span></li>
+        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>其它费用：</span><span class="pull-right" id="other"></span></li>
+        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>备注：</span><span class="pull-right" id="comment"></span></li>
+        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>本月合计：</span><span class="pull-right" id="total"></span></li>
+    </ul>
+</div>

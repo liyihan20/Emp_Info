@@ -1,0 +1,209 @@
+﻿@{
+    Layout = "~/Views/Shared/_ResLayout.cshtml";
+}
+@section CSS{
+    <style type="text/css">
+        .list-group-item .media img {
+            height: 64px;
+            width: 96px;
+        }
+    </style>
+}
+@section Scripts{
+
+    <script>
+        //日期控件设置
+        $(function () {
+            $(".form_date").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd",
+                autoclose: true,
+                todayBtn: true,
+                startView: 2,
+                minView: 2,
+                endDate: new Date()
+            });
+            $("#fromDatePicker").on("changeDate", function (e) {
+                $('#toDatePicker').datetimepicker('setStartDate', e.date);
+            });
+            $("#toDatePicker").on("changeDate", function (e) {
+                $('#fromDatePicker').datetimepicker('setEndDate', e.date);
+            });
+        });
+    </script>
+    <script>
+        function order(data) {
+            this.orderNo = data.orderNo;
+            this.orderDate = data.orderDate;
+            this.status = data.status;
+            this.endFlag = data.endFlag;
+            this.totalPrice = data.totalPrice.toFixed(1);
+            this.entry = $.map(data.entry, function (item) { return new orderEntry(item); });
+        }
+        function orderEntry(data) {
+            this.dishId = data.dishId;
+            this.price = data.price.toFixed(1);;
+            this.qty = data.qty;
+            this.dishName = data.dishName;
+        }
+        function orderModel() {
+            var self = this;
+            self.getStorageOrders = function () {
+                var resNo = window.localStorage.getItem("CheckMyOrders.currentResNo");
+                var o = window.localStorage.getItem("CheckMyOrders.Orders");
+                if (resNo == "@Session["currentResNo"]" && o) {
+                    var time = window.localStorage.getItem("CheckMyOrders.storageTime");
+                    if (time != null && time >= new Date(2016, 8, 21, 15, 34, 0).getTime()) { //表示缓存的有效期，注意月份，当前表示2016-7-23 早上9点以前的缓存失效
+                        return JSON.parse(o);
+                    } else {
+                        return [];
+                    }
+                }
+                return [];
+            };
+            self.orders = ko.observableArray(self.getStorageOrders());
+            //self.orders = window.localStorage.getItem("CheckMyOrders.Orders") ? ko.observable(JSON.parse(window.localStorage.getItem("CheckMyOrders.Orders"))) : ko.observableArray([]);
+            self.fromDate = window.localStorage.getItem("CheckMyOrders.fromDate") ? window.localStorage.getItem("CheckMyOrders.fromDate") : "";
+            self.toDate = window.localStorage.getItem("CheckMyOrders.toDate") ? window.localStorage.getItem("CheckMyOrders.toDate") : "";
+            self.orderNo = window.localStorage.getItem("CheckMyOrders.orderNo") ? window.localStorage.getItem("CheckMyOrders.orderNo") : "";
+            self.currentPage = window.localStorage.getItem("CheckMyOrders.currentPage") ? ko.observable(parseInt(window.localStorage.getItem("CheckMyOrders.currentPage"))) : ko.observable(1);//当前页码
+            self.pageSize = 10;//一页的记录数
+            self.isSearching = ko.observable(false);//数据是否正在加载的标识
+
+            //总页码
+            self.totalPage = ko.pureComputed(function () {
+                return Math.ceil(self.orders().length / self.pageSize);
+            });
+
+            //当前页的申请列表，当前的翻页是前台翻页，即数据先全部保存在前台，减少后台传输次数
+            self.displayOrders = ko.computed(function () {
+                return self.orders().slice((self.currentPage() - 1) * self.pageSize, self.currentPage() * self.pageSize);
+            });
+
+
+            @*事件*@
+            //上一页
+            self.GetPreviousPage = function () {
+                if (self.currentPage() > 1) {
+                    self.currentPage(self.currentPage() - 1);
+                    window.localStorage.removeItem("CheckMyOrders.currentPage");
+                    window.localStorage.setItem("CheckMyOrders.currentPage", self.currentPage());
+                }
+            };
+            //下一页
+            self.GetNextPage = function () {
+                if (self.currentPage() != self.totalPage()) {
+                    self.currentPage(self.currentPage() + 1);
+                    window.localStorage.removeItem("CheckMyOrders.currentPage");
+                    window.localStorage.setItem("CheckMyOrders.currentPage", self.currentPage());
+                }
+            };
+            //进入订单明细
+            self.CheckOrderDetail = function (ord) {
+                window.location.href = "@Url.Content("~/Restaurant/CheckOrder?order_no=")" + ord.orderNo;
+            };
+
+            //搜索按钮点击事件
+            self.SearchOrder = function () {
+                if (self.fromDate == "" || self.toDate == "") {
+                    toastr.error("日期不能为空");
+                    return;
+                }
+                self.isSearching(true);
+                $.post("@Url.Content("~/Restaurant/GetMyOrders")",
+                    { fr_date: self.fromDate, to_date: self.toDate, order_no: self.orderNo },
+                    function (data) {
+                        var mappedOrders = $.map(data, function (item) { return new order(item) });
+                        self.orders(mappedOrders);
+                        self.isSearching(false);
+                        if (self.orders().length == 0) {
+                            toastr.info("查询不到符合条件的记录");
+                        } else {
+                            //存入缓存中
+                            window.localStorage.clear();
+                            window.localStorage.setItem("CheckMyOrders.Orders", JSON.stringify(mappedOrders));
+                            window.localStorage.setItem("CheckMyOrders.fromDate", self.fromDate);
+                            window.localStorage.setItem("CheckMyOrders.toDate", self.toDate);
+                            window.localStorage.setItem("CheckMyOrders.orderNo", self.orderNo);
+                            window.localStorage.setItem("CheckMyOrders.currentPage", "1");
+                            window.localStorage.setItem("CheckMyOrders.storageTime", new Date().getTime());
+                            window.localStorage.setItem("CheckMyOrders.currentResNo", "@Session["currentResNo"]");
+                        }
+                    });
+            };
+
+        }
+
+        ko.applyBindings(new orderModel());
+        $("#orderListDiv").show();
+</script>
+}
+
+
+<div class="panel panel-success" style="min-height:300px;display:none" id="orderListDiv">
+    <div class="panel-heading">查询我的订餐记录</div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6">
+                <label for="recharge_from_date" class="sr-only">起始日期</label>
+                <div class="input-group date form_date" id="fromDatePicker" style="margin-bottom:8px;">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    <input class="form-control" type="text" placeholder="请输入起始日期" readonly data-bind="value:fromDate">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <label for="recharge_to_date" class="sr-only">结束日期</label>
+                <div class="input-group date form_date" id="toDatePicker" style="margin-bottom:8px;">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    <input class="form-control" type="text" placeholder="请输入结束日期" readonly data-bind="value:toDate">
+                </div>
+            </div>
+            <div class="col-xs-12" style="margin-bottom:8px;">
+                <input type="text" class="form-control" placeholder="请输入订单编号" data-bind="value:orderNo" />
+            </div>
+        </div>
+        <div style="margin-bottom:8px;"><button class="btn btn-success btn-block" id="searchBt" data-bind="click:SearchOrder"><span class="glyphicon glyphicon-search"></span> 开始查询</button></div>
+
+        <div data-bind="visible:isSearching" style="margin-top:20px;">
+            <span class="center-block" style="width:50px;"><i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i></span>
+        </div>
+        <div data-bind="visible:!isSearching(),foreach:displayOrders">
+            <div class="panel" data-bind="click:$parent.CheckOrderDetail,css:{'panel-danger':endFlag=='-1','panel-primary':endFlag=='0','panel-success':endFlag=='1'}" style="cursor:pointer;">
+                <div class="panel-heading">
+                    <span data-bind="text:orderDate"></span>
+                    <span data-bind="text:orderNo" class="pull-right"></span>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group" data-bind="foreach:entry" style="margin-bottom:0;">
+                        <div class="list-group-item">
+                            <div class="media">
+                                <div class="media-left media-middle">
+                                    <img class="media-object lazyload" data-bind="attr:{'data-src':'@Url.Content("~/Restaurant/GetThumbPic/")'+dishId}">
+                                </div>
+                                <div class="media-body">
+                                    <h4 class="media-heading" data-bind="text:dishName"></h4>
+                                    <span class="pull-right">
+                                        <span style="font-size: 16px; color: #e4393c;"><i class="fa fa-rmb"></i> <span data-bind="text:price"></span></span>
+                                        x
+                                        <span data-bind="text:qty"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <span>总额:<i class="fa fa-rmb"></i> <span data-bind="text:totalPrice"></span> </span>
+                    <span class="pull-right" data-bind="text:status"></span>
+                </div>
+            </div>
+        </div>
+        <nav data-bind="visible:!isSearching() && orders().length>0">
+            <ul class="pager">
+                <li data-bind="css:{'disabled':currentPage()==1}"><a href="#searchBt" data-bind="click:GetPreviousPage"><i class="fa fa-mail-reply"></i> </a></li>
+                <li>第<span data-bind="text:currentPage">1</span>页，共<span data-bind="text:totalPage"></span>页</li>
+                <li data-bind="css:{'disabled':currentPage()==totalPage()}"><a href="#searchBt" data-bind="click:GetNextPage"><i class="fa fa-mail-forward"></i></a></li>
+            </ul>
+        </nav>
+    </div>
+</div>

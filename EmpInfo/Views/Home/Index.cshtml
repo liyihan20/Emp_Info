@@ -1,0 +1,295 @@
+﻿@{
+    string auts = (string)ViewData["autStr"];
+    string isMinister = auts.IndexOf("MinisterDishOrder") >= 0 ? "1" : "0";
+}
+@section CSS{
+    <style type="text/css">
+        .row{
+            margin-left:-5px;
+            margin-right:-5px;
+        }
+        .row .col-xs-6,.row .col-sm-4{
+            padding-left:5px;
+            padding-right:5px;
+        }
+            .row .thumbnail {
+                margin-bottom:10px;
+            }
+            .row img{
+                width:96px;
+                height:auto;
+            }
+            .row .thumbnail .caption h3{
+                margin-top:10px;
+            }
+    </style>
+    }
+@section Scripts {
+    <script>
+
+    $(function () {
+
+        $('#resetPassModal').on('shown.bs.modal', function () {
+            $('#old_password').focus()
+        })
+        //修改密码
+        $("#updateInfoBt").click(function () {
+            var new_password = $("#new_password").val();
+            if (new_password!="" && new_password.length < 6) {
+                toastr.error("新密码长度不能少于6个字符");
+                return;
+            }
+            if (new_password != $("#confirm_password").val()) {
+                toastr.error("新密码与确认密码不一致。");
+                return;
+            }
+            $.post("@Url.Content("~/Home/UpdatePersonalInfo")", {
+                email: $("#emailAddr").val(),
+                shortPhone:$("#shortPhoneNumber").val(),
+                phone: $("#phoneNumber").val(),
+                new_pass: $("#new_password").val()
+            }, function (res) {
+                if (res.suc) {
+                    $("#resetPassModal").modal("hide");
+                    toastr.success(res.msg);
+                } else {
+                    toastr.error(res.msg);
+                }
+            });
+
+        });
+        //点击头像弹出密码修改框
+        $("#people_img").click(function () {
+            $("#personalInfoFm input").val("");
+            $("#personalInfo").hide();
+            $("#personalInfoBts").hide();
+            $("#oldPasswordDiv").show();
+            $("#resetPassModal").modal('show');
+        });
+
+        $("#old_password").keyup(function () {
+            if (event.keyCode == 13) {
+                $("#validatePasswordBt").click();
+            }
+        })
+
+        //验证原始密码按钮
+        $("#validatePasswordBt").click(function () {
+            var oldPass = $("#old_password").val();
+            if (oldPass.length < 6) {
+                toastr.error("请输入6位以上的原始密码进行验证");
+                return;
+            }
+            $(this).button('loading');
+            $.post("@Url.Content("~/Home/ValidateOldPassword")", { old_pass: oldPass }, function (data) {
+                $("#validatePasswordBt").button("reset");
+                if (data.suc) {
+                    $("#personalInfo").show();
+                    $("#personalInfoBts").show();
+                    $("#oldPasswordDiv").hide();
+                    $("#emailAddr").val(data.email);
+                    $("#phoneNumber").val(data.phone);
+                    $("#shortPhoneNumber").val(data.shortPhone);
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+        });
+
+        //安全退出登录
+        $("#logoutBt").click(function () {
+            window.location.href = "@Url.Content("~/Account/LogOut")";
+        });
+
+        //进入宿舍查询界面
+        $("#dormitoryBt,#dormitoryImg").click(function () {
+            $.post("@Url.Content("~/Home/ValidateDorm")", {}, function (data) {
+                if (data.suc) {
+                    window.location.href = "@Url.Content("~/Home/CheckDormitory")";
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+
+        });
+
+        //进入饭卡查询界面
+        $("#diningCardBt,#mealImg").click(function () {
+            window.location.href = "@Url.Content("~/Home/CheckDinningCard")";
+        });
+        //管理员入口
+        $("#adminBt,#adminImg").click(function () {
+            window.location.href = "@Url.Content("~/Admin/AdminIndex")";
+        });
+
+        //图形报表
+        $("#chartBt,#chartImg").click(function () {
+            window.location.href = "@Url.Content("~/Chart/ChartIndex")";
+        });
+
+        //会所点餐
+        $("#ResImg,#ResBt").click(function () {
+            $.post("@Url.Content("~/Home/ValidatePhone")", {}, function (data) {
+                if (data.suc) {
+                    //2016-10-05 如果有部长点餐权限，即跳过选择直接进入会所
+                    if ("@isMinister" == "1") {
+                        window.location.href = "@Url.Content("~/Restaurant/SetCurrentRes?resNo=HS")";
+                    } else {
+                        //弹出食堂清单提供选择
+                        openResSelDialog();
+                    }
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+        });
+
+    });
+
+</script>
+}
+
+<div style="background-image:url(@Url.Content("~/Content/images/index_bg.jpg"));background-repeat: round; height:176px;padding:15px;">
+    <img id="people_img" title="点击修改个人信息" class="img-circle center-block" style="background-color:#fff;border:1px solid #ddd;cursor:pointer;width:80px;height:90px;" alt="people image" src="@Url.Content("~/Home/GetEmpPortrait/")" />
+
+    <div class="center-block" style="margin-top:5px;">
+        <h5 class="text-center" style="color:white">@ViewData["username"]</h5>
+        <button class="btn btn-success btn-block btn-xs center-block"  style="width:80px;" id="logoutBt">安全退出</button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-6 col-sm-4">
+        <div class="thumbnail">
+            <a href="#" id="dormitoryImg">
+                <img src="@Url.Content("~/Content/images/dormitory_128.png")" alt="dormitory">
+            </a>
+            <div class="caption">
+                <h3>住宿状态及费用查询</h3>
+                <p>可以查询本人最近半年内的房租、水电费、扣费等记录</p>
+                <p><button class="btn btn-primary btn-block" id="dormitoryBt">进入查询</button></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 col-sm-4">
+        <div class="thumbnail">
+            <a href="#" id="mealImg"><img src="@Url.Content("~/Content/images/meal.png")" alt="meal"></a>
+            <div class="caption">
+                <h3>饭卡余额及消费查询</h3>
+                <p>可以查询本人的饭卡余额和最近的充值、消费历史记录</p>
+                <p><button class="btn btn-primary btn-block" id="diningCardBt">进入查询</button></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 col-sm-4">
+        <div class="thumbnail">
+            <a href="#" id="packageImg"><img src="@Url.Content("~/Content/images/post.png")" alt="package"></a>
+            <div class="caption">
+                <h3>宿舍快件寄存</h3>
+                <p>可以预约登记派送到信利宿舍区的快件，并查询历史记录</p>
+                <p><button class="btn btn-primary btn-block" id="packageBt">进入查询</button></p>
+            </div>
+        </div>
+    </div>
+    @if (auts.IndexOf("AdminIndex") >= 0)
+    {
+    <div class="col-xs-6 col-sm-4">
+        <div class="thumbnail">
+            <a href="#" id="adminImg"><img src="@Url.Content("~/Content/images/admin.png")" alt="admin"></a>
+            <div class="caption">
+                <h3>管理员入口</h3>
+                <p>用户、权限、组别等设置入口</p>
+                <p><button class="btn btn-primary btn-block" id="adminBt">进入查询</button></p>
+            </div>
+        </div>
+    </div>
+    }
+    @if (auts.IndexOf("ChartReport") >= 0) {
+        <div class="col-xs-6 col-sm-4">
+            <div class="thumbnail">
+                <a href="#" id="chartImg"><img src="@Url.Content("~/Content/images/paint.png")" alt="paint"></a>
+                <div class="caption">
+                    <h3>图形报表查看</h3>
+                    <p>可直观形象地查看各种数据组成的图形报表</p>
+                    <p><button class="btn btn-primary btn-block" id="chartBt">进入查看</button></p>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="col-xs-6 col-sm-4">
+        <div class="thumbnail">
+            <a href="#" id="ResImg"><img src="@Url.Content("~/Content/images/res_256.png")" alt="res" ></a>
+            <div class="caption">
+                <h3>会所订餐系统</h3>
+                <p>可以在会所进行订餐，并查询自己的订餐记录</p>
+                <p><button class="btn btn-primary btn-block" id="ResBt">进入系统(测试中...)</button></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 col-sm-4">
+        <div class="thumbnail">
+            <a href="#" id="SalaryImg"><img src="@Url.Content("~/Content/images/salary.png")" alt="salary"></a>
+            <div class="caption">
+                <h3>工资明细查询</h3>
+                <p>可以查询本人最近半年内的工资明细记录</p>
+                <p><button class="btn btn-danger btn-block disabled" id="SalaryBt">暂未开放</button></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_ResSelDialog")
+
+@section Modal {
+    <div class="modal fade" id="resetPassModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="resetPasswordLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">修改个人信息</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="personalInfoFm">
+                        <div id="oldPasswordDiv">
+                            <div class="form-group">
+                                <label for="recipient-name" class="control-label">先输入密码进行验证:</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="old_password" />
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-danger" type="button" id="validatePasswordBt" data-loading-text="验证中...">验证</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="personalInfo">
+                            <div class="form-group">
+                                <label for="recipient-name" class="control-label">邮箱地址:</label>
+                                <input type="email" class="form-control" id="emailAddr" />
+                            </div>
+                            <div class="form-group">
+                                <label for="recipient-name" class="control-label">手机短号:</label>
+                                <input type="text" class="form-control" id="shortPhoneNumber" />
+                            </div>
+                            <div class="form-group">
+                                <label for="recipient-name" class="control-label">手机长号:</label>
+                                <input type="text" class="form-control" id="phoneNumber" />
+                            </div>
+                            <div class="form-group">
+                                <label for="message-text" class="control-label">新密码（不填则不修改密码）:</label>
+                                <input type="password" class="form-control" id="new_password" />
+                            </div>
+                            <div class="form-group">
+                                <label for="message-text" class="control-label">确认新密码:</label>
+                                <input type="password" class="form-control" id="confirm_password" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer" id="personalInfoBts">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="updateInfoBt" type="button" class="btn btn-success">确认修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,33 @@
+﻿@{
+    Layout = null;
+}
+
+<div class="modal fade" id="confirmModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="confirmModalLabel"><i class="fa fa-question-circle"></i> 操作确认</h4>
+            </div>
+            <div class="modal-body">
+                <p id="confirm_content" class="text-danger"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-mail-reply"></i> 取消</button>
+                <button id="bt_confirm" type="button" class="btn btn-success"><i class="fa fa-check"></i> 确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //打开确认对话框，content是提示内容，callback是点击确认之后的回调方法
+    function openConfirmDialog(content, callback) {
+        $("#confirmModal").modal("show");
+        $("#confirm_content").html(content);
+        $("#bt_confirm").off("click").on("click",function () {
+            $("#confirmModal").modal("hide");
+            callback();
+        });
+    }
+</script>

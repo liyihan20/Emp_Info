@@ -1,0 +1,114 @@
+﻿@using EmpInfo.Models;
+@{
+    Layout = null;
+    List<DeskInfoModel> infos = (List<DeskInfoModel>)ViewData["deskInfo"];
+    List<VisualDeskModel> desks = (List<VisualDeskModel>)ViewData["desks"];
+}
+
+
+<link rel="stylesheet" href="@Url.Content("~/Content/tooltipster.bundle.min.css")" />
+<link rel="stylesheet" href="@Url.Content("~/Content/tooltipster/sideTip/themes/tooltipster-sideTip-borderless.min.css")" />
+<style type="text/css">
+    .deskSpan {
+        margin: 2px 0;
+        cursor: pointer;
+    }
+
+    .fullColor {
+        color: #CC0033;
+        opacity:0.7;
+    }
+
+    .halfColor {
+        color: #449d44;
+        opacity:0.8;
+    }
+</style>
+
+<script src="@Url.Content("~/Scripts/tooltipster.bundle.min.js")"></script>
+<script>
+    $(function () {
+        var lastDesk = "";
+        var lastHtml = "";
+
+        $(".deskSpan").on("click", function () {
+            if (lastDesk != "") {
+                $(lastDesk).html(lastHtml);
+            }
+            lastDesk = $(this);
+            lastHtml = $(this).html();
+            $(this).html("<i class='fa fa-fw fa-check-square fa-2x text-info'></i>");
+            $("#SelectedDesk").val($(this).attr("data-num"));
+
+        });
+
+        $('.tip').tooltipster({
+            theme: 'tooltipster-borderless',
+            trigger: 'click'
+        });
+
+        $("ul[role='tablist'] li").eq(0).addClass("active");
+        $("div[role='tabpanel']").eq(0).addClass("active");
+    });
+
+</script>
+
+<ul class="nav nav-tabs" role="tablist">
+    @foreach (var info in infos) {
+        <li role="presentation"><a href="@string.Format("#Tab_{0}",info.zone)" role="tab" data-toggle="tab">@string.Format("{0}—{1}区", info.belongTo, info.zone)</a></li>
+    }
+</ul>
+<div class="tab-content">
+    @foreach (var info in infos) {
+        <div role="tabpanel" class="tab-pane fade in" id="@string.Format("Tab_{0}",info.zone)">
+            <div class="text-center" style="border:3px inset;margin:8px 2px;padding:20px 0;">                
+                @for (var i = 1; i <= info.maxRow; i++) {
+                <div>
+                    <span style="display:inline-block;width:20px;">@i</span>
+                    @for (var j = 1; j <= info.maxCol; j++) {
+                        var desk = desks.Where(d => d.belongTo == info.belongTo && d.number == string.Format("{0}{1}-{2}", info.zone, i, j));
+                        if (desk.Count() < 1) {
+                            <span><i class="fa fa-fw fa-square-o fa-2x" style="visibility:hidden"></i></span>
+                        }
+                        else {
+                            if (desk.First().isCancel == true) {
+                                <span class="tip" title="不可用"><i class="fa fa-fw fa-square fa-2x" style="color:#eee"></i></span>
+                            }
+                            else if (!desk.First().nowCanUse) {
+                                <span class="tip" title="当前时间不可用"><i class="fa fa-fw fa-square fa-2x" style="color:#eee"></i></span>
+                            }
+                            else {
+                                string squareCss = "";
+                                if ((desk.First().seatHasTaken ?? 0) == 0) {
+                                    squareCss = "fa-square-o";
+                                }
+                                else if ((desk.First().seatHasTaken ?? 0) >= desk.First().seatQty) {
+                                    squareCss = "fa-square fullColor";
+                                }
+                                else {
+                                    squareCss = "fa-square halfColor";
+                                }
+                                <span class="deskSpan tip" data-num="@desk.First().number" title="@string.Format("{0}(剩余空位:{1})", desk.First().name,desk.First().seatQty - (desk.First().seatHasTaken??0))"><i class="fa fa-fw fa-2x @squareCss"></i></span>
+                            }
+                        }
+                    }
+                </div>
+            }
+            </div>
+        </div>
+    }
+</div>
+<div class="row">
+    <div class="col-xs-6">
+        <i class="fa fa-fw fa-2x fa-square-o"></i> 未坐台桌
+    </div>
+    <div class="col-xs-6">
+        <i class="fa fa-fw fa-2x fa-square halfColor"></i> 已坐未满台桌
+    </div>
+    <div class="col-xs-6">
+        <i class="fa fa-fw fa-2x fa-square fullColor"></i> 已坐满台桌
+    </div>
+    <div class="col-xs-6">
+        <i class="fa fa-fw fa-square fa-2x" style="color:#eee"></i> 不可用台桌
+    </div>    
+</div>

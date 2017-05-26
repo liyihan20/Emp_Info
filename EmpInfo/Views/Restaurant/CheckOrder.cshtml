@@ -1,0 +1,371 @@
+﻿@using EmpInfo.Models;
+@{
+    Layout = "~/Views/Shared/_ResLayout.cshtml";
+    dn_order order = (dn_order)ViewData["order"];
+    List<dn_orderEntry> entry = (List<dn_orderEntry>)ViewData["entry"];
+}
+@section CSS{
+    <style type="text/css">
+        .lab {
+            color: gray;
+            font-style: italic;
+        }
+
+        .cont {
+            float: right;
+            font-weight: bold;
+            /*color: #009933;*/
+            color: #CC6666;
+        }
+
+        .list-group-item .media img {
+            height: 64px;
+            width: 96px;
+        }
+
+        .row .panel-body div {
+            margin-bottom: 5px;
+            border-bottom: 1px dashed #c1d5e9;
+        }
+
+        #outter_panel {
+            background-color: #f5f5f5;
+        }
+
+        .badge {
+            font-size: 16px;
+            padding: 8px 20px;
+            margin-bottom: 6px;
+            background-color: #5cb85c;
+        }
+    </style>
+}
+@section Scripts{
+    <script>
+        $(function () {
+            $("#changePayTypeBtn").on("click", function () {
+                var payType = $.trim($("#payType").html()) == "现金" ? "饭卡" : "现金";
+                openConfirmDialog("确定要将支付方式修改为【" + payType + "】支付吗？", function () {
+                    $.post("@Url.Content("~/Restaurant/ChangePaymentType")", { order_no: "@order.order_no", payType: payType },
+                        function (data) {
+                            if (data.suc) {
+                                toastr.success(data.msg);
+                                $("#payType").html(payType);
+                            } else {
+                                toastr.error(data.msg);
+                            }
+                        });
+                });
+            });
+
+            $("#cancelBtn").on("click", function () {
+                $("#cancelOrderModal").modal("show");
+            });
+            $("#confirmCancelBtn").on("click", function () {
+                var reason = $("#cancelReason").val();
+                if (reason.length == 0) {
+                    toastr.error("取消原因不能为空");
+                    return;
+                }
+                $.post("@Url.Content("~/Restaurant/CancelOrder")", { order_no: "@order.order_no", reason: reason },
+                function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        $("#cancelOrderModal").modal("hide");
+                        setTimeout(function () {
+                            location.reload(true);
+                        }, 1500);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+            $("#payBillBtn").click(function () {
+                openConfirmDialog("确定要使用饭卡支付【@order.real_price】元吗？", function () {
+
+                });
+            });
+        });
+    </script>
+}
+
+<div class="panel panel-primary">
+    <div class="panel-heading"><i class="fa fa-search"></i>查看预约详情</div>
+    <div class="panel-body" id="outter_panel">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6">
+                <div class="badge"><i class="fa fa-smile-o"></i> 基本信息</div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div>
+                            <span class="lab">
+                                申请时间：
+                            </span>
+                            <span class="cont">
+                                @(((DateTime)order.create_time).ToString("yyyy-MM-dd HH:mm"))
+                            </span>
+                        </div>
+                        <div>
+                            <span class="lab">
+                                订单号：
+                            </span>
+                            <span class="cont">
+                                @order.order_no
+                            </span>
+                        </div>
+                        <div>
+                            <span class="lab">
+                                预定人数：
+                            </span>
+                            <span class="cont">
+                                @order.people_num
+                            </span>
+                        </div>
+                        <div>
+                            <span class="lab">
+                                订餐电话：
+                            </span>
+                            <span class="cont">
+                                @order.order_phone
+                            </span>
+                        </div>
+                        <div>
+                            <span class="lab">
+                                是否包间：
+                            </span>
+                            <span class="cont">
+                                @(order.is_in_room == true ? "是" : "否")
+                            </span>
+                        </div>
+                        <div>
+                            <span class="lab">
+                                是否配送：
+                            </span>
+                            <span class="cont">
+                                @(order.is_delivery == true ? "是" : "否")
+                            </span>
+                        </div>
+                        @if (order.is_delivery == true) {
+                            <div>
+                                <span class="lab">
+                                    配送地址：
+                                </span>
+                                <span class="cont">
+                                    @order.delivery_addr
+                                </span>
+                            </div>
+                            <div>
+                                <span class="lab">
+                                    收件人：
+                                </span>
+                                <span class="cont">
+                                    @order.recipient
+                                </span>
+                            </div>
+                            <div>
+                                <span class="lab">
+                                    联系电话：
+                                </span>
+                                <span class="cont">
+                                    @order.recipient_phone
+                                </span>
+                            </div>
+                        }
+                        <div>
+                            <span class="lab">
+                                到达时间：
+                            </span>
+                            <span class="cont">
+                                @(((DateTime)order.arrive_day).ToString("yyyy-MM-dd HH:mm"))
+                            </span>
+                        </div>
+                        <div>
+                            <span class="lab">
+                                支付方式：
+                            </span>
+                            <span class="cont" id="payType">
+                                @order.payment_type
+                            </span>
+                        </div>
+                        <div>
+                            <span class="lab">
+                                支付时间：
+                            </span>
+                            <span class="cont">
+                                @(order.payment_time == null ? "" : ((DateTime)order.payment_time).ToString("yyyy-MM-dd HH:mm"))
+                            </span>
+                        </div>
+                        <div>
+                            <span class="lab">
+                                备注：
+                            </span>
+                            <span class="cont">
+                                @order.user_comment
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <div class="badge"><i class="fa fa-commenting-o"></i> 审核信息</div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div>
+                            <span class="lab">
+                                状态：
+                            </span>
+                            <span class="cont">
+                                @order.status
+                            </span>
+                        </div>
+                        @if (order.cancelled == true) {
+                            <div>
+                                <span class="lab">
+                                    取消原因：
+                                </span>
+                                <span class="cont">
+                                    @order.cancell_reason
+                                </span>
+                            </div>
+                        }
+                        <div>
+                            <span class="lab">
+                                审核人：
+                            </span>
+                            <span class="cont">
+                                @order.auditor_name
+                            </span>
+                        </div>
+                        <div>
+                            <span class="lab">
+                                审核时间：
+                            </span>
+                            <span class="cont">
+                                @(order.audit_time == null ? "" : ((DateTime)order.audit_time).ToString("yyyy-MM-dd HH:mm"))
+                            </span>
+                        </div>
+                        <div>
+                            <span class="lab">
+                                审核意见：
+                            </span>
+                            <span class="cont">
+                                @order.audit_comment
+                            </span>
+                        </div>
+                        <div>
+                            <span class="lab">
+                                房号/台桌号：
+                            </span>
+                            <span class="cont">
+                                @order.desk_num (@order.desk_name)
+                            </span>
+                        </div>
+                        <div>
+                            <span class="lab">
+                                预约卡号：
+                            </span>
+                            <span class="cont">
+                                @order.book_card_num
+                            </span>
+                        </div>
+                        @if (order.benefit_info != null) { 
+                        <div>
+                            <span class="lab">
+                                订单优惠：
+                            </span>
+                            <span class="cont">
+                                @order.benefit_info
+                            </span>
+                        </div>
+                        }
+                        <div>
+                            <span class="lab">
+                                应收金额：
+                            </span>
+                            <span class="cont">
+                                @order.total_price
+                            </span>
+                        </div>
+                        <div>
+                            <span class="lab">
+                                实收金额：
+                            </span>
+                            <span class="cont">
+                                @order.real_price
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="badge"><i class="fa fa-list"></i> 菜式列表</div>
+        <div class="list-group">
+            @foreach (var en in entry) {
+                <a class="list-group-item" href="@string.Concat(Url.Content("~/Restaurant/DishDetail/"),en.disk_id)">
+                    <div class="media">
+                        <div class="media-left media-middle">
+                            <img class="media-object" src='@string.Concat(Url.Content("~/Restaurant/GetThumbPic/"),en.disk_id)'>
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">@en.dn_dishes.name</h4>
+                            @if (@en.benefit_info != null) {
+                                <div class="text-danger">
+                                    <i class="fa fa-info-circle"></i> @en.benefit_info
+                                </div>
+                            }
+                            <span class="pull-right">
+                                <span style="font-size: 16px; color: #e4393c;"><i class="fa fa-rmb"></i> @en.price</span>
+                                x
+                                @en.qty
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+        @if (order.status.Equals("等待审核") || (order.end_flag == 0 && order.payment_type.Equals("饭卡"))) {
+            <div class="badge"><i class="fa fa-edit"></i> 订单操作</div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @if (order.status.Equals("等待审核")) {
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6" style="margin-bottom:6px;">
+                                <button class="btn btn-danger btn-block" id="cancelBtn"><i class="fa fa-reply"></i> 取消申请</button>
+                            </div>
+                            <div class="col-xs-12 col-sm-6">
+                                <button class="btn btn-primary btn-block" id="changePayTypeBtn"><i class="fa fa-exchange"></i> 修改支付方式</button>
+                            </div>
+                        </div>
+                    }
+                    else {
+                        <div>
+                            <button class="btn btn-success btn-block" id="payBillBtn"><i class="fa fa-credit-card"></i> 使用饭卡支付</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<div class="modal fade" id="cancelOrderModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="CancelOrderLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">取消预约申请</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="old_password" class="control-label">取消原因:</label>
+                    <textarea class="form-control" rows="2" id="cancelReason"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-close"></i> 取消</button>
+                <button id="confirmCancelBtn" type="button" class="btn btn-success"><i class="fa fa-check"></i> 确认取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_ConfirmDialog")

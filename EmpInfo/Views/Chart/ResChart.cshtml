@@ -1,0 +1,366 @@
+﻿@section Scripts {
+    <script src="@Url.Content("~/Scripts/echarts.js")"></script>
+    <script>
+        var refleshSeconds = 10;  //刷新秒数间隔
+        var tmpSegement = ""; //临时保存当前时间段
+        var refleshTimes = [  //刷新时间段
+            { from: "06:30", end: "09:00" },
+            { from: "11:00", end: "13:00" },
+            { from: "17:00", end: "20:00" },
+            { from: "22:00", end: "24:00" },
+            { from: "00:00", end: "02:00" },
+        ];
+
+
+        //改为自适应全屏宽度
+        $("#topContainer").removeClass("container").addClass("container-fluid");
+
+        $(function () {
+            setInterval(setTime, 1000);
+            GetResData();
+        });
+
+        function setTime() {
+            $("#showTime").html(GetCurrentTime("hms"));
+
+            var currentTime = GetCurrentTime("hm"); //当前时间
+            var seccondLeft = $("#secondLeft").html(); //剩余刷新秒数
+            var refleshFlag = false; //当前是否刷新标识
+            for (var i = 0; i < refleshTimes.length; i++) {
+                if (currentTime >= refleshTimes[i].from && currentTime < refleshTimes[i].end) {
+                    refleshFlag = true;
+                    break;
+                }
+            }
+            if (refleshFlag) {
+                if (isNaN(seccondLeft)) {
+                    seccondLeft = refleshSeconds;
+                } else if (parseInt(seccondLeft) > 0) {
+                    seccondLeft--;
+                } else {
+                    $("#refreshIcon").addClass("fa-spin");
+                    seccondLeft = "刷新中...";
+                    GetResData();
+                }
+
+                $("#secondLeft").html(seccondLeft);
+            } else {
+                $("#secondLeft").html("---");
+            }
+        }
+
+        function GetResData() {
+            $.post("@Url.Content("~/Chart/GetResDatas")", {}, function (data) {
+                if (!data.suc) {
+                    toastr.error(data.msg);
+                } else {
+                    var deleteOldDatas = false;
+                    if (tmpSegement != data.segement) {
+                        deleteOldDatas = true;
+                    }
+                    $("#currentMealType").html(data.segement);
+                    $("#consumeCount").html(data.all);
+                    loadLineChart(data.list, "统计时间：" + GetCurrentTime("hms"), GetCurrentTime("hms"),deleteOldDatas);
+                    //loadPieChart(data.list, "统计时间：" + GetCurrentTime("hms"));
+                    loadBarChart(data.list, "统计时间：" + GetCurrentTime("hms"));
+                    tmpSegement = data.segement;
+                }
+                $("#refreshIcon").removeClass("fa-spin");
+            });
+        }
+
+        function GetCurrentTime(typ) {
+            var now = new Date();
+            var hour = now.getHours() < 10 ? "0" + now.getHours() : now.getHours();
+            var minute = now.getMinutes() < 10 ? "0" + now.getMinutes() : now.getMinutes();
+            var second = now.getSeconds() < 10 ? "0" + now.getSeconds() : now.getSeconds();
+            if (typ == "hms") {
+                return hour + ":" + minute + ":" + second;
+            } else if (typ == "hm") {
+                return hour + ":" + minute;
+            } else if (typ == "ms") {
+                return minute + ":" + second;
+            }
+        }
+
+    </script>
+    <script>
+        var lineChart = echarts.init(document.getElementById('lineChart'));
+        var lineSeries = [];  //保存点数据
+        var xAxisData = [];  //横坐标数据
+        lineChart.setOption({
+            title: {
+                text: '食堂人数增长图',
+                subtext: '',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            smooth: true,
+            legend: {
+                data: [],
+                bottom: 'bottom'
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '14%',
+                containLabel: true
+            },
+            //toolbox: {
+            //    feature: {
+            //        saveAsImage: {}
+            //    }
+            //},
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: xAxisData
+            },
+            yAxis: {
+                name: '就餐人次',
+                type: 'value'
+            },
+            series: lineSeries
+        });
+
+        //jsons:新的点信息，subtext:副标题,xAxisValue：新的横坐标轴信息
+        function loadLineChart(jsons, subtext, xAxisValue, deleteOldDatas) {
+            if (deleteOldDatas) {
+                lineSeries = [];
+                xAxisData = [];
+            }
+            xAxisData.push(xAxisValue);  //设置横坐标轴
+            var newLineLegend = [];  //类别数组
+            var oldSeriesLength = lineSeries.length; //当前series的长度，用变量存储，因为在循环内会改变长度
+            for (var i = 0; i < jsons.length; i++) {
+                var isNewItem = true;  //指示是否新的类别
+                newLineLegend.push(jsons[i].name); //设置类别
+                for (var j = 0; j < oldSeriesLength; j++) {
+                    if (jsons[i].name == lineSeries[j].name) {  //已有的类别，添加点
+                        lineSeries[j].data.push(jsons[i].value);
+                        isNewItem = false;
+                        break;
+                    }
+                }
+                //新加入的类别
+                if (isNewItem) {
+                    var newItemData = [];
+                    for (var k = 0; k < xAxisData.length - 1; k++) {
+                        newItemData.push(0);
+                    }
+                    newItemData.push(jsons[i].value);
+                    lineSeries.push({
+                        name: jsons[i].name,
+                        type: 'line',
+                        smooth: true,
+                        sampling: 'average',
+                        data: newItemData
+                    });
+                }
+            }
+            //新的参数设置入折线图，自动更新图形
+            lineChart.setOption({
+                title: {
+                    subtext: subtext
+                },
+                legend: {
+                    data: newLineLegend,
+                    bottom: 'bottom'
+                },
+                xAxis: {
+                    data: xAxisData
+                },
+                series: lineSeries
+            });
+        }
+
+    </script>
+    @*<script>
+        var pieChart = echarts.init(document.getElementById('pieChart'));
+        pieChart.setOption({
+            title: {
+                text: '食堂营业比例图',
+                x: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: []
+            },
+            series: [
+                {
+                    name: '营业额比例',
+                    type: 'pie',
+                    radius: '55%',
+                    center: ['50%', '60%'],
+                    clockwise: false,
+                    startAngle: 45,
+                    data: [],
+                    itemStyle: {
+                        normal: {
+                            label: {
+                                show: true,
+                                formatter: '{b} : {d}%'
+                            },
+                            labelLine: { show: true }
+                        },
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        });
+
+        function loadPieChart(jsons, subtext) {
+            var pieLegendData = [];
+            for (var i = 0; i < jsons.length; i++) {
+                pieLegendData.push(jsons[i].name);
+            }
+            pieChart.setOption({
+                title: {
+                    subtext: subtext
+                },
+                legend: {
+                    data: pieLegendData
+                },
+                series: [
+                    {
+                        data: jsons
+                    }
+                ]
+            });
+        }
+
+    </script>*@
+    <script>
+        //调色盘，共11个颜色
+        var colorPlates = ['#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83', '#ca8622', '#bda29a', '#6e7074', '#546570', '#c4ccd3'];
+        var barChart = echarts.init(document.getElementById('barChart'));       
+
+        barChart.setOption({
+            title: {
+                text: '食堂人数柱状图',
+                x: 'center'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {            
+                    type: 'shadow'        
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '14%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    axisLabel: {
+                        interval:0,
+                        rotate: -45
+                    },
+                    data: [],
+                    axisTick: {
+                        alignWithLabel: true
+                    }
+                }
+            ],
+            yAxis: [
+                {
+                    name:'就餐人次',
+                    type: 'value'
+                }
+            ],
+            series: [
+                {
+                    name: '就餐人数',
+                    type: 'bar',
+                    barWidth: '60%',
+                    data: [],
+                    label: {
+                        normal: {
+                            show: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            ]
+        });
+
+        function loadBarChart(jsons, subtext) {
+            var barSeriesData = [];  //保存点数据
+            var barXAxisData = [];  //横坐标数据
+
+            for (var i = 0; i < jsons.length; i++) {
+                barSeriesData.push({
+                    value: jsons[i].value,
+                    itemStyle: {
+                        normal: {
+                            color:colorPlates[i%11]
+                        }
+                    }
+                });
+                barXAxisData.push(jsons[i].name);
+            }
+            barChart.setOption({
+                title: {
+                    subtext: subtext
+                },
+                xAxis: [{
+                    data: barXAxisData
+                }],
+                series: [{
+                    data:barSeriesData
+                }]
+            });
+        }
+    </script>
+}
+
+<div class="panel panel-default text-danger">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-8">
+                <i class="fa fa-clock-o"></i> 当前时间: @ViewData["Today"] <span id="showTime"></span>
+            </div>
+            <div class="col-xs-4">
+                <i class="fa fa-refresh" id="refreshIcon"></i> 刷新倒计时: <span id="secondLeft">---</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-body row">
+        <div class="col-xs-12 text-center text-info" style="margin-bottom:14px;padding-bottom:10px; font-size:16px;font-weight:bold;border-bottom:1px solid #ddd;letter-spacing:2px;">
+            <span>
+                <i class="fa fa-cutlery"></i> 当前餐别:<span id="currentMealType"></span>
+            </span>
+            <span style="margin-left:100px;">
+                <i class="fa fa-users"></i> 消费总人次:<span id="consumeCount"></span>
+            </span>
+        </div>
+        <div class="col-md-6 col-xs-12 col-sm-12" style="margin-bottom:20px;">
+            <div id="lineChart" style="height:500px;width:100%;"></div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-sm-12" style="margin-bottom:20px;">
+            @*<div id="pieChart" style="height:500px;width:100%;"></div>*@
+            <div id="barChart" style="height:500px;width:100%;"></div>
+        </div>
+    </div>
+</div>
+<div class="panel panel-default text-warning" style="font-size:12px;">
+    <div class="panel-body text-center">
+           <i class="fa fa-tasks"></i> 版权所属：©2016 信利集团-信息中心
+    </div>
+</div>

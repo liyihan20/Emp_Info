@@ -1,0 +1,171 @@
+﻿@using EmpInfo.Models;
+@{
+    Layout = "~/Views/Shared/_ResLayout.cshtml";
+    DishDetailModel dish = (DishDetailModel)ViewData["dish"];
+}
+
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/flexslider/flexslider.css")" />
+    <style type="text/css">
+        .flexslider .slides li img {
+            height: auto;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .flex-control-thumbs li {
+            width: 33%;
+        }
+
+        .inline_label {
+            display: inline-block;
+            width: 75px;
+            color: #669999;
+            padding:4px 0;
+        }
+
+        .badge {
+            background-color: #3399CC;
+        }
+    </style>
+}
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/jquery.flexslider.js")"></script>
+
+    <script>
+        $(function () {
+            $('.flexslider').flexslider({
+                animation: "slide",
+                controlNav: "thumbnails",
+                slideshow: false
+            });
+            $('.flex-control-thumbs li img').addClass("thumbnail");
+
+            $("#addNumBt").click(function () {
+                var num = parseInt($("#numBt").html());                
+                $("#numBt").html(++num);
+            });
+            $("#minusNumBt").click(function () {
+                var num = parseInt($("#numBt").html());
+                if (num > 1) {
+                    $("#numBt").html(--num);
+                }
+            });
+            $("#shoppingCarBtn").click(function () {
+
+                $.post("@Url.Content("~/Restaurant/AddIntoShoppingCar")", { id: "@dish.id", qty: $("#numBt").html() }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                    } else {
+                        toastr.error("加入购物车失败：" + data.msg);
+                    }
+                });
+            });
+            $("#MakeOrderBtn").click(function () {
+                window.location.href = "@Url.Content("~/Restaurant/MakeAnOrderQuickly?dishId=")" + "@dish.id";
+            });
+        });
+        
+    </script>
+}
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        菜式详情页
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6">
+                <div class="flexslider" style="margin:0 0 10px 0;border:1px solid gray;padding:4px;">
+                    <ul class="slides">
+                        @if (dish.has_image_1) {
+                            <li data-thumb="@Html.Raw(string.Concat(Url.Content("~/Restaurant/GetThumbPic?id="), dish.id, "&which=1"))">
+                                <img data-src="@Html.Raw(string.Concat(Url.Content("~/Restaurant/GetFormalPic?id="),dish.id,"&which=1"))" class="lazyload" />
+                            </li>
+                        }
+                        @if (dish.has_image_2) {
+                            <li data-thumb="@Html.Raw(string.Concat(Url.Content("~/Restaurant/GetThumbPic?id="), dish.id, "&which=2"))">
+                                <img data-src="@Html.Raw(string.Concat(Url.Content("~/Restaurant/GetFormalPic?id="),dish.id,"&which=2"))" class="lazyload" />
+                            </li>
+                        }
+                        @if (dish.has_image_3) {
+                            <li data-thumb="@Html.Raw(string.Concat(Url.Content("~/Restaurant/GetThumbPic?id="), dish.id, "&which=3"))">
+                                <img data-src="@Html.Raw(string.Concat(Url.Content("~/Restaurant/GetFormalPic?id="),dish.id,"&which=3"))" class="lazyload" />
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <p class="text-primary">
+                @switch (dish.type) {
+                    case "套餐":
+                        <text><i class="fa fa-cutlery"></i></text>
+                        break;
+                    case "菜式":
+                        <text><i class="fa fa-glass"></i></text>
+                        break;
+                    case "酒水":
+                        <text><i class="fa fa-beer"></i></text>
+                        break;
+                    default:
+                        <text><i class="fa fa-leaf"></i></text>
+                        break;
+                }
+                @dish.number | @dish.type</p>
+                <h2>
+                    @dish.name 
+                    @if (dish.is_on_top == true) {
+                        <text> <span class="badge" style="vertical-align: top; background-color: #CC0033; "><i class="fa fa-thumbs-up"></i> </span> </text>
+                    }
+                </h2>
+                <p>@dish.description</p>
+                <div>
+                    <span class="inline_label">供应日</span>
+                    @foreach (string day in dish.sell_weekday.Split(',')) {
+                        <text><span class="badge">@day</span></text>
+                    }
+                </div>
+                <div>
+                    <span class="inline_label">供应时段</span>
+                    @foreach (string time in dish.sell_time.Split(',')) {
+                        <text><span class="badge">@time</span></text>
+                    }
+                </div>
+                <div>
+                    <span class="inline_label">可配送</span>
+                    <span class="text-danger">
+                        @if (dish.can_delivery == true) {
+                            <text><span class="badge" style="background-color:green"><i class="fa fa-check" title="可配送"></i></span></text>
+                        }
+                        else {
+                            <text><span class="badge" style="background-color:red"><i class="fa fa-close" title="不支持配送"></i></span></text>
+                        }
+                    </span>
+                </div>
+                <div style="margin-top:20px;">
+                    <span class="inline_label">单&nbsp;&nbsp;价</span>
+                    <span style="font-size: 24px; color: #e4393c;"><i class="fa fa-rmb"></i> @dish.price</span>
+                </div>
+                <div style="margin-top:15px">
+                    <span class="inline_label">数&nbsp;&nbsp;量</span>
+                    <div class="btn-group" role="group" aria-label="...">
+                        <button type="button" class="btn btn-default" id="minusNumBt"><i class="fa fa-minus"></i></button>
+                        <button type="button" class="btn btn-default" id="numBt">1</button>
+                        <button type="button" class="btn btn-default" id="addNumBt"><i class="fa fa-plus"></i></button>
+                    </div>
+                </div>
+                <div style="margin-top:12px;">
+                    @if (dish.is_selling == true) { 
+                        <button class="btn btn-success btn-lg btn-block" id="shoppingCarBtn"><i class="fa fa-shopping-cart"></i> 加入购物车</button>
+                        <button class="btn btn-danger btn-lg btn-block" id="MakeOrderBtn"><i class="fa fa-bolt"></i> 快速结算</button>
+                    }
+                    else {
+                        <button class="btn btn-danger btn-lg btn-block disabled"><i class="fa fa-ban"></i> 已下架</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

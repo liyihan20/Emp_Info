@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="CanteenModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <Function Name="laijq20161105_001" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="laijq20161105_002" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="ljq20160323_001" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="EmpNo" Type="varchar" Mode="In" />
+          <Parameter Name="BegDay" Type="varchar" Mode="In" />
+          <Parameter Name="EndDay" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="ljq20160323_002" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="EmpNo" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="ljq20160323_003" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="EmpNo" Type="varchar" Mode="In" />
+          <Parameter Name="BegDay" Type="varchar" Mode="In" />
+          <Parameter Name="EndDay" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="ljq20161019" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="EmpNo" Type="nvarchar" Mode="In" />
+          <Parameter Name="Status" Type="nvarchar" Mode="In" />
+        </Function>
+        <EntityContainer Name="CanteenModelStoreContainer" />
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="CanteenModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="CanteenEntities" annotation:LazyLoadingEnabled="true" >
+          <FunctionImport Name="ljq20160323_001" ReturnType="Collection(CanteenModel.ljq20160323_001_Result)">
+            <Parameter Name="EmpNo" Mode="In" Type="String" />
+            <Parameter Name="BegDay" Mode="In" Type="String" />
+            <Parameter Name="EndDay" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="ljq20160323_002" ReturnType="Collection(CanteenModel.ljq20160323_002_Result)">
+          <Parameter Name="EmpNo" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="ljq20160323_003" ReturnType="Collection(CanteenModel.ljq20160323_003_Result)">
+            <Parameter Name="EmpNo" Mode="In" Type="String" />
+            <Parameter Name="BegDay" Mode="In" Type="String" />
+            <Parameter Name="EndDay" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="ljq20161019">
+            <Parameter Name="EmpNo" Mode="In" Type="String" />
+            <Parameter Name="Status" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="laijq20161105_001" ReturnType="Collection(CanteenModel.laijq20161105_001_Result)" />
+          <FunctionImport Name="laijq20161105_002" ReturnType="Collection(CanteenModel.laijq20161105_002_Result)" />
+        </EntityContainer>
+        <ComplexType Name="ljq20160323_001_Result">
+          <Property Type="DateTime" Name="消费时间" Nullable="false" Precision="23" />
+          <Property Type="String" Name="消费场所" Nullable="true" MaxLength="50" />
+          <Property Type="Decimal" Name="消费金额" Nullable="false" Precision="10" />
+          <Property Type="String" Name="餐别" Nullable="false" MaxLength="4" />
+        </ComplexType>
+        <ComplexType Name="ljq20160323_002_Result">
+          <Property Type="DateTime" Name="DatLastConsumeTime" Nullable="true" Precision="23" />
+          <Property Type="String" Name="FStatus" Nullable="false" MaxLength="4" />
+          <Property Type="Decimal" Name="MonBalance" Nullable="true" Precision="19" />
+        </ComplexType>
+        <ComplexType Name="ljq20160323_003_Result">
+          <Property Type="Decimal" Name="充值前金额" Nullable="true" Precision="19" />
+          <Property Type="Decimal" Name="充值金额" Nullable="true" Precision="19" />
+          <Property Type="Decimal" Name="充值后金额" Nullable="true" Precision="19" />
+          <Property Type="DateTime" Name="充值时间" Nullable="false" Precision="23" />
+          <Property Type="String" Name="充值场所" Nullable="false" MaxLength="11" />
+        </ComplexType>
+        <ComplexType Name="laijq20161105_001_Result">
+          <Property Type="String" Name="FWeek" Nullable="true" MaxLength="30" />
+          <Property Type="String" Name="FFloor" Nullable="true" MaxLength="255" />
+          <Property Type="Int32" Name="SumMonConsume" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="laijq20161105_002_Result">
+          <Property Type="String" Name="FType" Nullable="false" MaxLength="4" />
+          <Property Type="Int32" Name="Total" Nullable="true" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="CanteenModelStoreContainer" CdmEntityContainer="CanteenEntities" >
+          <FunctionImportMapping FunctionImportName="ljq20160323_001" FunctionName="CanteenModel.Store.ljq20160323_001">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="CanteenModel.ljq20160323_001_Result">
+                <ScalarProperty Name="消费时间" ColumnName="消费时间" />
+                <ScalarProperty Name="消费场所" ColumnName="消费场所" />
+                <ScalarProperty Name="消费金额" ColumnName="消费金额" />
+                <ScalarProperty Name="餐别" ColumnName="餐别" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="ljq20160323_002" FunctionName="CanteenModel.Store.ljq20160323_002">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="CanteenModel.ljq20160323_002_Result">
+                <ScalarProperty Name="DatLastConsumeTime" ColumnName="DatLastConsumeTime" />
+                <ScalarProperty Name="FStatus" ColumnName="FStatus" />
+                <ScalarProperty Name="MonBalance" ColumnName="MonBalance" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="ljq20160323_003" FunctionName="CanteenModel.Store.ljq20160323_003">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="CanteenModel.ljq20160323_003_Result">
+                <ScalarProperty Name="充值前金额" ColumnName="充值前金额" />
+                <ScalarProperty Name="充值金额" ColumnName="充值金额" />
+                <ScalarProperty Name="充值后金额" ColumnName="充值后金额" />
+                <ScalarProperty Name="充值时间" ColumnName="充值时间" />
+                <ScalarProperty Name="充值场所" ColumnName="充值场所" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="ljq20161019" FunctionName="CanteenModel.Store.ljq20161019" />
+          <FunctionImportMapping FunctionImportName="laijq20161105_001" FunctionName="CanteenModel.Store.laijq20161105_001">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="CanteenModel.laijq20161105_001_Result">
+                <ScalarProperty Name="FWeek" ColumnName="FWeek" />
+                <ScalarProperty Name="FFloor" ColumnName="FFloor" />
+                <ScalarProperty Name="SumMonConsume" ColumnName="SumMonConsume" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="laijq20161105_002" FunctionName="CanteenModel.Store.laijq20161105_002">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="CanteenModel.laijq20161105_002_Result">
+                <ScalarProperty Name="FType" ColumnName="FType" />
+                <ScalarProperty Name="Total" ColumnName="Total" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="无" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

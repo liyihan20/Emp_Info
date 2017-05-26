@@ -1,0 +1,381 @@
+﻿@using EmpInfo.Models;
+@{
+    Layout = "~/Views/Shared/_ResLayout.cshtml";
+    List<ShoppingCarModel> items = (List<ShoppingCarModel>)ViewData["items"];    
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/autocomplete.css")" />
+
+    <style type="text/css">
+        .list-group-item .media img {
+            height: 64px;
+            width: 96px;
+        }
+
+        .b-label {
+            display: inline-block;
+            width: 80px;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+
+        .badge {
+            background-color: #3399CC;
+        }
+    </style>
+}
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/jquery.autocomplete.min.js")"></script>
+    <script>
+    $(function () {
+
+        $('#deliveryAddr').autocomplete({
+            serviceUrl: '@Url.Content("~/Restaurant/GetDeliveryAddr")',
+            minChars: 0
+        });
+
+        $('#orderPhone').autocomplete({
+            serviceUrl: '@Url.Content("~/Restaurant/GetOrderPhone")',
+            minChars: 0
+        });
+
+        $("#mealTimePicker").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd hh:ii",
+            autoclose: true,
+            maxView: 2,
+            minuteStep: 10,
+            startDate: new Date("@DateTime.Now.ToString("yyyy-MM-dd HH:mm")"),
+            endDate: new Date("@DateTime.Now.AddDays(2).ToString("yyyy-MM-dd 23:00")")
+        });
+
+    });
+
+    function BenefitInfo(data) {
+        this.id = data.id;
+        this.discount_name = data.discount_name;
+        this.discount_rate = data.discount_rate;
+        this.resume_bigger_than = data.resume_bigger_than;
+        this.minus_price = data.minus_price;
+    }
+
+    function BalanceModel() {
+        var self = this;
+        self.mealPlaces = ["大堂", "包间", "配送"];
+        self.payTypes = ["现金", "饭卡"];
+        self.mealPlace = ko.observable("大堂");
+        self.payType = ko.observable("现金");
+        self.peopleNum = ko.observable(1);
+        self.recipient = '@ViewData["userName"]';
+        self.recipientPhone = '@ViewData["userPhone"]';
+        self.mealTime = '@DateTime.Now.ToString("yyyy-MM-dd HH:mm")';
+        self.comment = "";
+        self.orderPhone = '@ViewData["shortPhone"]';
+        self.desk = ko.observable("");
+
+        self.totalNum = parseInt("@items.Sum(i=>i.qty)");
+        self.totalPrice = parseFloat("@items.Sum(i => i.qty * i.price)");
+        self.benefitInfos = ko.observableArray([]);
+        self.selectedBenefit = ko.observable();
+
+        self.priceAfterDiscount = ko.pureComputed(function () {
+            var sb = self.selectedBenefit();
+            if (sb) {
+                if (sb.discount_name.indexOf("折") >= 0) { //打折优惠
+                    return Math.round(self.totalPrice * parseFloat(sb.discount_rate)) / 10;
+                } else if(sb.discount_name.indexOf("满") >= 0) { //满减优惠
+                    if (self.totalPrice >= parseInt(sb.resume_bigger_than)) {
+                        return self.totalPrice - parseInt(sb.minus_price);
+                    }
+                }
+            }
+            return self.totalPrice;
+        });
+        self.discountSum = ko.pureComputed(function () {
+            return Math.round((self.totalPrice - self.priceAfterDiscount()) * 10) / 10;
+        });
+
+        //方法
+        //修改就餐地点
+        self.ChangeMealPlace = function (p) {
+            self.mealPlace(p);
+        };
+        //修改支付方式
+        self.ChangePayType = function (p) {
+            self.payType(p);
+        };
+        //增加人数
+        self.AddPeople = function () {
+            self.peopleNum(self.peopleNum() + 1);
+        };
+        //减少人数
+        self.MinusPeople = function () {
+            if (self.peopleNum() >= 1) {
+                self.peopleNum(self.peopleNum() - 1);
+            }
+        };
+        //查看营业时间
+        self.CheckServiceTimeSeg = function () {
+            $.post("@Url.Content("~/Restaurant/GetServiceTimeSeg")", "", function (data) {
+                var content = "";
+                for (var i = 0; i < data.length; i++) {
+                    content += "<p>" + data[i].segName + " : " + data[i].segValue + "</p>";
+                }
+                openMessageDialog(content, $("#menuResName").html() + " 营业时间");
+            });
+        }
+        //选择台桌
+        self.SelectDesk = function () {
+            if (self.mealPlace() == "配送") {
+                toastr.error("配送不支持选择台桌");
+                return;
+            }
+            if (self.mealTime == "") {
+                toastr.error("请先选择就餐时间");
+                return;
+            }
+            $("#DeskSelModal").modal("show");
+            $("#DeskSelModalBody").load(encodeURI("@Url.Content("~/Restaurant/VisibleDesks?orderDate=")"+self.mealTime+"&mealPlace="+self.mealPlace()));
+        }
+
+        self.DeskHasSelect = function () {
+            self.desk($("#SelectedDesk").val());
+            $("#DeskSelModal").modal("hide");
+        }
+
+        //提交申请
+        self.BeginApply = function () {
+            if ($("#orderPhone").val() == "") {
+                toastr.error("提交失败：订餐电话必须填写");
+                $('#orderPhone').focus();
+                return;
+            }
+            $("#applyBt").button("loading");
+
+            $.post("@Url.Content("~/Restaurant/BeginApply")", {
+                mealPlace: self.mealPlace(),
+                payType: self.payType(),
+                peopleNum: self.peopleNum(),
+                deliveryAddr: $("#deliveryAddr").val(), //autocomplete控件与knockout有冲突
+                recipient: self.recipient,
+                recipientPhone: self.recipientPhone,
+                mealTime: self.mealTime,
+                orderPhone: self.orderPhone,
+                comment: self.comment,
+                discountId: self.selectedBenefit() && self.discountSum() > 0 ? self.selectedBenefit().id : 0, //0表示没有优惠
+                deskNum:self.desk()
+            }, function (data) {
+                if (data.suc) {
+                    toastr.success(data.msg);
+                    setTimeout(function () {
+                        //转到查看订单页面
+                        window.location.href = "@Url.Content("~/Restaurant/CheckOrder?order_no=")" + data.extra;
+                    }, 500);
+                } else {
+                    $("#applyBt").button("reset");
+                    toastr.error("提交失败：" + data.msg, '信息中心提示', { timeOut: 4000 });
+                }
+            });
+        };
+        //获取优惠信息
+        $.post("@Url.Content("~/Restaurant/GetBenefitInfos")", {}, function (data) {
+            if (data.length > 0) {
+                self.benefitInfos($.map(data, function (item) { return new BenefitInfo(item); }));
+                self.benefitInfos.unshift(new BenefitInfo({ //增加不使用优惠选项 2016-9-26
+                    id: 0,
+                    discount_name: "不使用优惠"
+                }));
+                self.selectedBenefit(self.benefitInfos()[0]);
+            }
+        });
+    }
+
+    ko.applyBindings(new BalanceModel());
+
+</script>
+}
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <i class="fa fa-check-square-o"></i> 结算页面
+    </div>
+    <div class="panel-body">
+
+        <p class="bg-danger" style="padding:10px;margin:0 -15px;"><i class="fa fa-file-text-o"></i> 订单确认</p>
+
+        <div class="b-div">
+            <span class="b-label" style="letter-spacing:26px;">人数</span>
+            <div class="btn-group btn-group-sm" role="group" aria-label="...">
+                <button type="button" class="btn btn-default" data-bind="click:MinusPeople"><i class="fa fa-minus"></i></button>
+                <button type="button" class="btn btn-default"><span data-bind="text:peopleNum"></span></button>
+                <button type="button" class="btn btn-default" data-bind="click:AddPeople"><i class="fa fa-plus"></i></button>
+            </div>
+            <p class="small text-danger" style="margin-left:88px;"><i class="fa fa-warning"></i>如就餐过程加菜但不加人，人数请选择0</p>
+        </div>
+        <div class="b-div">
+            <span class="b-label">就餐地点</span>
+            <!--ko foreach: mealPlaces-->
+            <button class="btn btn-sm btn-default" data-bind="css:{'btn-primary':$parent.mealPlace()==$data},click:$parent.ChangeMealPlace">
+                <span data-bind="text:$data"></span>
+                <i class="fa fa-check-circle" data-bind="visible:$parent.mealPlace()==$data"></i>
+            </button>
+            <!--/ko-->
+        </div>
+        <div data-bind="visible:mealPlace()=='配送'">
+            <div class="b-div">
+                <span class="b-label">配送地点</span>
+                <span style="display:inline-block;width:70%;">
+                    <input type="text" class="form-control" placeholder="例如：第一宿舍区A栋101" id="deliveryAddr" />
+                </span>
+                <p class="small text-danger" style="margin-left:88px;"><i class="fa fa-warning"></i>只支持配送到信利宿舍区</p>
+            </div>
+            <div class="b-div">
+                <span class="b-label" style="letter-spacing:6px;">收件人</span>
+                <span style="display:inline-block;width:70%;">
+                    <input type="text" class="form-control" data-bind="value:recipient" />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">联系电话</span>
+                <span style="display:inline-block;width:70%;">
+                    <input type="text" class="form-control" data-bind="value:recipientPhone" />
+                </span>
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label" style="vertical-align:top;">就餐时间</span>
+            <span style="display:inline;width:70%;vertical-align:top;">
+                <span class="input-group date" style="display:inline-table;width:70%;" id="mealTimePicker">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span> </span>
+                    <input class="form-control" type="text" readonly data-bind="value:mealTime">
+                    <span class="input-group-addon" data-bind="click:CheckServiceTimeSeg"><a href="#" title="营业时间"><i class="fa fa-question-circle"></i></a></span>
+                </span>
+            </span>
+            <p class="small text-danger" style="margin-left:88px;"><i class="fa fa-warning"></i>只能预约今、明、后三天</p>
+        </div>
+        <div data-bind="visible:mealPlace()!='配送'">
+            <div class="b-div">
+                <span class="b-label" style="letter-spacing:7px;">台桌号</span>
+                <span style="display:inline-block;width:70%;vertical-align:top;">
+                    <span class="input-group" data-bind="click:SelectDesk">
+                        <input type="text" readonly class="form-control" data-bind="value:desk" />
+                        <span class="input-group-addon"><a href="#" title="点击选择台桌"><i class="fa fa-square-o"></i></a></span>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">支付方式</span>
+            <!--ko foreach: payTypes-->
+            <button class="btn btn-sm btn-default" data-bind="css:{'btn-danger':$parent.payType()==$data},click:$parent.ChangePayType">
+                <span data-bind="text:$data"></span>
+                <i class="fa fa-check-circle" data-bind="visible:$parent.payType()==$data"></i>
+            </button>
+            <!--/ko-->
+        </div>
+        <div class="b-div">
+            <span class="b-label">订餐电话</span>
+            <span style="display:inline-block;width:70%;">
+                <input type="text" class="form-control" data-bind="value:orderPhone" />
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label" style="vertical-align:top;letter-spacing:26px;">备注</span>
+            <span style="display:inline-block;width:70%;">
+                <textarea class="form-control" rows="2" data-bind="value:comment"></textarea>
+            </span>
+        </div>
+        <p class="bg-success" style="padding: 10px; margin: 10px -15px;"><i class="fa fa-list"></i> 菜式清单</p>
+        <div class="list-group">
+            @foreach (var m in items) {
+                <div class="list-group-item">
+                    <div class="media">
+                        <div class="media-left media-middle">
+                            <img class="media-object" src="@string.Concat(Url.Content("~/Restaurant/GetThumbPic/"),m.dish_id)">
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">
+                                @m.name
+                                @if (m.can_delivery == true) {
+                                    <text><span class="badge">可配送</span></text>
+                                }
+                                @if (m.is_selling == false) {
+                                    <span class="badge" style="background-color: #FF6666;vertical-align:top;">已下架</span>
+                                }
+                            </h4>
+                            <div>
+                                @foreach (string time in m.sell_time.Split(',')) {
+                                    <text><span class="badge">@time</span></text>
+                                }
+                                <span style="float:right;">
+                                    <span style="font-size: 16px; color: #e4393c;"><i class="fa fa-rmb"></i> @m.price </span>
+                                    x
+                                    @m.qty
+                                </span>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div>
+                                @foreach (string day in m.sell_day.Split(',')) {
+                                    <text><span class="badge">@day</span></text>
+                                }
+                            </div>
+                            @if (m.benefit_info != null) {
+                                <div class="text-danger">
+                                    <i class="fa fa-info-circle"></i> @m.benefit_info
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div style="text-align:right;padding:0 20px 0 0;">
+            <div data-bind="if:benefitInfos().length>0">
+                选择优惠：
+                <span style="display: inline-block; width: 120px; color: #e4393c;">
+                    <select class="form-control input-sm" data-bind="options:benefitInfos,optionsText:'discount_name',value:selectedBenefit"></select>
+                </span>
+            </div>
+            <div>
+                总数量：<b style="display: inline-block; width: 120px; color: #e4393c;" data-bind="text:totalNum"></b>
+            </div>
+            <div>
+                应收金额：<span style="display: inline-block; width: 120px; color: #e4393c;">
+                    <i class="fa fa-rmb"></i> <b data-bind="text:totalPrice"></b>
+                </span>
+            </div>
+            <div data-bind="if:selectedBenefit()">
+                <div>优惠额度：<span style="display: inline-block; width: 120px; color: green;">-<b data-bind="text:discountSum()"></b></span></div>
+                <div>优惠价：<span style="display: inline-block; width: 120px; color: #e4393c;"><b data-bind="text:priceAfterDiscount()"></b></span></div>
+            </div>
+            <button class="btn btn-success btn-block" style="margin-top:20px;" data-bind="click:BeginApply" data-loading-text="正在提交..." id="applyBt">提交预约申请</button>
+        </div>
+    </div>
+</div>
+
+
+@section Modal{
+    @Html.Partial("_MessageDialog")
+    
+<div class="modal fade" id="DeskSelModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="DeskSelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title text-info"><i class="fa fa-square"></i> <span id="labelTip">台桌选择</span></h4>
+            </div>
+            <div class="modal-body" id="DeskSelModalBody" style="min-height:300px;">
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-success" data-bind="click:DeskHasSelect">确认选择</button>
+                <input type="hidden" id="SelectedDesk"/>
+            </div>
+        </div>
+    </div>
+</div>
+
+}

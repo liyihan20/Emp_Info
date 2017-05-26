@@ -1,0 +1,83 @@
+﻿@using EmpInfo.Models
+@{
+    Layout = "~/Views/Shared/_ResLayout.cshtml";
+    BirthdayMealModel mb = (BirthdayMealModel)ViewData["model"];
+}
+@section CSS{
+    <style type="text/css">
+        a img {
+            opacity: 1;
+        }
+
+            a img:hover {
+                opacity: 0.6;
+            }
+    </style>
+}
+@section Scripts{
+<script>
+    $(function () {
+        if ("@mb.nowCanGetMeal" == "False") {
+            $(".row button").attr("disabled", "disabled");
+        }
+    });
+
+    function GetIt(id) {
+        openConfirmDialog("确定要领取此生日餐吗？", function () {
+            $.post("@Url.Content("~/Restaurant/GetBirthdayMeal")", { dishId: id }, function (data) {
+                if (data.suc) {
+                    toastr.success(data.msg);
+                    $(".row button").attr("disabled", "disabled");
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+        });
+    }
+</script>
+    }
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h3 class="panel-title"><span class="fa fa-pinterest"></span> 当前领取状态</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-6 col-md-3">生日：<strong>@mb.birthday</strong></div>
+            <div class="col-xs-6 col-md-3">已领取次数：<strong>@mb.hasGotTimes</strong> </div>
+            <div class="col-xs-6 col-md-3">今年已领：<strong>@(mb.thisYearHasGot?"是":"否")</strong></div>
+            <div class="col-xs-6 col-md-3">现可领取：<strong>@(mb.nowCanGetMeal ? "是" : "否")</strong></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-birthday-cake"></i> 生日套餐</h3>
+    </div>
+    <div class="panel-body">
+        @if (mb.dishList.Count() == 0) {
+            <p class="text-center text-warning">暂没有生日套餐可以领取</p>
+        }
+        <div class="row">
+            @foreach (var d in mb.dishList) {
+                <div class="col-xs-12 col-md-4 col-sm-6">
+                    <div class="thumbnail">
+                        <a href="@string.Concat(Url.Content("~/Restaurant/DishDetail/"),@d.dishId)">
+                            <img src="@string.Concat(Url.Content("~/Restaurant/GetThumbPic/"),@d.dishId)" alt="dish">
+                        </a>
+                        <div class="caption">
+                            <h3>@d.dishName</h3>
+                            <p>已领取数量：@d.hasGotNum</p>
+                            <p><button class="btn btn-primary btn-block" onclick="GetIt(@d.dishId)"><i class="fa fa-shopping-cart"></i> 确定领取</button></p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+@section Modal{
+    @Html.Partial("_ConfirmDialog")
+}

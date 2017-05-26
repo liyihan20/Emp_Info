@@ -1,0 +1,25 @@
+﻿@{
+    string auts = (string)ViewData["autStr"];
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li class="active">图形报表查询</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row" style="margin: 0;">
+            @if (auts.IndexOf("ResChart") >= 0) {
+                <div class="col-xs-4 col-sm-3 col-md-2">
+                    <a href="@Url.Content("~/Chart/ResChart")">
+                        <img src="@Url.Content("~/Content/images/statistics_48.png")" alt="ResChart" class="center-block" />
+                        <p class="text-center">食堂消费流量分析</p>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

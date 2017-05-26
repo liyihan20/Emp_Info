@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>信利员工信息查询系统</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/toastr.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/fontawesome/fontcss/font-awesome.min.css")" />
+
+    @RenderSection("CSS", false)
+    <style type="text/css">
+        body, div, p, h1, h2, h3, h4, h5, h6, legend, input, button, a, label, span {
+            font-family: 'Microsoft YaHei','Courier New',Arial;
+        }
+        .container {
+            padding:0;
+        }
+    </style>
+
+    <script src="@Url.Content("~/Scripts/jquery-1.11.3.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/toastr.min.js")"></script>
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="@Url.Content("~/Scripts/html5shiv.min.js")"></script>
+      <script src="@Url.Content("~/Scripts/respond.min.js")"></script>
+    <![endif]-->
+
+    <script>
+    if (!Array.prototype.indexOf) {
+        Array.prototype.indexOf = function (elt /*, from*/) {
+            var len = this.length >>> 0;
+
+            var from = Number(arguments[1]) || 0;
+            from = (from < 0)
+                 ? Math.ceil(from)
+                 : Math.floor(from);
+            if (from < 0)
+                from += len;
+
+            for (; from < len; from++) {
+                if (from in this &&
+                    this[from] === elt)
+                    return from;
+            }
+            return -1;
+        };
+    }
+    </script>
+    <script src="@Url.Content("~/Scripts/knockout-3.4.0.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Scripts/lazysizes.min.js")"></script>
+
+</head>
+<body>
+    <div class="container">
+        @Html.Partial("_ResMenu")
+        @RenderBody()
+
+    </div>
+    @Html.Partial("_ResSelDialog")
+    @RenderSection("Modal", false)
+    @RenderSection("Scripts",false)
+</body>
+</html>

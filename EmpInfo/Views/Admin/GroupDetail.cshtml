@@ -1,0 +1,404 @@
+﻿@using EmpInfo.Models;
+@{
+    List<GroupUserModel> userList = (List<GroupUserModel>)ViewData["groupUsers"];
+    List<GroupAutModel> autList = (List<GroupAutModel>)ViewData["groupAuts"];
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-select.min.css")" />
+    <style>
+        .badge {
+            color: #337ab7;
+            background-color: #fff;
+        }
+    </style>
+}
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/bootstrap-select.min.js")"></script>
+    <script>
+    $(function () {
+                
+
+        //列表的点击激活事件
+        $("#userList,#autList").on("click", "a", function () {
+            if ($(this).hasClass("active")) {
+                $(this).removeClass("active");
+                $(this).find(".badge").addClass("hidden");
+            } else {
+                $(this).addClass("active");
+                $(this).find(".badge").removeClass("hidden");
+            }
+        });
+        //用户搜索
+        $("#searchUserText").keyup(function () {
+            if (event.keyCode == 13) {
+                $("#searchUserBt").click();
+            }
+        });
+        $("#searchUserBt").click(function () {
+            var str = $("#searchUserText").val();
+            $("#userList a").each(function () {
+                var name = $(this).find(".u_name").html();
+                var no = $(this).find(".u_no").html();
+                if (name.indexOf(str) < 0 && no.indexOf(str) < 0) {
+                    $(this).hide();
+                    if ($(this).hasClass("active")) {
+                        $(this).removeClass("active");
+                        $(this).find(".badge").addClass("hidden");
+                    }
+                } else {
+                    $(this).show();
+                }
+            });
+        });
+        //权限搜索
+        $("#searchAutText").keyup(function () {
+            if (event.keyCode == 13) {
+                $("#searchAutBt").click();
+            }
+        });
+        $("#searchAutBt").click(function () {
+            var str = $("#searchAutText").val();
+            $("#autList a").each(function () {
+                var name = $(this).find(".a_name").html();
+                var des = $(this).find(".a_des").html();
+                if (name.indexOf(str) < 0 && des.indexOf(str) < 0) {
+                    $(this).hide();
+                    if ($(this).hasClass("active")) {
+                        $(this).removeClass("active");
+                        $(this).find(".badge").addClass("hidden");
+                    }
+                } else {
+                    $(this).show();
+                }
+            });
+        });
+
+        //更新组
+        $("#group_save_bt").click(function () {
+            var name = $("#groupName").val();
+            var des = $("#groupDes").val();
+            $.post("@Url.Content("~/Admin/UpdateGroup")", { id: "@ViewData["groupId"]", name: name, des: des }, function (data) {
+                if (data.suc) {
+                    toastr.success(data.msg);
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+        });
+
+        //删除组
+        $("#group_remove_bt").click(function () {
+            openConfirmDialog("确定要删除本分组吗？组内用户和权限也会一并删除！", function () {
+                window.location.href = "@string.Concat(Url.Content("~/Admin/RemoveGroup/"),ViewData["groupId"])";
+            });
+        });
+
+        //添加用户到组
+        $("#addUserBt").click(function () {
+            $("#groupUserModal").modal("show");
+            if ($("#userSelect option").length < 1) {
+                $.post("@Url.Content("~/Item/GetUserBySelect")", {}, function (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var userOpt = "<option value='" + data[i].intValue + "'>" + data[i].text + "</option>";
+                        $("#userSelect").append(userOpt);
+                    }
+                    $('#userSelect').selectpicker({ liveSearch: 'true' });
+                });
+            }
+        });
+        $("#bt_groupUser").click(function () {
+            var id = $("#userSelect").val();
+            $.post("@Url.Content("~/Admin/AddUserToGroup")", { group_id: "@ViewData["groupId"]", user_id: id }, function (data) {
+                if (data.result.suc) {
+                    var node = "<a class='list-group-item'><div class='media'><div class='media-left media-middle'><img class='media-object' src='@Url.Content("~/Content/images/user_blue_48.png")' alt='user_blue_48'></div><div class='media-body'><h4 class='media-heading'><span class='u_name'>";
+                    node += data.groupUser.userName;
+                    node += "</span></h4><div><span class='u_no'>";
+                    node += data.groupUser.cardNo;
+                    node += "</span><input type='hidden' class='u_id' value='";
+                    node += data.groupUser.id;
+                    node += "' /></div></div><div class='media-right'><span class='badge hidden'><i class='glyphicon glyphicon-ok'></i></span></div></div></a>";
+                    $("#userList").append(node);
+                    toastr.success(data.result.msg);
+                } else {
+                    toastr.error(data.result.msg);
+                }
+            });
+        });
+
+        //移除组内用户
+        $("#removeUserBt").click(function () {
+            if ($("#userList a.active").length < 1) {
+                toastr.error("请先选择需要移除的用户");
+                return;
+            }
+            var user_ids = "";
+            $("#userList a.active").each(function () {
+                var user_id = $(this).find(".u_id").val();
+                if (user_ids != "") user_ids += ",";
+                user_ids += user_id;
+            });
+            $.post("@Url.Content("~/Admin/RemoveUserInGroup")", { group_id: "@ViewData["groupId"]", user_ids: user_ids }, function (data) {
+                if (data.suc) {
+                    toastr.success(data.msg);
+                    $("#userList a.active").remove();
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+        });
+
+        //添加权限到组
+        $("#addAutBt").click(function () {
+            $("#groupAutModal").modal("show");
+            if ($("#autSelect option").length < 1) {
+                $.post("@Url.Content("~/Item/GetAutBySelect")", {}, function (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var autOpt = "<option value='" + data[i].intValue + "'>" + data[i].text + "</option>";
+                        $("#autSelect").append(autOpt);
+                    }
+                    $('#autSelect').selectpicker({ liveSearch: 'true' });
+                });
+            }
+        });
+        $("#bt_groupAut").click(function () {
+            var id = $("#autSelect").val();
+            $.post("@Url.Content("~/Admin/AddAutToGroup")", { group_id: "@ViewData["groupId"]", aut_id: id }, function (data) {
+                    if (data.result.suc) {
+                        var node = "<a class='list-group-item'><div class='media'><div class='media-left media-middle'><img class='media-object' src='@Url.Content("~/Content/images/athority_48.png")' alt='athority_48'></div><div class='media-body'><h4 class='media-heading'>";
+                        node += data.groupAut.autNumber + "&nbsp;<span class='a_name'>" + data.groupAut.autName;
+                        node += "</span></h4><div><span class='a_des'>";
+                        node += data.groupAut.autDes;
+                        node += "</span><input type='hidden' class='a_id' value='";
+                        node += data.groupAut.id;
+                        node += "' /></div></div><div class='media-right'><span class='badge hidden'><i class='glyphicon glyphicon-ok'></i></span></div></div></a>";
+                        $("#autList").append(node);
+                        toastr.success(data.result.msg);
+                    } else {
+                        toastr.error(data.result.msg);
+                    }
+                });
+        });
+
+        //移除组内权限
+        $("#removeAutBt").click(function () {
+            if ($("#autList a.active").length < 1) {
+                toastr.error("请先选择需要移除的权限");
+                return;
+            }
+            var aut_ids = "";
+            $("#autList a.active").each(function () {
+                var aut_id = $(this).find(".a_id").val();
+                if (aut_ids != "") aut_ids += ",";
+                aut_ids += aut_id;
+            });
+            $.post("@Url.Content("~/Admin/RemoveAutInGroup")", { group_id: "@ViewData["groupId"]", aut_ids: aut_ids }, function (data) {
+                if (data.suc) {
+                    toastr.success(data.msg);
+                    $("#autList a.active").remove();
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+    });
+
+        });
+
+    </script>
+}
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Admin/AdminIndex")">管理员工具栏</a></li>
+            <li><a href="@Url.Content("~/Admin/Groups")">组别管理</a></li>
+            <li class="active">组内用户及权限</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="form-group">
+                    <label for="aut_no" class="sr-only">组名:</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">组名:</div>
+                        <input type="text" class="form-control" id="groupName" value="@ViewData["groupName"]" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="form-group">
+                    <label for="aut_no" class="sr-only">描述:</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">描述:</div>
+                        <input type="text" class="form-control" id="groupDes" value="@ViewData["groupDes"]" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-4">
+                <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary" id="group_save_bt"><span class="glyphicon glyphicon-floppy-save"></span> 保存</button>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-danger" id="group_remove_bt"><span class="glyphicon glyphicon-floppy-remove"></span> 删除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <h3 class="panel-title"><span class="glyphicon glyphicon-usd"></span> 用户&权限</h3>
+    </div>
+    <div class="panel-body">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#groupUser" aria-controls="groupUser" role="tab" data-toggle="tab">组内用户</a></li>
+            <li role="presentation"><a href="#groupAut" aria-controls="groupAut" role="tab" data-toggle="tab">组内权限</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <!-- 用户tab -->
+            <div role="tabpanel" class="tab-pane fade in active" id="groupUser">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="searchUserText" placeholder="Search for...">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="button" id="searchUserBt"><span class="glyphicon glyphicon-search"></span> Search</button>
+                            </span>
+                        </div>
+                        <div class="btn-group btn-group-justified" role="group" aria-label="操作按钮" style="margin-top:10px;">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-success" id="addUserBt">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    添加用户
+                                </button>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-danger" id="removeUserBt">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    移除用户
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group" id="userList">
+                        @foreach (var u in userList)
+                        {
+                            <a class="list-group-item">
+                                <div class="media">
+                                    <div class="media-left media-middle">
+                                        <img class="media-object" src="@Url.Content("~/Content/images/user_blue_48.png")" alt="user_blue_48">
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="media-heading"><span class="u_name">@u.userName</span></h4>
+                                        <div>
+                                            <span class="u_no">@u.cardNo</span>
+                                            <input type="hidden" class="u_id" value="@u.id" />
+                                        </div>
+                                    </div>
+                                    <div class='media-right'>
+                                        <span class='badge hidden'><i class='glyphicon glyphicon-ok'></i></span>
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+            <!-- 以下是权限tab -->
+            <div role="tabpanel" class="tab-pane fade" id="groupAut">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="searchAutText" placeholder="Search for...">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="button" id="searchAutBt"><span class="glyphicon glyphicon-search"></span> Search</button>
+                            </span>
+                        </div>
+                        <div class="btn-group btn-group-justified" role="group" aria-label="操作按钮" style="margin-top:10px;">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-success" id="addAutBt">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    添加权限
+                                </button>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-danger" id="removeAutBt">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    移除权限
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group" id="autList">
+                        @foreach (var a in autList)
+                        {
+                            <a class="list-group-item">
+                                <div class="media">
+                                    <div class="media-left media-middle">
+                                        <img class="media-object" src="@Url.Content("~/Content/images/athority_48.png")" alt="athority_48">
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="media-heading">@a.autNumber &nbsp;<span class="a_name">@a.autName</span></h4>
+                                        <div>
+                                            <span class="a_des">@a.autDes</span>
+                                            <input type="hidden" class="a_id" value="@a.id" />
+                                        </div>
+                                    </div>
+                                    <div class='media-right'>
+                                        <span class='badge hidden'><i class='glyphicon glyphicon-ok'></i></span>
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal{
+    <div class="modal fade" id="groupUserModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupUserModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">添加组内用户</h4>
+            </div>
+            <div class="modal-body">
+                <select class="form-control" id="userSelect">
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button id="bt_groupUser" type="button" class="btn btn-success">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<div class="modal fade" id="groupAutModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupAutModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">添加组内权限</h4>
+            </div>
+            <div class="modal-body">
+                <select class="form-control" id="autSelect"></select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button id="bt_groupAut" type="button" class="btn btn-success">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+    @Html.Partial("_ConfirmDialog");    
+}

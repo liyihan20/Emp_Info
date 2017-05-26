@@ -1,0 +1,1680 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="ICAuditModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="all_maxNum">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="bill_type" Type="varchar" MaxLength="10" />
+          <Property Name="date_str" Type="varchar" MaxLength="10" />
+          <Property Name="max_num" Type="int" />
+        </EntityType>
+        <EntityType Name="dn_birthdayMealLog">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="year" Type="varchar" MaxLength="10" />
+          <Property Name="user_no" Type="varchar" MaxLength="20" />
+          <Property Name="birthday" Type="varchar" MaxLength="20" />
+          <Property Name="op_date" Type="smalldatetime" />
+          <Property Name="is_cancelled" Type="bit" />
+          <Property Name="dish_name" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="dn_desks">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="number" Type="varchar" MaxLength="20" />
+          <Property Name="seat_qty" Type="int" />
+          <Property Name="name" Type="varchar" MaxLength="50" />
+          <Property Name="can_seat_together" Type="bit" />
+          <Property Name="open_weekday" Type="varchar" MaxLength="100" />
+          <Property Name="open_time" Type="varchar" MaxLength="100" />
+          <Property Name="is_cancel" Type="bit" />
+          <Property Name="create_user" Type="int" />
+          <Property Name="create_time" Type="smalldatetime" />
+          <Property Name="last_update_time" Type="smalldatetime" />
+          <Property Name="belong_to" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="dn_discountInfo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="resume_bigger_than" Type="decimal" Precision="6" Scale="1" />
+          <Property Name="minus_price" Type="decimal" Precision="6" Scale="1" />
+          <Property Name="discount_rate" Type="decimal" Precision="6" Scale="1" />
+          <Property Name="for_everyone" Type="bit" />
+          <Property Name="from_date" Type="smalldatetime" />
+          <Property Name="end_date" Type="smalldatetime" />
+          <Property Name="create_no" Type="varchar" MaxLength="50" />
+          <Property Name="create_date" Type="smalldatetime" />
+          <Property Name="comment" Type="varchar" MaxLength="200" />
+          <Property Name="discount_name" Type="varchar" MaxLength="50" />
+          <Property Name="has_benefit_times" Type="int" />
+          <Property Name="res_no" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="dn_discountInfoUsers">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="discount_id" Type="int" />
+          <Property Name="suit_user_no" Type="varchar" MaxLength="50" />
+          <Property Name="suit_user_name" Type="varchar" MaxLength="50" />
+          <Property Name="has_discount_times" Type="int" />
+        </EntityType>
+        <EntityType Name="dn_dishes">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="number" Type="varchar" MaxLength="50" />
+          <Property Name="name" Type="varchar" MaxLength="50" />
+          <Property Name="type" Type="varchar" MaxLength="20" />
+          <Property Name="price" Type="decimal" Precision="8" Scale="2" />
+          <Property Name="discount_price" Type="decimal" Precision="8" Scale="2" />
+          <Property Name="discount_weekday" Type="varchar" MaxLength="100" />
+          <Property Name="discount_time" Type="varchar" MaxLength="100" />
+          <Property Name="sell_weekday" Type="varchar" MaxLength="100" />
+          <Property Name="sell_time" Type="varchar" MaxLength="100" />
+          <Property Name="can_delivery" Type="bit" />
+          <Property Name="description" Type="varchar" MaxLength="1000" />
+          <Property Name="image_1" Type="image" />
+          <Property Name="image_2" Type="image" />
+          <Property Name="image_3" Type="image" />
+          <Property Name="create_time" Type="smalldatetime" />
+          <Property Name="last_update_time" Type="smalldatetime" />
+          <Property Name="create_user" Type="int" />
+          <Property Name="is_selling" Type="bit" />
+          <Property Name="image_1_name" Type="varchar" MaxLength="100" />
+          <Property Name="image_2_name" Type="varchar" MaxLength="100" />
+          <Property Name="image_3_name" Type="varchar" MaxLength="100" />
+          <Property Name="is_on_top" Type="bit" />
+          <Property Name="image_1_thumb" Type="image" />
+          <Property Name="image_2_thumb" Type="image" />
+          <Property Name="image_3_thumb" Type="image" />
+          <Property Name="is_birthday_meal" Type="bit" />
+          <Property Name="res_no" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="dn_items">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="100" />
+          <Property Name="value" Type="varchar" MaxLength="500" />
+          <Property Name="res_no" Type="varchar" MaxLength="20" />
+          <Property Name="create_date" Type="smalldatetime" />
+          <Property Name="modify_date" Type="smalldatetime" />
+          <Property Name="create_username" Type="varchar" MaxLength="50" />
+          <Property Name="comment" Type="varchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="dn_order">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="order_no" Type="varchar" MaxLength="50" />
+          <Property Name="user_name" Type="varchar" MaxLength="50" />
+          <Property Name="user_no" Type="varchar" MaxLength="50" />
+          <Property Name="is_in_room" Type="bit" />
+          <Property Name="is_delivery" Type="bit" />
+          <Property Name="people_num" Type="int" />
+          <Property Name="arrive_day" Type="smalldatetime" />
+          <Property Name="arrive_time" Type="varchar" MaxLength="50" />
+          <Property Name="create_time" Type="smalldatetime" />
+          <Property Name="user_comment" Type="varchar" MaxLength="100" />
+          <Property Name="payment_type" Type="varchar" MaxLength="20" />
+          <Property Name="payment_time" Type="smalldatetime" />
+          <Property Name="auditor_name" Type="varchar" MaxLength="50" />
+          <Property Name="auditor_no" Type="varchar" MaxLength="50" />
+          <Property Name="audit_result" Type="bit" />
+          <Property Name="audit_comment" Type="varchar" MaxLength="200" />
+          <Property Name="audit_time" Type="smalldatetime" />
+          <Property Name="desk_num" Type="varchar" MaxLength="50" />
+          <Property Name="total_price" Type="decimal" Precision="6" Scale="1" />
+          <Property Name="real_price" Type="decimal" Precision="6" Scale="1" />
+          <Property Name="discount_rate" Type="int" />
+          <Property Name="book_card_num" Type="varchar" MaxLength="50" />
+          <Property Name="delivery_addr" Type="varchar" MaxLength="200" />
+          <Property Name="cancelled" Type="bit" />
+          <Property Name="cancell_reason" Type="varchar" MaxLength="100" />
+          <Property Name="status" Type="varchar" MaxLength="100" />
+          <Property Name="recipient" Type="varchar" MaxLength="50" />
+          <Property Name="recipient_phone" Type="varchar" MaxLength="50" />
+          <Property Name="end_flag" Type="int" />
+          <Property Name="order_phone" Type="varchar" MaxLength="50" />
+          <Property Name="benefit_info" Type="varchar" MaxLength="200" />
+          <Property Name="res_no" Type="varchar" MaxLength="20" />
+          <Property Name="desk_name" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="dn_orderEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="order_id" Type="int" />
+          <Property Name="disk_id" Type="int" />
+          <Property Name="qty" Type="int" />
+          <Property Name="price" Type="decimal" Precision="6" Scale="1" />
+          <Property Name="is_done" Type="bit" />
+          <Property Name="done_time" Type="smalldatetime" />
+          <Property Name="benefit_info" Type="varchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="dn_points">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_no" Type="varchar" MaxLength="50" />
+          <Property Name="user_name" Type="varchar" MaxLength="50" />
+          <Property Name="points" Type="int" Nullable="false" />
+          <Property Name="res_no" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="dn_pointsForDish">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="points_need" Type="int" Nullable="false" />
+          <Property Name="dish_id" Type="int" />
+          <Property Name="from_date" Type="smalldatetime" />
+          <Property Name="end_date" Type="smalldatetime" />
+          <Property Name="create_no" Type="varchar" MaxLength="50" />
+          <Property Name="create_date" Type="smalldatetime" />
+          <Property Name="is_selling" Type="bit" />
+          <Property Name="has_fullfill" Type="int" />
+          <Property Name="res_no" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="dn_pointsRecord">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_no" Type="varchar" MaxLength="50" />
+          <Property Name="income" Type="int" Nullable="false" />
+          <Property Name="op_date" Type="smalldatetime" />
+          <Property Name="info" Type="varchar" MaxLength="200" />
+          <Property Name="user_name" Type="varchar" MaxLength="50" />
+          <Property Name="res_no" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="dn_Restaurent">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="50" />
+          <Property Name="no" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="dn_shoppingCar">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_no" Type="varchar" MaxLength="50" />
+          <Property Name="dish_id" Type="int" />
+          <Property Name="qty" Type="int" />
+          <Property Name="in_time" Type="smalldatetime" />
+          <Property Name="is_submit" Type="bit" />
+          <Property Name="order_id" Type="int" />
+          <Property Name="is_delete" Type="bit" />
+          <Property Name="delete_time" Type="smalldatetime" />
+          <Property Name="is_checked" Type="bit" />
+          <Property Name="benefit_price" Type="decimal" Precision="6" Scale="1" />
+          <Property Name="benefit_info" Type="varchar" MaxLength="200" />
+          <Property Name="res_no" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="ei_authority">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="number" Type="decimal" Precision="6" Scale="2" />
+          <Property Name="name" Type="varchar" MaxLength="50" />
+          <Property Name="en_name" Type="varchar" MaxLength="50" />
+          <Property Name="description" Type="varchar" MaxLength="100" />
+          <Property Name="controler_name" Type="varchar" MaxLength="30" />
+          <Property Name="action_name" Type="varchar" MaxLength="30" />
+          <Property Name="iconcls" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="ei_event_log">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_id" Type="int" />
+          <Property Name="user_name" Type="varchar" MaxLength="50" />
+          <Property Name="model" Type="varchar" MaxLength="50" />
+          <Property Name="do_what" Type="varchar" MaxLength="500" />
+          <Property Name="is_normal" Type="int" />
+          <Property Name="op_date" Type="smalldatetime" />
+          <Property Name="ip" Type="varchar" MaxLength="64" />
+        </EntityType>
+        <EntityType Name="ei_groupAuthority">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="group_id" Type="int" />
+          <Property Name="authority_id" Type="int" />
+        </EntityType>
+        <EntityType Name="ei_groups">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="50" />
+          <Property Name="description" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="ei_groupUser">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="group_id" Type="int" />
+          <Property Name="user_id" Type="int" />
+        </EntityType>
+        <EntityType Name="ei_resVisitLog">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_no" Type="varchar" MaxLength="50" />
+          <Property Name="user_name" Type="varchar" MaxLength="50" />
+          <Property Name="res_no" Type="varchar" MaxLength="20" />
+          <Property Name="visit_date" Type="smalldatetime" />
+        </EntityType>
+        <EntityType Name="ei_specialUsers">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="card_no" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="ei_users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="card_number" Type="varchar" MaxLength="50" />
+          <Property Name="name" Type="varchar" MaxLength="100" />
+          <Property Name="email" Type="varchar" MaxLength="50" />
+          <Property Name="phone" Type="varchar" MaxLength="50" />
+          <Property Name="forbit_flag" Type="bit" />
+          <Property Name="create_date" Type="smalldatetime" />
+          <Property Name="last_login_date" Type="smalldatetime" />
+          <Property Name="password" Type="varchar" MaxLength="50" />
+          <Property Name="fail_times" Type="int" />
+          <Property Name="sex" Type="varchar" MaxLength="10" />
+          <Property Name="id_number" Type="varchar" MaxLength="50" />
+          <Property Name="salary_no" Type="varchar" MaxLength="20" />
+          <Property Name="short_phone" Type="varchar" MaxLength="50" />
+          <Property Name="short_portrait" Type="image" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“ICAudit.dbo.vw_ei_simple_users”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vw_ei_simple_users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="card_number" Type="varchar" MaxLength="50" />
+          <Property Name="name" Type="varchar" MaxLength="100" />
+          <Property Name="forbit_flag" Type="bit" />
+          <Property Name="sex" Type="varchar" MaxLength="10" />
+          <Property Name="id_number" Type="varchar" MaxLength="50" />
+          <Property Name="salary_no" Type="varchar" MaxLength="20" />
+          <Property Name="dep_name" Type="varchar" MaxLength="100" />
+          <Property Name="short_dep_name" Type="varchar" MaxLength="200" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“ICAudit.dbo.vw_ei_users”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vw_ei_users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="card_number" Type="varchar" MaxLength="50" />
+          <Property Name="name" Type="varchar" MaxLength="100" />
+          <Property Name="email" Type="varchar" MaxLength="50" />
+          <Property Name="phone" Type="varchar" MaxLength="50" />
+          <Property Name="forbit_flag" Type="bit" />
+          <Property Name="create_date" Type="smalldatetime" />
+          <Property Name="last_login_date" Type="smalldatetime" />
+          <Property Name="sex" Type="varchar" MaxLength="10" />
+          <Property Name="id_number" Type="varchar" MaxLength="50" />
+          <Property Name="salary_no" Type="varchar" MaxLength="20" />
+          <Property Name="short_portrait" Type="image" />
+          <Property Name="dep_name" Type="varchar" MaxLength="100" />
+          <Property Name="short_dep_name" Type="varchar" MaxLength="200" />
+          <Property Name="short_phone" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <Association Name="FK_dn_discountInfoUsers_dn_discountInfo">
+          <End Role="dn_discountInfo" Type="Self.dn_discountInfo" Multiplicity="0..1" />
+          <End Role="dn_discountInfoUsers" Type="Self.dn_discountInfoUsers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="dn_discountInfo">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="dn_discountInfoUsers">
+              <PropertyRef Name="discount_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dn_orderEntry_dn_dishes">
+          <End Role="dn_dishes" Type="Self.dn_dishes" Multiplicity="0..1" />
+          <End Role="dn_orderEntry" Type="Self.dn_orderEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="dn_dishes">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="dn_orderEntry">
+              <PropertyRef Name="disk_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dn_orderEntry_dn_order">
+          <End Role="dn_order" Type="Self.dn_order" Multiplicity="0..1" />
+          <End Role="dn_orderEntry" Type="Self.dn_orderEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="dn_order">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="dn_orderEntry">
+              <PropertyRef Name="order_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dn_pointsForDish_dn_dishes">
+          <End Role="dn_dishes" Type="Self.dn_dishes" Multiplicity="0..1" />
+          <End Role="dn_pointsForDish" Type="Self.dn_pointsForDish" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="dn_dishes">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="dn_pointsForDish">
+              <PropertyRef Name="dish_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dn_shoppingCar_dn_dishes">
+          <End Role="dn_dishes" Type="Self.dn_dishes" Multiplicity="0..1" />
+          <End Role="dn_shoppingCar" Type="Self.dn_shoppingCar" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="dn_dishes">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="dn_shoppingCar">
+              <PropertyRef Name="dish_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dn_shoppingCar_dn_order">
+          <End Role="dn_order" Type="Self.dn_order" Multiplicity="0..1" />
+          <End Role="dn_shoppingCar" Type="Self.dn_shoppingCar" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="dn_order">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="dn_shoppingCar">
+              <PropertyRef Name="order_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ei_groupAuthority_ei_authority">
+          <End Role="ei_authority" Type="Self.ei_authority" Multiplicity="0..1" />
+          <End Role="ei_groupAuthority" Type="Self.ei_groupAuthority" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_authority">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_groupAuthority">
+              <PropertyRef Name="authority_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ei_groupAuthority_ei_groups">
+          <End Role="ei_groups" Type="Self.ei_groups" Multiplicity="0..1" />
+          <End Role="ei_groupAuthority" Type="Self.ei_groupAuthority" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_groups">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_groupAuthority">
+              <PropertyRef Name="group_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ei_groupUser_ei_groups">
+          <End Role="ei_groups" Type="Self.ei_groups" Multiplicity="0..1" />
+          <End Role="ei_groupUser" Type="Self.ei_groupUser" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_groups">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_groupUser">
+              <PropertyRef Name="group_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ei_groupUser_ei_users">
+          <End Role="ei_users" Type="Self.ei_users" Multiplicity="0..1" />
+          <End Role="ei_groupUser" Type="Self.ei_groupUser" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_groupUser">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="GetDormChargeMonth" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="GetDormFeeByMonth" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="yearMonth" Type="varchar" Mode="In" />
+          <Parameter Name="salaryNo" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="GetEmpDormInfo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="card_no" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="GetHREmpInfo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="card_no" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="GetHREmpStatus" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="card_no" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="GetPOAccount" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="po_number" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="InsertIntoYFEmp" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="email" Type="varchar" Mode="In" />
+          <Parameter Name="mobilephone" Type="varchar" Mode="In" />
+          <Parameter Name="shortphone" Type="varchar" Mode="In" />
+          <Parameter Name="username" Type="varchar" Mode="In" />
+          <Parameter Name="cardno" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="ValidateDormStatus" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="account" Type="varchar" Mode="In" />
+        </Function>
+        <EntityContainer Name="ICAuditModelStoreContainer">
+          <EntitySet Name="all_maxNum" EntityType="Self.all_maxNum" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dn_birthdayMealLog" EntityType="Self.dn_birthdayMealLog" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dn_desks" EntityType="Self.dn_desks" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dn_discountInfo" EntityType="Self.dn_discountInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dn_discountInfoUsers" EntityType="Self.dn_discountInfoUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dn_dishes" EntityType="Self.dn_dishes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dn_items" EntityType="Self.dn_items" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dn_order" EntityType="Self.dn_order" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dn_orderEntry" EntityType="Self.dn_orderEntry" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dn_points" EntityType="Self.dn_points" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dn_pointsForDish" EntityType="Self.dn_pointsForDish" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dn_pointsRecord" EntityType="Self.dn_pointsRecord" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dn_Restaurent" EntityType="Self.dn_Restaurent" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dn_shoppingCar" EntityType="Self.dn_shoppingCar" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_authority" EntityType="Self.ei_authority" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_event_log" EntityType="Self.ei_event_log" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_groupAuthority" EntityType="Self.ei_groupAuthority" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_groups" EntityType="Self.ei_groups" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_groupUser" EntityType="Self.ei_groupUser" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_resVisitLog" EntityType="Self.ei_resVisitLog" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_specialUsers" EntityType="Self.ei_specialUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_users" EntityType="Self.ei_users" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="vw_ei_simple_users" EntityType="Self.vw_ei_simple_users" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vw_ei_simple_users].[id] AS [id], 
+[vw_ei_simple_users].[card_number] AS [card_number], 
+[vw_ei_simple_users].[name] AS [name], 
+[vw_ei_simple_users].[forbit_flag] AS [forbit_flag], 
+[vw_ei_simple_users].[sex] AS [sex], 
+[vw_ei_simple_users].[id_number] AS [id_number], 
+[vw_ei_simple_users].[salary_no] AS [salary_no], 
+[vw_ei_simple_users].[dep_name] AS [dep_name], 
+[vw_ei_simple_users].[short_dep_name] AS [short_dep_name]
+FROM [dbo].[vw_ei_simple_users] AS [vw_ei_simple_users]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_ei_users" EntityType="Self.vw_ei_users" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vw_ei_users].[id] AS [id], 
+[vw_ei_users].[card_number] AS [card_number], 
+[vw_ei_users].[name] AS [name], 
+[vw_ei_users].[email] AS [email], 
+[vw_ei_users].[phone] AS [phone], 
+[vw_ei_users].[forbit_flag] AS [forbit_flag], 
+[vw_ei_users].[create_date] AS [create_date], 
+[vw_ei_users].[last_login_date] AS [last_login_date], 
+[vw_ei_users].[sex] AS [sex], 
+[vw_ei_users].[id_number] AS [id_number], 
+[vw_ei_users].[salary_no] AS [salary_no], 
+[vw_ei_users].[short_portrait] AS [short_portrait], 
+[vw_ei_users].[dep_name] AS [dep_name], 
+[vw_ei_users].[short_dep_name] AS [short_dep_name], 
+[vw_ei_users].[short_phone] AS [short_phone]
+FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_dn_discountInfoUsers_dn_discountInfo" Association="Self.FK_dn_discountInfoUsers_dn_discountInfo">
+            <End Role="dn_discountInfo" EntitySet="dn_discountInfo" />
+            <End Role="dn_discountInfoUsers" EntitySet="dn_discountInfoUsers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dn_orderEntry_dn_dishes" Association="Self.FK_dn_orderEntry_dn_dishes">
+            <End Role="dn_dishes" EntitySet="dn_dishes" />
+            <End Role="dn_orderEntry" EntitySet="dn_orderEntry" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dn_orderEntry_dn_order" Association="Self.FK_dn_orderEntry_dn_order">
+            <End Role="dn_order" EntitySet="dn_order" />
+            <End Role="dn_orderEntry" EntitySet="dn_orderEntry" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dn_pointsForDish_dn_dishes" Association="Self.FK_dn_pointsForDish_dn_dishes">
+            <End Role="dn_dishes" EntitySet="dn_dishes" />
+            <End Role="dn_pointsForDish" EntitySet="dn_pointsForDish" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dn_shoppingCar_dn_dishes" Association="Self.FK_dn_shoppingCar_dn_dishes">
+            <End Role="dn_dishes" EntitySet="dn_dishes" />
+            <End Role="dn_shoppingCar" EntitySet="dn_shoppingCar" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dn_shoppingCar_dn_order" Association="Self.FK_dn_shoppingCar_dn_order">
+            <End Role="dn_order" EntitySet="dn_order" />
+            <End Role="dn_shoppingCar" EntitySet="dn_shoppingCar" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ei_groupAuthority_ei_authority" Association="Self.FK_ei_groupAuthority_ei_authority">
+            <End Role="ei_authority" EntitySet="ei_authority" />
+            <End Role="ei_groupAuthority" EntitySet="ei_groupAuthority" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ei_groupAuthority_ei_groups" Association="Self.FK_ei_groupAuthority_ei_groups">
+            <End Role="ei_groups" EntitySet="ei_groups" />
+            <End Role="ei_groupAuthority" EntitySet="ei_groupAuthority" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ei_groupUser_ei_groups" Association="Self.FK_ei_groupUser_ei_groups">
+            <End Role="ei_groups" EntitySet="ei_groups" />
+            <End Role="ei_groupUser" EntitySet="ei_groupUser" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ei_groupUser_ei_users" Association="Self.FK_ei_groupUser_ei_users">
+            <End Role="ei_users" EntitySet="ei_users" />
+            <End Role="ei_groupUser" EntitySet="ei_groupUser" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ICAuditModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="ICAuditEntities" annotation:LazyLoadingEnabled="true" >
+          <EntitySet Name="ei_users" EntityType="ICAuditModel.ei_users" />
+          <EntitySet Name="ei_event_log" EntityType="ICAuditModel.ei_event_log" />
+          <FunctionImport Name="GetHREmpInfo" ReturnType="Collection(ICAuditModel.GetHREmpInfo_Result)">
+          <Parameter Name="card_no" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="GetDormChargeMonth" ReturnType="Collection(String)" />
+          <FunctionImport Name="GetEmpDormInfo" ReturnType="Collection(ICAuditModel.GetEmpDormInfo_Result)">
+          <Parameter Name="card_no" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="GetDormFeeByMonth" ReturnType="Collection(ICAuditModel.GetDormFeeByMonth_Result)">
+            <Parameter Name="yearMonth" Mode="In" Type="String" />
+            <Parameter Name="salaryNo" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="ValidateDormStatus" ReturnType="Collection(ICAuditModel.ValidateDormStatus_Result)">
+          <Parameter Name="account" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="GetHREmpStatus" ReturnType="Collection(String)">
+          <Parameter Name="card_no" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="vw_ei_users" EntityType="ICAuditModel.vw_ei_users" />
+          <EntitySet Name="ei_authority" EntityType="ICAuditModel.ei_authority" />
+          <EntitySet Name="ei_groupAuthority" EntityType="ICAuditModel.ei_groupAuthority" />
+          <EntitySet Name="ei_groups" EntityType="ICAuditModel.ei_groups" />
+          <EntitySet Name="ei_groupUser" EntityType="ICAuditModel.ei_groupUser" />
+          <AssociationSet Name="FK_ei_groupAuthority_ei_authority" Association="ICAuditModel.FK_ei_groupAuthority_ei_authority">
+            <End Role="ei_authority" EntitySet="ei_authority" />
+            <End Role="ei_groupAuthority" EntitySet="ei_groupAuthority" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ei_groupAuthority_ei_groups" Association="ICAuditModel.FK_ei_groupAuthority_ei_groups">
+            <End Role="ei_groups" EntitySet="ei_groups" />
+            <End Role="ei_groupAuthority" EntitySet="ei_groupAuthority" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ei_groupUser_ei_groups" Association="ICAuditModel.FK_ei_groupUser_ei_groups">
+            <End Role="ei_groups" EntitySet="ei_groups" />
+            <End Role="ei_groupUser" EntitySet="ei_groupUser" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ei_groupUser_ei_users" Association="ICAuditModel.FK_ei_groupUser_ei_users">
+            <End Role="ei_users" EntitySet="ei_users" />
+            <End Role="ei_groupUser" EntitySet="ei_groupUser" />
+          </AssociationSet>
+          <FunctionImport Name="GetPOAccount" ReturnType="Collection(ICAuditModel.GetPOAccount_Result)">
+          <Parameter Name="po_number" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="dn_dishes" EntityType="ICAuditModel.dn_dishes" />
+          <EntitySet Name="dn_order" EntityType="ICAuditModel.dn_order" />
+          <EntitySet Name="dn_orderEntry" EntityType="ICAuditModel.dn_orderEntry" />
+          <AssociationSet Name="FK_dn_orderEntry_dn_dishes" Association="ICAuditModel.FK_dn_orderEntry_dn_dishes">
+            <End Role="dn_dishes" EntitySet="dn_dishes" />
+            <End Role="dn_orderEntry" EntitySet="dn_orderEntry" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dn_orderEntry_dn_order" Association="ICAuditModel.FK_dn_orderEntry_dn_order">
+            <End Role="dn_order" EntitySet="dn_order" />
+            <End Role="dn_orderEntry" EntitySet="dn_orderEntry" />
+          </AssociationSet>
+          <EntitySet Name="dn_desks" EntityType="ICAuditModel.dn_desks" />
+          <EntitySet Name="dn_shoppingCar" EntityType="ICAuditModel.dn_shoppingCar" />
+          <AssociationSet Name="FK_dn_shoppingCar_dn_dishes" Association="ICAuditModel.FK_dn_shoppingCar_dn_dishes">
+            <End Role="dn_dishes" EntitySet="dn_dishes" />
+            <End Role="dn_shoppingCar" EntitySet="dn_shoppingCar" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dn_shoppingCar_dn_order" Association="ICAuditModel.FK_dn_shoppingCar_dn_order">
+            <End Role="dn_order" EntitySet="dn_order" />
+            <End Role="dn_shoppingCar" EntitySet="dn_shoppingCar" />
+          </AssociationSet>
+          <EntitySet Name="all_maxNum" EntityType="ICAuditModel.all_maxNum" />
+          <EntitySet Name="dn_discountInfo" EntityType="ICAuditModel.dn_discountInfo" />
+          <EntitySet Name="dn_discountInfoUsers" EntityType="ICAuditModel.dn_discountInfoUsers" />
+          <EntitySet Name="dn_points" EntityType="ICAuditModel.dn_points" />
+          <EntitySet Name="dn_pointsForDish" EntityType="ICAuditModel.dn_pointsForDish" />
+          <EntitySet Name="dn_pointsRecord" EntityType="ICAuditModel.dn_pointsRecord" />
+          <AssociationSet Name="FK_dn_discountInfoUsers_dn_discountInfo" Association="ICAuditModel.FK_dn_discountInfoUsers_dn_discountInfo">
+            <End Role="dn_discountInfo" EntitySet="dn_discountInfo" />
+            <End Role="dn_discountInfoUsers" EntitySet="dn_discountInfoUsers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dn_pointsForDish_dn_dishes" Association="ICAuditModel.FK_dn_pointsForDish_dn_dishes">
+            <End Role="dn_dishes" EntitySet="dn_dishes" />
+            <End Role="dn_pointsForDish" EntitySet="dn_pointsForDish" />
+          </AssociationSet>
+          <EntitySet Name="dn_birthdayMealLog" EntityType="ICAuditModel.dn_birthdayMealLog" />
+          <EntitySet Name="ei_specialUsers" EntityType="ICAuditModel.ei_specialUsers" />
+          <EntitySet Name="dn_items" EntityType="ICAuditModel.dn_items" />
+          <EntitySet Name="dn_Restaurent" EntityType="ICAuditModel.dn_Restaurent" />
+          <EntitySet Name="ei_resVisitLog" EntityType="ICAuditModel.ei_resVisitLog" />
+          <EntitySet Name="vw_ei_simple_users" EntityType="ICAuditModel.vw_ei_simple_users" />
+          <FunctionImport Name="InsertIntoYFEmp">
+            <Parameter Name="email" Mode="In" Type="String" />
+            <Parameter Name="mobilephone" Mode="In" Type="String" />
+            <Parameter Name="shortphone" Mode="In" Type="String" />
+            <Parameter Name="username" Mode="In" Type="String" />
+            <Parameter Name="cardno" Mode="In" Type="String" />
+          </FunctionImport>
+        </EntityContainer>
+        <EntityType Name="ei_users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="card_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="forbit_flag" Type="Boolean" />
+          <Property Name="create_date" Type="DateTime" Precision="0" />
+          <Property Name="last_login_date" Type="DateTime" Precision="0" />
+          <Property Name="password" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="fail_times" Type="Int32" />
+          <Property Name="sex" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="id_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="salary_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ei_groupUser" Relationship="ICAuditModel.FK_ei_groupUser_ei_users" FromRole="ei_users" ToRole="ei_groupUser" />
+          <Property Name="short_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="short_portrait" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="ei_event_log">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_id" Type="Int32" />
+          <Property Name="user_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="model" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="do_what" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="is_normal" Type="Int32" />
+          <Property Name="op_date" Type="DateTime" Precision="0" />
+          <Property Name="ip" Type="String" MaxLength="64" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <ComplexType Name="GetHREmpInfo_Result">
+          <Property Type="String" Name="sex" Nullable="true" MaxLength="2" />
+          <Property Type="String" Name="emp_name" Nullable="false" MaxLength="50" />
+          <Property Type="String" Name="id_code" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="email" Nullable="true" MaxLength="30" />
+          <Property Type="String" Name="tp" Nullable="true" MaxLength="50" />
+          <Property Type="Binary" Name="zp" Nullable="true" MaxLength="Max" />
+          <Property Type="String" Name="txm" Nullable="true" MaxLength="10" />
+        </ComplexType>
+        <ComplexType Name="GetEmpDormInfo_Result">
+          <Property Type="String" Name="area" Nullable="true" MaxLength="20" />
+          <Property Type="String" Name="dorm_number" Nullable="true" MaxLength="50" />
+          <Property Type="DateTime" Name="in_date" Nullable="true" Precision="23" />
+        </ComplexType>
+        <ComplexType Name="GetDormFeeByMonth_Result">
+          <Property Type="String" Name="dorm_number" Nullable="true" MaxLength="50" />
+          <Property Type="Decimal" Name="rent" Nullable="true" Precision="8" Scale="2" />
+          <Property Type="Decimal" Name="water" Nullable="true" Precision="8" Scale="2" />
+          <Property Type="Decimal" Name="electricity" Nullable="true" Precision="8" Scale="2" />
+          <Property Type="Decimal" Name="management" Nullable="true" Precision="8" Scale="2" />
+          <Property Type="Decimal" Name="repair" Nullable="true" Precision="8" Scale="2" />
+          <Property Type="Decimal" Name="fine" Nullable="true" Precision="8" Scale="2" />
+          <Property Type="Decimal" Name="others" Nullable="true" Precision="8" Scale="2" />
+          <Property Type="String" Name="comment" Nullable="true" MaxLength="200" />
+          <Property Type="Decimal" Name="total" Nullable="true" Precision="10" Scale="1" />
+        </ComplexType>
+        <ComplexType Name="ValidateDormStatus_Result">
+          <Property Type="String" Name="msg" Nullable="false" MaxLength="28" />
+          <Property Type="Int32" Name="suc" Nullable="false" />
+        </ComplexType>
+        <EntityType Name="vw_ei_users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="card_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="forbit_flag" Type="Boolean" />
+          <Property Name="create_date" Type="DateTime" Precision="0" />
+          <Property Name="last_login_date" Type="DateTime" Precision="0" />
+          <Property Name="sex" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="id_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="salary_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="dep_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="short_dep_name" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="short_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="short_portrait" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="ei_authority">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="number" Type="Decimal" Precision="6" Scale="2" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="en_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="description" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="controler_name" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="action_name" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="iconcls" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ei_groupAuthority" Relationship="ICAuditModel.FK_ei_groupAuthority_ei_authority" FromRole="ei_authority" ToRole="ei_groupAuthority" />
+        </EntityType>
+        <EntityType Name="ei_groupAuthority">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="group_id" Type="Int32" />
+          <Property Name="authority_id" Type="Int32" />
+          <NavigationProperty Name="ei_authority" Relationship="ICAuditModel.FK_ei_groupAuthority_ei_authority" FromRole="ei_groupAuthority" ToRole="ei_authority" />
+          <NavigationProperty Name="ei_groups" Relationship="ICAuditModel.FK_ei_groupAuthority_ei_groups" FromRole="ei_groupAuthority" ToRole="ei_groups" />
+        </EntityType>
+        <EntityType Name="ei_groups">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="description" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ei_groupAuthority" Relationship="ICAuditModel.FK_ei_groupAuthority_ei_groups" FromRole="ei_groups" ToRole="ei_groupAuthority" />
+          <NavigationProperty Name="ei_groupUser" Relationship="ICAuditModel.FK_ei_groupUser_ei_groups" FromRole="ei_groups" ToRole="ei_groupUser" />
+        </EntityType>
+        <EntityType Name="ei_groupUser">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="group_id" Type="Int32" />
+          <Property Name="user_id" Type="Int32" />
+          <NavigationProperty Name="ei_groups" Relationship="ICAuditModel.FK_ei_groupUser_ei_groups" FromRole="ei_groupUser" ToRole="ei_groups" />
+          <NavigationProperty Name="ei_users" Relationship="ICAuditModel.FK_ei_groupUser_ei_users" FromRole="ei_groupUser" ToRole="ei_users" />
+        </EntityType>
+        <Association Name="FK_ei_groupAuthority_ei_authority">
+          <End Type="ICAuditModel.ei_authority" Role="ei_authority" Multiplicity="0..1" />
+          <End Type="ICAuditModel.ei_groupAuthority" Role="ei_groupAuthority" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_authority">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_groupAuthority">
+              <PropertyRef Name="authority_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ei_groupAuthority_ei_groups">
+          <End Type="ICAuditModel.ei_groups" Role="ei_groups" Multiplicity="0..1" />
+          <End Type="ICAuditModel.ei_groupAuthority" Role="ei_groupAuthority" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_groups">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_groupAuthority">
+              <PropertyRef Name="group_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ei_groupUser_ei_groups">
+          <End Type="ICAuditModel.ei_groups" Role="ei_groups" Multiplicity="0..1" />
+          <End Type="ICAuditModel.ei_groupUser" Role="ei_groupUser" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_groups">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_groupUser">
+              <PropertyRef Name="group_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ei_groupUser_ei_users">
+          <End Type="ICAuditModel.ei_users" Role="ei_users" Multiplicity="0..1" />
+          <End Type="ICAuditModel.ei_groupUser" Role="ei_groupUser" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_groupUser">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <ComplexType Name="GetPOAccount_Result">
+          <Property Type="String" Name="account" Nullable="true" MaxLength="20" />
+          <Property Type="DateTime" Name="poDate" Nullable="true" Precision="23" />
+        </ComplexType>
+        <EntityType Name="dn_dishes">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="type" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="price" Type="Decimal" Precision="8" Scale="2" />
+          <Property Name="discount_price" Type="Decimal" Precision="8" Scale="2" />
+          <Property Name="discount_weekday" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="discount_time" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="sell_weekday" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="sell_time" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="can_delivery" Type="Boolean" />
+          <Property Name="description" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="image_1" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="image_2" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="image_3" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="create_time" Type="DateTime" Precision="0" />
+          <Property Name="last_update_time" Type="DateTime" Precision="0" />
+          <Property Name="create_user" Type="Int32" />
+          <Property Name="is_selling" Type="Boolean" />
+          <Property Name="image_1_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="image_2_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="image_3_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="is_on_top" Type="Boolean" />
+          <NavigationProperty Name="dn_orderEntry" Relationship="ICAuditModel.FK_dn_orderEntry_dn_dishes" FromRole="dn_dishes" ToRole="dn_orderEntry" />
+          <Property Name="image_1_thumb" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="image_2_thumb" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="image_3_thumb" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <NavigationProperty Name="dn_shoppingCar" Relationship="ICAuditModel.FK_dn_shoppingCar_dn_dishes" FromRole="dn_dishes" ToRole="dn_shoppingCar" />
+          <Property Name="is_birthday_meal" Type="Boolean" />
+          <NavigationProperty Name="dn_pointsForDish" Relationship="ICAuditModel.FK_dn_pointsForDish_dn_dishes" FromRole="dn_dishes" ToRole="dn_pointsForDish" />
+          <Property Name="res_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="dn_order">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="order_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="user_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="user_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="is_in_room" Type="Boolean" />
+          <Property Name="is_delivery" Type="Boolean" />
+          <Property Name="people_num" Type="Int32" />
+          <Property Name="arrive_day" Type="DateTime" Precision="0" />
+          <Property Name="arrive_time" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="create_time" Type="DateTime" Precision="0" />
+          <Property Name="user_comment" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="payment_type" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="payment_time" Type="DateTime" Precision="0" />
+          <Property Name="auditor_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="auditor_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="audit_result" Type="Boolean" />
+          <Property Name="audit_comment" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="audit_time" Type="DateTime" Precision="0" />
+          <Property Name="desk_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="total_price" Type="Decimal" Precision="6" Scale="1" />
+          <Property Name="real_price" Type="Decimal" Precision="6" Scale="1" />
+          <Property Name="discount_rate" Type="Int32" />
+          <Property Name="book_card_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="delivery_addr" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="dn_orderEntry" Relationship="ICAuditModel.FK_dn_orderEntry_dn_order" FromRole="dn_order" ToRole="dn_orderEntry" />
+          <NavigationProperty Name="dn_shoppingCar" Relationship="ICAuditModel.FK_dn_shoppingCar_dn_order" FromRole="dn_order" ToRole="dn_shoppingCar" />
+          <Property Name="cancelled" Type="Boolean" />
+          <Property Name="cancell_reason" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="status" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="recipient" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="recipient_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="end_flag" Type="Int32" />
+          <Property Name="order_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="benefit_info" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="res_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="desk_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="dn_orderEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="order_id" Type="Int32" />
+          <Property Name="disk_id" Type="Int32" />
+          <Property Name="qty" Type="Int32" />
+          <Property Name="price" Type="Decimal" Precision="6" Scale="1" />
+          <NavigationProperty Name="dn_dishes" Relationship="ICAuditModel.FK_dn_orderEntry_dn_dishes" FromRole="dn_orderEntry" ToRole="dn_dishes" />
+          <NavigationProperty Name="dn_order" Relationship="ICAuditModel.FK_dn_orderEntry_dn_order" FromRole="dn_orderEntry" ToRole="dn_order" />
+          <Property Name="is_done" Type="Boolean" />
+          <Property Name="done_time" Type="DateTime" Precision="0" />
+          <Property Name="benefit_info" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <Association Name="FK_dn_orderEntry_dn_dishes">
+          <End Type="ICAuditModel.dn_dishes" Role="dn_dishes" Multiplicity="0..1" />
+          <End Type="ICAuditModel.dn_orderEntry" Role="dn_orderEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="dn_dishes">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="dn_orderEntry">
+              <PropertyRef Name="disk_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dn_orderEntry_dn_order">
+          <End Type="ICAuditModel.dn_order" Role="dn_order" Multiplicity="0..1" />
+          <End Type="ICAuditModel.dn_orderEntry" Role="dn_orderEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="dn_order">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="dn_orderEntry">
+              <PropertyRef Name="order_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="dn_desks">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="number" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="seat_qty" Type="Int32" />
+          <Property Name="can_seat_together" Type="Boolean" />
+          <Property Name="open_weekday" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="open_time" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="is_cancel" Type="Boolean" />
+          <Property Name="create_user" Type="Int32" />
+          <Property Name="create_time" Type="DateTime" Precision="0" />
+          <Property Name="last_update_time" Type="DateTime" Precision="0" />
+          <Property Name="belong_to" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="dn_shoppingCar">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="dish_id" Type="Int32" />
+          <Property Name="qty" Type="Int32" />
+          <Property Name="in_time" Type="DateTime" Precision="0" />
+          <Property Name="is_submit" Type="Boolean" />
+          <Property Name="order_id" Type="Int32" />
+          <Property Name="is_delete" Type="Boolean" />
+          <Property Name="delete_time" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="dn_dishes" Relationship="ICAuditModel.FK_dn_shoppingCar_dn_dishes" FromRole="dn_shoppingCar" ToRole="dn_dishes" />
+          <NavigationProperty Name="dn_order" Relationship="ICAuditModel.FK_dn_shoppingCar_dn_order" FromRole="dn_shoppingCar" ToRole="dn_order" />
+          <Property Name="is_checked" Type="Boolean" />
+          <Property Name="benefit_price" Type="Decimal" Precision="6" Scale="1" />
+          <Property Name="benefit_info" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="res_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <Association Name="FK_dn_shoppingCar_dn_dishes">
+          <End Type="ICAuditModel.dn_dishes" Role="dn_dishes" Multiplicity="0..1" />
+          <End Type="ICAuditModel.dn_shoppingCar" Role="dn_shoppingCar" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="dn_dishes">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="dn_shoppingCar">
+              <PropertyRef Name="dish_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dn_shoppingCar_dn_order">
+          <End Type="ICAuditModel.dn_order" Role="dn_order" Multiplicity="0..1" />
+          <End Type="ICAuditModel.dn_shoppingCar" Role="dn_shoppingCar" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="dn_order">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="dn_shoppingCar">
+              <PropertyRef Name="order_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="all_maxNum">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="bill_type" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="date_str" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="max_num" Type="Int32" />
+        </EntityType>
+        <EntityType Name="dn_discountInfo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="resume_bigger_than" Type="Decimal" Precision="6" Scale="1" />
+          <Property Name="minus_price" Type="Decimal" Precision="6" Scale="1" />
+          <Property Name="discount_rate" Type="Decimal" Precision="6" Scale="1" />
+          <Property Name="for_everyone" Type="Boolean" />
+          <Property Name="from_date" Type="DateTime" Precision="0" />
+          <Property Name="end_date" Type="DateTime" Precision="0" />
+          <Property Name="create_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="create_date" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="dn_discountInfoUsers" Relationship="ICAuditModel.FK_dn_discountInfoUsers_dn_discountInfo" FromRole="dn_discountInfo" ToRole="dn_discountInfoUsers" />
+          <Property Name="comment" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="discount_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="has_benefit_times" Type="Int32" />
+          <Property Name="res_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="dn_discountInfoUsers">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="discount_id" Type="Int32" />
+          <Property Name="suit_user_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="suit_user_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="has_discount_times" Type="Int32" />
+          <NavigationProperty Name="dn_discountInfo" Relationship="ICAuditModel.FK_dn_discountInfoUsers_dn_discountInfo" FromRole="dn_discountInfoUsers" ToRole="dn_discountInfo" />
+        </EntityType>
+        <EntityType Name="dn_points">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="user_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="points" Type="Int32" Nullable="false" />
+          <Property Name="res_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="dn_pointsForDish">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="points_need" Type="Int32" Nullable="false" />
+          <Property Name="dish_id" Type="Int32" />
+          <Property Name="from_date" Type="DateTime" Precision="0" />
+          <Property Name="end_date" Type="DateTime" Precision="0" />
+          <Property Name="create_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="create_date" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="dn_dishes" Relationship="ICAuditModel.FK_dn_pointsForDish_dn_dishes" FromRole="dn_pointsForDish" ToRole="dn_dishes" />
+          <Property Name="is_selling" Type="Boolean" />
+          <Property Name="has_fullfill" Type="Int32" />
+          <Property Name="res_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="dn_pointsRecord">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="income" Type="Int32" Nullable="false" />
+          <Property Name="op_date" Type="DateTime" Precision="0" />
+          <Property Name="info" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="user_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="res_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <Association Name="FK_dn_discountInfoUsers_dn_discountInfo">
+          <End Type="ICAuditModel.dn_discountInfo" Role="dn_discountInfo" Multiplicity="0..1" />
+          <End Type="ICAuditModel.dn_discountInfoUsers" Role="dn_discountInfoUsers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="dn_discountInfo">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="dn_discountInfoUsers">
+              <PropertyRef Name="discount_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dn_pointsForDish_dn_dishes">
+          <End Type="ICAuditModel.dn_dishes" Role="dn_dishes" Multiplicity="0..1" />
+          <End Type="ICAuditModel.dn_pointsForDish" Role="dn_pointsForDish" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="dn_dishes">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="dn_pointsForDish">
+              <PropertyRef Name="dish_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="dn_birthdayMealLog">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="year" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="user_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="birthday" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="op_date" Type="DateTime" Precision="0" />
+          <Property Name="is_cancelled" Type="Boolean" />
+          <Property Name="dish_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ei_specialUsers">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="card_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="dn_items">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="value" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="res_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="create_date" Type="DateTime" Precision="0" />
+          <Property Name="modify_date" Type="DateTime" Precision="0" />
+          <Property Name="create_username" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="comment" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="dn_Restaurent">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ei_resVisitLog">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="user_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="res_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="visit_date" Type="DateTime" Precision="0" />
+        </EntityType>
+        <EntityType Name="vw_ei_simple_users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="card_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="forbit_flag" Type="Boolean" />
+          <Property Name="sex" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="id_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="salary_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="dep_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="short_dep_name" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ICAuditModelStoreContainer" CdmEntityContainer="ICAuditEntities" >
+          <EntitySetMapping Name="ei_users">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_users">
+              <MappingFragment StoreEntitySet="ei_users">
+                <ScalarProperty Name="short_portrait" ColumnName="short_portrait" />
+                <ScalarProperty Name="short_phone" ColumnName="short_phone" />
+                <ScalarProperty Name="salary_no" ColumnName="salary_no" />
+                <ScalarProperty Name="id_number" ColumnName="id_number" />
+                <ScalarProperty Name="sex" ColumnName="sex" />
+                <ScalarProperty Name="fail_times" ColumnName="fail_times" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="last_login_date" ColumnName="last_login_date" />
+                <ScalarProperty Name="create_date" ColumnName="create_date" />
+                <ScalarProperty Name="forbit_flag" ColumnName="forbit_flag" />
+                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_event_log">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_event_log">
+              <MappingFragment StoreEntitySet="ei_event_log">
+                <ScalarProperty Name="ip" ColumnName="ip" />
+                <ScalarProperty Name="op_date" ColumnName="op_date" />
+                <ScalarProperty Name="is_normal" ColumnName="is_normal" />
+                <ScalarProperty Name="do_what" ColumnName="do_what" />
+                <ScalarProperty Name="model" ColumnName="model" />
+                <ScalarProperty Name="user_name" ColumnName="user_name" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetHREmpInfo" FunctionName="ICAuditModel.Store.GetHREmpInfo">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetHREmpInfo_Result">
+                <ScalarProperty Name="sex" ColumnName="sex" />
+                <ScalarProperty Name="emp_name" ColumnName="emp_name" />
+                <ScalarProperty Name="id_code" ColumnName="id_code" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="tp" ColumnName="tp" />
+                <ScalarProperty Name="zp" ColumnName="zp" />
+                <ScalarProperty Name="txm" ColumnName="txm" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetDormChargeMonth" FunctionName="ICAuditModel.Store.GetDormChargeMonth" />
+          <FunctionImportMapping FunctionImportName="GetEmpDormInfo" FunctionName="ICAuditModel.Store.GetEmpDormInfo">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetEmpDormInfo_Result">
+                <ScalarProperty Name="area" ColumnName="area" />
+                <ScalarProperty Name="dorm_number" ColumnName="dorm_number" />
+                <ScalarProperty Name="in_date" ColumnName="in_date" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetDormFeeByMonth" FunctionName="ICAuditModel.Store.GetDormFeeByMonth">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetDormFeeByMonth_Result">
+                <ScalarProperty Name="dorm_number" ColumnName="dorm_number" />
+                <ScalarProperty Name="rent" ColumnName="rent" />
+                <ScalarProperty Name="water" ColumnName="water" />
+                <ScalarProperty Name="electricity" ColumnName="electricity" />
+                <ScalarProperty Name="management" ColumnName="management" />
+                <ScalarProperty Name="repair" ColumnName="repair" />
+                <ScalarProperty Name="fine" ColumnName="fine" />
+                <ScalarProperty Name="others" ColumnName="others" />
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="total" ColumnName="total" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="ValidateDormStatus" FunctionName="ICAuditModel.Store.ValidateDormStatus">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.ValidateDormStatus_Result">
+                <ScalarProperty Name="msg" ColumnName="msg" />
+                <ScalarProperty Name="suc" ColumnName="suc" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetHREmpStatus" FunctionName="ICAuditModel.Store.GetHREmpStatus" />
+          <EntitySetMapping Name="vw_ei_users">
+            <EntityTypeMapping TypeName="ICAuditModel.vw_ei_users">
+              <MappingFragment StoreEntitySet="vw_ei_users">
+                <ScalarProperty Name="short_portrait" ColumnName="short_portrait" />
+                <ScalarProperty Name="short_phone" ColumnName="short_phone" />
+                <ScalarProperty Name="short_dep_name" ColumnName="short_dep_name" />
+                <ScalarProperty Name="dep_name" ColumnName="dep_name" />
+                <ScalarProperty Name="salary_no" ColumnName="salary_no" />
+                <ScalarProperty Name="id_number" ColumnName="id_number" />
+                <ScalarProperty Name="sex" ColumnName="sex" />
+                <ScalarProperty Name="last_login_date" ColumnName="last_login_date" />
+                <ScalarProperty Name="create_date" ColumnName="create_date" />
+                <ScalarProperty Name="forbit_flag" ColumnName="forbit_flag" />
+                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_authority">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_authority">
+              <MappingFragment StoreEntitySet="ei_authority">
+                <ScalarProperty Name="iconcls" ColumnName="iconcls" />
+                <ScalarProperty Name="action_name" ColumnName="action_name" />
+                <ScalarProperty Name="controler_name" ColumnName="controler_name" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="en_name" ColumnName="en_name" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="number" ColumnName="number" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_groupAuthority">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_groupAuthority">
+              <MappingFragment StoreEntitySet="ei_groupAuthority">
+                <ScalarProperty Name="authority_id" ColumnName="authority_id" />
+                <ScalarProperty Name="group_id" ColumnName="group_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_groups">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_groups">
+              <MappingFragment StoreEntitySet="ei_groups">
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_groupUser">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_groupUser">
+              <MappingFragment StoreEntitySet="ei_groupUser">
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="group_id" ColumnName="group_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetPOAccount" FunctionName="ICAuditModel.Store.GetPOAccount">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetPOAccount_Result">
+                <ScalarProperty Name="account" ColumnName="account" />
+                <ScalarProperty Name="poDate" ColumnName="poDate" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="dn_dishes">
+            <EntityTypeMapping TypeName="ICAuditModel.dn_dishes">
+              <MappingFragment StoreEntitySet="dn_dishes">
+                <ScalarProperty Name="res_no" ColumnName="res_no" />
+                <ScalarProperty Name="is_birthday_meal" ColumnName="is_birthday_meal" />
+                <ScalarProperty Name="image_3_thumb" ColumnName="image_3_thumb" />
+                <ScalarProperty Name="image_2_thumb" ColumnName="image_2_thumb" />
+                <ScalarProperty Name="image_1_thumb" ColumnName="image_1_thumb" />
+                <ScalarProperty Name="is_on_top" ColumnName="is_on_top" />
+                <ScalarProperty Name="image_3_name" ColumnName="image_3_name" />
+                <ScalarProperty Name="image_2_name" ColumnName="image_2_name" />
+                <ScalarProperty Name="image_1_name" ColumnName="image_1_name" />
+                <ScalarProperty Name="is_selling" ColumnName="is_selling" />
+                <ScalarProperty Name="create_user" ColumnName="create_user" />
+                <ScalarProperty Name="last_update_time" ColumnName="last_update_time" />
+                <ScalarProperty Name="create_time" ColumnName="create_time" />
+                <ScalarProperty Name="image_3" ColumnName="image_3" />
+                <ScalarProperty Name="image_2" ColumnName="image_2" />
+                <ScalarProperty Name="image_1" ColumnName="image_1" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="can_delivery" ColumnName="can_delivery" />
+                <ScalarProperty Name="sell_time" ColumnName="sell_time" />
+                <ScalarProperty Name="sell_weekday" ColumnName="sell_weekday" />
+                <ScalarProperty Name="discount_time" ColumnName="discount_time" />
+                <ScalarProperty Name="discount_weekday" ColumnName="discount_weekday" />
+                <ScalarProperty Name="discount_price" ColumnName="discount_price" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="type" ColumnName="type" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="number" ColumnName="number" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="dn_order">
+            <EntityTypeMapping TypeName="ICAuditModel.dn_order">
+              <MappingFragment StoreEntitySet="dn_order">
+                <ScalarProperty Name="desk_name" ColumnName="desk_name" />
+                <ScalarProperty Name="res_no" ColumnName="res_no" />
+                <ScalarProperty Name="benefit_info" ColumnName="benefit_info" />
+                <ScalarProperty Name="order_phone" ColumnName="order_phone" />
+                <ScalarProperty Name="end_flag" ColumnName="end_flag" />
+                <ScalarProperty Name="recipient_phone" ColumnName="recipient_phone" />
+                <ScalarProperty Name="recipient" ColumnName="recipient" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="cancell_reason" ColumnName="cancell_reason" />
+                <ScalarProperty Name="cancelled" ColumnName="cancelled" />
+                <ScalarProperty Name="delivery_addr" ColumnName="delivery_addr" />
+                <ScalarProperty Name="book_card_num" ColumnName="book_card_num" />
+                <ScalarProperty Name="discount_rate" ColumnName="discount_rate" />
+                <ScalarProperty Name="real_price" ColumnName="real_price" />
+                <ScalarProperty Name="total_price" ColumnName="total_price" />
+                <ScalarProperty Name="desk_num" ColumnName="desk_num" />
+                <ScalarProperty Name="audit_time" ColumnName="audit_time" />
+                <ScalarProperty Name="audit_comment" ColumnName="audit_comment" />
+                <ScalarProperty Name="audit_result" ColumnName="audit_result" />
+                <ScalarProperty Name="auditor_no" ColumnName="auditor_no" />
+                <ScalarProperty Name="auditor_name" ColumnName="auditor_name" />
+                <ScalarProperty Name="payment_time" ColumnName="payment_time" />
+                <ScalarProperty Name="payment_type" ColumnName="payment_type" />
+                <ScalarProperty Name="user_comment" ColumnName="user_comment" />
+                <ScalarProperty Name="create_time" ColumnName="create_time" />
+                <ScalarProperty Name="arrive_time" ColumnName="arrive_time" />
+                <ScalarProperty Name="arrive_day" ColumnName="arrive_day" />
+                <ScalarProperty Name="people_num" ColumnName="people_num" />
+                <ScalarProperty Name="is_delivery" ColumnName="is_delivery" />
+                <ScalarProperty Name="is_in_room" ColumnName="is_in_room" />
+                <ScalarProperty Name="user_no" ColumnName="user_no" />
+                <ScalarProperty Name="user_name" ColumnName="user_name" />
+                <ScalarProperty Name="order_no" ColumnName="order_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="dn_orderEntry">
+            <EntityTypeMapping TypeName="ICAuditModel.dn_orderEntry">
+              <MappingFragment StoreEntitySet="dn_orderEntry">
+                <ScalarProperty Name="benefit_info" ColumnName="benefit_info" />
+                <ScalarProperty Name="done_time" ColumnName="done_time" />
+                <ScalarProperty Name="is_done" ColumnName="is_done" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="qty" ColumnName="qty" />
+                <ScalarProperty Name="disk_id" ColumnName="disk_id" />
+                <ScalarProperty Name="order_id" ColumnName="order_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="dn_desks">
+            <EntityTypeMapping TypeName="ICAuditModel.dn_desks">
+              <MappingFragment StoreEntitySet="dn_desks">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="belong_to" ColumnName="belong_to" />
+                <ScalarProperty Name="last_update_time" ColumnName="last_update_time" />
+                <ScalarProperty Name="create_time" ColumnName="create_time" />
+                <ScalarProperty Name="create_user" ColumnName="create_user" />
+                <ScalarProperty Name="is_cancel" ColumnName="is_cancel" />
+                <ScalarProperty Name="open_time" ColumnName="open_time" />
+                <ScalarProperty Name="open_weekday" ColumnName="open_weekday" />
+                <ScalarProperty Name="can_seat_together" ColumnName="can_seat_together" />
+                <ScalarProperty Name="seat_qty" ColumnName="seat_qty" />
+                <ScalarProperty Name="number" ColumnName="number" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="dn_shoppingCar">
+            <EntityTypeMapping TypeName="ICAuditModel.dn_shoppingCar">
+              <MappingFragment StoreEntitySet="dn_shoppingCar">
+                <ScalarProperty Name="res_no" ColumnName="res_no" />
+                <ScalarProperty Name="benefit_info" ColumnName="benefit_info" />
+                <ScalarProperty Name="benefit_price" ColumnName="benefit_price" />
+                <ScalarProperty Name="is_checked" ColumnName="is_checked" />
+                <ScalarProperty Name="delete_time" ColumnName="delete_time" />
+                <ScalarProperty Name="is_delete" ColumnName="is_delete" />
+                <ScalarProperty Name="order_id" ColumnName="order_id" />
+                <ScalarProperty Name="is_submit" ColumnName="is_submit" />
+                <ScalarProperty Name="in_time" ColumnName="in_time" />
+                <ScalarProperty Name="qty" ColumnName="qty" />
+                <ScalarProperty Name="dish_id" ColumnName="dish_id" />
+                <ScalarProperty Name="user_no" ColumnName="user_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="all_maxNum">
+            <EntityTypeMapping TypeName="ICAuditModel.all_maxNum">
+              <MappingFragment StoreEntitySet="all_maxNum">
+                <ScalarProperty Name="max_num" ColumnName="max_num" />
+                <ScalarProperty Name="date_str" ColumnName="date_str" />
+                <ScalarProperty Name="bill_type" ColumnName="bill_type" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="dn_discountInfo">
+            <EntityTypeMapping TypeName="ICAuditModel.dn_discountInfo">
+              <MappingFragment StoreEntitySet="dn_discountInfo">
+                <ScalarProperty Name="res_no" ColumnName="res_no" />
+                <ScalarProperty Name="has_benefit_times" ColumnName="has_benefit_times" />
+                <ScalarProperty Name="discount_name" ColumnName="discount_name" />
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="create_date" ColumnName="create_date" />
+                <ScalarProperty Name="create_no" ColumnName="create_no" />
+                <ScalarProperty Name="end_date" ColumnName="end_date" />
+                <ScalarProperty Name="from_date" ColumnName="from_date" />
+                <ScalarProperty Name="for_everyone" ColumnName="for_everyone" />
+                <ScalarProperty Name="discount_rate" ColumnName="discount_rate" />
+                <ScalarProperty Name="minus_price" ColumnName="minus_price" />
+                <ScalarProperty Name="resume_bigger_than" ColumnName="resume_bigger_than" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="dn_discountInfoUsers">
+            <EntityTypeMapping TypeName="ICAuditModel.dn_discountInfoUsers">
+              <MappingFragment StoreEntitySet="dn_discountInfoUsers">
+                <ScalarProperty Name="has_discount_times" ColumnName="has_discount_times" />
+                <ScalarProperty Name="suit_user_name" ColumnName="suit_user_name" />
+                <ScalarProperty Name="suit_user_no" ColumnName="suit_user_no" />
+                <ScalarProperty Name="discount_id" ColumnName="discount_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="dn_points">
+            <EntityTypeMapping TypeName="ICAuditModel.dn_points">
+              <MappingFragment StoreEntitySet="dn_points">
+                <ScalarProperty Name="res_no" ColumnName="res_no" />
+                <ScalarProperty Name="points" ColumnName="points" />
+                <ScalarProperty Name="user_name" ColumnName="user_name" />
+                <ScalarProperty Name="user_no" ColumnName="user_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="dn_pointsForDish">
+            <EntityTypeMapping TypeName="ICAuditModel.dn_pointsForDish">
+              <MappingFragment StoreEntitySet="dn_pointsForDish">
+                <ScalarProperty Name="res_no" ColumnName="res_no" />
+                <ScalarProperty Name="has_fullfill" ColumnName="has_fullfill" />
+                <ScalarProperty Name="is_selling" ColumnName="is_selling" />
+                <ScalarProperty Name="create_date" ColumnName="create_date" />
+                <ScalarProperty Name="create_no" ColumnName="create_no" />
+                <ScalarProperty Name="end_date" ColumnName="end_date" />
+                <ScalarProperty Name="from_date" ColumnName="from_date" />
+                <ScalarProperty Name="dish_id" ColumnName="dish_id" />
+                <ScalarProperty Name="points_need" ColumnName="points_need" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="dn_pointsRecord">
+            <EntityTypeMapping TypeName="ICAuditModel.dn_pointsRecord">
+              <MappingFragment StoreEntitySet="dn_pointsRecord">
+                <ScalarProperty Name="res_no" ColumnName="res_no" />
+                <ScalarProperty Name="user_name" ColumnName="user_name" />
+                <ScalarProperty Name="info" ColumnName="info" />
+                <ScalarProperty Name="op_date" ColumnName="op_date" />
+                <ScalarProperty Name="income" ColumnName="income" />
+                <ScalarProperty Name="user_no" ColumnName="user_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="dn_birthdayMealLog">
+            <EntityTypeMapping TypeName="ICAuditModel.dn_birthdayMealLog">
+              <MappingFragment StoreEntitySet="dn_birthdayMealLog">
+                <ScalarProperty Name="dish_name" ColumnName="dish_name" />
+                <ScalarProperty Name="is_cancelled" ColumnName="is_cancelled" />
+                <ScalarProperty Name="op_date" ColumnName="op_date" />
+                <ScalarProperty Name="birthday" ColumnName="birthday" />
+                <ScalarProperty Name="user_no" ColumnName="user_no" />
+                <ScalarProperty Name="year" ColumnName="year" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_specialUsers">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_specialUsers">
+              <MappingFragment StoreEntitySet="ei_specialUsers">
+                <ScalarProperty Name="card_no" ColumnName="card_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="dn_items">
+            <EntityTypeMapping TypeName="ICAuditModel.dn_items">
+              <MappingFragment StoreEntitySet="dn_items">
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="create_username" ColumnName="create_username" />
+                <ScalarProperty Name="modify_date" ColumnName="modify_date" />
+                <ScalarProperty Name="create_date" ColumnName="create_date" />
+                <ScalarProperty Name="res_no" ColumnName="res_no" />
+                <ScalarProperty Name="value" ColumnName="value" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="dn_Restaurent">
+            <EntityTypeMapping TypeName="ICAuditModel.dn_Restaurent">
+              <MappingFragment StoreEntitySet="dn_Restaurent">
+                <ScalarProperty Name="no" ColumnName="no" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_resVisitLog">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_resVisitLog">
+              <MappingFragment StoreEntitySet="ei_resVisitLog">
+                <ScalarProperty Name="visit_date" ColumnName="visit_date" />
+                <ScalarProperty Name="res_no" ColumnName="res_no" />
+                <ScalarProperty Name="user_name" ColumnName="user_name" />
+                <ScalarProperty Name="user_no" ColumnName="user_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_ei_simple_users">
+            <EntityTypeMapping TypeName="ICAuditModel.vw_ei_simple_users">
+              <MappingFragment StoreEntitySet="vw_ei_simple_users">
+                <ScalarProperty Name="short_dep_name" ColumnName="short_dep_name" />
+                <ScalarProperty Name="dep_name" ColumnName="dep_name" />
+                <ScalarProperty Name="salary_no" ColumnName="salary_no" />
+                <ScalarProperty Name="id_number" ColumnName="id_number" />
+                <ScalarProperty Name="sex" ColumnName="sex" />
+                <ScalarProperty Name="forbit_flag" ColumnName="forbit_flag" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="InsertIntoYFEmp" FunctionName="ICAuditModel.Store.InsertIntoYFEmp" />
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="无" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

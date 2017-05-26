@@ -1,0 +1,62 @@
+﻿@{
+    Layout = null;
+    string resNo = (string)Session["currentResNo"];
+    string resName = "";
+    switch (resNo) {
+        case "HS":
+            resName = "会所";
+            break;
+        case "R1":
+            resName = "第一食堂";
+            break;
+        case "R2":
+            resName = "第二食堂";
+            break;
+        case "R3":
+            resName = "第三食堂";
+            break;
+    }
+}
+<script>
+    $(function () {
+        $(".navbar-brand").click(function () {
+            openResSelDialog();
+        });
+    })
+</script>
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#res-navbar" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#"><span class="text-success"><strong><i class="glyphicon glyphicon-cutlery"></i> 订餐系统 <i class="fa fa-caret-right"></i> <span id="menuResName">@resName</span> </strong></span></a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="res-navbar">
+            <ul class="nav navbar-nav"></ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="@Url.Content("~/Restaurant/ResIndex")"><i class="glyphicon glyphicon-list-alt" ></i> 订餐主页</a></li>
+                <li><a href="@Url.Content("~/Restaurant/CheckShoppingCar")"><i class="glyphicon glyphicon-shopping-cart"></i> 购物车</a></li>
+                <li><a href="@Url.Content("~/Restaurant/CheckMyOrders")"><i class="glyphicon glyphicon-tasks"></i> 我的订单</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-star"></i> 积分&福利 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="@Url.Content("~/Restaurant/CheckPoints")"><i class="fa fa-search-plus"></i> 查看积分</a></li>
+                        <li><a href="@Url.Content("~/Restaurant/PointsForDish")"><i class="fa fa-gift"></i> 积分换购</a></li>
+                        @if (resNo == "HS") { 
+                            <li role="separator" class="divider"></li>
+                            <li><a href="@Url.Content("~/Restaurant/BirthdayMeal")"><i class="fa fa-birthday-cake"></i> 领取生日餐</a></li>
+                        }
+                    </ul>
+                </li>
+                <li><a href="@Url.Content("~/Home/Index")"><i class="glyphicon glyphicon-log-out"></i> 退出订餐</a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<div class="clearfix" style="margin-top:50px"></div>

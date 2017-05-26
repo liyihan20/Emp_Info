@@ -1,0 +1,31 @@
+﻿@{
+    Layout = null;
+}
+
+<div class="modal fade" id="MessageModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="MessageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title text-info"><i class="fa fa-info-circle"></i> <span id="labelTip">信息提示</span></h4>
+            </div>
+            <div class="modal-body">
+                <p id="confirm_content"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //打开消息提示框，content是提示内容
+    function openMessageDialog(content,label) {
+        $("#MessageModal").modal("show");
+        if (label) {
+            $("#labelTip").html(label);
+        }
+        $("#confirm_content").html(content);        
+    }
+</script>

@@ -1,0 +1,101 @@
+﻿@section Scripts {
+    <script>
+        $(function () {
+
+            $("#searchText").keyup(function () {
+                if (event.keyCode == 13) {
+                    $("#searchBt").click();
+                }
+            });
+            //搜索按钮
+            $("#searchBt").click(function () {
+                $(this).button("loading");
+                $.post("@Url.Content("~/Admin/GetUsers")", {searchContent:$.trim($("#searchText").val())}, function (data) {
+                    //先更新页码
+                    if (data.suc) {
+                        $("#currentPage").html(1);
+                        $("#totalPage").html(data.pages);
+                        fillUsers(data.rows);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                    $("#searchBt").button("reset");
+                });
+            });
+
+            //下一页按钮
+            $("#nextLink").click(function () {
+                var currentP = parseInt($("#currentPage").html());
+                var totalP = parseInt($("#totalPage").html());
+                if (currentP == totalP) return;
+                $.post("@Url.Content("~/Admin/GetUsersPage")", { page: currentP + 1 }, function (data) {
+                    if (data.suc) {
+                        $("#currentPage").html(currentP + 1);
+                        fillUsers(data.rows);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+
+            //上一页按钮
+            $("#previousLink").click(function () {
+                var currentP = parseInt($("#currentPage").html());
+                if (currentP == 1) return;
+                $.post("@Url.Content("~/Admin/GetUsersPage")", { page: currentP - 1 }, function (data) {
+                    if (data.suc) {
+                        $("#currentPage").html(currentP - 1);
+                        fillUsers(data.rows);
+                    }
+                });
+            });
+        });
+
+        //填充用户列表
+        function fillUsers(rows) {
+            //清空已有内容
+            $("#userList a").remove();
+            //加载数据
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                var item = "<a class='list-group-item' href='@Url.Content("~/Admin/CheckUserDetail?cardNo=")"+row.cardNo+"'><div class='media'><div class='media-left media-middle'>";
+                item += "<img class='media-object' src='@Url.Content("~/Content/images/contact.png")' alt='user_friend'></div><div class='media-body'><h4 class='media-heading'>";
+                item += row.name + " " + row.sex;
+                item += "</h4><div style='color:gray'>";
+                item += row.depName + "<br/>" + row.cardNo + " " + row.status;
+                item += "</div></div><div class='media-right media-middle'><span class='glyphicon glyphicon-menu-right' style='color:green'></span></div></div></a>";
+                $("#userList").append(item);
+            }
+        }
+
+    </script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Admin/AdminIndex")">管理员工具栏</a></li>
+            <li class="active">用户管理</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="input-group">
+            <input type="text" class="form-control" id="searchText" placeholder="现有用户 @ViewData["userCount"] 人，输入厂牌、姓名、身份证、工资号搜索">
+            <span class="input-group-btn">
+                <button class="btn btn-primary" type="button" id="searchBt" data-loading-text="查询中..."><span class="glyphicon glyphicon-search"></span> Search</button>
+            </span>
+        </div><!-- /input-group -->
+    </div>
+    <div class="list-group" id="userList">
+        @*存放用户列表*@
+    </div>
+    <nav>
+        <ul class="pager">
+            <li><a href="#" id="previousLink">&larr; Previous</a></li>
+            <li>第<span id="currentPage">1</span>页，共<span id="totalPage">1</span>页</li>
+            <li><a href="#" id="nextLink">Next &rarr;</a></li>
+        </ul>
+    </nav>
+</div>
