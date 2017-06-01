@@ -236,16 +236,16 @@ namespace EmpInfo.Util
         {
             string alph = @"[A-Za-z]+";
             string num = @"\d+";
-            string cha = @"[\-`=\\\[\];',\./~!@#\$%\^&\*\(\)_\+\|\{\}:""<>\?]+";
+            //string cha = @"[\-`=\\\[\];',\./~!@#\$%\^&\*\(\)_\+\|\{\}:""<>\?]+";
             if (!new Regex(alph).IsMatch(str)) {
                 return "新密码必须包含英文字母，保存失败。英文字母有：A~Z，a~z";
             }
             if (!new Regex(num).IsMatch(str)) {
                 return "新密码必须包含阿拉伯数字，保存失败。数字有：0~9";
             }
-            if (!new Regex(cha).IsMatch(str)) {
-                return @"新密码必须包含特殊字符，保存失败。特殊字符有：-`=\[];',./~!@#$%^&*()_+|{}:""<>?";
-            }
+            //if (!new Regex(cha).IsMatch(str)) {
+            //    return @"新密码必须包含特殊字符，保存失败。特殊字符有：-`=\[];',./~!@#$%^&*()_+|{}:""<>?";
+            //}
             return "";
         }
 

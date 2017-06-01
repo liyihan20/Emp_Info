@@ -267,13 +267,23 @@ namespace EmpInfo.Controllers
 
         #endregion
 
-        #region 手机号码信息是否健全
+        #region 检查信息是否健全
 
+        //手机信息
         [SessionTimeOutJsonFilter]
         public JsonResult ValidatePhone()
         {
             if (string.IsNullOrEmpty(userInfoDetail.phone) && string.IsNullOrEmpty(userInfoDetail.shortPhone)) {
                 return Json(new SimpleResultModel() { suc = false, msg = "手机号码未填写，请先点击头像完善个人信息" });
+            }
+            return Json(new SimpleResultModel() { suc = true });
+        }
+
+        //邮箱信息
+        public JsonResult ValidateEmail()
+        {
+            if (string.IsNullOrEmpty(userInfoDetail.email)) {
+                return Json(new SimpleResultModel() { suc = false, msg = "检测到你的邮箱地址未填写，请先点击头像完善个人信息，邮箱地址不限于信利邮箱，可以是qq、网易邮箱或其他邮箱。" });
             }
             return Json(new SimpleResultModel() { suc = true });
         }

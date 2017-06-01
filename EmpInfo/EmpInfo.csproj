@@ -140,6 +140,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
+    <Compile Include="Controllers\PackageController.cs" />
     <Compile Include="Controllers\RestaurantBaseController.cs" />
     <Compile Include="Controllers\RestaurantController.cs" />
     <Compile Include="Controllers\ChartController.cs" />
@@ -331,6 +332,7 @@
     <Content Include="Content\images\user_man.png" />
     <Content Include="Content\images\user_woman.png" />
     <Content Include="Content\login.css" />
+    <Content Include="Content\select2.min.css" />
     <Content Include="Content\skins\all.css" />
     <Content Include="Content\skins\flat\aero%402x.png" />
     <Content Include="Content\skins\flat\aero.css" />
@@ -592,6 +594,7 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="Scripts\tooltipster.bundle.min.js" />
     <Content Include="Scripts\_references.js" />
@@ -640,6 +643,7 @@
     <Content Include="Views\Restaurant\MinisterMakeAnOrder.cshtml" />
     <Content Include="Views\Chart\ChartIndex.cshtml" />
     <Content Include="Views\Chart\ResChart.cshtml" />
+    <Content Include="Views\Package\EmpView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
