@@ -71,7 +71,7 @@ namespace EmpInfo.Controllers
                 {
                     return Json(new SimpleResultModel() { suc = false, msg = "邮箱地址不合法" });
                 }
-                if (db.ei_users.Where(u => u.email == email && u.id != userInfo.id).Count() > 0) {
+                if (db.ei_users.Where(u => u.email == email && u.id != userInfo.id && u.name!=userInfo.name).Count() > 0) {
                     return Json(new SimpleResultModel() { suc = false, msg = "此邮箱已被其他人绑定" });
                 }
                 user.email = email;
@@ -82,6 +82,9 @@ namespace EmpInfo.Controllers
                 if (!phoneR.IsMatch(phone))
                 {
                     return Json(new SimpleResultModel() { suc = false, msg = "手机长号必须是11位数字" });
+                }
+                if (db.ei_users.Where(u => u.phone == phone && u.id != userInfo.id && u.name != userInfo.name).Count() > 0) {
+                    return Json(new SimpleResultModel() { suc = false, msg = "此手机长号已被其他人绑定" });
                 }
                 user.phone = phone;
             }
@@ -253,7 +256,6 @@ namespace EmpInfo.Controllers
                     canteenDb.ljq20161019(userInfo.cardNo, lockStatus);
                 }
                 catch (Exception ex) {
-
                     return Json(new SimpleResultModel() { suc = false, msg = "操作失败,原因：" + ex.InnerException.Message });
                 }
                 CleardinningCarStatus();  //刷新饭卡状态
@@ -263,6 +265,76 @@ namespace EmpInfo.Controllers
 
             }
             return Json(new SimpleResultModel() { suc = false, msg = "操作失败" });
+        }
+
+                
+        //饭卡绑定
+        [SessionTimeOutJsonFilter]
+        public JsonResult GetDinnerCardBinding()
+        {
+            var bindings = canteenDb.t_UserConfig.Where(t => t.FNumber == userInfo.cardNo);
+            if (bindings.Count() < 1) {
+                return Json(new SimpleResultModel() { suc = false, msg = "没有绑卡信息" });
+            }
+            var binding = bindings.First();
+            return Json(new { suc = true, status = binding.FStatus, limit = binding.FQuota });
+        }
+
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult SaveDinnerCardBinding(string canConsume, string payPassword, int maxLimit)
+        {
+            if (maxLimit < 0 || maxLimit > 100) {
+                return Json(new SimpleResultModel() { suc = false, msg = "免密限额必须介于0与100之间" });
+            }
+            string phone = userInfoDetail.phone;
+            if (string.IsNullOrEmpty(phone)) {
+                return Json(new SimpleResultModel() { suc = false, msg = "保存设定需要先绑定手机长号，请在主界面点击头像设置手机长号" });
+            }
+            else {
+                var phoneExists = db.ei_users.Where(u => u.phone == phone && u.name != userInfo.name).Select(u=>u.name).Distinct().ToArray();
+                if (phoneExists.Count() > 0) {
+                    return Json(new SimpleResultModel() { suc = false, msg = "你的手机长号与[" + string.Join(",", phoneExists) + "]重复，保存失败。" });
+                }
+            }
+            var passwordRegx = new Regex(@"^\d{6}$");
+            var hasBindingRecord = canteenDb.t_UserConfig.Where(t => t.FNumber == userInfo.cardNo);
+            if (hasBindingRecord.Count() > 0) {
+                var record = hasBindingRecord.First();
+                if (!"之前设定密码".Equals(payPassword)) {
+                    if (!passwordRegx.IsMatch(payPassword)) {
+                        return Json(new SimpleResultModel() { suc = false, msg = "支付密码必须为6位数字" });
+                    }
+                    else {
+                        record.FPassword = MyUtils.getNormalMD5(payPassword);
+                    }
+                }
+                record.FPhone = phone;
+                record.FStatus = canConsume.Equals("1") ? "1" : "0";
+                record.FQuota = maxLimit;
+            }
+            else {
+                if (!passwordRegx.IsMatch(payPassword)) {
+                    return Json(new SimpleResultModel() { suc = false, msg = "支付密码必须为6位数字" });
+                }
+                t_UserConfig binding = new t_UserConfig();
+                binding.FNumber = userInfo.cardNo;
+                binding.FPassword = MyUtils.getNormalMD5(payPassword);
+                binding.FPhone = userInfoDetail.phone;
+                binding.FStatus = canConsume.Equals("1") ? "1" : "0";
+                binding.FQuota = maxLimit;
+
+                canteenDb.t_UserConfig.Add(binding);
+            }
+
+            try {
+                canteenDb.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = "服务器错误，保存失败，请联系管理员" });
+            }
+
+            return Json(new SimpleResultModel() { suc = true, msg = "保存设定成功！" }); 
         }
 
         #endregion
@@ -286,6 +358,40 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = "检测到你的邮箱地址未填写，请先点击头像完善个人信息，邮箱地址不限于信利邮箱，可以是qq、网易邮箱或其他邮箱。" });
             }
             return Json(new SimpleResultModel() { suc = true });
+        }
+
+        #endregion
+
+        #region 工资查询
+
+        [SessionTimeOutFilter]
+        public ActionResult CheckSalary()
+        {
+            int salaryNo=int.Parse(userInfoDetail.salaryNo);
+            ViewData["salaryNo"] = salaryNo;
+            ViewData["info"] = db.GetSalaryInfo(salaryNo).ToList();
+            ViewData["months"] = db.GetSalaryMonths(salaryNo).ToList();
+
+            WriteEventLog("工资查询", "进入工资查询页面");
+            return View();           
+        }
+
+        public JsonResult CheckSalarySummary(string yearMonth)
+        {
+            int salaryNo = int.Parse(userInfoDetail.salaryNo);
+            DateTime firstDay = DateTime.Parse(yearMonth + "-01");
+            DateTime lastDay = firstDay.AddMonths(1);
+
+            return Json(db.GetSalarySummary(salaryNo, firstDay, lastDay).ToList().First());
+        }
+
+        public JsonResult CheckSalaryDetail(string yearMonth)
+        {
+            int salaryNo=int.Parse(userInfoDetail.salaryNo);
+            DateTime firstDay = DateTime.Parse(yearMonth + "-01");
+            DateTime lastDay = firstDay.AddMonths(1);
+
+            return Json(db.GetSalaryDetail(salaryNo, firstDay, lastDay).ToList().First());
         }
 
         #endregion

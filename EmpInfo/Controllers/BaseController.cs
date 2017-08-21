@@ -98,7 +98,7 @@ namespace EmpInfo.Controllers
                     _dinningCarStatusModel = new DinningCardStatusModel();
                     _dinningCarStatusModel.username = userInfo.name;
                     _dinningCarStatusModel.cardNo = userInfo.cardNo;
-                    if (cardStatus.Count() < 1) {                        
+                    if (cardStatus.Count() < 1) { 
                         _dinningCarStatusModel.status = "不存在";
                         _dinningCarStatusModel.remainingSum = 0;
                         _dinningCarStatusModel.lastConsumeTime = "无";

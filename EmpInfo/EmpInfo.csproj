@@ -39,7 +39,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="cn.jpush.api, Version=3.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\cn.jpush.api.3.3.1\lib\net40\cn.jpush.api.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
@@ -74,9 +82,6 @@
     <Reference Include="Microsoft.Web.Mvc.FixedDisplayModes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.Mvc.FixedDisplayModes.1.0.0\lib\net40\Microsoft.Web.Mvc.FixedDisplayModes.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http">
       <Private>True</Private>
@@ -141,6 +146,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
     <Compile Include="Controllers\PackageController.cs" />
+    <Compile Include="Controllers\PushController.cs" />
     <Compile Include="Controllers\RestaurantBaseController.cs" />
     <Compile Include="Controllers\RestaurantController.cs" />
     <Compile Include="Controllers\ChartController.cs" />
@@ -213,6 +219,9 @@
     <Compile Include="Models\ei_authority.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_deliveryInfo.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_event_log.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -246,6 +255,15 @@
     <Compile Include="Models\GetPOAccount_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\GetSalaryDetail_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GetSalaryInfo_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GetSalarySummary_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\InfoDB.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -277,6 +295,9 @@
       <DependentUpon>Canteen.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ResModels.cs" />
+    <Compile Include="Models\t_UserConfig.cs">
+      <DependentUpon>Canteen.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ValidateDormStatus_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -294,6 +315,8 @@
     <Content Include="Content\autocomplete.css" />
     <Content Include="Content\bootstrap-datetimepicker.min.css" />
     <Content Include="Content\bootstrap-select.min.css" />
+    <Content Include="Content\bootstrap-slider.min.css" />
+    <Content Include="Content\bootstrap-switch.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -568,6 +591,8 @@
     <Content Include="Scripts\bootstrap-datetimepicker.min.js" />
     <Content Include="Scripts\bootstrap-datetimepicker.zh-CN.js" />
     <Content Include="Scripts\bootstrap-select.min.js" />
+    <Content Include="Scripts\bootstrap-slider.min.js" />
+    <Content Include="Scripts\bootstrap-switch.min.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\echarts.js" />
     <Content Include="Scripts\echarts.simple.min.js" />
@@ -645,6 +670,7 @@
     <Content Include="Views\Chart\ChartIndex.cshtml" />
     <Content Include="Views\Chart\ResChart.cshtml" />
     <Content Include="Views\Package\EmpView.cshtml" />
+    <Content Include="Views\Home\CheckSalary.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

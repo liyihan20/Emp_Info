@@ -245,6 +245,24 @@
           <Property Name="action_name" Type="varchar" MaxLength="30" />
           <Property Name="iconcls" Type="varchar" MaxLength="50" />
         </EntityType>
+        <EntityType Name="ei_deliveryInfo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_id" Type="int" />
+          <Property Name="register_date" Type="datetime" />
+          <Property Name="delivery_no" Type="varchar" MaxLength="50" />
+          <Property Name="deivery_cop" Type="varchar" MaxLength="50" />
+          <Property Name="delivery_stuff" Type="varchar" MaxLength="100" />
+          <Property Name="drop_date" Type="datetime" />
+          <Property Name="fetch_date" Type="datetime" />
+          <Property Name="dorm_area" Type="varchar" MaxLength="50" />
+          <Property Name="dorm_number" Type="varchar" MaxLength="50" />
+          <Property Name="status" Type="varchar" MaxLength="50" />
+          <Property Name="is_finish" Type="bit" />
+          <Property Name="packs" Type="int" />
+        </EntityType>
         <EntityType Name="ei_event_log">
           <Key>
             <PropertyRef Name="id" />
@@ -429,6 +447,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ei_deliveryInfo_ei_users">
+          <End Role="ei_users" Type="Self.ei_users" Multiplicity="0..1" />
+          <End Role="ei_deliveryInfo" Type="Self.ei_deliveryInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_deliveryInfo">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ei_groupAuthority_ei_authority">
           <End Role="ei_authority" Type="Self.ei_authority" Multiplicity="0..1" />
           <End Role="ei_groupAuthority" Type="Self.ei_groupAuthority" Multiplicity="*" />
@@ -494,6 +524,22 @@
         <Function Name="GetPOAccount" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="po_number" Type="varchar" Mode="In" />
         </Function>
+        <Function Name="GetSalaryDetail" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="salary_no" Type="int" Mode="In" />
+          <Parameter Name="begin_date" Type="datetime" Mode="In" />
+          <Parameter Name="end_date" Type="datetime" Mode="In" />
+        </Function>
+        <Function Name="GetSalaryInfo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="salary_no" Type="int" Mode="In" />
+        </Function>
+        <Function Name="GetSalaryMonths" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="salary_no" Type="int" Mode="In" />
+        </Function>
+        <Function Name="GetSalarySummary" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="salary_no" Type="int" Mode="In" />
+          <Parameter Name="begin_date" Type="datetime" Mode="In" />
+          <Parameter Name="end_date" Type="datetime" Mode="In" />
+        </Function>
         <Function Name="InsertIntoYFEmp" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="email" Type="varchar" Mode="In" />
           <Parameter Name="mobilephone" Type="varchar" Mode="In" />
@@ -520,6 +566,7 @@
           <EntitySet Name="dn_Restaurent" EntityType="Self.dn_Restaurent" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="dn_shoppingCar" EntityType="Self.dn_shoppingCar" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_authority" EntityType="Self.ei_authority" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_deliveryInfo" EntityType="Self.ei_deliveryInfo" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_event_log" EntityType="Self.ei_event_log" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groupAuthority" EntityType="Self.ei_groupAuthority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groups" EntityType="Self.ei_groups" Schema="dbo" store:Type="Tables" />
@@ -582,6 +629,10 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           <AssociationSet Name="FK_dn_shoppingCar_dn_order" Association="Self.FK_dn_shoppingCar_dn_order">
             <End Role="dn_order" EntitySet="dn_order" />
             <End Role="dn_shoppingCar" EntitySet="dn_shoppingCar" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ei_deliveryInfo_ei_users" Association="Self.FK_ei_deliveryInfo_ei_users">
+            <End Role="ei_users" EntitySet="ei_users" />
+            <End Role="ei_deliveryInfo" EntitySet="ei_deliveryInfo" />
           </AssociationSet>
           <AssociationSet Name="FK_ei_groupAuthority_ei_authority" Association="Self.FK_ei_groupAuthority_ei_authority">
             <End Role="ei_authority" EntitySet="ei_authority" />
@@ -696,6 +747,27 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
             <Parameter Name="username" Mode="In" Type="String" />
             <Parameter Name="cardno" Mode="In" Type="String" />
           </FunctionImport>
+          <EntitySet Name="ei_deliveryInfo" EntityType="ICAuditModel.ei_deliveryInfo" />
+          <AssociationSet Name="FK_ei_deliveryInfo_ei_users" Association="ICAuditModel.FK_ei_deliveryInfo_ei_users">
+            <End Role="ei_users" EntitySet="ei_users" />
+            <End Role="ei_deliveryInfo" EntitySet="ei_deliveryInfo" />
+          </AssociationSet>
+          <FunctionImport Name="GetSalaryDetail" ReturnType="Collection(ICAuditModel.GetSalaryDetail_Result)">
+            <Parameter Name="salary_no" Mode="In" Type="Int32" />
+            <Parameter Name="begin_date" Mode="In" Type="DateTime" />
+            <Parameter Name="end_date" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <FunctionImport Name="GetSalaryInfo" ReturnType="Collection(ICAuditModel.GetSalaryInfo_Result)">
+          <Parameter Name="salary_no" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="GetSalarySummary" ReturnType="Collection(ICAuditModel.GetSalarySummary_Result)">
+            <Parameter Name="salary_no" Mode="In" Type="Int32" />
+            <Parameter Name="begin_date" Mode="In" Type="DateTime" />
+            <Parameter Name="end_date" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <FunctionImport Name="GetSalaryMonths" ReturnType="Collection(String)">
+          <Parameter Name="salary_no" Mode="In" Type="Int32" />
+          </FunctionImport>
         </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -717,6 +789,7 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           <NavigationProperty Name="ei_groupUser" Relationship="ICAuditModel.FK_ei_groupUser_ei_users" FromRole="ei_users" ToRole="ei_groupUser" />
           <Property Name="short_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="short_portrait" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <NavigationProperty Name="ei_deliveryInfo" Relationship="ICAuditModel.FK_ei_deliveryInfo_ei_users" FromRole="ei_users" ToRole="ei_deliveryInfo" />
         </EntityType>
         <EntityType Name="ei_event_log">
           <Key>
@@ -1219,6 +1292,70 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           <Property Name="dep_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="short_dep_name" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
         </EntityType>
+        <EntityType Name="ei_deliveryInfo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_id" Type="Int32" />
+          <Property Name="register_date" Type="DateTime" Precision="3" />
+          <Property Name="delivery_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="deivery_cop" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="delivery_stuff" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="drop_date" Type="DateTime" Precision="3" />
+          <Property Name="fetch_date" Type="DateTime" Precision="3" />
+          <Property Name="dorm_area" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="dorm_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="status" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="is_finish" Type="Boolean" />
+          <NavigationProperty Name="ei_users" Relationship="ICAuditModel.FK_ei_deliveryInfo_ei_users" FromRole="ei_deliveryInfo" ToRole="ei_users" />
+          <Property Name="packs" Type="Int32" />
+        </EntityType>
+        <Association Name="FK_ei_deliveryInfo_ei_users">
+          <End Type="ICAuditModel.ei_users" Role="ei_users" Multiplicity="0..1" />
+          <End Type="ICAuditModel.ei_deliveryInfo" Role="ei_deliveryInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_deliveryInfo">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <ComplexType Name="GetSalaryInfo_Result" >
+          <Property Type="Decimal" Name="basicSalary" Nullable="false" />
+          <Property Type="String" Name="salaryType" Nullable="false" />
+          <Property Type="String" Name="lastSalaryDate" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="GetSalarySummary_Result" >
+          <Property Type="Decimal" Name="work_days" Nullable="false" />
+          <Property Type="Decimal" Name="basicSalary" Nullable="false" />
+          <Property Type="Decimal" Name="should_pay_salary" Nullable="false" />
+          <Property Type="Decimal" Name="withhold_salary" Nullable="false" />
+          <Property Type="Decimal" Name="real_salary" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="GetSalaryDetail_Result" >
+          <Property Type="Decimal" Name="work_days" Nullable="true" />
+          <Property Type="Decimal" Name="monthly_work_days" Nullable="true" />
+          <Property Type="Decimal" Name="counter_days" Nullable="true" />
+          <Property Type="Decimal" Name="off_duty_days" Nullable="true" />
+          <Property Type="Decimal" Name="late_days" Nullable="true" />
+          <Property Type="Decimal" Name="run_away_days" Nullable="true" />
+          <Property Type="Decimal" Name="allowance" Nullable="true" />
+          <Property Type="Decimal" Name="work_value" Nullable="true" />
+          <Property Type="Decimal" Name="other_salary" Nullable="true" />
+          <Property Type="Decimal" Name="cut_money" Nullable="true" />
+          <Property Type="Decimal" Name="sanction" Nullable="true" />
+          <Property Type="Decimal" Name="overtime_salary" Nullable="true" />
+          <Property Type="Decimal" Name="work_years_salary" Nullable="true" />
+          <Property Type="Decimal" Name="dinner_welfare" Nullable="true" />
+          <Property Type="Decimal" Name="dorm_rent" Nullable="true" />
+          <Property Type="Decimal" Name="other_debit" Nullable="true" />
+          <Property Type="Decimal" Name="tax" Nullable="true" />
+          <Property Type="Decimal" Name="old_insurance" Nullable="true" />
+          <Property Type="Decimal" Name="public_reserve_funds" Nullable="true" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1654,6 +1791,71 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
             </EntityTypeMapping>
           </EntitySetMapping>
           <FunctionImportMapping FunctionImportName="InsertIntoYFEmp" FunctionName="ICAuditModel.Store.InsertIntoYFEmp" />
+          <EntitySetMapping Name="ei_deliveryInfo">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_deliveryInfo">
+              <MappingFragment StoreEntitySet="ei_deliveryInfo">
+                <ScalarProperty Name="packs" ColumnName="packs" />
+                <ScalarProperty Name="is_finish" ColumnName="is_finish" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="dorm_number" ColumnName="dorm_number" />
+                <ScalarProperty Name="dorm_area" ColumnName="dorm_area" />
+                <ScalarProperty Name="fetch_date" ColumnName="fetch_date" />
+                <ScalarProperty Name="drop_date" ColumnName="drop_date" />
+                <ScalarProperty Name="delivery_stuff" ColumnName="delivery_stuff" />
+                <ScalarProperty Name="deivery_cop" ColumnName="deivery_cop" />
+                <ScalarProperty Name="delivery_no" ColumnName="delivery_no" />
+                <ScalarProperty Name="register_date" ColumnName="register_date" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetSalaryDetail" FunctionName="ICAuditModel.Store.GetSalaryDetail" >
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetSalaryDetail_Result">
+                <ScalarProperty Name="work_days" ColumnName="work_days" />
+                <ScalarProperty Name="monthly_work_days" ColumnName="monthly_work_days" />
+                <ScalarProperty Name="counter_days" ColumnName="counter_days" />
+                <ScalarProperty Name="off_duty_days" ColumnName="off_duty_days" />
+                <ScalarProperty Name="late_days" ColumnName="late_days" />
+                <ScalarProperty Name="run_away_days" ColumnName="run_away_days" />
+                <ScalarProperty Name="allowance" ColumnName="allowance" />
+                <ScalarProperty Name="work_value" ColumnName="work_value" />
+                <ScalarProperty Name="other_salary" ColumnName="other_salary" />
+                <ScalarProperty Name="cut_money" ColumnName="cut_money" />
+                <ScalarProperty Name="sanction" ColumnName="sanction" />
+                <ScalarProperty Name="overtime_salary" ColumnName="overtime_salary" />
+                <ScalarProperty Name="work_years_salary" ColumnName="work_years_salary" />
+                <ScalarProperty Name="dinner_welfare" ColumnName="dinner_welfare" />
+                <ScalarProperty Name="dorm_rent" ColumnName="dorm_rent" />
+                <ScalarProperty Name="other_debit" ColumnName="other_debit" />
+                <ScalarProperty Name="tax" ColumnName="tax" />
+                <ScalarProperty Name="old_insurance" ColumnName="old_insurance" />
+                <ScalarProperty Name="public_reserve_funds" ColumnName="public_reserve_funds" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetSalaryInfo" FunctionName="ICAuditModel.Store.GetSalaryInfo" >
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetSalaryInfo_Result">
+                <ScalarProperty Name="basicSalary" ColumnName="basicSalary" />
+                <ScalarProperty Name="salaryType" ColumnName="salaryType" />
+                <ScalarProperty Name="lastSalaryDate" ColumnName="lastSalaryDate" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetSalarySummary" FunctionName="ICAuditModel.Store.GetSalarySummary" >
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetSalarySummary_Result">
+                <ScalarProperty Name="work_days" ColumnName="work_days" />
+                <ScalarProperty Name="basicSalary" ColumnName="basicSalary" />
+                <ScalarProperty Name="should_pay_salary" ColumnName="should_pay_salary" />
+                <ScalarProperty Name="withhold_salary" ColumnName="withhold_salary" />
+                <ScalarProperty Name="real_salary" ColumnName="real_salary" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetSalaryMonths" FunctionName="ICAuditModel.Store.GetSalaryMonths" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

@@ -52,6 +52,7 @@ namespace EmpInfo.Models
         public DbSet<dn_Restaurent> dn_Restaurent { get; set; }
         public DbSet<ei_resVisitLog> ei_resVisitLog { get; set; }
         public DbSet<vw_ei_simple_users> vw_ei_simple_users { get; set; }
+        public DbSet<ei_deliveryInfo> ei_deliveryInfo { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {
@@ -139,6 +140,58 @@ namespace EmpInfo.Models
                 new ObjectParameter("cardno", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("InsertIntoYFEmp", emailParameter, mobilephoneParameter, shortphoneParameter, usernameParameter, cardnoParameter);
+        }
+    
+        public virtual ObjectResult<GetSalaryDetail_Result> GetSalaryDetail(Nullable<int> salary_no, Nullable<System.DateTime> begin_date, Nullable<System.DateTime> end_date)
+        {
+            var salary_noParameter = salary_no.HasValue ?
+                new ObjectParameter("salary_no", salary_no) :
+                new ObjectParameter("salary_no", typeof(int));
+    
+            var begin_dateParameter = begin_date.HasValue ?
+                new ObjectParameter("begin_date", begin_date) :
+                new ObjectParameter("begin_date", typeof(System.DateTime));
+    
+            var end_dateParameter = end_date.HasValue ?
+                new ObjectParameter("end_date", end_date) :
+                new ObjectParameter("end_date", typeof(System.DateTime));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSalaryDetail_Result>("GetSalaryDetail", salary_noParameter, begin_dateParameter, end_dateParameter);
+        }
+    
+        public virtual ObjectResult<GetSalaryInfo_Result> GetSalaryInfo(Nullable<int> salary_no)
+        {
+            var salary_noParameter = salary_no.HasValue ?
+                new ObjectParameter("salary_no", salary_no) :
+                new ObjectParameter("salary_no", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSalaryInfo_Result>("GetSalaryInfo", salary_noParameter);
+        }
+    
+        public virtual ObjectResult<GetSalarySummary_Result> GetSalarySummary(Nullable<int> salary_no, Nullable<System.DateTime> begin_date, Nullable<System.DateTime> end_date)
+        {
+            var salary_noParameter = salary_no.HasValue ?
+                new ObjectParameter("salary_no", salary_no) :
+                new ObjectParameter("salary_no", typeof(int));
+    
+            var begin_dateParameter = begin_date.HasValue ?
+                new ObjectParameter("begin_date", begin_date) :
+                new ObjectParameter("begin_date", typeof(System.DateTime));
+    
+            var end_dateParameter = end_date.HasValue ?
+                new ObjectParameter("end_date", end_date) :
+                new ObjectParameter("end_date", typeof(System.DateTime));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSalarySummary_Result>("GetSalarySummary", salary_noParameter, begin_dateParameter, end_dateParameter);
+        }
+    
+        public virtual ObjectResult<string> GetSalaryMonths(Nullable<int> salary_no)
+        {
+            var salary_noParameter = salary_no.HasValue ?
+                new ObjectParameter("salary_no", salary_no) :
+                new ObjectParameter("salary_no", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("GetSalaryMonths", salary_noParameter);
         }
     }
 }

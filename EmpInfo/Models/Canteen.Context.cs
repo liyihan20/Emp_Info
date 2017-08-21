@@ -28,6 +28,7 @@ namespace EmpInfo.Models
             throw new UnintentionalCodeFirstException();
         }
     
+        public DbSet<t_UserConfig> t_UserConfig { get; set; }
     
         public virtual ObjectResult<ljq20160323_001_Result> ljq20160323_001(string empNo, string begDay, string endDay)
         {

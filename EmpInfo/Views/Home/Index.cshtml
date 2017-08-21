@@ -32,7 +32,7 @@
         //每次打开主页先看邮箱是否有绑定
         $.post("@Url.Content("~/Home/ValidateEmail")", {}, function (data) {
             if (!data.suc) {
-                toastr.error(data.msg);
+                toastr.error(data.msg, "", { timeOut: 6000 });
             }
         });
 
@@ -128,6 +128,11 @@
             window.location.href = "@Url.Content("~/Admin/AdminIndex")";
         });
 
+        //工资查询入口
+        $("#SalaryImg,#SalaryBt").click(function () {
+            window.location.href = "@Url.Content("~/Home/CheckSalary")";
+        });
+
         //图形报表
         $("#chartBt,#chartImg").click(function () {
             window.location.href = "@Url.Content("~/Chart/ChartIndex")";
@@ -172,18 +177,6 @@
 <div class="row">
     <div class="col-xs-6 col-sm-4">
         <div class="thumbnail">
-            <a href="#" id="dormitoryImg">
-                <img src="@Url.Content("~/Content/images/dormitory_128.png")" alt="dormitory">
-            </a>
-            <div class="caption">
-                <h3>住宿状态及费用查询</h3>
-                <p>可以查询本人最近半年内的房租、水电费、扣费等记录</p>
-                <p><button class="btn btn-primary btn-block" id="dormitoryBt">进入查询</button></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-xs-6 col-sm-4">
-        <div class="thumbnail">
             <a href="#" id="mealImg"><img src="@Url.Content("~/Content/images/meal.png")" alt="meal"></a>
             <div class="caption">
                 <h3>饭卡余额及消费查询</h3>
@@ -194,6 +187,28 @@
     </div>
     <div class="col-xs-6 col-sm-4">
         <div class="thumbnail">
+            <a href="#" id="SalaryImg"><img src="@Url.Content("~/Content/images/salary.png")" alt="salary"></a>
+            <div class="caption">
+                <h3>工资明细查询</h3>
+                <p>可以查询本人的工资概况和最近一年内的发放明细记录</p>
+                <p><button class="btn btn-danger btn-block" id="SalaryBt">进入查询</button></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 col-sm-4">
+        <div class="thumbnail">
+            <a href="#" id="dormitoryImg">
+                <img src="@Url.Content("~/Content/images/dormitory_128.png")" alt="dormitory">
+            </a>
+            <div class="caption">
+                <h3>住宿状态及费用查询</h3>
+                <p>可以查询本人最近半年内的房租、水电费、扣费等记录</p>
+                <p><button class="btn btn-primary btn-block" id="dormitoryBt">进入查询</button></p>
+            </div>
+        </div>
+    </div>
+    @*<div class="col-xs-6 col-sm-4">
+        <div class="thumbnail">
             <a href="#" id="packageImg"><img src="@Url.Content("~/Content/images/post.png")" alt="package"></a>
             <div class="caption">
                 <h3>宿舍快件寄存</h3>
@@ -201,7 +216,7 @@
                 <p><button class="btn btn-primary btn-block" id="packageBt">进入登记</button></p>
             </div>
         </div>
-    </div>
+    </div>*@
     @if (auts.IndexOf("AdminIndex") >= 0)
     {
     <div class="col-xs-6 col-sm-4">
@@ -234,16 +249,6 @@
                 <h3>会所订餐系统</h3>
                 <p>可以在会所进行订餐，并查询自己的订餐记录</p>
                 <p><button class="btn btn-primary btn-block" id="ResBt">进入系统(测试中...)</button></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-xs-6 col-sm-4">
-        <div class="thumbnail">
-            <a href="#" id="SalaryImg"><img src="@Url.Content("~/Content/images/salary.png")" alt="salary"></a>
-            <div class="caption">
-                <h3>工资明细查询</h3>
-                <p>可以查询本人最近半年内的工资明细记录</p>
-                <p><button class="btn btn-danger btn-block disabled" id="SalaryBt">暂未开放</button></p>
             </div>
         </div>
     </div>

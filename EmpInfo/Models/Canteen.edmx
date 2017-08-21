@@ -4,7 +4,18 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="CanteenModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+    <Schema Namespace="CanteenModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="t_UserConfig">
+          <Key>
+            <PropertyRef Name="FID" />
+          </Key>
+          <Property Name="FID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FNumber" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="FPhone" Type="nvarchar" MaxLength="50" />
+          <Property Name="FPassword" Type="nvarchar(max)" />
+          <Property Name="FQuota" Type="money" Nullable="false" />
+          <Property Name="FStatus" Type="nvarchar" MaxLength="5" />
+        </EntityType>
         <Function Name="laijq20161105_001" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="laijq20161105_002" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="ljq20160323_001" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
@@ -24,7 +35,9 @@
           <Parameter Name="EmpNo" Type="nvarchar" Mode="In" />
           <Parameter Name="Status" Type="nvarchar" Mode="In" />
         </Function>
-        <EntityContainer Name="CanteenModelStoreContainer" />
+        <EntityContainer Name="CanteenModelStoreContainer">
+          <EntitySet Name="t_UserConfig" EntityType="Self.t_UserConfig" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -49,6 +62,7 @@
           </FunctionImport>
           <FunctionImport Name="laijq20161105_001" ReturnType="Collection(CanteenModel.laijq20161105_001_Result)" />
           <FunctionImport Name="laijq20161105_002" ReturnType="Collection(CanteenModel.laijq20161105_002_Result)" />
+          <EntitySet Name="t_UserConfig" EntityType="CanteenModel.t_UserConfig" />
         </EntityContainer>
         <ComplexType Name="ljq20160323_001_Result">
           <Property Type="DateTime" Name="消费时间" Nullable="false" Precision="23" />
@@ -77,6 +91,17 @@
           <Property Type="String" Name="FType" Nullable="false" MaxLength="4" />
           <Property Type="Int32" Name="Total" Nullable="true" />
         </ComplexType>
+        <EntityType Name="t_UserConfig">
+          <Key>
+            <PropertyRef Name="FID" />
+          </Key>
+          <Property Name="FID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FNumber" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="FPhone" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="FPassword" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="FQuota" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
+          <Property Name="FStatus" Type="String" MaxLength="5" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -131,6 +156,18 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="t_UserConfig">
+            <EntityTypeMapping TypeName="CanteenModel.t_UserConfig">
+              <MappingFragment StoreEntitySet="t_UserConfig">
+                <ScalarProperty Name="FStatus" ColumnName="FStatus" />
+                <ScalarProperty Name="FQuota" ColumnName="FQuota" />
+                <ScalarProperty Name="FPassword" ColumnName="FPassword" />
+                <ScalarProperty Name="FPhone" ColumnName="FPhone" />
+                <ScalarProperty Name="FNumber" ColumnName="FNumber" />
+                <ScalarProperty Name="FID" ColumnName="FID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

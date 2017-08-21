@@ -4,7 +4,29 @@
 }
 
 @section CSS{
-    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />    
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-slider.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-switch.min.css")" />
+    <style type="text/css">
+        #ex1Slider .slider-selection {
+	        background: #85C7E7;
+        }
+        #ex1Slider .tooltip-inner{
+            background:#0B8BCC;
+        }
+        .slider.slider-horizontal{
+            width:100%;
+        }
+
+        .b-label {
+            display: inline-block;
+            width: 80px;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
 }
 @section Scripts{
     @*加入以下js，使IE8支持datetimepicker组件*@
@@ -32,9 +54,12 @@
     @*<script src="@Url.Content("~/Scripts/moment.js")"></script>*@
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-slider.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-switch.min.js")"></script>    
     <script>        
         //日期控件设置
-        $(function () {
+        $(function () {           
+
             $(".form_date").datetimepicker({
                 language: 'zh-CN',
                 format: "yyyy-mm-dd",
@@ -144,13 +169,138 @@
             $("#unLockCard").click(function () {
                 openConfirmDialog("确认要解除挂失你的饭卡吗？解除挂失后此饭卡可以继续刷机消费。", function () { lockOrUnlockCard("1"); });
             });
+
+            //$('#maxLimit').slider();
+            //$("#maxLimit").on("slide", function (slideEvt) {
+            //    $("#maxLimitValue").html(slideEvt.value + " 元");
+            //});
+            
+            $('#maxLimit').slider({
+                formatter: function (value) {
+                    return value + " 元";
+                }
+            });
+
+            $('[name="canConsume"]').bootstrapSwitch({
+                onText: "开启",
+                offText: "关闭",
+                onColor: "success",
+                offColor: "default",
+                size: "small",
+                onInit: function (event, state) {
+                    if (state == true) {
+                        $("#payPassword").removeAttr("disabled");
+                        $('#maxLimit').slider("enable");
+                        $(this).val("1");
+                    } else {
+                        $("#payPassword").attr("disabled", "disabled");
+                        $('#maxLimit').slider("disable");
+                        $(this).val("0");
+                    }
+                },
+                onSwitchChange: function (event, state) {
+                    if (state == true) {
+                        $("#payPassword").removeAttr("disabled");
+                        $('#maxLimit').slider("enable");
+                        $(this).val("1");
+                    } else {
+                        $("#payPassword").attr("disabled", "disabled");
+                        $('#maxLimit').slider("disable");
+                        $(this).val("0");
+                    }
+                }
+            });
+
+            $("#seePayPassword").click(function () {
+                if ($(this).hasClass("fa-eye-slash")) {
+                    $(this).removeClass("fa-eye-slash").addClass("fa-eye");
+                    $("#payPassword").attr({ "type": "text" });
+                } else {
+                    $(this).removeClass("fa-eye").addClass("fa-eye-slash");
+                    $("#payPassword").attr({ "type": "password" });
+                }
+            });
+
+
+            //获取饭卡绑定信息
+            $.post("@Url.Content("~/Home/GetDinnerCardBinding")", {}, function (data) {
+                if (data.suc) {
+                    $('#maxLimit').slider("setValue", data.limit);
+                    $("#payPassword").val("之前设定密码");
+                    if (data.status == "1") {
+                        $('[name="canConsume"]').bootstrapSwitch("state", true);
+                    }
+                }
+            });
+
+            //保存饭卡绑定信息
+            $("#saveDinnerCar").on("click", function () {
+                var canConsume = $('input[name="canConsume"]').val();
+                var payPassword = $("#payPassword").val();
+                var maxLimit = $('#maxLimit')[0].value;
+                console.log(canConsume + ";" + payPassword + ";" + maxLimit);
+                
+                if (canConsume == "1") {
+                    if (payPassword == "") {
+                        toastr.error("开启状态下请设定支付密码");
+                        return;
+                    }
+                    if (payPassword != "之前设定密码") {
+                        var reg = new RegExp(/^\d{6}$/);
+                        if (!reg.test(payPassword)) {
+                            toastr.error("支付密码必须为6位数字，保存失败");
+                            return;
+                        }
+                    }
+                }
+                if (parseInt(maxLimit) < 0 || parseInt(maxLimit) > 100) {
+                    toastr.error("免密限额必须介于0与100之间！");
+                    return;
+                }
+                
+                $("#saveDinnerCar").addClass("disabled");
+                $.post("@Url.Content("~/Home/SaveDinnerCardBinding")", {
+                    canConsume: canConsume,
+                    payPassword: payPassword,
+                    maxLimit:maxLimit
+                }, function (data) {
+                    $("#saveDinnerCar").removeClass("disabled");
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+
+            });
+            
+            $("#dinner_title").on("click", function () {                
+                if ($("#dinner_op_icon").hasClass("fa-chevron-circle-down")) {
+                    $("#dinner_op_icon").removeClass("fa-chevron-circle-down").addClass("fa-chevron-circle-up");
+                    $("#dinner_body").slideDown(500);
+                } else {
+                    $("#dinner_op_icon").removeClass("fa-chevron-circle-up").addClass("fa-chevron-circle-down");
+                    $("#dinner_body").slideUp(500);                    
+                }
+            });
+
+            $("#c_r_title").on("click", function () {
+                if ($("#c_r_op_icon").hasClass("fa-chevron-circle-down")) {
+                    $("#c_r_op_icon").removeClass("fa-chevron-circle-down").addClass("fa-chevron-circle-up");
+                    $("#c_r_body").slideDown(500);
+                } else {
+                    $("#c_r_op_icon").removeClass("fa-chevron-circle-up").addClass("fa-chevron-circle-down");
+                    $("#c_r_body").slideUp(500);
+                }
+            });
+
         });
 
         //挂失、解除挂失
         function lockOrUnlockCard(isLock) {
             console.log(isLock);
             $.post("@Url.Content("~/Home/LockOrUnlock")", { lockStatus: isLock }, function (data) {
-                if (data.suc) {
+                if (data.suc) {                    
                     toastr.success(data.msg);
                     setTimeout(function () { location.reload(true); },1000);
                 } else {
@@ -167,32 +317,71 @@
     </div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-xs-6 col-md-4">
+            <div class="col-xs-4 col-md-4">
                 姓名：<strong class="text-success">@ds.username</strong>
             </div>
-            <div class="col-xs-6 col-md-4">
+            <div class="col-xs-8 col-md-4">
                 厂牌：<strong class="text-success">@ds.cardNo</strong>
             </div>
+            <div class="col-xs-4 col-md-4">余额：<strong class="text-success">@(((decimal)ds.remainingSum).ToString("0.0"))</strong> </div>
             <div class="col-xs-8 col-md-4">
-                饭卡状态：<strong class="text-success">@ds.status</strong>
+                状态：<strong class="text-success">@ds.status</strong>
                 @if (ds.status.Equals("挂失")) { 
-                <a href="#" class="text-danger" id="unLockCard">&nbsp; 解除挂失？ </a>
+                    <a href="#" class="text-danger" id="unLockCard">&nbsp; 解除挂失？ </a>
                 }
                 else if(ds.status.Equals("正常")) {
                     <a href="#" class="text-danger" id="lockCard">&nbsp; 申请挂失？ </a>
                 }
             </div>
-            <div class="col-xs-4 col-md-4">余额：<strong class="text-success">@(((decimal)ds.remainingSum).ToString("0.0"))</strong> </div>
             <div class="col-xs-12 col-md-8">最后消费时间：<strong class="text-success">@ds.lastConsumeTime</strong></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title" id="dinner_title">
+        <i class="fa fa-vcard"></i> 信利超市饭卡消费绑定
+        <span class="pull-right"><i class="fa fa-chevron-circle-down" id="dinner_op_icon"></i></span>
+        </h3>
+    </div>
+    <div class="panel-body" id="dinner_body" style="display:none">
+        <div class="b-div">
+            <span class="b-label">是否启用:</span>
+            <input name="canConsume" type="checkbox" data-size="small">
+            <p class="small text-danger"><i class="fa fa-info-circle"></i> 开启表示开通刷卡消费，关闭表示禁用刷卡消费</p>
+        </div>
+        <div class="b-div">
+            <span class="b-label" style="vertical-align:top;">支付密码:</span>
+            <span style="display:inline;width:70%;">
+                <span class="input-group" style="display:inline-table;width:70%;">
+                    <input type="password" id="payPassword" name="payPassword" class="form-control input-sm" placeholder="请输入6位数字" />
+                    <span class="input-group-addon"><i id="seePayPassword" title="查看密码" class="fa fa-eye-slash text-danger"></i> </span>
+                </span>
+            </span>
+        </div>
+        <div class="b-div" style="margin-top:32px;">
+            <span class="b-label">免密限额:</span>
+            <span style="display:inline-block;width:70%;vertical-align:top;">
+                <input id="maxLimit" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0" data-slider-tooltip="always"/>
+            </span>
+            <p class="small text-danger"><i class="fa fa-info-circle"></i> 例如：免密限额设置为50元，则50元以下消费不需要输入支付密码，50元以上消费则需要输入支付密码</p>
+        </div>
+        <div class="b-div">
+            <button class="btn btn-primary btn-block" id="saveDinnerCar"><i class="fa fa-save"></i> 保存设定</button>
+            <p class="small text-danger"><i class="fa fa-info-circle"></i> 以上设定只对信利城市广场和蓝天广场等消费时生效，对食堂和社区超市消费没有影响。</p>            
         </div>
     </div>
 </div>
 
 <div class="panel panel-danger">
     <div class="panel-heading">
-        <h3 class="panel-title"><span class="glyphicon glyphicon-usd"></span> 消费&充值记录查询</h3>
+        <h3 class="panel-title" id="c_r_title">
+            <span class="glyphicon glyphicon-usd"></span> 消费&充值记录查询
+            <span class="pull-right"><i class="fa fa-chevron-circle-down" id="c_r_op_icon"></i></span>
+        </h3>
     </div>
-    <div class="panel-body">
+    <div class="panel-body" id="c_r_body" style="display:none">
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active"><a href="#consumeRecord" aria-controls="consumeRecord" role="tab" data-toggle="tab">查询消费记录</a></li>

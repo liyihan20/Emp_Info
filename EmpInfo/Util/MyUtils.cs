@@ -102,16 +102,20 @@ namespace EmpInfo.Util
             {
                 str = "Who" + str + "Are" + str + "You";
             }
+            return getNormalMD5(str);
+
+        }
+
+        public static string getNormalMD5(string str)
+        {
             MD5 md5 = new MD5CryptoServiceProvider();
             byte[] data = Encoding.Default.GetBytes(str);
             byte[] result = md5.ComputeHash(data);
             String ret = "";
-            for (int i = 0; i < result.Length; i++)
-            {
+            for (int i = 0; i < result.Length; i++) {
                 ret += result[i].ToString("x").PadLeft(2, '0');
             }
             return ret;
-
         }
 
         //将中文编码为utf-8
