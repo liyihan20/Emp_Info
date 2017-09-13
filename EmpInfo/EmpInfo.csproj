@@ -43,6 +43,10 @@
       <HintPath>..\packages\cn.jpush.api.3.3.1\lib\net40\cn.jpush.api.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Gma.QrCodeNet.Encoding.Net35, Version=0.4.0.0, Culture=neutral, PublicKeyToken=e8a75d24b142be49, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Gma.QrCodeNet.Encoding.Net35.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -54,6 +58,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -142,6 +147,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\AndroidAppController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
@@ -222,6 +228,9 @@
     <Compile Include="Models\ei_deliveryInfo.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_emp_portrait.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_event_log.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -232,6 +241,12 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_groupUser.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_pushMsg.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_PushResponse.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_resVisitLog.cs">
@@ -308,10 +323,16 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service References\EmpWebSvr\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Util\MyEmail.cs" />
     <Compile Include="Util\MyUtils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="bin\Gma.QrCodeNet.Encoding.Net35.dll" />
     <Content Include="Content\autocomplete.css" />
     <Content Include="Content\bootstrap-datetimepicker.min.css" />
     <Content Include="Content\bootstrap-select.min.css" />
@@ -327,6 +348,7 @@
     <Content Include="Content\fontawesome\fontcss\font-awesome.css" />
     <Content Include="Content\fontawesome\fontcss\font-awesome.min.css" />
     <Content Include="Content\fontawesome\fonts\fontawesome-webfont.svg" />
+    <Content Include="Content\images\book.png" />
     <Content Include="Content\images\bubble-sprite.png" />
     <Content Include="Content\images\paint.png" />
     <Content Include="Content\images\post.png" />
@@ -345,6 +367,7 @@
     <Content Include="Content\images\meal.png" />
     <Content Include="Content\images\index_bg.jpg" />
     <Content Include="Content\images\index_bg2.jpg" />
+    <Content Include="Content\images\repair.png" />
     <Content Include="Content\images\res_256.png" />
     <Content Include="Content\images\salary.png" />
     <Content Include="Content\images\salary1.png" />
@@ -624,6 +647,13 @@
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="Scripts\tooltipster.bundle.min.js" />
     <Content Include="Scripts\_references.js" />
+    <None Include="Service References\EmpWebSvr\TrulyEmpSvr.disco" />
+    <None Include="Service References\EmpWebSvr\configuration91.svcinfo" />
+    <None Include="Service References\EmpWebSvr\configuration.svcinfo" />
+    <None Include="Service References\EmpWebSvr\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -671,6 +701,9 @@
     <Content Include="Views\Chart\ResChart.cshtml" />
     <Content Include="Views\Package\EmpView.cshtml" />
     <Content Include="Views\Home\CheckSalary.cshtml" />
+    <None Include="Service References\EmpWebSvr\TrulyEmpSvr.wsdl" />
+    <Content Include="Views\AndroidApp\PushNotice.cshtml" />
+    <Content Include="Views\AndroidApp\PushClickView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -681,6 +714,12 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\EmpWebSvr\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

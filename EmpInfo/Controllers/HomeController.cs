@@ -38,11 +38,37 @@ namespace EmpInfo.Controllers
             var user = db.ei_users.Single(u => u.card_number == card_no);
             byte[] portrait = user.short_portrait;
             if (portrait == null) {
-                string picUrl = Server.MapPath("~/Content/images/") + (user.sex.Equals("男") ? "user_man.png" : "user_woman.png");
-                portrait = MyUtils.GetServerImage(picUrl);
+                //无照片的，先看看人事系统有没有 2017-9-5
+                var emp = db.GetHREmpInfo(card_no).ToList();
+                if (emp.Count() > 0) {
+                    if (emp.First().zp != null) {
+                        user.short_portrait = MyUtils.MakeThumbnail(MyUtils.BytesToImage(emp.First().zp));
+                        db.SaveChanges();
+                        portrait = user.short_portrait;
+                    }
+                }
+                else {
+                    string picUrl = Server.MapPath("~/Content/images/") + (user.sex.Equals("男") ? "user_man.png" : "user_woman.png");
+                    portrait = MyUtils.GetServerImage(picUrl);
+                }
             }
             return File(portrait, @"image/bmp");
         }
+
+        //获取二维码
+        public ActionResult GetQrCode()
+        {
+            byte[] code = MyUtils.GetQrCode(userInfo.cardNo);
+            return File(code, @"image/jpeg");
+        }
+
+        //获取一维码
+        public ActionResult GetCode39()
+        {
+            byte[] code=MyUtils.GetCode39(userInfo.cardNo);
+            return File(code, @"image/bmp");
+        }
+
 
         #region 更新个人信息
         //更新信息之前验证密码
@@ -369,10 +395,10 @@ namespace EmpInfo.Controllers
         {
             int salaryNo=int.Parse(userInfoDetail.salaryNo);
             ViewData["salaryNo"] = salaryNo;
-            ViewData["info"] = db.GetSalaryInfo(salaryNo).ToList();
+            var info = db.GetSalaryInfo(salaryNo).ToList();
             ViewData["months"] = db.GetSalaryMonths(salaryNo).ToList();
-
-            WriteEventLog("工资查询", "进入工资查询页面");
+            ViewData["info"] = info;
+            WriteEventLog("工资查询", "进入工资查询页面:"+info.First().basicSalary);
             return View();           
         }
 
@@ -382,6 +408,7 @@ namespace EmpInfo.Controllers
             DateTime firstDay = DateTime.Parse(yearMonth + "-01");
             DateTime lastDay = firstDay.AddMonths(1);
 
+            
             return Json(db.GetSalarySummary(salaryNo, firstDay, lastDay).ToList().First());
         }
 

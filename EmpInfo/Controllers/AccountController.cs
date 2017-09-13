@@ -6,6 +6,7 @@ using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using EmpInfo.EmpWebSvr;
 
 namespace EmpInfo.Controllers
 {
@@ -20,6 +21,10 @@ namespace EmpInfo.Controllers
         [AllowAnonymous]
         public ActionResult Login()
         {
+            TrulyEmpSvrSoapClient client = new TrulyEmpSvrSoapClient();
+            string appUrl = client.GetAppUrl();
+            ViewData["appUrl"] = appUrl;
+
             return View();
         }
 
@@ -73,7 +78,7 @@ namespace EmpInfo.Controllers
             {
                 msg = "用户名已被禁用，登陆失败!";
             }
-            else if (db.GetHREmpStatus(model.UserName).Count()>0 && db.GetHREmpStatus(model.UserName).ToList().First() != "在职")
+            else if (db.GetHREmpStatus(model.UserName).Count() == 0 || (db.GetHREmpStatus(model.UserName).Count()>0 && db.GetHREmpStatus(model.UserName).ToList().First() != "在职"))
             {
                 thisUser = user.First();
                 thisUser.forbit_flag = true;
@@ -344,6 +349,18 @@ namespace EmpInfo.Controllers
             }
             WriteEventLogWithoutLogin("注册", "自助注册成功");
             return Json(new SimpleResultModel() { suc = true, msg = "注册成功，请登录系统" });            
+        }
+
+        //更新照片，无照片的去取人事系统的
+        public string UpdatePortrait()
+        {
+            var list = db.ei_emp_portrait.ToList();
+            foreach (var l in list) {
+                var emp = db.ei_users.Single(e => e.card_number == l.card_number);
+                emp.short_portrait = MyUtils.MakeThumbnail(MyUtils.BytesToImage(l.zp));                
+            }
+            db.SaveChanges();
+            return "ok";
         }
 
         //用户是否有登记邮箱

@@ -1,0 +1,1408 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://ic.truly.com.cn/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://ic.truly.com.cn/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://ic.truly.com.cn/">
+      <s:element name="SendToAll">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="msg" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SendToAllResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SendToAllResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SendToAlias">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="msg" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="alias" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SendToAliasResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SendToAliasResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SendToTags">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="msg" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="tags" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SendToTagsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SendToTagsResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="QuerySendResult">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="msgId" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="QuerySendResultResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="QuerySendResultResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UserLogin">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UserLoginResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserLoginResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ResetPassword">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ResetPasswordResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ResetPasswordResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RegisterFirst">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RegisterFirstResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="RegisterFirstResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SendEmailCode">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SendEmailCodeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SendEmailCodeResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="FinishRegister">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="FinishRegisterResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="FinishRegisterResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UserHasEmail">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UserHasEmailResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserHasEmailResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ActivateUser">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ActivateUserResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ActivateUserResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateUserInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateUserInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UpdateUserInfoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="IsUserInDorm">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="IsUserInDormResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="IsUserInDormResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDormInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDormInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetDormInfoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDormFee">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDormFeeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetDormFeeResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDinnerInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDinnerInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetDinnerInfoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LockOrUnLockDinnerCard">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LockOrUnLockDinnerCardResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LockOrUnLockDinnerCardResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDinnerBindingInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDinnerBindingInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetDinnerBindingInfoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SaveDinnerBindingInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SaveDinnerBindingInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SaveDinnerBindingInfoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetConsumeRecords">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetConsumeRecordsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetConsumeRecordsResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetReChargeRecords">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetReChargeRecordsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetReChargeRecordsResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetVersionCode">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetVersionCodeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetVersionCodeResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAppUrl">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetAppUrlResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetAppUrlResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserPower">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserPowerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetUserPowerResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserCount">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserCountResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetUserCountResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SearchUsers">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SearchUsersResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SearchUsersResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserDetail">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserDetailResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetUserDetailResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AdminResetPassword">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AdminResetPasswordResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AdminResetPasswordResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AdminActivatePassword">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AdminActivatePasswordResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AdminActivatePasswordResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSalaryInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSalaryInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSalaryInfoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSalaryMonths">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSalaryMonthsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSalaryMonthsResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSalarySummary">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSalarySummaryResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSalarySummaryResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSalaryDetail">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSalaryDetailResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSalaryDetailResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="SendToAllSoapIn">
+    <wsdl:part name="parameters" element="tns:SendToAll" />
+  </wsdl:message>
+  <wsdl:message name="SendToAllSoapOut">
+    <wsdl:part name="parameters" element="tns:SendToAllResponse" />
+  </wsdl:message>
+  <wsdl:message name="SendToAliasSoapIn">
+    <wsdl:part name="parameters" element="tns:SendToAlias" />
+  </wsdl:message>
+  <wsdl:message name="SendToAliasSoapOut">
+    <wsdl:part name="parameters" element="tns:SendToAliasResponse" />
+  </wsdl:message>
+  <wsdl:message name="SendToTagsSoapIn">
+    <wsdl:part name="parameters" element="tns:SendToTags" />
+  </wsdl:message>
+  <wsdl:message name="SendToTagsSoapOut">
+    <wsdl:part name="parameters" element="tns:SendToTagsResponse" />
+  </wsdl:message>
+  <wsdl:message name="QuerySendResultSoapIn">
+    <wsdl:part name="parameters" element="tns:QuerySendResult" />
+  </wsdl:message>
+  <wsdl:message name="QuerySendResultSoapOut">
+    <wsdl:part name="parameters" element="tns:QuerySendResultResponse" />
+  </wsdl:message>
+  <wsdl:message name="UserLoginSoapIn">
+    <wsdl:part name="parameters" element="tns:UserLogin" />
+  </wsdl:message>
+  <wsdl:message name="UserLoginSoapOut">
+    <wsdl:part name="parameters" element="tns:UserLoginResponse" />
+  </wsdl:message>
+  <wsdl:message name="ResetPasswordSoapIn">
+    <wsdl:part name="parameters" element="tns:ResetPassword" />
+  </wsdl:message>
+  <wsdl:message name="ResetPasswordSoapOut">
+    <wsdl:part name="parameters" element="tns:ResetPasswordResponse" />
+  </wsdl:message>
+  <wsdl:message name="RegisterFirstSoapIn">
+    <wsdl:part name="parameters" element="tns:RegisterFirst" />
+  </wsdl:message>
+  <wsdl:message name="RegisterFirstSoapOut">
+    <wsdl:part name="parameters" element="tns:RegisterFirstResponse" />
+  </wsdl:message>
+  <wsdl:message name="SendEmailCodeSoapIn">
+    <wsdl:part name="parameters" element="tns:SendEmailCode" />
+  </wsdl:message>
+  <wsdl:message name="SendEmailCodeSoapOut">
+    <wsdl:part name="parameters" element="tns:SendEmailCodeResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinishRegisterSoapIn">
+    <wsdl:part name="parameters" element="tns:FinishRegister" />
+  </wsdl:message>
+  <wsdl:message name="FinishRegisterSoapOut">
+    <wsdl:part name="parameters" element="tns:FinishRegisterResponse" />
+  </wsdl:message>
+  <wsdl:message name="UserHasEmailSoapIn">
+    <wsdl:part name="parameters" element="tns:UserHasEmail" />
+  </wsdl:message>
+  <wsdl:message name="UserHasEmailSoapOut">
+    <wsdl:part name="parameters" element="tns:UserHasEmailResponse" />
+  </wsdl:message>
+  <wsdl:message name="ActivateUserSoapIn">
+    <wsdl:part name="parameters" element="tns:ActivateUser" />
+  </wsdl:message>
+  <wsdl:message name="ActivateUserSoapOut">
+    <wsdl:part name="parameters" element="tns:ActivateUserResponse" />
+  </wsdl:message>
+  <wsdl:message name="UpdateUserInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateUserInfo" />
+  </wsdl:message>
+  <wsdl:message name="UpdateUserInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateUserInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IsUserInDormSoapIn">
+    <wsdl:part name="parameters" element="tns:IsUserInDorm" />
+  </wsdl:message>
+  <wsdl:message name="IsUserInDormSoapOut">
+    <wsdl:part name="parameters" element="tns:IsUserInDormResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetDormInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetDormInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetDormInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetDormInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetDormFeeSoapIn">
+    <wsdl:part name="parameters" element="tns:GetDormFee" />
+  </wsdl:message>
+  <wsdl:message name="GetDormFeeSoapOut">
+    <wsdl:part name="parameters" element="tns:GetDormFeeResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetDinnerInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetDinnerInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetDinnerInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetDinnerInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="LockOrUnLockDinnerCardSoapIn">
+    <wsdl:part name="parameters" element="tns:LockOrUnLockDinnerCard" />
+  </wsdl:message>
+  <wsdl:message name="LockOrUnLockDinnerCardSoapOut">
+    <wsdl:part name="parameters" element="tns:LockOrUnLockDinnerCardResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetDinnerBindingInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetDinnerBindingInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetDinnerBindingInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetDinnerBindingInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="SaveDinnerBindingInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:SaveDinnerBindingInfo" />
+  </wsdl:message>
+  <wsdl:message name="SaveDinnerBindingInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:SaveDinnerBindingInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetConsumeRecordsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetConsumeRecords" />
+  </wsdl:message>
+  <wsdl:message name="GetConsumeRecordsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetConsumeRecordsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetReChargeRecordsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetReChargeRecords" />
+  </wsdl:message>
+  <wsdl:message name="GetReChargeRecordsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetReChargeRecordsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetVersionCodeSoapIn">
+    <wsdl:part name="parameters" element="tns:GetVersionCode" />
+  </wsdl:message>
+  <wsdl:message name="GetVersionCodeSoapOut">
+    <wsdl:part name="parameters" element="tns:GetVersionCodeResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetAppUrlSoapIn">
+    <wsdl:part name="parameters" element="tns:GetAppUrl" />
+  </wsdl:message>
+  <wsdl:message name="GetAppUrlSoapOut">
+    <wsdl:part name="parameters" element="tns:GetAppUrlResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetUserPowerSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserPower" />
+  </wsdl:message>
+  <wsdl:message name="GetUserPowerSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserPowerResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetUserCountSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserCount" />
+  </wsdl:message>
+  <wsdl:message name="GetUserCountSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserCountResponse" />
+  </wsdl:message>
+  <wsdl:message name="SearchUsersSoapIn">
+    <wsdl:part name="parameters" element="tns:SearchUsers" />
+  </wsdl:message>
+  <wsdl:message name="SearchUsersSoapOut">
+    <wsdl:part name="parameters" element="tns:SearchUsersResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDetailSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserDetail" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDetailSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserDetailResponse" />
+  </wsdl:message>
+  <wsdl:message name="AdminResetPasswordSoapIn">
+    <wsdl:part name="parameters" element="tns:AdminResetPassword" />
+  </wsdl:message>
+  <wsdl:message name="AdminResetPasswordSoapOut">
+    <wsdl:part name="parameters" element="tns:AdminResetPasswordResponse" />
+  </wsdl:message>
+  <wsdl:message name="AdminActivatePasswordSoapIn">
+    <wsdl:part name="parameters" element="tns:AdminActivatePassword" />
+  </wsdl:message>
+  <wsdl:message name="AdminActivatePasswordSoapOut">
+    <wsdl:part name="parameters" element="tns:AdminActivatePasswordResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSalaryInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSalaryInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetSalaryInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSalaryInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSalaryMonthsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSalaryMonths" />
+  </wsdl:message>
+  <wsdl:message name="GetSalaryMonthsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSalaryMonthsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSalarySummarySoapIn">
+    <wsdl:part name="parameters" element="tns:GetSalarySummary" />
+  </wsdl:message>
+  <wsdl:message name="GetSalarySummarySoapOut">
+    <wsdl:part name="parameters" element="tns:GetSalarySummaryResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSalaryDetailSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSalaryDetail" />
+  </wsdl:message>
+  <wsdl:message name="GetSalaryDetailSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSalaryDetailResponse" />
+  </wsdl:message>
+  <wsdl:portType name="TrulyEmpSvrSoap">
+    <wsdl:operation name="SendToAll">
+      <wsdl:input message="tns:SendToAllSoapIn" />
+      <wsdl:output message="tns:SendToAllSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SendToAlias">
+      <wsdl:input message="tns:SendToAliasSoapIn" />
+      <wsdl:output message="tns:SendToAliasSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SendToTags">
+      <wsdl:input message="tns:SendToTagsSoapIn" />
+      <wsdl:output message="tns:SendToTagsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="QuerySendResult">
+      <wsdl:input message="tns:QuerySendResultSoapIn" />
+      <wsdl:output message="tns:QuerySendResultSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UserLogin">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">用户登录验证</wsdl:documentation>
+      <wsdl:input message="tns:UserLoginSoapIn" />
+      <wsdl:output message="tns:UserLoginSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ResetPassword">
+      <wsdl:input message="tns:ResetPasswordSoapIn" />
+      <wsdl:output message="tns:ResetPasswordSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="RegisterFirst">
+      <wsdl:input message="tns:RegisterFirstSoapIn" />
+      <wsdl:output message="tns:RegisterFirstSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SendEmailCode">
+      <wsdl:input message="tns:SendEmailCodeSoapIn" />
+      <wsdl:output message="tns:SendEmailCodeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="FinishRegister">
+      <wsdl:input message="tns:FinishRegisterSoapIn" />
+      <wsdl:output message="tns:FinishRegisterSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UserHasEmail">
+      <wsdl:input message="tns:UserHasEmailSoapIn" />
+      <wsdl:output message="tns:UserHasEmailSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ActivateUser">
+      <wsdl:input message="tns:ActivateUserSoapIn" />
+      <wsdl:output message="tns:ActivateUserSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateUserInfo">
+      <wsdl:input message="tns:UpdateUserInfoSoapIn" />
+      <wsdl:output message="tns:UpdateUserInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="IsUserInDorm">
+      <wsdl:input message="tns:IsUserInDormSoapIn" />
+      <wsdl:output message="tns:IsUserInDormSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDormInfo">
+      <wsdl:input message="tns:GetDormInfoSoapIn" />
+      <wsdl:output message="tns:GetDormInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDormFee">
+      <wsdl:input message="tns:GetDormFeeSoapIn" />
+      <wsdl:output message="tns:GetDormFeeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDinnerInfo">
+      <wsdl:input message="tns:GetDinnerInfoSoapIn" />
+      <wsdl:output message="tns:GetDinnerInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="LockOrUnLockDinnerCard">
+      <wsdl:input message="tns:LockOrUnLockDinnerCardSoapIn" />
+      <wsdl:output message="tns:LockOrUnLockDinnerCardSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDinnerBindingInfo">
+      <wsdl:input message="tns:GetDinnerBindingInfoSoapIn" />
+      <wsdl:output message="tns:GetDinnerBindingInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SaveDinnerBindingInfo">
+      <wsdl:input message="tns:SaveDinnerBindingInfoSoapIn" />
+      <wsdl:output message="tns:SaveDinnerBindingInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetConsumeRecords">
+      <wsdl:input message="tns:GetConsumeRecordsSoapIn" />
+      <wsdl:output message="tns:GetConsumeRecordsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetReChargeRecords">
+      <wsdl:input message="tns:GetReChargeRecordsSoapIn" />
+      <wsdl:output message="tns:GetReChargeRecordsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetVersionCode">
+      <wsdl:input message="tns:GetVersionCodeSoapIn" />
+      <wsdl:output message="tns:GetVersionCodeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAppUrl">
+      <wsdl:input message="tns:GetAppUrlSoapIn" />
+      <wsdl:output message="tns:GetAppUrlSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPower">
+      <wsdl:input message="tns:GetUserPowerSoapIn" />
+      <wsdl:output message="tns:GetUserPowerSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserCount">
+      <wsdl:input message="tns:GetUserCountSoapIn" />
+      <wsdl:output message="tns:GetUserCountSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SearchUsers">
+      <wsdl:input message="tns:SearchUsersSoapIn" />
+      <wsdl:output message="tns:SearchUsersSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDetail">
+      <wsdl:input message="tns:GetUserDetailSoapIn" />
+      <wsdl:output message="tns:GetUserDetailSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AdminResetPassword">
+      <wsdl:input message="tns:AdminResetPasswordSoapIn" />
+      <wsdl:output message="tns:AdminResetPasswordSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AdminActivatePassword">
+      <wsdl:input message="tns:AdminActivatePasswordSoapIn" />
+      <wsdl:output message="tns:AdminActivatePasswordSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSalaryInfo">
+      <wsdl:input message="tns:GetSalaryInfoSoapIn" />
+      <wsdl:output message="tns:GetSalaryInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSalaryMonths">
+      <wsdl:input message="tns:GetSalaryMonthsSoapIn" />
+      <wsdl:output message="tns:GetSalaryMonthsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSalarySummary">
+      <wsdl:input message="tns:GetSalarySummarySoapIn" />
+      <wsdl:output message="tns:GetSalarySummarySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSalaryDetail">
+      <wsdl:input message="tns:GetSalaryDetailSoapIn" />
+      <wsdl:output message="tns:GetSalaryDetailSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="TrulyEmpSvrSoap" type="tns:TrulyEmpSvrSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="SendToAll">
+      <soap:operation soapAction="http://ic.truly.com.cn/SendToAll" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SendToAlias">
+      <soap:operation soapAction="http://ic.truly.com.cn/SendToAlias" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SendToTags">
+      <soap:operation soapAction="http://ic.truly.com.cn/SendToTags" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="QuerySendResult">
+      <soap:operation soapAction="http://ic.truly.com.cn/QuerySendResult" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UserLogin">
+      <soap:operation soapAction="http://ic.truly.com.cn/UserLogin" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ResetPassword">
+      <soap:operation soapAction="http://ic.truly.com.cn/ResetPassword" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RegisterFirst">
+      <soap:operation soapAction="http://ic.truly.com.cn/RegisterFirst" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SendEmailCode">
+      <soap:operation soapAction="http://ic.truly.com.cn/SendEmailCode" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FinishRegister">
+      <soap:operation soapAction="http://ic.truly.com.cn/FinishRegister" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UserHasEmail">
+      <soap:operation soapAction="http://ic.truly.com.cn/UserHasEmail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ActivateUser">
+      <soap:operation soapAction="http://ic.truly.com.cn/ActivateUser" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateUserInfo">
+      <soap:operation soapAction="http://ic.truly.com.cn/UpdateUserInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsUserInDorm">
+      <soap:operation soapAction="http://ic.truly.com.cn/IsUserInDorm" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDormInfo">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetDormInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDormFee">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetDormFee" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDinnerInfo">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetDinnerInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LockOrUnLockDinnerCard">
+      <soap:operation soapAction="http://ic.truly.com.cn/LockOrUnLockDinnerCard" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDinnerBindingInfo">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetDinnerBindingInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SaveDinnerBindingInfo">
+      <soap:operation soapAction="http://ic.truly.com.cn/SaveDinnerBindingInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetConsumeRecords">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetConsumeRecords" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetReChargeRecords">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetReChargeRecords" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVersionCode">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetVersionCode" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAppUrl">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetAppUrl" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPower">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetUserPower" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserCount">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetUserCount" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SearchUsers">
+      <soap:operation soapAction="http://ic.truly.com.cn/SearchUsers" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDetail">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetUserDetail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AdminResetPassword">
+      <soap:operation soapAction="http://ic.truly.com.cn/AdminResetPassword" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AdminActivatePassword">
+      <soap:operation soapAction="http://ic.truly.com.cn/AdminActivatePassword" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSalaryInfo">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetSalaryInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSalaryMonths">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetSalaryMonths" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSalarySummary">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetSalarySummary" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSalaryDetail">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetSalaryDetail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="TrulyEmpSvrSoap12" type="tns:TrulyEmpSvrSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="SendToAll">
+      <soap12:operation soapAction="http://ic.truly.com.cn/SendToAll" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SendToAlias">
+      <soap12:operation soapAction="http://ic.truly.com.cn/SendToAlias" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SendToTags">
+      <soap12:operation soapAction="http://ic.truly.com.cn/SendToTags" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="QuerySendResult">
+      <soap12:operation soapAction="http://ic.truly.com.cn/QuerySendResult" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UserLogin">
+      <soap12:operation soapAction="http://ic.truly.com.cn/UserLogin" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ResetPassword">
+      <soap12:operation soapAction="http://ic.truly.com.cn/ResetPassword" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RegisterFirst">
+      <soap12:operation soapAction="http://ic.truly.com.cn/RegisterFirst" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SendEmailCode">
+      <soap12:operation soapAction="http://ic.truly.com.cn/SendEmailCode" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FinishRegister">
+      <soap12:operation soapAction="http://ic.truly.com.cn/FinishRegister" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UserHasEmail">
+      <soap12:operation soapAction="http://ic.truly.com.cn/UserHasEmail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ActivateUser">
+      <soap12:operation soapAction="http://ic.truly.com.cn/ActivateUser" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateUserInfo">
+      <soap12:operation soapAction="http://ic.truly.com.cn/UpdateUserInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsUserInDorm">
+      <soap12:operation soapAction="http://ic.truly.com.cn/IsUserInDorm" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDormInfo">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetDormInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDormFee">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetDormFee" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDinnerInfo">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetDinnerInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LockOrUnLockDinnerCard">
+      <soap12:operation soapAction="http://ic.truly.com.cn/LockOrUnLockDinnerCard" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDinnerBindingInfo">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetDinnerBindingInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SaveDinnerBindingInfo">
+      <soap12:operation soapAction="http://ic.truly.com.cn/SaveDinnerBindingInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetConsumeRecords">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetConsumeRecords" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetReChargeRecords">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetReChargeRecords" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVersionCode">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetVersionCode" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAppUrl">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetAppUrl" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPower">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetUserPower" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserCount">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetUserCount" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SearchUsers">
+      <soap12:operation soapAction="http://ic.truly.com.cn/SearchUsers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDetail">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetUserDetail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AdminResetPassword">
+      <soap12:operation soapAction="http://ic.truly.com.cn/AdminResetPassword" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AdminActivatePassword">
+      <soap12:operation soapAction="http://ic.truly.com.cn/AdminActivatePassword" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSalaryInfo">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetSalaryInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSalaryMonths">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetSalaryMonths" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSalarySummary">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetSalarySummary" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSalaryDetail">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetSalaryDetail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="TrulyEmpSvr">
+    <wsdl:port name="TrulyEmpSvrSoap" binding="tns:TrulyEmpSvrSoap">
+      <soap:address location="http://59.37.42.23/EmpWebSvr/TrulyEmpSvr.asmx" />
+    </wsdl:port>
+    <wsdl:port name="TrulyEmpSvrSoap12" binding="tns:TrulyEmpSvrSoap12">
+      <soap12:address location="http://59.37.42.23/EmpWebSvr/TrulyEmpSvr.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

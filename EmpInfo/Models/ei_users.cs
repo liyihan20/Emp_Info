@@ -35,6 +35,7 @@ namespace EmpInfo.Models
         public string salary_no { get; set; }
         public string short_phone { get; set; }
         public byte[] short_portrait { get; set; }
+        public string bank_card_no { get; set; }
     
         public virtual ICollection<ei_groupUser> ei_groupUser { get; set; }
         public virtual ICollection<ei_deliveryInfo> ei_deliveryInfo { get; set; }

@@ -1,0 +1,87 @@
+﻿@{
+    ViewBag.Title = "PushNotice";
+}
+<div style="margin:0 12px;">
+    <h3>第三方系统收不到推送的消息</h3>
+    <h4>由于第三方 ROM 的管理软件需要用户手动操作</h4>
+    <p><i class="fa fa-check-circle-o text-danger"></i> 小米【MIUI】</p>
+    <div style="padding-left:6px">
+        <ul>
+            <li>
+                自启动管理：需要把应用加到【自启动管理】列表，否则杀进程或重新开机后进程无法开启
+            </li>
+            <li>
+                通知栏设置：应用默认都是显示通知栏通知，如果关闭，则收到通知也不会提示
+            </li>
+            <li>
+                网络助手：可以手动禁止已安装的第三方程序访问2G/3G和WIFI的网络和设置以后新安装程序是否允许访问2G/3G和WIFI的网络
+            </li>
+            <li>
+                MIUI 7 神隐模式： 允许应用进行自定义配置模式，应用在后台保持联网可用，否则应用进入后台时，应用无法正常接收消息。【设置】下电量和性能中【神隐模式】
+            </li>
+        </ul>
+    </div>
+
+    <p><i class="fa fa-check-circle-o text-danger"></i> 华为【Emotion】</p>
+    <div style="padding-left:6px">
+        <ul>
+            <li>
+                自启动管理：需要把应用加到【自启动管理】列表，否则杀进程或重新开机后进程不会开启，只能手动开启应用
+            </li>
+            <li>
+                后台应用保护：需要手动把应用加到此列表，否则设备进入睡眠后会自动杀掉应用进程，只有手动开启应用才能恢复运行
+            </li>
+            <li>
+                通知管理：应用状态有三种：提示、允许、禁止。禁止应用则通知栏不会有任何提醒
+            </li>
+        </ul>
+    </div>
+
+    <p><i class="fa fa-check-circle-o text-danger"></i> 魅族【Flyme】</p>
+    <div style="padding-left:6px">
+        <ul>
+            <li>
+                自启动管理：需要把应用加到【自启动管理】列表，否则杀进程或重新开机后进程无法开启
+            </li>
+            <li>
+                通知栏推送：关闭应用通知则收到消息不会有任何展示
+            </li>
+            <li>
+                省电管理： 安全中心里设置省电模式，在【待机耗电管理】中允许应用待机时，保持允许，否则手机休眠或者应用闲置一段时间，无法正常接收消息。
+            </li>
+        </ul>
+    </div>
+
+    <p><i class="fa fa-check-circle-o text-danger"></i> VIVO【Funtouch OS】</p>
+    <div style="padding-left:6px">
+        <ul>
+            <li>
+                内存一键清理：需要将应用加入【白名单】列表，否则系统自带的“一键加速”，会杀掉进程
+            </li>
+            <li>
+                自启动管理：需要将应用加入“i管家”中的【自启动管理】列表，否则重启手机后进程不会自启。但强制手动杀进程，即使加了这个列表中，后续进程也无法自启动。
+            </li>
+        </ul>
+    </div>
+
+    <p><i class="fa fa-check-circle-o text-danger"></i> OPPO【ColorOS】</p>
+    <div style="padding-left:6px">
+        <ul>
+            <li>
+                冻结应用管理：需要将应用加入纯净后台，否则锁屏状态下无法及时收到消息
+            </li>
+            <li>
+                自启动管理：将应用加入【自启动管理】列表的同时，还需要到设置-应用程序-正在运行里锁定应用进程，否则杀进程或者开机后进程不会开启，只能手动开启应用
+            </li>
+        </ul>
+    </div>
+
+    <p><i class="fa fa-check-circle-o text-danger"></i> 三星</p>
+    <div style="padding-left:6px">
+        <ul>
+            <li>
+                内存一键优化：需要将应用加入【白名单】列表，否则系统内存优化后，会杀掉应用进程
+            </li>
+        </ul>
+    </div>
+</div>

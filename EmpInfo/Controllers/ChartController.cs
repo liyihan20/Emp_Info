@@ -30,8 +30,7 @@ namespace EmpInfo.Controllers
         }
 
         #region 食堂数据分析
-
-        [SessionTimeOutFilter]
+        
         public ActionResult ResChart()
         {
             ViewData["Today"] = MyUtils.GetWeekDay(DateTime.Now.DayOfWeek) + "  " + DateTime.Now.ToString("yyyy-MM-dd");

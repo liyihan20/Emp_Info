@@ -263,6 +263,14 @@
           <Property Name="is_finish" Type="bit" />
           <Property Name="packs" Type="int" />
         </EntityType>
+        <EntityType Name="ei_emp_portrait">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="card_number" Type="varchar" MaxLength="50" />
+          <Property Name="zp" Type="image" />
+        </EntityType>
         <EntityType Name="ei_event_log">
           <Key>
             <PropertyRef Name="id" />
@@ -300,6 +308,31 @@
           <Property Name="group_id" Type="int" />
           <Property Name="user_id" Type="int" />
         </EntityType>
+        <EntityType Name="ei_pushMsg">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="card_no" Type="varchar(max)" />
+          <Property Name="send_to_all" Type="bit" />
+          <Property Name="send_title" Type="varchar" MaxLength="200" />
+          <Property Name="send_content" Type="varchar" MaxLength="1000" />
+          <Property Name="task_type" Type="varchar" MaxLength="50" />
+          <Property Name="create_date" Type="datetime" />
+          <Property Name="send_date" Type="datetime" />
+          <Property Name="has_sent" Type="bit" />
+          <Property Name="msg_id" Type="bigint" />
+        </EntityType>
+        <EntityType Name="ei_PushResponse">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="push_id" Type="int" />
+          <Property Name="card_no" Type="varchar" MaxLength="50" />
+          <Property Name="received_date" Type="datetime" />
+          <Property Name="click_date" Type="datetime" />
+        </EntityType>
         <EntityType Name="ei_resVisitLog">
           <Key>
             <PropertyRef Name="id" />
@@ -336,6 +369,7 @@
           <Property Name="salary_no" Type="varchar" MaxLength="20" />
           <Property Name="short_phone" Type="varchar" MaxLength="50" />
           <Property Name="short_portrait" Type="image" />
+          <Property Name="bank_card_no" Type="varchar" MaxLength="50" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_ei_simple_users”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -507,6 +541,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ei_PushResponse_ei_pushMsg">
+          <End Role="ei_pushMsg" Type="Self.ei_pushMsg" Multiplicity="0..1" />
+          <End Role="ei_PushResponse" Type="Self.ei_PushResponse" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_pushMsg">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_PushResponse">
+              <PropertyRef Name="push_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Function Name="GetDormChargeMonth" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="GetDormFeeByMonth" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="yearMonth" Type="varchar" Mode="In" />
@@ -567,10 +613,13 @@
           <EntitySet Name="dn_shoppingCar" EntityType="Self.dn_shoppingCar" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_authority" EntityType="Self.ei_authority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_deliveryInfo" EntityType="Self.ei_deliveryInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_emp_portrait" EntityType="Self.ei_emp_portrait" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_event_log" EntityType="Self.ei_event_log" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groupAuthority" EntityType="Self.ei_groupAuthority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groups" EntityType="Self.ei_groups" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groupUser" EntityType="Self.ei_groupUser" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_pushMsg" EntityType="Self.ei_pushMsg" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_PushResponse" EntityType="Self.ei_PushResponse" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_resVisitLog" EntityType="Self.ei_resVisitLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_specialUsers" EntityType="Self.ei_specialUsers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_users" EntityType="Self.ei_users" Schema="dbo" store:Type="Tables" />
@@ -649,6 +698,10 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           <AssociationSet Name="FK_ei_groupUser_ei_users" Association="Self.FK_ei_groupUser_ei_users">
             <End Role="ei_users" EntitySet="ei_users" />
             <End Role="ei_groupUser" EntitySet="ei_groupUser" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ei_PushResponse_ei_pushMsg" Association="Self.FK_ei_PushResponse_ei_pushMsg">
+            <End Role="ei_pushMsg" EntitySet="ei_pushMsg" />
+            <End Role="ei_PushResponse" EntitySet="ei_PushResponse" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -768,6 +821,13 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           <FunctionImport Name="GetSalaryMonths" ReturnType="Collection(String)">
           <Parameter Name="salary_no" Mode="In" Type="Int32" />
           </FunctionImport>
+          <EntitySet Name="ei_pushMsg" EntityType="ICAuditModel.ei_pushMsg" />
+          <EntitySet Name="ei_emp_portrait" EntityType="ICAuditModel.ei_emp_portrait" />
+          <EntitySet Name="ei_PushResponse" EntityType="ICAuditModel.ei_PushResponse" />
+          <AssociationSet Name="FK_ei_PushResponse_ei_pushMsg" Association="ICAuditModel.FK_ei_PushResponse_ei_pushMsg">
+            <End Role="ei_pushMsg" EntitySet="ei_pushMsg" />
+            <End Role="ei_PushResponse" EntitySet="ei_PushResponse" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -790,6 +850,7 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           <Property Name="short_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="short_portrait" Type="Binary" MaxLength="Max" FixedLength="false" />
           <NavigationProperty Name="ei_deliveryInfo" Relationship="ICAuditModel.FK_ei_deliveryInfo_ei_users" FromRole="ei_users" ToRole="ei_deliveryInfo" />
+          <Property Name="bank_card_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="ei_event_log">
           <Key>
@@ -1356,6 +1417,53 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           <Property Type="Decimal" Name="old_insurance" Nullable="true" />
           <Property Type="Decimal" Name="public_reserve_funds" Nullable="true" />
         </ComplexType>
+        <EntityType Name="ei_pushMsg">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="card_no" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="send_to_all" Type="Boolean" />
+          <Property Name="send_title" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="send_content" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="task_type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="create_date" Type="DateTime" Precision="3" />
+          <Property Name="send_date" Type="DateTime" Precision="3" />
+          <Property Name="has_sent" Type="Boolean" />
+          <NavigationProperty Name="ei_PushResponse" Relationship="ICAuditModel.FK_ei_PushResponse_ei_pushMsg" FromRole="ei_pushMsg" ToRole="ei_PushResponse" />
+          <Property Name="msg_id" Type="Int64" />
+        </EntityType>
+        <EntityType Name="ei_emp_portrait">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="card_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="zp" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="ei_PushResponse">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="push_id" Type="Int32" />
+          <Property Name="card_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="received_date" Type="DateTime" Precision="3" />
+          <Property Name="click_date" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="ei_pushMsg" Relationship="ICAuditModel.FK_ei_PushResponse_ei_pushMsg" FromRole="ei_PushResponse" ToRole="ei_pushMsg" />
+        </EntityType>
+        <Association Name="FK_ei_PushResponse_ei_pushMsg">
+          <End Type="ICAuditModel.ei_pushMsg" Role="ei_pushMsg" Multiplicity="0..1" />
+          <End Type="ICAuditModel.ei_PushResponse" Role="ei_PushResponse" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_pushMsg">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_PushResponse">
+              <PropertyRef Name="push_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1365,6 +1473,7 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           <EntitySetMapping Name="ei_users">
             <EntityTypeMapping TypeName="ICAuditModel.ei_users">
               <MappingFragment StoreEntitySet="ei_users">
+                <ScalarProperty Name="bank_card_no" ColumnName="bank_card_no" />
                 <ScalarProperty Name="short_portrait" ColumnName="short_portrait" />
                 <ScalarProperty Name="short_phone" ColumnName="short_phone" />
                 <ScalarProperty Name="salary_no" ColumnName="salary_no" />
@@ -1856,6 +1965,42 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
             </ResultMapping>
           </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="GetSalaryMonths" FunctionName="ICAuditModel.Store.GetSalaryMonths" />
+          <EntitySetMapping Name="ei_pushMsg">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_pushMsg">
+              <MappingFragment StoreEntitySet="ei_pushMsg">
+                <ScalarProperty Name="msg_id" ColumnName="msg_id" />
+                <ScalarProperty Name="has_sent" ColumnName="has_sent" />
+                <ScalarProperty Name="send_date" ColumnName="send_date" />
+                <ScalarProperty Name="create_date" ColumnName="create_date" />
+                <ScalarProperty Name="task_type" ColumnName="task_type" />
+                <ScalarProperty Name="send_content" ColumnName="send_content" />
+                <ScalarProperty Name="send_title" ColumnName="send_title" />
+                <ScalarProperty Name="send_to_all" ColumnName="send_to_all" />
+                <ScalarProperty Name="card_no" ColumnName="card_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_emp_portrait">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_emp_portrait">
+              <MappingFragment StoreEntitySet="ei_emp_portrait">
+                <ScalarProperty Name="zp" ColumnName="zp" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_PushResponse">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_PushResponse">
+              <MappingFragment StoreEntitySet="ei_PushResponse">
+                <ScalarProperty Name="click_date" ColumnName="click_date" />
+                <ScalarProperty Name="received_date" ColumnName="received_date" />
+                <ScalarProperty Name="card_no" ColumnName="card_no" />
+                <ScalarProperty Name="push_id" ColumnName="push_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

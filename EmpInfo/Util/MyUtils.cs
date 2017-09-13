@@ -8,6 +8,8 @@ using System.Text;
 using EmpInfo.Models;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Gma.QrCodeNet.Encoding;
+using Gma.QrCodeNet.Encoding.Windows.Render;
 
 namespace EmpInfo.Util
 {
@@ -28,16 +30,13 @@ namespace EmpInfo.Util
 
             Random rand = new Random();
             //采用一个简单的算法以保证生成随机数的不同
-            for (int i = 1; i < length + 1; i++)
-            {
-                if (temp != -1)
-                {
+            for (int i = 1; i < length + 1; i++) {
+                if (temp != -1) {
                     rand = new Random(i * temp * unchecked((int)DateTime.Now.Ticks));
                 }
 
                 int t = rand.Next(VcArray.Length - 1);
-                if (temp != -1 && temp == t)
-                {
+                if (temp != -1 && temp == t) {
                     return CreateValidateNumber(length);
 
                 }
@@ -51,15 +50,13 @@ namespace EmpInfo.Util
         {
             Bitmap image = new Bitmap((int)Math.Ceiling(validateCode.Length * 18.0), 26);
             Graphics g = Graphics.FromImage(image);
-            try
-            {
+            try {
                 //生成随机生成器
                 Random random = new Random();
                 //清空图片背景色
                 g.Clear(Color.White);
                 //画图片的干扰线
-                for (int i = 0; i < 25; i++)
-                {
+                for (int i = 0; i < 25; i++) {
                     int x1 = random.Next(image.Width);
                     int x2 = random.Next(image.Width);
                     int y1 = random.Next(image.Height);
@@ -71,8 +68,7 @@ namespace EmpInfo.Util
                  Color.Blue, Color.DarkRed, 1.2f, true);
                 g.DrawString(validateCode, font, brush, 3, 2);
                 //画图片的前景干扰点
-                for (int i = 0; i < 100; i++)
-                {
+                for (int i = 0; i < 100; i++) {
                     int x = random.Next(image.Width);
                     int y = random.Next(image.Height);
                     image.SetPixel(x, y, Color.FromArgb(random.Next()));
@@ -85,8 +81,7 @@ namespace EmpInfo.Util
                 //输出图片流
                 return stream.ToArray();
             }
-            finally
-            {
+            finally {
                 g.Dispose();
                 image.Dispose();
             }
@@ -94,12 +89,10 @@ namespace EmpInfo.Util
 
         public static string getMD5(string str)
         {
-            if (str.Length > 2)
-            {
+            if (str.Length > 2) {
                 str = "Who" + str.Substring(2) + "Are" + str.Substring(0, 2) + "You";
             }
-            else
-            {
+            else {
                 str = "Who" + str + "Are" + str + "You";
             }
             return getNormalMD5(str);
@@ -136,8 +129,7 @@ namespace EmpInfo.Util
         public static bool hasGotPower(int userId, string controlerName, string actionName)
         {
             ICAuditEntities db = new ICAuditEntities();
-            try
-            {
+            try {
                 var power = from a in db.ei_authority
                             from u in db.ei_groups
                             from ga in a.ei_groupAuthority
@@ -152,8 +144,7 @@ namespace EmpInfo.Util
                 else
                     return false;
             }
-            catch
-            {
+            catch {
                 return false;
             }
 
@@ -335,6 +326,116 @@ namespace EmpInfo.Util
                 originalImage.Dispose();
                 g.Dispose();
             }
+        }
+
+        //生成二维码
+        public static byte[] GetQrCode(string content, int size = 9)
+        {
+            var encoder = new QrEncoder(ErrorCorrectionLevel.M);
+            QrCode qrCode = encoder.Encode(content);
+            GraphicsRenderer render = new GraphicsRenderer(new FixedModuleSize(size, QuietZoneModules.Two), Brushes.Black, Brushes.White);
+
+            MemoryStream memoryStream = new MemoryStream();
+            render.WriteToStream(qrCode.Matrix, ImageFormat.Jpeg, memoryStream);
+
+            return memoryStream.ToArray();
+        }
+
+        //生成一维码
+        public static byte[] GetCode39(string sourceCode, int barCodeHeight = 80)
+        {
+            string BarCodeText = sourceCode.ToUpper();
+            int leftMargin = 5;
+            int topMargin = 0;
+            int thickLength = 4;
+            int narrowLength = 2;
+            int intSourceLength = sourceCode.Length;
+            string strEncode = "010010100"; //添加起始码“ *”.            
+            string AlphaBet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%*";
+            string[] Code39 =
+             {
+                 /* 0 */ "000110100" , 
+                 /* 1 */ "100100001" , 
+                 /* 2 */ "001100001" , 
+                 /* 3 */ "101100000" ,
+                 /* 4 */ "000110001" , 
+                 /* 5 */ "100110000" , 
+                 /* 6 */ "001110000" , 
+                 /* 7 */ "000100101" ,
+                 /* 8 */ "100100100" , 
+                 /* 9 */ "001100100" , 
+                 /* A */ "100001001" , 
+                 /* B */ "001001001" ,
+                 /* C */ "101001000" , 
+                 /* D */ "000011001" , 
+                 /* E */ "100011000" , 
+                 /* F */ "001011000" ,
+                 /* G */ "000001101" , 
+                 /* H */ "100001100" , 
+                 /* I */ "001001100" , 
+                 /* J */ "000011100" ,
+                 /* K */ "100000011" , 
+                 /* L */ "001000011" , 
+                 /* M */ "101000010" , 
+                 /* N */ "000010011" ,
+                 /* O */ "100010010" , 
+                 /* P */ "001010010" , 
+                 /* Q */ "000000111" , 
+                 /* R */ "100000110" ,
+                 /* S */ "001000110" , 
+                 /* T */ "000010110" , 
+                 /* U */ "110000001" , 
+                 /* V */ "011000001" ,
+                 /* W */ "111000000" , 
+                 /* X */ "010010001" , 
+                 /* Y */ "110010000" , 
+                 /* Z */ "011010000" ,
+                 /* - */ "010000101" , 
+                 /* . */ "110000100" , 
+                 /*' '*/ "011000100" ,
+                 /* $ */ "010101000" ,
+                 /* / */ "010100010" , 
+                 /* + */ "010001010" , 
+                 /* % */ "000101010" , 
+                 /* * */ "010010100"  
+             };
+            sourceCode = sourceCode.ToUpper();
+            Bitmap objBitmap = new Bitmap(((thickLength * 3 + narrowLength * 7) * (intSourceLength + 2)) +
+                                           (leftMargin * 2), barCodeHeight + (topMargin * 2));
+            Graphics objGraphics = Graphics.FromImage(objBitmap);
+            objGraphics.FillRectangle(Brushes.White, 0, 0, objBitmap.Width, objBitmap.Height);
+            for (int i = 0; i < intSourceLength; i++) {
+                //非法字符校验
+                if (AlphaBet.IndexOf(sourceCode[i]) == -1 || sourceCode[i] == '*') {
+                    objGraphics.DrawString("Invalid Bar Code", SystemFonts.DefaultFont, Brushes.Red, leftMargin, topMargin);
+                    return null;
+                }
+                //编码
+                strEncode = string.Format("{0}0{1}", strEncode,
+                Code39[AlphaBet.IndexOf(sourceCode[i])]);
+            }
+            strEncode = string.Format("{0}0010010100", strEncode); //添加结束码“*”
+            int intEncodeLength = strEncode.Length;
+            int intBarWidth;
+            for (int i = 0; i < intEncodeLength; i++) //绘制 Code39 barcode
+            {
+                intBarWidth = strEncode[i] == '1' ? thickLength : narrowLength;
+                objGraphics.FillRectangle(i % 2 == 0 ? Brushes.Black : Brushes.White, leftMargin, topMargin, intBarWidth, barCodeHeight);
+                leftMargin += intBarWidth;
+            }
+            //绘制明码         
+            //Font barCodeTextFont = new Font("黑体", 10F);
+            //RectangleF rect = new RectangleF(2, barCodeHeight - 20, objBitmap.Width - 4, 20);
+            //objGraphics.FillRectangle(Brushes.White, rect);
+            //文本对齐
+            //StringFormat sf = new StringFormat();
+            //sf.Alignment = StringAlignment.Center;
+            //objGraphics.DrawString(BarCodeText, barCodeTextFont, Brushes.Black, rect, sf);
+
+            MemoryStream ms = new MemoryStream();
+            objBitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+
+            return ms.ToArray();
         }
 
     }

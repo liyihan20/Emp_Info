@@ -53,6 +53,9 @@ namespace EmpInfo.Models
         public DbSet<ei_resVisitLog> ei_resVisitLog { get; set; }
         public DbSet<vw_ei_simple_users> vw_ei_simple_users { get; set; }
         public DbSet<ei_deliveryInfo> ei_deliveryInfo { get; set; }
+        public DbSet<ei_pushMsg> ei_pushMsg { get; set; }
+        public DbSet<ei_emp_portrait> ei_emp_portrait { get; set; }
+        public DbSet<ei_PushResponse> ei_PushResponse { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {

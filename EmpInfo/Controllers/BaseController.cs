@@ -177,8 +177,8 @@ namespace EmpInfo.Controllers
             log.is_normal = isNomal;
             log.model = model;
             log.op_date = DateTime.Now;
-            log.user_id = userInfo.id;
-            log.user_name = userInfo.name;
+            log.user_id = userInfo==null?0: userInfo.id;
+            log.user_name = userInfo==null?"":userInfo.name;
             db.ei_event_log.Add(log);
             db.SaveChanges();
         }

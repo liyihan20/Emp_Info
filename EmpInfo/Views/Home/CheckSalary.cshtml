@@ -8,11 +8,11 @@
     $(function () {
         $(".ck_more").hide();
 
-        $("#check_more_bt").click(function () { 
+        $("#check_more_bt").click(function () {
             toggleDetail(true);
             var val = $("#yearMonthSelect").val();
             if (val != "") {
-                $.post("@Url.Content("~/Home/CheckSalaryDetail")", { yearMonth: val }, function (data) {                    
+                $.post("@Url.Content("~/Home/CheckSalaryDetail")", { yearMonth: val }, function (data) {
 
                     //通过遍历得到结果对象的字段名和字段值，字段名和html的span id一致即可动态赋值
                     for (var key in data) {
@@ -67,7 +67,7 @@
             $(".ck_base").addClass("col-sm-4").removeClass("col-xs-12");
             $(".ck_more").slideDown(400);
             $(".bt_li").hide();
-        } else {            
+        } else {
             $(".ck_more").slideUp(400, function () {
                 $(".ck_base").addClass("col-xs-12").removeClass("col-sm-4");
             });
@@ -79,14 +79,18 @@
 
 <div class="panel panel-success">
     <div class="panel-heading">
-        <h3 class="panel-title"><span class="glyphicon glyphicon-home"></span> 当前工资概览</h3>
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li class="active">当前工资概览</li>
+        </ol>
     </div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-xs-5 col-md-3">账号：<strong>@ViewData["salaryNo"]</strong></div>
-            <div class="col-xs-7 col-md-3">基本工资：<strong>@info.basicSalary.ToString("N1")</strong></div>
-            <div class="col-xs-5 col-md-3">类别：<strong>@info.salaryType</strong> </div>
-            <div class="col-xs-7 col-md-3">最近发放月份：<strong>@info.lastSalaryDate</strong></div>
+            <div class="col-xs-5 col-md-3 text-success">账号：<strong>@ViewData["salaryNo"]</strong></div>
+            <div class="col-xs-7 col-md-3 text-success">基本工资：<strong>@info.basicSalary.ToString("N1")</strong></div>
+            <div class="col-xs-5 col-md-3 text-success">类别：<strong>@info.salaryType</strong> </div>
+            <div class="col-xs-7 col-md-3 text-success">最近发放月份：<strong>@info.lastSalaryDate</strong></div>
         </div>
     </div>
 </div>
@@ -95,58 +99,47 @@
     <div class="panel-heading">
         <h3 class="panel-title"><span class="glyphicon glyphicon-usd"></span> 工资明细查询</h3>
     </div>
-    <div class="panel-body"> 
-            <select class="form-control" id="yearMonthSelect">
-                <option value="">请选择需要查询的月份</option>
-                @foreach (var y in months) {
-                    <option value="@y">@y</option>
-                }
-            </select>
+    <div class="panel-body">
+        <select class="form-control" id="yearMonthSelect">
+            <option value="">请选择需要查询的月份</option>
+            @foreach (var y in months) {
+                <option value="@y">@y</option>
+            }
+        </select>
     </div>
     <div class="row">
         <div class="col-xs-12 ck_base">
             <ul class="list-group">
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>公司工日：</span><span class="pull-right" id="work_days"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>基本工资：</span><span class="pull-right" id="basicSalary"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>应发工资：</span><span class="pull-right" id="should_pay_salary"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>代扣工资：</span><span class="pull-right" id="withhold_salary"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>实发工资：</span><span class="pull-right" id="real_salary"></span></li>
+                @{
+                    string[] texts1 = new string[] { "公司工日", "基本工资", "应发工资", "代扣工资", "实发工资" };
+                    string[] names1 = new string[] { "work_days", "basicSalary", "should_pay_salary", "withhold_salary", "real_salary" };
+                    for (var i = 0; i < texts1.Count(); i++) {
+                        <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>@texts1[i]：</span><span class="pull-right" id="@names1[i]"></span></li>
+                    }
+                }
                 <li class="list-group-item text-primary bt_li"><button class="btn btn-danger btn-block" id="check_more_bt"><i class="fa fa-th-list"></i> 查看更多</button></li>
             </ul>
         </div>
-        <div class="col-sm-4 ck_more">
-            <ul class="list-group">
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>工作工日：</span><span class="pull-right" id="monthly_work_days"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>计件工日：</span><span class="pull-right" id="counter_days"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>请假：</span><span class="pull-right" id="off_duty_days"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>迟到：</span><span class="pull-right" id="late_days"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>旷工：</span><span class="pull-right" id="run_away_days"></span></li>
-            </ul>
-        </div>
-        <div class="col-sm-4 ck_more">
-            <ul class="list-group">
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>津贴：</span><span class="pull-right" id="allowance"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>工值：</span><span class="pull-right" id="work_value"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>其它工资：</span><span class="pull-right" id="other_salary"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>补扣款：</span><span class="pull-right" id="cut_money"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>奖罚：</span><span class="pull-right" id="sanction"></span></li>
-            </ul>
-        </div>
-        <div class="col-sm-4 ck_more">
-            <ul class="list-group">
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>加班工资：</span><span class="pull-right" id="overtime_salary"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>工龄奖：</span><span class="pull-right" id="work_years_salary"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>伙食补贴：</span><span class="pull-right" id="dinner_welfare"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>房租：</span><span class="pull-right" id="dorm_rent"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>其它扣款：</span><span class="pull-right" id="other_debit"></span></li>
-            </ul>
-        </div>        
-        <div class="col-sm-4 ck_more">
-            <ul class="list-group">
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>税金：</span><span class="pull-right" id="tax"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>养老保险：</span><span class="pull-right" id="old_insurance"></span></li>
-                <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>公积金：</span><span class="pull-right" id="public_reserve_funds"></span></li>
-            </ul>
-        </div>
+        @{
+            string[] texts = new string[] { "工作工日", "计件工日", "请假", "迟到", "旷工",
+                                            "津贴", "工值", "其它工资", "补扣款", "奖罚",
+                                            "加班工资", "工龄奖", "伙食补贴", "房租", "其它扣款",
+                                            "税金", "养老保险", "公积金" };
+            string[] names = new string[] { "monthly_work_days", "counter_days", "off_duty_days", "late_days", "run_away_days",
+                                            "allowance", "work_value", "other_salary", "cut_money", "sanction",
+                                            "overtime_salary", "work_years_salary", "dinner_welfare", "dorm_rent", "other_debit",
+                                            "tax", "old_insurance", "public_reserve_funds" };
+            //每5行分为1组                                
+            int groupCount=(int)Math.Ceiling(texts.Length/5m);
+            for (var i = 0; i < groupCount; i++) {
+                <div class="col-sm-4 ck_more">
+                    <ul class="list-group">
+                        @for (var j = i * 5; j < i * 5 + 5 && j < texts.Length; j++) { 
+                            <li class="list-group-item text-primary"><i class="fa fa-chevron-circle-right"></i> <span>@texts[j]：</span><span class="pull-right" id="@names[j]">></span></li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
     </div>
 </div>
