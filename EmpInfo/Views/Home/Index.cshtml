@@ -142,7 +142,24 @@
                         }
                     });
                 }
-            });           
+            });
+        });
+
+        //K3重置密码
+        $("#K3Img,#K3Bt").click(function () {
+            $.post("@Url.Content("~/Home/ValidateEmail")", {}, function (data) {
+                if (!data.suc) {
+                    toastr.error(data.msg);
+                } else {
+                    $.post("@Url.Content("~/Home/ValidatePhone")", {}, function (data) {
+                        if (data.suc) {
+                            window.location.href = "@Url.Content("~/K3/AccountReset")";
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                }
+            });
         });
 
         //图形报表
@@ -194,7 +211,7 @@
                 <button class="btn btn-success btn-block btn-sm center-block"  style="width:100px;" id="logoutBt"><i class="fa fa-sign-out"></i> 安全退出</button>
             </div>
             <div class="col-xs-4">
-                <button class="btn btn-primary btn-block btn-sm center-block"  style="width:100px;" id="codeBt"><i class="fa fa-barcode"></i> 饭卡付款码</button>
+                <button class="btn btn-primary btn-block btn-sm center-block hidden"  style="width:100px;" id="codeBt"><i class="fa fa-barcode"></i> 饭卡付款码</button>
             </div>
         </div>
         
@@ -225,11 +242,11 @@
     </div>
     <div class="col-xs-6 col-sm-4">
         <div class="thumbnail">
-            <a href="#" id="ResImg"><img src="@Url.Content("~/Content/images/res_256.png")" alt="res" ></a>
+            <a href="#" id="K3Img"><img src="@Url.Content("~/Content/images/box.png")" alt="k3" ></a>
             <div class="caption">
-                <h3>会所订餐服务</h3>
-                <p>可以在会所进行订餐，并查询自己的订餐记录</p>
-                <p><button class="btn btn-primary btn-block disabled" id="ResBt">进入系统(待开放)</button></p>
+                <h3>K3用户重开</h3>
+                <p>可以处理K3用户的重新开通与重置登录密码</p>
+                <p><button class="btn btn-primary btn-block" id="K3Bt">进入处理</button></p>
             </div>
         </div>
     </div>
@@ -272,6 +289,16 @@
                 <h3>住宿费用查询</h3>
                 <p>可以查询本人最近半年内的房租明细</p>
                 <p><button class="btn btn-primary btn-block" id="dormitoryBt">进入查询</button></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 col-sm-4">
+        <div class="thumbnail">
+            <a href="#" id="ResImg"><img src="@Url.Content("~/Content/images/res_256.png")" alt="res" ></a>
+            <div class="caption">
+                <h3>会所订餐服务</h3>
+                <p>可以在会所进行订餐，并查询自己的订餐记录</p>
+                <p><button class="btn btn-primary btn-block disabled" id="ResBt">进入系统(待开放)</button></p>
             </div>
         </div>
     </div>

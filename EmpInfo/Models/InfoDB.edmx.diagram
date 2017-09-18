@@ -45,6 +45,7 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_emp_portrait" Width="1.5" PointX="12.375" PointY="4.75" />
         <EntityTypeShape EntityType="ICAuditModel.ei_PushResponse" Width="1.5" PointX="14.625" PointY="1.375" />
         <AssociationConnector Association="ICAuditModel.FK_ei_PushResponse_ei_pushMsg" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_k3RestLog" Width="1.5" PointX="11.75" PointY="6.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

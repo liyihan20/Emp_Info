@@ -1,0 +1,249 @@
+﻿@using EmpInfo.Models;
+@{
+    List<K3AccountModel> accs = (List<K3AccountModel>)ViewData["k3Accounts"];
+}
+<script>
+    var needToValidateEmail = true;
+    $(function () {
+        $("input[name='k3Account']").iCheck({
+            radioClass: 'iradio_square-green'
+        });
+        $("input[name='activateCk'],input[name='resetCk']").iCheck({
+            checkboxClass: 'icheckbox_square-red',
+        });
+
+        $("#dealBt").click(function () {
+            var account = $("input[name='k3Account']:checked").val();
+            var opType = 0;
+            var k3Name = $.trim($("#k3Name").val());
+            if ($("#activateCk:checked").length > 0) {
+                opType += parseInt(1);
+            }
+            if ($("#resetCk:checked").length > 0) {
+                opType += parseInt(2);
+            }
+            if (!account) {
+                toastr.error("请选择一个K3账套");
+                return;
+            }
+            if (opType == 0) {
+                toastr.error("请至少选择一项处理方式");
+                return;
+            }
+            if (k3Name == "") {
+                toastr.error("请输入对应K3账套的登录名");
+                return;
+            }
+            $(this).button('loading');
+
+            if (needToValidateEmail) {
+                $("#EmailModal").modal("show");
+            }else{
+                BeginHandle();
+            }            
+            
+        });
+
+        //忘记密码发送邮箱验证码
+        $("#sendEmailCodeBt").click(function () {
+            SendEmailCode(this, "@ViewData["email"]", $("#k3Name").val());
+        });
+
+        //邮箱验证对话框按钮
+        $("#validateEmailBtn").click(function () {
+            var code = $("#emailCode").val();
+            if (code == "") {
+                toastr.error("请输入邮箱验证码");
+                return;
+            }
+            $.post("@Url.Content("~/Account/ValidateEmailCode")", { email_code: $("#emailCode").val() }, function (data) {
+                if (data=="True") {
+                    $("#EmailModal").modal("hide");
+                    needToValidateEmail = false;
+                    toastr.success("邮箱验证成功，处理K3事务中...");
+                    BeginHandle();
+                } else {
+                    toastr.error("验证码错误");
+                }
+            });
+        });
+
+    });
+        
+    function BeginHandle() {
+        var account = $("input[name='k3Account']:checked").val();
+        var opType = 0;
+        var k3Name = $.trim($("#k3Name").val());
+        if ($("#activateCk:checked").length > 0) {
+            opType += parseInt(1);
+        }
+        if ($("#resetCk:checked").length > 0) {
+            opType += parseInt(2);
+        }
+        $.post("@Url.Content("~/K3/BeginReset")", { k3Name: k3Name, account: account, opType: opType }, function (data) {
+            $("#dealBt").button('reset');
+            if (data.suc) {
+                toastr.success("K3事务操作成功！");
+            } else {
+                toastr.error(data.msg);
+            }
+        });
+    }
+
+    //发送邮箱验证码
+    function SendEmailCode(bt, email_addr, user_name) {
+        $(bt).button('loading');
+        $.post("@Url.Content("~/Account/SendValidateEmail")", { name: user_name, email: email_addr },
+            function (data) {
+                if (data.suc) {
+                    toastr.success(data.msg);
+                    var blockTime = 60;
+                    var inter_id = self.setInterval(function () {
+                        $(bt).html(--blockTime);
+                        $(bt).attr("disabled", "disabled");
+                        if (blockTime < 1) {
+                            clearInterval(inter_id);
+                            $(bt).button("reset");
+                        }
+                    }, 1000);
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+    }
+</script>
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li class="active">K3重开通|重置密码</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <h4 style="margin-bottom:12px;" class="text-danger"><i class="fa fa-question-circle"></i> 请选择K3账套:</h4>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="text-success"><i class="fa fa-flag"></i> 半导体 </div>
+                <div class="row">
+                    @foreach (var acc in accs.Where(a => a.number.Contains("semi"))) {
+                        <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
+                            <input type="radio" name="k3Account" value="@acc.name" /> <span> @acc.number | @acc.name </span>
+                        </div>
+                    }
+                </div>
+                <div class="text-success" style="margin-top:16px;"><i class="fa fa-flag"></i> 香港 </div>
+                <div class="row">
+                    @foreach (var acc in accs.Where(a => a.number.Contains("HT"))) {
+                        <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
+                            <input type="radio" name="k3Account" value="@acc.name" /> <span> @acc.number | @acc.name </span>
+                        </div>
+                    }
+                </div>
+                <div class="text-success" style="margin-top:16px;"><i class="fa fa-flag"></i> 集团 </div>
+                <div class="row">
+                    @foreach (var acc in accs.Where(a => a.number.Contains("truly"))) {
+                        <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
+                            <input type="radio" name="k3Account" value="@acc.name" /> <span> @acc.number | @acc.name </span>
+                        </div>
+                    }
+                </div>
+                @if (accs.Where(a => a.number.Contains("OPTO")).Count() > 0) {
+                    <div class="text-success" style="margin-top:16px;"><i class="fa fa-flag"></i> 光电 </div>
+                    <div class="row">
+                        @foreach (var acc in accs.Where(a => a.number.Contains("OPTO"))) {
+                            <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
+                                <input type="radio" name="k3Account" value="@acc.name" /> <span> @acc.number | @acc.name </span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+        <h4 style="margin-bottom:12px;" class="text-danger"><i class="fa fa-question-circle"></i> 请输入对应账套的K3登陆名:</h4>
+        <div class="row">
+            <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
+                <input type="text" class="form-control" id="k3Name" />
+            </div>
+        </div>
+        <h4 style="margin-bottom:12px;" class="text-danger"><i class="fa fa-question-circle"></i> 请选择处理方式:</h4>
+        <div class="text-center">
+            <input type="checkbox" name="activateCk" id="activateCk" /> 重开通/解除禁用 &nbsp;&nbsp;&nbsp;
+            <input type="checkbox" name="resetCk" id="resetCk" /> 重置密码
+        </div>
+        <div>
+            <button class="btn btn-success btn-block" style="margin-top:16px;" id="dealBt" data-loading-text="处理中..."><i class="fa fa-check"></i> 确认处理</button>
+        </div>
+
+        <div class="panel panel-default" style="margin-top:16px;">
+            <div class="panel-body">
+                <h4 class="text-danger"><i class="fa fa-info-circle"></i> 功能说明 </h4>
+                <div style="margin-left:18px;padding-top:6px;" class="text-danger">
+                    <p>
+                        1. 重开通/解除禁用：成功后请于当天登陆K3系统，否则可能会被再次禁用
+                    </p>
+                    <p>
+                        2. 重置密码：默认重置后的密码都是<span style="font-weight:bold;">k3,456</span>，请及时修改为你自己的密码
+                    </p>
+                    <p>
+                        3. 选择了哪个账套，请填写哪个账套的登录名。因为有一些同事的K3登录名不是他本人的姓名
+                    </p>
+                    <p>
+                        4. 本功能只能处理自己的K3账户。如需处理其他人的K3账户，请登陆OA走流程，流程名是：K3用户重开通或重置申请
+                    </p>
+                    <p>
+                        5. 如果提示[用户不存在]，表示当前k3账套你没有开通过用户，请登陆OA走流程申请用户，流程名是：K3用户权限申请
+                    </p>
+                    <p>
+                        6. 如果提示[职员信息不存在]，表示你已经开通了K3用户，但是没有职员信息，请登陆OA走流程，流程名是：K3用户重开通或重置申请
+                    </p>
+                    <p>
+                        7. 如果有其它问题，请联系K3管理员：赖吉全（座机：3009；邮箱：laijiquan@trulyopto.cn）
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+@section Modal {
+    @*验证邮箱*@
+    <div class="modal fade" id="EmailModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="EmailModallLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="EmailModalLabel">验证用户邮箱</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="emailAddress" class="sr-only">邮箱地址：</label>
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-envelope"></span>
+                            </span>
+                            <input type="text" class="form-control" id="emailAddress" readonly value="@ViewData["email"]" />
+                        </div>
+                    </div>
+                    <div class="form-group" id="emailCodeDiv">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-pawn"></span>
+                            </span>
+                            <input type="text" class="form-control" id="emailCode" placeholder="在此处输入邮箱中的验证码">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" id="sendEmailCodeBt" data-loading-text="邮件发送中...">发送验证码</button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="small text-danger"><i class="fa fa-info-circle"></i> 此页面在不刷新/不关闭并重新打开的情况下，处理多个事务仅验证一次邮箱地址</div>
+                </div>
+                <div class="modal-footer">
+                    <button id="validateEmailBtn" type="button" class="btn btn-success">
+                        <i class="fa fa-check"></i> 开始验证
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

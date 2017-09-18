@@ -56,6 +56,7 @@ namespace EmpInfo.Models
         public DbSet<ei_pushMsg> ei_pushMsg { get; set; }
         public DbSet<ei_emp_portrait> ei_emp_portrait { get; set; }
         public DbSet<ei_PushResponse> ei_PushResponse { get; set; }
+        public DbSet<ei_k3RestLog> ei_k3RestLog { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {
@@ -195,6 +196,53 @@ namespace EmpInfo.Models
                 new ObjectParameter("salary_no", typeof(int));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("GetSalaryMonths", salary_noParameter);
+        }
+    
+        public virtual ObjectResult<string> BindK3Emp(string k3_username, string card_number, string k3_account)
+        {
+            var k3_usernameParameter = k3_username != null ?
+                new ObjectParameter("k3_username", k3_username) :
+                new ObjectParameter("k3_username", typeof(string));
+    
+            var card_numberParameter = card_number != null ?
+                new ObjectParameter("card_number", card_number) :
+                new ObjectParameter("card_number", typeof(string));
+    
+            var k3_accountParameter = k3_account != null ?
+                new ObjectParameter("k3_account", k3_account) :
+                new ObjectParameter("k3_account", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("BindK3Emp", k3_usernameParameter, card_numberParameter, k3_accountParameter);
+        }
+    
+        public virtual ObjectResult<GetK3AccoutList_Result> GetK3AccoutList()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetK3AccoutList_Result>("GetK3AccoutList");
+        }
+    
+        public virtual ObjectResult<string> ResetK3Emp(string k3_username, string card_number, string phone, string k3_account, string op_type)
+        {
+            var k3_usernameParameter = k3_username != null ?
+                new ObjectParameter("k3_username", k3_username) :
+                new ObjectParameter("k3_username", typeof(string));
+    
+            var card_numberParameter = card_number != null ?
+                new ObjectParameter("card_number", card_number) :
+                new ObjectParameter("card_number", typeof(string));
+    
+            var phoneParameter = phone != null ?
+                new ObjectParameter("phone", phone) :
+                new ObjectParameter("phone", typeof(string));
+    
+            var k3_accountParameter = k3_account != null ?
+                new ObjectParameter("k3_account", k3_account) :
+                new ObjectParameter("k3_account", typeof(string));
+    
+            var op_typeParameter = op_type != null ?
+                new ObjectParameter("op_type", op_type) :
+                new ObjectParameter("op_type", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("ResetK3Emp", k3_usernameParameter, card_numberParameter, phoneParameter, k3_accountParameter, op_typeParameter);
         }
     }
 }

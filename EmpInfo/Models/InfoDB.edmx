@@ -308,6 +308,17 @@
           <Property Name="group_id" Type="int" />
           <Property Name="user_id" Type="int" />
         </EntityType>
+        <EntityType Name="ei_k3RestLog">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="k3_name" Type="varchar" MaxLength="50" />
+          <Property Name="card_number" Type="varchar" MaxLength="50" />
+          <Property Name="account" Type="varchar" MaxLength="100" />
+          <Property Name="op_type" Type="varchar" MaxLength="50" />
+          <Property Name="op_time" Type="datetime" />
+        </EntityType>
         <EntityType Name="ei_pushMsg">
           <Key>
             <PropertyRef Name="id" />
@@ -553,6 +564,11 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Function Name="BindK3Emp" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="k3_username" Type="varchar" Mode="In" />
+          <Parameter Name="card_number" Type="varchar" Mode="In" />
+          <Parameter Name="k3_account" Type="varchar" Mode="In" />
+        </Function>
         <Function Name="GetDormChargeMonth" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="GetDormFeeByMonth" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="yearMonth" Type="varchar" Mode="In" />
@@ -567,6 +583,7 @@
         <Function Name="GetHREmpStatus" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="card_no" Type="varchar" Mode="In" />
         </Function>
+        <Function Name="GetK3AccoutList" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="GetPOAccount" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="po_number" Type="varchar" Mode="In" />
         </Function>
@@ -593,6 +610,13 @@
           <Parameter Name="username" Type="varchar" Mode="In" />
           <Parameter Name="cardno" Type="varchar" Mode="In" />
         </Function>
+        <Function Name="ResetK3Emp" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="k3_username" Type="varchar" Mode="In" />
+          <Parameter Name="card_number" Type="varchar" Mode="In" />
+          <Parameter Name="phone" Type="varchar" Mode="In" />
+          <Parameter Name="k3_account" Type="varchar" Mode="In" />
+          <Parameter Name="op_type" Type="varchar" Mode="In" />
+        </Function>
         <Function Name="ValidateDormStatus" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="account" Type="varchar" Mode="In" />
         </Function>
@@ -618,6 +642,7 @@
           <EntitySet Name="ei_groupAuthority" EntityType="Self.ei_groupAuthority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groups" EntityType="Self.ei_groups" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groupUser" EntityType="Self.ei_groupUser" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_k3RestLog" EntityType="Self.ei_k3RestLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_pushMsg" EntityType="Self.ei_pushMsg" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_PushResponse" EntityType="Self.ei_PushResponse" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_resVisitLog" EntityType="Self.ei_resVisitLog" Schema="dbo" store:Type="Tables" />
@@ -828,6 +853,20 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
             <End Role="ei_pushMsg" EntitySet="ei_pushMsg" />
             <End Role="ei_PushResponse" EntitySet="ei_PushResponse" />
           </AssociationSet>
+          <FunctionImport Name="BindK3Emp" ReturnType="Collection(String)">
+            <Parameter Name="k3_username" Mode="In" Type="String" />
+            <Parameter Name="card_number" Mode="In" Type="String" />
+            <Parameter Name="k3_account" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="GetK3AccoutList" ReturnType="Collection(ICAuditModel.GetK3AccoutList_Result)" />
+          <FunctionImport Name="ResetK3Emp" ReturnType="Collection(String)">
+            <Parameter Name="k3_username" Mode="In" Type="String" />
+            <Parameter Name="card_number" Mode="In" Type="String" />
+            <Parameter Name="phone" Mode="In" Type="String" />
+            <Parameter Name="k3_account" Mode="In" Type="String" />
+            <Parameter Name="op_type" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="ei_k3RestLog" EntityType="ICAuditModel.ei_k3RestLog" />
         </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -1464,6 +1503,21 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <ComplexType Name="GetK3AccoutList_Result">
+          <Property Type="String" Name="FAcctNumber" Nullable="true" MaxLength="80" />
+          <Property Type="String" Name="FAcctName" Nullable="false" MaxLength="255" />
+        </ComplexType>
+        <EntityType Name="ei_k3RestLog">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="k3_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="card_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="account" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="op_type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="op_time" Type="DateTime" Precision="3" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1997,6 +2051,28 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
                 <ScalarProperty Name="received_date" ColumnName="received_date" />
                 <ScalarProperty Name="card_no" ColumnName="card_no" />
                 <ScalarProperty Name="push_id" ColumnName="push_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="BindK3Emp" FunctionName="ICAuditModel.Store.BindK3Emp" />
+          <FunctionImportMapping FunctionImportName="GetK3AccoutList" FunctionName="ICAuditModel.Store.GetK3AccoutList">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetK3AccoutList_Result">
+                <ScalarProperty Name="FAcctNumber" ColumnName="FAcctNumber" />
+                <ScalarProperty Name="FAcctName" ColumnName="FAcctName" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="ResetK3Emp" FunctionName="ICAuditModel.Store.ResetK3Emp" />
+          <EntitySetMapping Name="ei_k3RestLog">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_k3RestLog">
+              <MappingFragment StoreEntitySet="ei_k3RestLog">
+                <ScalarProperty Name="op_time" ColumnName="op_time" />
+                <ScalarProperty Name="op_type" ColumnName="op_type" />
+                <ScalarProperty Name="account" ColumnName="account" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
+                <ScalarProperty Name="k3_name" ColumnName="k3_name" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

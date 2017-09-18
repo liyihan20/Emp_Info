@@ -151,6 +151,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
+    <Compile Include="Controllers\K3Controller.cs" />
     <Compile Include="Controllers\PackageController.cs" />
     <Compile Include="Controllers\PushController.cs" />
     <Compile Include="Controllers\RestaurantBaseController.cs" />
@@ -243,6 +244,9 @@
     <Compile Include="Models\ei_groupUser.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_k3RestLog.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_pushMsg.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -265,6 +269,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetHREmpInfo_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GetK3AccoutList_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetPOAccount_Result.cs">
@@ -294,6 +301,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>InfoDB.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\K3Models.cs" />
     <Compile Include="Models\laijq20161105_001_Result.cs">
       <DependentUpon>Canteen.tt</DependentUpon>
     </Compile>
@@ -349,6 +357,7 @@
     <Content Include="Content\fontawesome\fontcss\font-awesome.min.css" />
     <Content Include="Content\fontawesome\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\images\book.png" />
+    <Content Include="Content\images\box.png" />
     <Content Include="Content\images\bubble-sprite.png" />
     <Content Include="Content\images\paint.png" />
     <Content Include="Content\images\post.png" />
@@ -704,6 +713,7 @@
     <None Include="Service References\EmpWebSvr\TrulyEmpSvr.wsdl" />
     <Content Include="Views\AndroidApp\PushNotice.cshtml" />
     <Content Include="Views\AndroidApp\PushClickView.cshtml" />
+    <Content Include="Views\K3\AccountReset.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
