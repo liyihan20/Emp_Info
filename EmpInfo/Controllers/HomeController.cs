@@ -37,6 +37,7 @@ namespace EmpInfo.Controllers
             if (string.IsNullOrEmpty(card_no)) card_no = userInfo.cardNo;
             var user = db.ei_users.Single(u => u.card_number == card_no);
             byte[] portrait = user.short_portrait;
+            string picUrl;
             if (portrait == null) {
                 //无照片的，先看看人事系统有没有 2017-9-5
                 var emp = db.GetHREmpInfo(card_no).ToList();
@@ -46,9 +47,13 @@ namespace EmpInfo.Controllers
                         db.SaveChanges();
                         portrait = user.short_portrait;
                     }
+                    else {
+                        picUrl = Server.MapPath("~/Content/images/") + (user.sex.Equals("男") ? "user_man.png" : "user_woman.png");
+                        portrait = MyUtils.GetServerImage(picUrl);
+                    }
                 }
                 else {
-                    string picUrl = Server.MapPath("~/Content/images/") + (user.sex.Equals("男") ? "user_man.png" : "user_woman.png");
+                    picUrl = Server.MapPath("~/Content/images/") + (user.sex.Equals("男") ? "user_man.png" : "user_woman.png");
                     portrait = MyUtils.GetServerImage(picUrl);
                 }
             }
@@ -399,7 +404,7 @@ namespace EmpInfo.Controllers
             ViewData["months"] = db.GetSalaryMonths(salaryNo).ToList();
             ViewData["info"] = info;
             WriteEventLog("工资查询", "进入工资查询页面:"+info.First().basicSalary);
-            return View();           
+            return View();
         }
 
         public JsonResult CheckSalarySummary(string yearMonth)
@@ -408,7 +413,7 @@ namespace EmpInfo.Controllers
             DateTime firstDay = DateTime.Parse(yearMonth + "-01");
             DateTime lastDay = firstDay.AddMonths(1);
 
-            
+            WriteEventLog("工资查询", "查询工资月度摘要:"+yearMonth);
             return Json(db.GetSalarySummary(salaryNo, firstDay, lastDay).ToList().First());
         }
 
@@ -418,6 +423,7 @@ namespace EmpInfo.Controllers
             DateTime firstDay = DateTime.Parse(yearMonth + "-01");
             DateTime lastDay = firstDay.AddMonths(1);
 
+            WriteEventLog("工资查询", "查询工资月度明细:" + yearMonth);
             return Json(db.GetSalaryDetail(salaryNo, firstDay, lastDay).ToList().First());
         }
 
