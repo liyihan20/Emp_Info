@@ -1,6 +1,12 @@
 ﻿@{
     string auts = (string)ViewData["autStr"];
     string isMinister = auts.IndexOf("MinisterDishOrder") >= 0 ? "1" : "0";
+
+    bool auditorComing = false;
+    if (ViewData["auditorComing"] != null) {
+        auditorComing = (bool)ViewData["auditorComing"];
+    }
+    
 }
 @section CSS{
     <style type="text/css">
@@ -220,6 +226,7 @@
 </div>
 
 <div class="row">
+    @if (!auditorComing) { 
     <div class="col-xs-6 col-sm-4">
         <div class="thumbnail">
             <a href="#" id="SalaryImg"><img src="@Url.Content("~/Content/images/salary.png")" alt="salary"></a>
@@ -240,6 +247,7 @@
             </div>
         </div>
     </div>
+    }
     <div class="col-xs-6 col-sm-4">
         <div class="thumbnail">
             <a href="#" id="K3Img"><img src="@Url.Content("~/Content/images/box.png")" alt="k3" ></a>
@@ -250,6 +258,7 @@
             </div>
         </div>
     </div>
+    @if (!auditorComing) { 
     <div class="col-xs-6 col-sm-4">
         <div class="thumbnail">
             <a href="#" id="packageImg"><img src="@Url.Content("~/Content/images/repair.png")" alt="repair"></a>
@@ -302,7 +311,7 @@
             </div>
         </div>
     </div>
-    @if (auts.IndexOf("AdminIndex") >= 0)
+    if (auts.IndexOf("AdminIndex") >= 0)
     {
     <div class="col-xs-6 col-sm-4">
         <div class="thumbnail">
@@ -315,7 +324,7 @@
         </div>
     </div>
     }
-    @if (auts.IndexOf("ChartReport") >= 0) {
+    if (auts.IndexOf("ChartReport") >= 0) {
         <div class="col-xs-6 col-sm-4">
             <div class="thumbnail">
                 <a href="#" id="chartImg"><img src="@Url.Content("~/Content/images/paint.png")" alt="paint"></a>
@@ -327,7 +336,7 @@
             </div>
         </div>
     }
-    
+    }
 </div>
 
 @Html.Partial("_ResSelDialog")

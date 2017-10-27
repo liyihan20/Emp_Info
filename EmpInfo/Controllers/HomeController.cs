@@ -3,6 +3,7 @@ using EmpInfo.Models;
 using EmpInfo.Util;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
@@ -28,6 +29,10 @@ namespace EmpInfo.Controllers
             string autStr = string.Join(",", auts);
             ViewData["autStr"] = autStr;
 
+            if ("06022701".Equals(userInfo.cardNo)) {
+                bool auditorComing = bool.Parse(ConfigurationManager.AppSettings["auditorComing"]);
+                ViewData["auditorComing"] = auditorComing;
+            }
             return View();
         }
 
@@ -129,8 +134,8 @@ namespace EmpInfo.Controllers
                 else {
                     return Json(new SimpleResultModel() { suc = false, msg = passTip });
                 }
-                
             }
+            
             if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(phone) && !string.IsNullOrEmpty(shortPhone)) {
                 db.InsertIntoYFEmp(email ?? "", phone ?? "", shortPhone ?? "", user.name, user.card_number);
             }
