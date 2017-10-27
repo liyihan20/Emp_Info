@@ -2,6 +2,14 @@
 @{
     List<K3AccountModel> accs = (List<K3AccountModel>)ViewData["k3Accounts"];
 }
+@section CSS{
+    <style type="text/css">
+        .accountName{
+            cursor:pointer;
+        }        
+    </style>
+    }
+@section Scripts {
 <script>
     var needToValidateEmail = true;
     $(function () {
@@ -68,6 +76,11 @@
             });
         });
 
+        $(".accountName").click(function () {
+            var ck = $(this).parent().find("input")[0];
+            $(ck).iCheck("check");
+        });
+
     });
         
     function BeginHandle() {
@@ -112,6 +125,7 @@
             });
     }
 </script>
+    }
 <div class="panel panel-success">
     <div class="panel-heading">
         <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
@@ -128,7 +142,7 @@
                 <div class="row">
                     @foreach (var acc in accs.Where(a => a.number.Contains("semi"))) {
                         <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
-                            <input type="radio" name="k3Account" value="@acc.name" /> <span> @acc.number | @acc.name </span>
+                            <input type="radio" name="k3Account" value="@acc.name" /> <span class="accountName"> @acc.number | @acc.name </span>
                         </div>
                     }
                 </div>
@@ -136,7 +150,7 @@
                 <div class="row">
                     @foreach (var acc in accs.Where(a => a.number.Contains("HT"))) {
                         <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
-                            <input type="radio" name="k3Account" value="@acc.name" /> <span> @acc.number | @acc.name </span>
+                            <input type="radio" name="k3Account" value="@acc.name" /> <span class="accountName"> @acc.number | @acc.name </span>
                         </div>
                     }
                 </div>
@@ -144,7 +158,7 @@
                 <div class="row">
                     @foreach (var acc in accs.Where(a => a.number.Contains("truly"))) {
                         <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
-                            <input type="radio" name="k3Account" value="@acc.name" /> <span> @acc.number | @acc.name </span>
+                            <input type="radio" name="k3Account" value="@acc.name" /> <span class="accountName"> @acc.number | @acc.name </span>
                         </div>
                     }
                 </div>
@@ -153,7 +167,7 @@
                     <div class="row">
                         @foreach (var acc in accs.Where(a => a.number.Contains("OPTO"))) {
                             <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
-                                <input type="radio" name="k3Account" value="@acc.name" /> <span> @acc.number | @acc.name </span>
+                                <input type="radio" name="k3Account" value="@acc.name" /> <span class="accountName"> @acc.number | @acc.name </span>
                             </div>
                         }
                     </div>
