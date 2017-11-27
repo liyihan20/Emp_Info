@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://ic.truly.com.cn/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://ic.truly.com.cn/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://ic.truly.com.cn/">
+      <s:element name="StartWorkFlow">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="formJson" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="billType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="createUser" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="title" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="subTitle" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="StartWorkFlowResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="StartWorkFlowResult" type="tns:FlowResultModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="FlowResultModel">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="suc" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="msg" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="nextAuditors" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="BeginAudit">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="currentStep" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="userNumber" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="isPass" type="s:boolean" />
+            <s:element minOccurs="0" maxOccurs="1" name="opinion" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="formJson" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BeginAuditResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="BeginAuditResult" type="tns:FlowResultModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetApplyResult">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetApplyResultResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetApplyResultResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetFlowRecord">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetFlowRecordResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetFlowRecordResult" type="tns:ArrayOfFlowRecordModels" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfFlowRecordModels">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="FlowRecordModels" nillable="true" type="tns:FlowRecordModels" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="FlowRecordModels">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="step" nillable="true" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="stepName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="auditors" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="auditTimes" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="auditResult" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="opinions" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetMyApplyList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="applier" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="fromDateQuery" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="toDateQuery" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="billType" type="tns:ArrayOfString" />
+            <s:element minOccurs="0" maxOccurs="1" name="title" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="subTitle" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="auditResult" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="maxReturnCount" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetMyApplyListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetMyApplyListResult" type="tns:ArrayOfFlowMyAppliesModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfFlowMyAppliesModel">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="FlowMyAppliesModel" nillable="true" type="tns:FlowMyAppliesModel" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="FlowMyAppliesModel">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="applyTime" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="title" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="subTitle" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="billType" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="auditResult" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="finishTime" nillable="true" type="s:dateTime" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetAuditList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="auditor" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="applier" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="title" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="subTitle" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="fromTime" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="toTime" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="auditResult" type="tns:ArrayOfInt" />
+            <s:element minOccurs="0" maxOccurs="1" name="finalResult" type="tns:ArrayOfInt" />
+            <s:element minOccurs="0" maxOccurs="1" name="billTypes" type="tns:ArrayOfString" />
+            <s:element minOccurs="1" maxOccurs="1" name="maxReturnCount" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfInt">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="int" type="s:int" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetAuditListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetAuditListResult" type="tns:ArrayOfFlowAuditListModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfFlowAuditListModel">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="FlowAuditListModel" nillable="true" type="tns:FlowAuditListModel" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="FlowAuditListModel">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="applyTime" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="billType" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="title" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="subTitle" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="applier" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="step" nillable="true" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="stepName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="auditResult" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="finalResult" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetMyApplyCount">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="applier" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="billType" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetMyApplyCountResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetMyApplyCountResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetMyDealingApplyCount">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="auditor" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="billType" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetMyDealingApplyCountResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetMyDealingApplyCountResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestStarFlow">
+        <s:complexType />
+      </s:element>
+      <s:element name="TestStarFlowResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TestStarFlowResult" type="tns:FlowResultModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestAudit">
+        <s:complexType />
+      </s:element>
+      <s:element name="TestAuditResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TestAuditResult" type="tns:FlowResultModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestFlowRecord">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestFlowRecordResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TestFlowRecordResult" type="tns:ArrayOfFlowRecordModels" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestFlowAuditList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestFlowAuditListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TestFlowAuditListResult" type="tns:ArrayOfFlowAuditListModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestMyFlowList">
+        <s:complexType />
+      </s:element>
+      <s:element name="TestMyFlowListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TestMyFlowListResult" type="tns:ArrayOfFlowMyAppliesModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="StartWorkFlowSoapIn">
+    <wsdl:part name="parameters" element="tns:StartWorkFlow" />
+  </wsdl:message>
+  <wsdl:message name="StartWorkFlowSoapOut">
+    <wsdl:part name="parameters" element="tns:StartWorkFlowResponse" />
+  </wsdl:message>
+  <wsdl:message name="BeginAuditSoapIn">
+    <wsdl:part name="parameters" element="tns:BeginAudit" />
+  </wsdl:message>
+  <wsdl:message name="BeginAuditSoapOut">
+    <wsdl:part name="parameters" element="tns:BeginAuditResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetApplyResultSoapIn">
+    <wsdl:part name="parameters" element="tns:GetApplyResult" />
+  </wsdl:message>
+  <wsdl:message name="GetApplyResultSoapOut">
+    <wsdl:part name="parameters" element="tns:GetApplyResultResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetFlowRecordSoapIn">
+    <wsdl:part name="parameters" element="tns:GetFlowRecord" />
+  </wsdl:message>
+  <wsdl:message name="GetFlowRecordSoapOut">
+    <wsdl:part name="parameters" element="tns:GetFlowRecordResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetMyApplyListSoapIn">
+    <wsdl:part name="parameters" element="tns:GetMyApplyList" />
+  </wsdl:message>
+  <wsdl:message name="GetMyApplyListSoapOut">
+    <wsdl:part name="parameters" element="tns:GetMyApplyListResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetAuditListSoapIn">
+    <wsdl:part name="parameters" element="tns:GetAuditList" />
+  </wsdl:message>
+  <wsdl:message name="GetAuditListSoapOut">
+    <wsdl:part name="parameters" element="tns:GetAuditListResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetMyApplyCountSoapIn">
+    <wsdl:part name="parameters" element="tns:GetMyApplyCount" />
+  </wsdl:message>
+  <wsdl:message name="GetMyApplyCountSoapOut">
+    <wsdl:part name="parameters" element="tns:GetMyApplyCountResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetMyDealingApplyCountSoapIn">
+    <wsdl:part name="parameters" element="tns:GetMyDealingApplyCount" />
+  </wsdl:message>
+  <wsdl:message name="GetMyDealingApplyCountSoapOut">
+    <wsdl:part name="parameters" element="tns:GetMyDealingApplyCountResponse" />
+  </wsdl:message>
+  <wsdl:message name="TestStarFlowSoapIn">
+    <wsdl:part name="parameters" element="tns:TestStarFlow" />
+  </wsdl:message>
+  <wsdl:message name="TestStarFlowSoapOut">
+    <wsdl:part name="parameters" element="tns:TestStarFlowResponse" />
+  </wsdl:message>
+  <wsdl:message name="TestAuditSoapIn">
+    <wsdl:part name="parameters" element="tns:TestAudit" />
+  </wsdl:message>
+  <wsdl:message name="TestAuditSoapOut">
+    <wsdl:part name="parameters" element="tns:TestAuditResponse" />
+  </wsdl:message>
+  <wsdl:message name="TestFlowRecordSoapIn">
+    <wsdl:part name="parameters" element="tns:TestFlowRecord" />
+  </wsdl:message>
+  <wsdl:message name="TestFlowRecordSoapOut">
+    <wsdl:part name="parameters" element="tns:TestFlowRecordResponse" />
+  </wsdl:message>
+  <wsdl:message name="TestFlowAuditListSoapIn">
+    <wsdl:part name="parameters" element="tns:TestFlowAuditList" />
+  </wsdl:message>
+  <wsdl:message name="TestFlowAuditListSoapOut">
+    <wsdl:part name="parameters" element="tns:TestFlowAuditListResponse" />
+  </wsdl:message>
+  <wsdl:message name="TestMyFlowListSoapIn">
+    <wsdl:part name="parameters" element="tns:TestMyFlowList" />
+  </wsdl:message>
+  <wsdl:message name="TestMyFlowListSoapOut">
+    <wsdl:part name="parameters" element="tns:TestMyFlowListResponse" />
+  </wsdl:message>
+  <wsdl:portType name="FlowSvrSoap">
+    <wsdl:operation name="StartWorkFlow">
+      <wsdl:input message="tns:StartWorkFlowSoapIn" />
+      <wsdl:output message="tns:StartWorkFlowSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="BeginAudit">
+      <wsdl:input message="tns:BeginAuditSoapIn" />
+      <wsdl:output message="tns:BeginAuditSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetApplyResult">
+      <wsdl:input message="tns:GetApplyResultSoapIn" />
+      <wsdl:output message="tns:GetApplyResultSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetFlowRecord">
+      <wsdl:input message="tns:GetFlowRecordSoapIn" />
+      <wsdl:output message="tns:GetFlowRecordSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMyApplyList">
+      <wsdl:input message="tns:GetMyApplyListSoapIn" />
+      <wsdl:output message="tns:GetMyApplyListSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAuditList">
+      <wsdl:input message="tns:GetAuditListSoapIn" />
+      <wsdl:output message="tns:GetAuditListSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMyApplyCount">
+      <wsdl:input message="tns:GetMyApplyCountSoapIn" />
+      <wsdl:output message="tns:GetMyApplyCountSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMyDealingApplyCount">
+      <wsdl:input message="tns:GetMyDealingApplyCountSoapIn" />
+      <wsdl:output message="tns:GetMyDealingApplyCountSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TestStarFlow">
+      <wsdl:input message="tns:TestStarFlowSoapIn" />
+      <wsdl:output message="tns:TestStarFlowSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TestAudit">
+      <wsdl:input message="tns:TestAuditSoapIn" />
+      <wsdl:output message="tns:TestAuditSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TestFlowRecord">
+      <wsdl:input message="tns:TestFlowRecordSoapIn" />
+      <wsdl:output message="tns:TestFlowRecordSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TestFlowAuditList">
+      <wsdl:input message="tns:TestFlowAuditListSoapIn" />
+      <wsdl:output message="tns:TestFlowAuditListSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TestMyFlowList">
+      <wsdl:input message="tns:TestMyFlowListSoapIn" />
+      <wsdl:output message="tns:TestMyFlowListSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="FlowSvrSoap" type="tns:FlowSvrSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="StartWorkFlow">
+      <soap:operation soapAction="http://ic.truly.com.cn/StartWorkFlow" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BeginAudit">
+      <soap:operation soapAction="http://ic.truly.com.cn/BeginAudit" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetApplyResult">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetApplyResult" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetFlowRecord">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetFlowRecord" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMyApplyList">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetMyApplyList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAuditList">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetAuditList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMyApplyCount">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetMyApplyCount" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMyDealingApplyCount">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetMyDealingApplyCount" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestStarFlow">
+      <soap:operation soapAction="http://ic.truly.com.cn/TestStarFlow" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestAudit">
+      <soap:operation soapAction="http://ic.truly.com.cn/TestAudit" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestFlowRecord">
+      <soap:operation soapAction="http://ic.truly.com.cn/TestFlowRecord" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestFlowAuditList">
+      <soap:operation soapAction="http://ic.truly.com.cn/TestFlowAuditList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestMyFlowList">
+      <soap:operation soapAction="http://ic.truly.com.cn/TestMyFlowList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="FlowSvrSoap12" type="tns:FlowSvrSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="StartWorkFlow">
+      <soap12:operation soapAction="http://ic.truly.com.cn/StartWorkFlow" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BeginAudit">
+      <soap12:operation soapAction="http://ic.truly.com.cn/BeginAudit" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetApplyResult">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetApplyResult" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetFlowRecord">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetFlowRecord" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMyApplyList">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetMyApplyList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAuditList">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetAuditList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMyApplyCount">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetMyApplyCount" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMyDealingApplyCount">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetMyDealingApplyCount" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestStarFlow">
+      <soap12:operation soapAction="http://ic.truly.com.cn/TestStarFlow" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestAudit">
+      <soap12:operation soapAction="http://ic.truly.com.cn/TestAudit" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestFlowRecord">
+      <soap12:operation soapAction="http://ic.truly.com.cn/TestFlowRecord" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestFlowAuditList">
+      <soap12:operation soapAction="http://ic.truly.com.cn/TestFlowAuditList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestMyFlowList">
+      <soap12:operation soapAction="http://ic.truly.com.cn/TestMyFlowList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="FlowSvr">
+    <wsdl:port name="FlowSvrSoap" binding="tns:FlowSvrSoap">
+      <soap:address location="http://59.37.42.23/FlowSvrWebService/FlowSvr.asmx" />
+    </wsdl:port>
+    <wsdl:port name="FlowSvrSoap12" binding="tns:FlowSvrSoap12">
+      <soap12:address location="http://59.37.42.23/FlowSvrWebService/FlowSvr.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

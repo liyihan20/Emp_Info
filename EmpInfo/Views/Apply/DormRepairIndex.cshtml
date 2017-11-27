@@ -1,0 +1,326 @@
+﻿@{
+
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/autocomplete.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+
+    <style type="text/css">
+        .list-group-item .media img {
+            height: 64px;
+            width: 96px;
+        }
+
+        .b-label {
+            display: inline-block;
+            width: 80px;
+            vertical-align:top;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+
+        .badge {
+            background-color: #3399CC;
+        }
+    </style>
+}
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/knockout-3.4.0.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script>
+
+        $(function () {
+            $("#repairTimePicker").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd hh:ii",
+                autoclose: true,
+                maxView: 2,
+                minuteStep: 10,
+                startDate: new Date("@DateTime.Now.ToString("yyyy-MM-dd HH:mm")"),
+                endDate: new Date("@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd 20:00")")
+            });
+        });
+
+        function RoomMale(dmString) {
+            this.cardNumber = dmString.split(":")[0];
+            this.name = dmString.split(":")[1];
+        }
+
+        function DormRepairModel() {
+            var self = this;
+            self.dealingCount = parseInt("@ViewData["dealingCount"]");
+            self.areaName = ko.observable("");
+            self.dormNumber = ko.observable("");
+            self.phoneNumber = ko.observable("");
+            self.shortPhoneNumber = ko.observable("");
+            self.contactName = ko.observable("");
+            self.roomMates = ko.observableArray([]);
+            self.repairTypes = ["直接维修", "预约维修"];
+            self.feeShareTypes = ko.observableArray(["户主本人", "舍友分摊"]);
+            self.repairType = ko.observable("");               
+            self.contactTypes = ["户主", "其他"];
+            self.contactType = ko.observable();
+            self.feeShareType = ko.observable("");
+            self.checkedRoomMates = ko.observable([]);
+            self.ownerName = "";
+            self.ownerPhone = "";
+            self.ownerShortPhone = "";
+            self.repairTime = "";
+            self.repairContent = ko.observable("");
+
+            //打开申请单对话框
+            self.openApplyDialog = function () {                
+                $.post("@Url.Content("~/Apply/GetDormInfoAndRoomMale")", {}, function (data) {
+                    if (data.suc) {
+                        var model = data.model;
+                        self.areaName(model.areaName);
+                        self.dormNumber(model.dormNumber);
+                        self.ownerName = model.contactName;
+                        self.ownerPhone = model.phoneNumber;
+                        self.ownerShortPhone = model.shortPhoneNumber;
+
+                        if (model.roomMaleList == "") {
+                            self.feeShareTypes.pop();
+                        } else {
+                            self.roomMates([]);//清空
+                            var roomMaleArr = model.roomMaleList.split(";");
+                            for (var i = 0; i < roomMaleArr.length; i++) {
+                                if (roomMaleArr[i] != "") {
+                                    self.roomMates().push(new RoomMale(roomMaleArr[i]));
+                                }
+                            }
+                        }                        
+                        $("#dpApplyModal").modal("show");
+                        setTimeout(function () { self.roomMates(self.roomMates());}, 50); //因为是异步操作，dom比ajax提前渲染，在这里通知dom更新
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });                
+            }
+
+            //修改维修类型
+            self.ChangeRepairType = function (r) {
+                self.repairType(r);
+            }
+
+            //修改分摊类型
+            self.ChangeFeeShareType = function (f) {
+                self.feeShareType(f);                
+                self.roomMates(self.roomMates());//必须加上这句通知dom，否则dom没变化
+            }
+
+            //修改联系人
+            self.ChangeContactType = function (c) {
+                self.contactType(c);
+                if (c == "户主") {
+                    self.contactName(self.ownerName);
+                    self.phoneNumber(self.ownerPhone);
+                    self.shortPhoneNumber(self.ownerShortPhone);
+                } else {
+                    self.contactName("");
+                    self.phoneNumber("");
+                    self.shortPhoneNumber("");
+                }
+            }
+
+            //提交申请
+            self.submitApply = function () {
+                if (self.repairType() == "") {
+                    toastr.error("请选择维修类型");
+                    return;
+                }
+                if (self.repairType() == "预约维修" && self.repairTime == "") {
+                    toastr.error("请选择预约时间");
+                    return;
+                }
+                if (self.feeShareType() == "") {
+                    toastr.error("请选择费用承担方式");
+                    return;
+                }
+                if (self.feeShareType() == "舍友分摊" && self.checkedRoomMates().length == 0) {
+                    toastr.error("请勾选需要分摊费用的舍友");
+                    return;
+                }
+                if (self.contactName() == "") {
+                    toastr.error("请填写联系人");
+                    return;
+                }
+                if (self.phoneNumber() == "" && self.shortPhoneNumber() == "") {
+                    toastr.error("手机号和短号至少必须填写一个");
+                    return;
+                }
+
+                $("#applyBt").button("loading");
+                $.post("@Url.Content("~/Apply/SubmitDPApply")", {
+                    area: self.areaName,
+                    dorm: self.dormNumber,
+                    repairType: self.repairType(),
+                    repairTime: self.repairTime,
+                    feeShareType: self.feeShareType(),
+                    feeShareRoomMates: self.checkedRoomMates().join(";"),
+                    contactName: self.contactName(),
+                    phoneNumber: self.phoneNumber(),
+                    shortPhoneNumber: self.shortPhoneNumber(),
+                    repairContent:self.repairContent()
+                }, function (data) {
+                    $("#applyBt").button("reset");
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        $("#dpApplyModal").modal("hide");
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });                
+            }
+
+            
+        }
+        ko.applyBindings(new DormRepairModel());
+    </script>
+}
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li class="active">宿舍维修申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <i> 点击以下列表选择相应的服务:</i>
+    </div>
+    <div class="list-group">
+        <a href="#" class="list-group-item" data-bind="click:openApplyDialog"><span class="text-danger"><i class="fa fa-fw fa-pencil"></i> 开始申请</span></a>
+        <a href="@Url.Content("~/Apply/GetMyApplyDPList")" class="list-group-item"><i class="fa fa-fw fa-th"></i> 我申请的</a>
+        <a href="@Url.Content("~/Apply/GetMyAuditingDPList")" class="list-group-item"><i class="fa fa-fw fa-th-list"></i> 我的待办 <span class="badge" data-bind="text:dealingCount,visible:dealingCount>0" /></a>
+        <a href="@Url.Content("~/Apply/GetMyAuditedDPList")" class="list-group-item"><i class="fa fa-fw fa-th-large"></i> 我的已办</a>
+    </div>
+</div>
+
+<div class="panel panel-default" style="margin-top:16px;">
+    <div class="panel-body">
+        <h4 class="text-danger"><i class="fa fa-info-circle"></i> 功能说明 </h4>
+        <div style="margin-left:18px;padding-top:6px;" class="text-danger">
+            <p>
+                1. 流程步骤：开始--->员工申请宿舍维修--->舍友确认（如没有舍友分摊，则跳过此步骤）--->后勤受理人接单--->维修完成--->申请人确认评价--->结束。
+            </p>
+            <p>
+                2. 维修单一旦确认完成之后，再次发生维修事宜均属于有偿服务，费用另外计算。
+            </p>
+            <p>
+                3. 对本次服务不确认评价，将不能再次申请维修，请配合给予评价。
+            </p>
+            <p>
+                4. 详细操作指引，<a href="@Url.Content("~/Content/doc/宿舍维修申请流程操作指引.pdf")" target="_blank">点此下载</a> 。
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Modal {
+    <div class="modal fade" id="dpApplyModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="resetPasswordLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">宿舍维修申请单</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="b-div">
+                        <span class="b-label">
+                            区号:
+                        </span>
+                        <span data-bind="text:areaName" />
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            宿舍号:
+                        </span>
+                        <span data-bind="text:dormNumber" />
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            维修类型:
+                        </span>
+                        <!--ko foreach: repairTypes-->
+                        <button class="btn btn-sm btn-default" data-bind="css:{'btn-primary':$parent.repairType()==$data},click:$parent.ChangeRepairType" style="margin-right:12px;">
+                            <span data-bind="text:$data"></span>
+                            <i class="fa fa-check-circle" data-bind="visible:$parent.repairType()==$data"></i>
+                        </button>
+                        <!--/ko-->
+                    </div>
+                    <div class="b-div" data-bind="visible:repairType()=='预约维修'">
+                        <span class="b-label" style="vertical-align:top;">预约时间</span>
+                        <span style="display:inline;width:70%;vertical-align:top;">
+                            <span class="input-group date" style="display:inline-table;width:70%;" id="repairTimePicker">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span> </span>
+                                <input class="form-control" type="text" readonly data-bind="value:repairTime">
+                            </span>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            费用承担:
+                        </span>
+                        <!--ko foreach: feeShareTypes-->
+                        <button class="btn btn-sm btn-default" data-bind="css:{'btn-danger':$parent.feeShareType()==$data},click:$parent.ChangeFeeShareType" style="margin-right:12px;">
+                            <span data-bind="text:$data"></span>
+                            <i class="fa fa-check-circle" data-bind="visible:$parent.feeShareType()==$data"></i>
+                        </button>
+                        <!--/ko-->
+                    </div>
+                    <div class="b-div" data-bind="visible:feeShareType()=='舍友分摊'">
+                        <span class="b-label">
+                            选择舍友:
+                        </span>
+                        <!--ko foreach: roomMates-->
+                        <input type="checkbox" data-bind="value:$data.cardNumber,checked:$parent.checkedRoomMates" /><span data-bind="text:$data.name"></span>&nbsp;
+                        <!--/ko-->
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            联系信息:
+                        </span>
+                        <!--ko foreach: contactTypes-->
+                        <button class="btn btn-sm btn-default" data-bind="css:{'btn-info':$parent.contactType()==$data},click:$parent.ChangeContactType" style="margin-right:12px;">
+                            <span data-bind="text:$data"></span>
+                            <i class="fa fa-check-circle" data-bind="visible:$parent.contactType()==$data"></i>
+                        </button>
+                        <!--/ko-->
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">联系人</span>
+                        <span style="display:inline-block;width:70%;">
+                            <input type="text" class="form-control" data-bind="value:contactName" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">手机号码</span>
+                        <span style="display:inline-block;width:70%;">
+                            <input type="text" class="form-control" data-bind="value:phoneNumber" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">手机短号</span>
+                        <span style="display:inline-block;width:70%;">
+                            <input type="text" class="form-control" data-bind="value:shortPhoneNumber" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">维修内容</span>
+                        <span style="display:inline-block;width:70%;">
+                            <textarea class="form-control" rows="3" data-bind="value:repairContent"></textarea>
+                        </span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-success" data-bind="click:submitApply" data-loading-text="提交中..." id="applyBt" >提交申请</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

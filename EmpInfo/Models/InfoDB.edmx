@@ -263,6 +263,39 @@
           <Property Name="is_finish" Type="bit" />
           <Property Name="packs" Type="int" />
         </EntityType>
+        <EntityType Name="ei_dormRepair">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="varchar" MaxLength="50" />
+          <Property Name="area_name" Type="varchar" MaxLength="20" />
+          <Property Name="dorm_num" Type="varchar" MaxLength="20" />
+          <Property Name="repair_type" Type="varchar" MaxLength="50" />
+          <Property Name="repair_time" Type="smalldatetime" />
+          <Property Name="fee_share_type" Type="varchar" MaxLength="20" />
+          <Property Name="fee_share_peple" Type="varchar" MaxLength="100" />
+          <Property Name="repair_content" Type="varchar" MaxLength="500" />
+          <Property Name="contact_name" Type="varchar" MaxLength="50" />
+          <Property Name="contact_phone" Type="varchar" MaxLength="50" />
+          <Property Name="contact_short_phone" Type="varchar" MaxLength="50" />
+          <Property Name="apply_time" Type="datetime" />
+          <Property Name="accepter_num" Type="varchar" MaxLength="20" />
+          <Property Name="accepter_name" Type="varchar" MaxLength="50" />
+          <Property Name="is_accept" Type="bit" />
+          <Property Name="accept_comment" Type="varchar" MaxLength="500" />
+          <Property Name="accepter_phone" Type="varchar" MaxLength="50" />
+          <Property Name="accepter_short_phone" Type="varchar" MaxLength="50" />
+          <Property Name="confirm_repair_time" Type="smalldatetime" />
+          <Property Name="repaire_subject" Type="varchar" MaxLength="500" />
+          <Property Name="charge_fee" Type="decimal" Precision="8" Scale="1" />
+          <Property Name="finish_repair_time" Type="smalldatetime" />
+          <Property Name="applier_confirm_time" Type="datetime" />
+          <Property Name="applier_evaluation" Type="varchar" MaxLength="200" />
+          <Property Name="applier_evaluation_score" Type="int" />
+        </EntityType>
         <EntityType Name="ei_emp_portrait">
           <Key>
             <PropertyRef Name="id" />
@@ -574,6 +607,9 @@
           <Parameter Name="yearMonth" Type="varchar" Mode="In" />
           <Parameter Name="salaryNo" Type="varchar" Mode="In" />
         </Function>
+        <Function Name="GetDormRoomMate" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="dormNumber" Type="varchar" Mode="In" />
+        </Function>
         <Function Name="GetEmpDormInfo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="card_no" Type="varchar" Mode="In" />
         </Function>
@@ -637,6 +673,7 @@
           <EntitySet Name="dn_shoppingCar" EntityType="Self.dn_shoppingCar" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_authority" EntityType="Self.ei_authority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_deliveryInfo" EntityType="Self.ei_deliveryInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_dormRepair" EntityType="Self.ei_dormRepair" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_emp_portrait" EntityType="Self.ei_emp_portrait" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_event_log" EntityType="Self.ei_event_log" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groupAuthority" EntityType="Self.ei_groupAuthority" Schema="dbo" store:Type="Tables" />
@@ -867,6 +904,10 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
             <Parameter Name="op_type" Mode="In" Type="String" />
           </FunctionImport>
           <EntitySet Name="ei_k3RestLog" EntityType="ICAuditModel.ei_k3RestLog" />
+          <FunctionImport Name="GetDormRoomMate" ReturnType="Collection(ICAuditModel.GetDormRoomMate_Result)">
+          <Parameter Name="dormNumber" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="ei_dormRepair" EntityType="ICAuditModel.ei_dormRepair" />
         </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -1518,6 +1559,44 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           <Property Name="op_type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="op_time" Type="DateTime" Precision="3" />
         </EntityType>
+        <ComplexType Name="GetDormRoomMate_Result">
+          <Property Type="String" Name="emp_name" Nullable="true" MaxLength="40" />
+          <Property Type="String" Name="card_number" Nullable="true" MaxLength="20" />
+          <Property Type="String" Name="dorm_number" Nullable="true" MaxLength="50" />
+        </ComplexType>
+        <EntityType Name="ei_dormRepair">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="area_name" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="dorm_num" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="repair_type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="repair_time" Type="DateTime" Precision="0" />
+          <Property Name="fee_share_type" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="fee_share_peple" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="repair_content" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="contact_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="contact_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="contact_short_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="accepter_num" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="accepter_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="is_accept" Type="Boolean" />
+          <Property Name="accept_comment" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="accepter_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="accepter_short_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="confirm_repair_time" Type="DateTime" Precision="0" />
+          <Property Name="repaire_subject" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="charge_fee" Type="Decimal" Precision="8" Scale="1" />
+          <Property Name="finish_repair_time" Type="DateTime" Precision="0" />
+          <Property Name="applier_confirm_time" Type="DateTime" Precision="3" />
+          <Property Name="applier_evaluation" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="applier_evaluation_score" Type="Int32" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -2073,6 +2152,49 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
                 <ScalarProperty Name="account" ColumnName="account" />
                 <ScalarProperty Name="card_number" ColumnName="card_number" />
                 <ScalarProperty Name="k3_name" ColumnName="k3_name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetDormRoomMate" FunctionName="ICAuditModel.Store.GetDormRoomMate">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetDormRoomMate_Result">
+                <ScalarProperty Name="emp_name" ColumnName="emp_name" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
+                <ScalarProperty Name="dorm_number" ColumnName="dorm_number" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="ei_dormRepair">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_dormRepair">
+              <MappingFragment StoreEntitySet="ei_dormRepair">
+                <ScalarProperty Name="applier_evaluation_score" ColumnName="applier_evaluation_score" />
+                <ScalarProperty Name="applier_evaluation" ColumnName="applier_evaluation" />
+                <ScalarProperty Name="applier_confirm_time" ColumnName="applier_confirm_time" />
+                <ScalarProperty Name="finish_repair_time" ColumnName="finish_repair_time" />
+                <ScalarProperty Name="charge_fee" ColumnName="charge_fee" />
+                <ScalarProperty Name="repaire_subject" ColumnName="repaire_subject" />
+                <ScalarProperty Name="confirm_repair_time" ColumnName="confirm_repair_time" />
+                <ScalarProperty Name="accepter_short_phone" ColumnName="accepter_short_phone" />
+                <ScalarProperty Name="accepter_phone" ColumnName="accepter_phone" />
+                <ScalarProperty Name="accept_comment" ColumnName="accept_comment" />
+                <ScalarProperty Name="is_accept" ColumnName="is_accept" />
+                <ScalarProperty Name="accepter_name" ColumnName="accepter_name" />
+                <ScalarProperty Name="accepter_num" ColumnName="accepter_num" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="contact_short_phone" ColumnName="contact_short_phone" />
+                <ScalarProperty Name="contact_phone" ColumnName="contact_phone" />
+                <ScalarProperty Name="contact_name" ColumnName="contact_name" />
+                <ScalarProperty Name="repair_content" ColumnName="repair_content" />
+                <ScalarProperty Name="fee_share_peple" ColumnName="fee_share_peple" />
+                <ScalarProperty Name="fee_share_type" ColumnName="fee_share_type" />
+                <ScalarProperty Name="repair_time" ColumnName="repair_time" />
+                <ScalarProperty Name="repair_type" ColumnName="repair_type" />
+                <ScalarProperty Name="dorm_num" ColumnName="dorm_num" />
+                <ScalarProperty Name="area_name" ColumnName="area_name" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

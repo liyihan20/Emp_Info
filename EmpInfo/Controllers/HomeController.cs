@@ -33,6 +33,7 @@ namespace EmpInfo.Controllers
                 bool auditorComing = bool.Parse(ConfigurationManager.AppSettings["auditorComing"]);
                 ViewData["auditorComing"] = auditorComing;
             }
+                        
             return View();
         }
 

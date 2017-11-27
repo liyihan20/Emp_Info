@@ -23,10 +23,19 @@ namespace EmpInfo.Models
         public string water { get; set; }
         public string repair { get; set; }
         public string fine { get; set; }
-
         public string others { get; set; }
         public string comment { get; set; }
         public string total { get; set; }
     }
+
+    public class DormRepairBeginApplyModel
+    {
+        public string areaName { get; set; }
+        public string dormNumber { get; set; }
+        public string roomMaleList { get; set; }
+        public string phoneNumber { get; set; }
+        public string shortPhoneNumber { get; set; }
+        public string contactName { get; set; }
+    }        
 
 }

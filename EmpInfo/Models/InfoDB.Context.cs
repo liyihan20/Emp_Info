@@ -57,6 +57,7 @@ namespace EmpInfo.Models
         public DbSet<ei_emp_portrait> ei_emp_portrait { get; set; }
         public DbSet<ei_PushResponse> ei_PushResponse { get; set; }
         public DbSet<ei_k3RestLog> ei_k3RestLog { get; set; }
+        public DbSet<ei_dormRepair> ei_dormRepair { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {
@@ -243,6 +244,15 @@ namespace EmpInfo.Models
                 new ObjectParameter("op_type", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("ResetK3Emp", k3_usernameParameter, card_numberParameter, phoneParameter, k3_accountParameter, op_typeParameter);
+        }
+    
+        public virtual ObjectResult<GetDormRoomMate_Result> GetDormRoomMate(string dormNumber)
+        {
+            var dormNumberParameter = dormNumber != null ?
+                new ObjectParameter("dormNumber", dormNumber) :
+                new ObjectParameter("dormNumber", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetDormRoomMate_Result>("GetDormRoomMate", dormNumberParameter);
         }
     }
 }

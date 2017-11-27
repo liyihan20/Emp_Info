@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -20,6 +21,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <TypeScriptToolsVersion>1.0</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -152,6 +154,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AndroidAppController.cs" />
+    <Compile Include="Controllers\ApplyController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
@@ -170,6 +173,7 @@
     <Compile Include="Models\all_maxNum.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ApplyModels.cs" />
     <Compile Include="Models\Canteen.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -233,6 +237,9 @@
     <Compile Include="Models\ei_deliveryInfo.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_dormRepair.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_emp_portrait.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -267,6 +274,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetDormFeeByMonth_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GetDormRoomMate_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetEmpDormInfo_Result.cs">
@@ -336,6 +346,11 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\EmpWebSvr\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\FlowSvr\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
@@ -505,6 +520,7 @@
     <Content Include="Content\skins\square\yellow.css" />
     <Content Include="Content\skins\square\yellow.png" />
     <Content Include="Content\skins\square\_all.css" />
+    <Content Include="Content\star-rating.min.css" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -621,6 +637,7 @@
     <Content Include="Content\doc\员工信息查询操作指引V1.0.pdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\doc\宿舍维修申请流程操作指引.pdf" />
     <None Include="Properties\PublishProfiles\EmpInfo.pubxml" />
     <Content Include="Scripts\bootstrap-select.js.map" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
@@ -656,6 +673,7 @@
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\select2.min.js" />
+    <Content Include="Scripts\star-rating.min.js" />
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="Scripts\tooltipster.bundle.min.js" />
@@ -664,6 +682,25 @@
     <None Include="Service References\EmpWebSvr\configuration91.svcinfo" />
     <None Include="Service References\EmpWebSvr\configuration.svcinfo" />
     <None Include="Service References\EmpWebSvr\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <Content Include="Service References\FlowSvr\EmpInfo.FlowSvr.FlowAuditListModel.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
+    <Content Include="Service References\FlowSvr\EmpInfo.FlowSvr.FlowMyAppliesModel.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
+    <Content Include="Service References\FlowSvr\EmpInfo.FlowSvr.FlowRecordModels.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
+    <Content Include="Service References\FlowSvr\EmpInfo.FlowSvr.FlowResultModel.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
+    <None Include="Service References\FlowSvr\FlowSvr.disco" />
+    <None Include="Service References\FlowSvr\configuration91.svcinfo" />
+    <None Include="Service References\FlowSvr\configuration.svcinfo" />
+    <None Include="Service References\FlowSvr\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
@@ -718,6 +755,12 @@
     <Content Include="Views\AndroidApp\PushNotice.cshtml" />
     <Content Include="Views\AndroidApp\PushClickView.cshtml" />
     <Content Include="Views\K3\AccountReset.cshtml" />
+    <None Include="Service References\FlowSvr\FlowSvr.wsdl" />
+    <Content Include="Views\Apply\DormRepairIndex.cshtml" />
+    <Content Include="Views\Apply\GetMyApplyDPList.cshtml" />
+    <Content Include="Views\Apply\CheckAndAuditDPApply.cshtml" />
+    <Content Include="Views\Apply\GetMyAuditedDPList.cshtml" />
+    <Content Include="Views\Apply\GetMyAuditingDPList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -734,12 +777,14 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\EmpWebSvr\" />
+    <WCFMetadataStorage Include="Service References\FlowSvr\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">

@@ -25,7 +25,7 @@
         <EntityTypeShape EntityType="ICAuditModel.dn_shoppingCar" Width="1.5" PointX="5.125" PointY="13.5" />
         <AssociationConnector Association="ICAuditModel.FK_dn_shoppingCar_dn_dishes" />
         <AssociationConnector Association="ICAuditModel.FK_dn_shoppingCar_dn_order" />
-        <EntityTypeShape EntityType="ICAuditModel.all_maxNum" Width="1.5" PointX="4" PointY="7" />
+        <EntityTypeShape EntityType="ICAuditModel.all_maxNum" Width="1.5" PointX="4" PointY="7.875" />
         <EntityTypeShape EntityType="ICAuditModel.dn_discountInfo" Width="1.5" PointX="10.625" PointY="13.125" />
         <EntityTypeShape EntityType="ICAuditModel.dn_discountInfoUsers" Width="1.5" PointX="8.875" PointY="13.75" />
         <EntityTypeShape EntityType="ICAuditModel.dn_points" Width="1.5" PointX="5.25" PointY="17.875" />
@@ -46,6 +46,7 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_PushResponse" Width="1.5" PointX="14.625" PointY="1.375" />
         <AssociationConnector Association="ICAuditModel.FK_ei_PushResponse_ei_pushMsg" />
         <EntityTypeShape EntityType="ICAuditModel.ei_k3RestLog" Width="1.5" PointX="11.75" PointY="6.75" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_dormRepair" Width="1.5" PointX="12.375" PointY="9.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

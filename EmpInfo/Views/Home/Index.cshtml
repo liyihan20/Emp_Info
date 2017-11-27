@@ -195,6 +195,11 @@
             });
         });*@
 
+        //维修申请
+        $("#repairImg,#repairBt").click(function () {
+            window.location.href = "@Url.Content("~/Apply/DormRepairIndex")";
+        });
+
         $("#codeBt").click(function () {
             $("#codeModal").modal("show");
         });
@@ -261,11 +266,11 @@
     @if (!auditorComing) { 
     <div class="col-xs-6 col-sm-4">
         <div class="thumbnail">
-            <a href="#" id="packageImg"><img src="@Url.Content("~/Content/images/repair.png")" alt="repair"></a>
+            <a href="#" id="repairImg"><img src="@Url.Content("~/Content/images/repair.png")" alt="repair"></a>
             <div class="caption">
                 <h3>宿舍维修申请</h3>
                 <p>可以预约宿舍维修服务，查询维修费用与历史记录</p>
-                <p><button class="btn btn-primary btn-block disabled" id="packageBt">进入预约(待开放)</button></p>
+                <p><button class="btn btn-primary btn-block" id="repairBt">进入申请</button></p>
             </div>
         </div>
     </div>

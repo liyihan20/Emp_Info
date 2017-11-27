@@ -74,6 +74,7 @@ namespace EmpInfo.Controllers
                     {
                         _userInfoDetail = new UserInfoDetail();
                         var user = db.ei_users.Single(u => u.id == userInfo.id);
+                        _userInfoDetail.name = user.name;
                         _userInfoDetail.email = user.email;
                         _userInfoDetail.sex = user.sex;
                         _userInfoDetail.shortPhone = user.short_phone;
@@ -247,6 +248,38 @@ namespace EmpInfo.Controllers
                 return true;
             }
             return false;
+        }
+
+        //根据厂牌获取姓名
+        protected string GetUserNameByCardNum(string cardNumbers)
+        {
+            string names = "";
+            foreach (var num in cardNumbers.Split(new char[] { ';' })) {
+                if (!string.IsNullOrEmpty(num)) {
+                    var emp = db.GetHREmpInfo(num).ToList();
+                    if (emp.Count() > 0) {
+                        if (!string.IsNullOrEmpty(names)) names += ",";
+                        names += emp.First().emp_name;
+                    }
+                }
+            }
+            return names;
+        }
+
+        //根据厂牌获取邮箱
+        protected string GetUserEmailByCardNum(string cardNumbers)
+        {
+            string emails = "";
+            foreach (var num in cardNumbers.Split(new char[] { ';' })) {
+                if (!string.IsNullOrEmpty(num)) {
+                    var user = db.ei_users.Where(u => u.card_number == num);
+                    if (user.Count() > 0) {
+                        if (!string.IsNullOrEmpty(emails)) emails += ",";
+                        emails += user.First().email;
+                    }
+                }
+            }
+            return emails;
         }
 
     }

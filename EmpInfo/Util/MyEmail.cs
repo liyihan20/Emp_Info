@@ -17,5 +17,11 @@ namespace EmpInfo.Util
             
         }
 
+        public static bool SendEmail(string subject, string emailAddrs, string content)
+        {
+            return TrulyEmail.EmailUtil.SemiSend("信利员工信息查询系统", subject, content, emailAddrs);            
+        }
+
+
     }
 }
