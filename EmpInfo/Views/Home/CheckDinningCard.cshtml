@@ -69,9 +69,9 @@
                 minView: 2,
                 endDate: new Date()
             });
-            //设置时间点，消费只能查最近1个月，充值只能查最近6个月
-            $('#fromDatePicker1').datetimepicker('setStartDate', new Date("@(DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"))"));
-            $('#toDatePicker1').datetimepicker('setStartDate', new Date("@(DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"))"));
+            //设置时间点，消费只能查最近2个月，充值只能查最近6个月
+            $('#fromDatePicker1').datetimepicker('setStartDate', new Date("@(DateTime.Now.AddMonths(-2).ToString("yyyy-MM-dd"))"));
+            $('#toDatePicker1').datetimepicker('setStartDate', new Date("@(DateTime.Now.AddMonths(-2).ToString("yyyy-MM-dd"))"));
             $('#fromDatePicker2').datetimepicker('setStartDate', new Date("@(DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd"))"));
             $('#toDatePicker2').datetimepicker('setStartDate', new Date("@(DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd"))"));
 
@@ -415,7 +415,7 @@
                             </div>
                         </div>
                         <div style="margin-top:10px;"><button class="btn btn-success btn-block" id="resumneBt"><span class="glyphicon glyphicon-search"></span> 开始查询</button></div>
-                        <div class="small text-danger"><span class="glyphicon glyphicon-info-sign"></span> 可以查询到最近1个月以内的消费记录</div>
+                        <div class="small text-danger"><span class="glyphicon glyphicon-info-sign"></span> 可以查询到最近2个月以内的消费记录</div>
                     </div>
                     <ul class="list-group" id="consumeContent">
                         @*此处插入消费记录*@
