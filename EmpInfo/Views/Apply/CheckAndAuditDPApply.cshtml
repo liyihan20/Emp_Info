@@ -237,6 +237,15 @@
                     @(records.Where(r => r.stepName.Contains("提交")).First().auditTimes)
                     提交成功
                 </div>
+                @if (records.Where(r => r.stepName.Contains("撤销")).Count() > 0) {
+                    <div class="well well-sm text-danger">
+                        <i class="fa fa-reply"></i> 
+                        @(records.Where(r => r.stepName.Contains("撤销")).First().auditors)
+                        于
+                        @(records.Where(r => r.stepName.Contains("撤销")).First().auditTimes)
+                        撤销/中止此维修单流程
+                    </div>
+                }
                 <div class="row">
                     <div class="col-xs-12 col-md-4 col-sm-6">
                         <span class="b-label">
@@ -261,7 +270,7 @@
                     @if (form.repair_type.Equals("预约维修")) {
                         <div class="col-xs-12 col-md-4 col-sm-6">
                             <span class="b-label">
-                                预约时间:
+                                维修时间:
                             </span>
                             <span>
                                 @(((DateTime)form.repair_time).ToString("yyyy-MM-dd HH:mm"))
@@ -313,7 +322,7 @@
 
                     </div>
                     <div class="col-xs-12">
-                        <span class="b-label">维修内容</span>
+                        <span class="b-label">维修内容:</span>
                         <span>@form.repair_content</span>
                     </div>
                 </div>
@@ -342,17 +351,17 @@
                 <div class="panel-body">
                     @foreach (var suc in secondRecords.Where(r => r.auditResult == "成功")) {
                         <div class="well well-sm text-success">
-                            @suc.auditors 于 @suc.auditTimes 确认同意维修申请
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认同意维修申请
                         </div>
                     }
                     @foreach (var suc in secondRecords.Where(r => r.auditResult == "失败")) {
                         <div class="well well-sm text-danger">
-                            @suc.auditors 于 @suc.auditTimes 确认不同意维修申请，流程结束
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认不同意维修申请，流程结束
                         </div>
                     }
                     @foreach (var suc in secondRecords.Where(r => r.auditResult == "审核中")) {
                         <div class="well well-sm text-info">
-                            等待 @suc.auditors 确认处理
+                           <i class="fa fa-clock-o"></i> 等待 @suc.auditors 确认处理
                         </div>
                     }
                     @if (auditModel.isAuditing && auditModel.stepName.Contains("舍友")) {
@@ -397,17 +406,17 @@
                 <div class="panel-body">
                     @foreach (var suc in thirdRecords.Where(r => r.auditResult == "成功")) {
                         <div class="well well-sm text-success">
-                            @suc.auditors 于 @suc.auditTimes 确认受理此维修申请
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认受理此维修申请
                         </div>
                     }
                     @foreach (var suc in thirdRecords.Where(r => r.auditResult == "失败")) {
                         <div class="well well-sm text-danger">
-                            @suc.auditors 于 @suc.auditTimes 确认不受理此维修申请，流程结束
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认不受理此维修申请，流程结束
                         </div>
                     }
                     @foreach (var suc in thirdRecords.Where(r => r.auditResult == "审核中")) {
                         <div class="well well-sm text-info">
-                            等待 @suc.auditors 确认受理
+                           <i class="fa fa-clock-o"></i> 等待 @suc.auditors 确认受理
                         </div>
                     }
                     @if (thirdIsPass == true) {
@@ -424,7 +433,7 @@
                                 </span>
                                 <span>@form.accepter_name</span>
                             </div>
-                            <div class="col-xs-12 col-md-4 col-sm-6">
+                            @*<div class="col-xs-12 col-md-4 col-sm-6">
                                 <span class="b-label">
                                     手机号码:
                                 </span>
@@ -435,7 +444,7 @@
                                     手机短号:
                                 </span>
                                 <span>@form.accepter_short_phone</span>
-                            </div>
+                            </div>*@
                             <div class="col-xs-12 col-md-8 col-sm-12">
                                 <span class="b-label">
                                     维修意见:
@@ -461,7 +470,7 @@
                             <span style="display:inline;width:70%;vertical-align:top;">
                                 <span class="input-group date" style="display:inline-table;width:70%;" id="accepterTimePicker">
                                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span> </span>
-                                    <input class="form-control" type="text" readonly id="confirmTime" value="@(form.apply_time==null?"":((DateTime)form.apply_time).ToString("yyyy-MM-dd HH:mm"))">
+                                    <input class="form-control" type="text" readonly id="confirmTime" value="@(DateTime.Now.AddHours(1).ToString("yyyy-MM-dd HH:mm"))">
                                 </span>
                             </span>
                         </div>
@@ -524,17 +533,17 @@
                 <div class="panel-body">
                     @foreach (var suc in forthRecords.Where(r => r.auditResult == "成功")) {
                         <div class="well well-sm text-success">
-                            @suc.auditors 于 @suc.auditTimes 确认完成此维修申请
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认完成此维修申请
                         </div>
                     }
                     @foreach (var suc in forthRecords.Where(r => r.auditResult == "失败")) {
                         <div class="well well-sm text-danger">
-                            @suc.auditors 于 @suc.auditTimes 确认拒绝此维修申请，流程结束
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认拒绝此维修申请，流程结束
                         </div>
                     }
                     @foreach (var suc in forthRecords.Where(r => r.auditResult == "审核中")) {
                         <div class="well well-sm text-info">
-                            等待 @suc.auditors 确认处理
+                           <i class="fa fa-clock-o"></i> 等待 @suc.auditors 确认处理
                         </div>
                     }
                     @if (forthIsPass == true) {
@@ -543,7 +552,7 @@
                                 <span class="b-label">
                                     维修项目:
                                 </span>
-                                <span>@(((DateTime)form.confirm_repair_time).ToString("yyyy-MM-dd HH:mm"))</span>
+                                <span>@form.repaire_subject</span>
                             </div>
                             <div class="col-xs-12 col-md-4 col-sm-6">
                                 <span class="b-label">
@@ -618,17 +627,17 @@
                 <div class="panel-body">
                     @foreach (var suc in fifthRecords.Where(r => r.auditResult == "成功")) {
                         <div class="well well-sm text-success">
-                            @suc.auditors 于 @suc.auditTimes 确认并评价了此维修申请，流程成功结束
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认并评价了此维修申请，流程成功结束
                         </div>
                     }
                     @foreach (var suc in fifthRecords.Where(r => r.auditResult == "失败")) {
                         <div class="well well-sm text-danger">
-                            @suc.auditors 于 @suc.auditTimes 拒绝评价此维修申请，流程结束
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 拒绝评价此维修申请，流程结束
                         </div>
                     }
                     @foreach (var suc in fifthRecords.Where(r => r.auditResult == "审核中")) {
                         <div class="well well-sm text-info">
-                            等待 @suc.auditors 对此服务进行评价
+                           <i class="fa fa-clock-o"></i> 等待 @suc.auditors 对此服务进行评价
                         </div>
                     }
                     @if (fifthIsPass == true) {
