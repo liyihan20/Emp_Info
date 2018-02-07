@@ -1,0 +1,417 @@
+﻿@using EmpInfo.Models;
+@{
+    List<ei_empLevel> empLevels = (List<ei_empLevel>)ViewData["pLevels"];
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
+
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 25%;
+            vertical-align: top;
+            color: gray;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+
+        #al_file_tb th {
+            font-size: small;
+            text-align: center;
+        }
+
+        #al_file_tb td {
+            font-size: small;
+            text-align: center;
+        }
+
+        #al_file_list i {
+            cursor: pointer;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Scripts/webuploader.withoutimage.js")"></script>
+
+    <script>
+
+        $(function () {
+            $("#beginTimePicker,#endTimePicker").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd hh:ii",
+                autoclose: true,
+                startView: 2,
+                maxView: 2,
+                minuteStep: 5,
+            });
+
+            $("#directSpan").hide();
+            //$("#eLevel").val("2");
+
+            //经理级别以上才能选择是否直管
+            $("#eLevel").on("change", function () {
+                if ($("#eLevel").val() >= 7) {
+                    $("#directSpan").show();
+                } else {
+                    $("#directSpan").hide();
+                }
+            });
+
+            //选择部门
+            $("#eDepName").on("click", function () {
+                openSelectDepDialog(function (selectedDep) {
+                    $("#eDepName").val(selectedDep.depLongName);
+                    $("#eDepNum").val(selectedDep.depNum);
+                });
+            });
+
+            //选择代理人
+            $("#agentMan").on("click", function () {
+                openSelectUserDialog($("#agentMan").val(), 1, function (result) {
+                    $("#agentMan").val(result);
+                });
+            });
+
+            //选择知会人
+            $("#informMan").on("click", function () {
+                openSelectUserDialog($("#informMan").val(), 10, function (result) {
+                    $("#informMan").val(result);
+                });
+            });
+
+            //请假类型变更
+            $("input[name='leave_type']").on("change", function () {
+                console.log($("input[name='leave_type']:checked").val());
+            });
+
+            //提交申请
+            $("#apply_bt").on("click", function () {
+                if (!validateForm()) {
+                    return;
+                }
+
+                $("#hasAttachment").val($("#al_file_list").children().length > 0);
+                $(this).button("loading");
+                var formParam = $("#alForm").serialize();               
+                $.ajax({
+                    type: 'post',
+                    url: '@Url.Content("~/Apply/SaveApplyAL")',
+                    data: formParam,
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.suc) {
+                            toastr.success("提交申请成功");
+                            
+                        } else {                            
+                            toastr.error("提交失败："+ data.msg);
+                        }
+                        $("#apply_bt").button("reset");
+                    }
+                });
+            });
+
+        });
+
+        //验证表单
+        function validateForm() {
+            if ($("#eLevel").val() == "") {
+                toastr.error("必须选择[职位级别]");
+                return false;
+            }
+            if ($("input[name='leave_type']:checked").length < 1) {
+                toastr.error("必须选择[请假类型]");
+                return false;
+            }
+            if ($("#beginTime").val() == "") {
+                toastr.error("必须填写请假[开始时间]");
+                return false;
+            }
+            if ($("#endTime").val() == "") {
+                toastr.error("必须填写请假[结束时间]");
+                return false;
+            }
+            var days = $("#days").val(), hours = $("#hours").val();
+            if (days == "") {
+                toastr.error("必须填写[工作日]天数");
+                return false;
+            }
+            if (isNaN(days)) {
+                toastr.error("[工作日]必须填写数字");
+                return false;
+            }
+            if (days < 0 || days % 1 != 0) {
+                toastr.error("[工作日]必须为正整数");
+                return false;
+            }
+            if (hours == "") {
+                toastr.error("必须填写[小时]数");
+                return false;
+            }            
+            if (isNaN(hours) || hours<0) {
+                toastr.error("[小时]必须填写大于0的数字");
+                return false;
+            }
+            if ($($("input[name='leave_type']:checked")[0]).val() == "年假" && hours % 4 != 0) {
+                toastr.error("当[请假类型]是年假时，[小时]数必须是4的整数倍");
+                return false;
+            } else if (hours % 0.5 != 0) {
+                toastr.error("[小时]必须为0.5的整数倍");
+                return false;
+            }
+            if (days == 0 && hours == 0) {
+                toastr.error("请假时间不能都是0");
+                return false;
+            }
+            return true;
+        }
+
+    </script>
+
+    <script>
+        $(function () {
+
+            $("#al_file_panel").hide();
+            var maxNum = 3; //最多上传3个文件
+            var maxSingleSize = 5 * 1024 * 1024; //单个文件最多5M
+            var uploader = WebUploader.create({
+                swf: '@Url.Content("~/Content/webupload/Uploader.swf")',
+                server: '@Url.Content("~/File/BeginUpload")',
+                pick: '#picker',
+                resize: false,
+                auto: true,
+                formData: { sysNum: '@ViewData["sysNum"]' },
+                fileNumLimit: maxNum,
+                fileSingleSizeLimit: maxSingleSize
+            });
+
+            uploader.on('fileQueued', function (file) {
+                var fileName = file.name;
+                if (fileName.length > 20) {
+                    var ext = fileName.substr(fileName.lastIndexOf("."));
+                    fileName = fileName.substr(0, 14) + ".." + ext;
+                }
+                $("#al_file_list").append('<tr><td id="' + file.id + '" data-fd="' + file.name + '" class="item">' +
+                    fileName +
+                '</td><td>' + (file.size / 1000).toFixed(1) + " K</td><td class='state'>上传中...</td></tr>");
+                $("#al_file_panel").show();
+            });
+
+            uploader.on('uploadSuccess', function (file, res) {
+                if (!res.suc) {
+                    $('#' + file.id).parent().find('td.state').addClass("text-danger").html("上传出错");
+                    console.log(res);
+                } else {
+                    $('#' + file.id).parent().find('td.state').addClass("text-success").html("已上传| <i class='fa fa-times-circle-o text-danger' title='移除'></i>");
+                }
+
+            });
+
+            uploader.on('uploadError', function (file) {
+                $('#' + file.id).parent().find('td.state').addClass("text-danger").html('上传出错');
+            });
+
+            uploader.on('uploadComplete', function (file) {
+                //$('#' + file.id).find('.progress').fadeOut();
+            });
+
+            //上传队列出错提示
+            uploader.on("error", function (type) {
+                switch (type) {
+                    case "F_EXCEED_SIZE":
+                        toastr.error("单个文件大小必须少于5M");
+                        break;
+                    case "F_DUPLICATE":
+                        toastr.error("不能重复上传文件");
+                        break;
+                    case "Q_EXCEED_NUM_LIMIT":
+                        toastr.error("最多上传文件数量是" + maxNum + "个");
+                        break;
+                    default:
+                        console.error("上传失败：" + type);
+                        break;
+                }
+            });
+
+            //移除已上传文件
+            $("#al_file_list").on("click", "td i", function () {
+                var fileTD = $(this).parents("tr").find("td")[0];
+                openConfirmDialog("确定要移除此上传的文件吗？", function () {                    
+                    var fileId = $(fileTD).attr("id");
+                    var fileName = $(fileTD).attr("data-fd");
+
+                    $.post("@Url.Content("~/File/RemoveUploadedFile")", { sysNum: "@ViewData["sysNum"]", fileName: fileName }, function (data) {
+                        if (data.suc) {
+                            toastr.success("文件移除成功");
+                            uploader.removeFile(fileId);
+                            $(fileTD).parent().fadeOut(1000);                     
+                        } else {
+                            toastr.error("移除失败：" + data.msg);
+                        }
+                    })
+                });
+
+            });
+
+        });
+    </script>
+}
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                请假申请单
+            </div>
+            <div class="panel-body">
+                <form id="alForm">
+                    <div class="b-div">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>申请流水号</button>
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <input type="text" class="form-control" id="sysNum" value="@ViewData["sysNum"]" disabled />
+                            <input type="hidden" name="sys_no" value="@ViewData["sysNum"]" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>所属部门</button>
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <input type="text" class="form-control" id="eDepName" name="dep_long_name" value="@ViewData["depName"]" />
+                            <input type="hidden" id="eDepNum" name="dep_no" value="@ViewData["depNum"]" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>职位级别</button>
+                        </span>
+                        <span style="display:inline-block;width:30%">
+                            <select class="form-control" id="eLevel" name="emp_level">
+                                <option></option>
+                                @foreach (var el in empLevels) {
+                                    <option value="@el.level_no">@el.level_name</option>
+                                }
+                            </select>
+                        </span>
+                        <span style="display:inline-block;width:30%;text-align:center;" id="directSpan">
+                            <input type="checkbox" id="isDirect" name="is_direct_charge" value="true"/> 董事/总裁办直管
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>请假类型</button>
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <span style="display:block" class="row">
+                                @{
+                                    string[] types = new string[] { "事假", "病假", "年假", "探亲", "婚假", "产假", "工伤", "丧假" };
+                                    foreach (var ty in types) {
+                                        <span class="col-xs-3 text-center" style="padding:0 4px;">
+                                            <input type="radio" name="leave_type" value="@ty" /> @ty
+                                        </span>
+                                    }
+                                }                                
+                            </span>
+                        </span>
+                    </div>
+                    <div class="b-div" style="vertical-align:middle;">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>请假时间</button>
+                        </span>
+                        <div style="display:inline-block;width:70%;vertical-align:top;">
+                            <div class="input-group date" id="beginTimePicker">
+                                <span class="input-group-addon">从 </span>
+                                <input class="form-control" type="text" id="beginTime" name="from_date"/>
+                                <span class="input-group-addon"><span class="fa fa-calendar"></span> </span>
+                            </div>
+                            <div class="input-group date" id="endTimePicker">
+                                <span class="input-group-addon">到 </span>
+                                <input class="form-control" type="text" id="endTime" name="to_date"/>
+                                <span class="input-group-addon"><span class="fa fa-calendar"></span> </span>
+                            </div>
+                            <div style="display:inline-block;width:60%;">
+                                <div class="input-group">
+                                    <span class="input-group-addon">共</span>
+                                    <input class="form-control" type="text" id="days" name="work_days"/>
+                                    <span class="input-group-addon">工作日</span>
+                                </div>
+                            </div>
+                            <div style="display:inline-block;width:38%;margin-left:-5px;">
+                                <div class="input-group">
+                                    <input class="form-control" type="text" id="hours" name="work_hours"/>
+                                    <span class="input-group-addon">小时</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>请假事由</button>
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <textarea type="text" class="form-control" rows="2" id="leaveReason" name="leave_reason"></textarea>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>工作代理</button>
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <input type="text" class="form-control" id="agentMan" name="agent_man"/>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>知会人</button>
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <textarea type="text" class="form-control" rows="2" id="informMan" name="inform_man"></textarea>
+                        </span>
+                    </div>
+                    <input type="hidden" name="has_attachment" id="hasAttachment" />
+                </form>
+                <div class="b-div">
+                    <span class="b-label">
+                        <button class="btn btn-block btn-default" disabled>附件</button>
+                    </span>
+                    <div style="display:inline-block;width:70%">
+                        <div id="uploader" class="wu-example">
+                            <div id="picker"> + </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default" id="al_file_panel">
+                        <div class="panel-heading">附件信息</div>
+                        <div class="panel-body" style="padding:0 8px;">
+                            <table class="table table-condensed table-hover" id="al_file_tb" style="margin:10px 0;">
+                                <thead>
+                                    <tr>
+                                        <th style="width:50%;">名称</th>
+                                        <th style="width:20%;">大小</th>
+                                        <th style="width:30%;">状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="al_file_list"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                <br/>
+                <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..."><i class="fa fa-check-circle-o"></i> 提交请假申请</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_SelectDep")
+    @Html.Partial("_SelectUsers")
+    @Html.Partial("_ConfirmDialog")
+}

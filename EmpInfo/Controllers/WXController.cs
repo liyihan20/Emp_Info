@@ -10,7 +10,12 @@ namespace EmpInfo.Controllers
 {
     public class WXController : BaseController
     {
-        private string redirectIndex = "http://emp.truly.com.cn/WX/WIndex?cardnumber={0}&secret={1}";
+        private string redirectIndex = "http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}";
+        private string wLoginUrl = "http://emp.truly.com.cn/Emp/WX/WLogin?openId=";
+        private string wLogoutUrl = "http://emp.truly.com.cn/Emp/WX/WLogout?openId=";
+        private string wSystemLoginUrl = "http://emp.truly.com.cn/Emp/Account/Login?from=wx";
+
+        //查询openid是否已登记
         public string QueryOpenId(string openId)
         {
             try {
@@ -19,17 +24,21 @@ namespace EmpInfo.Controllers
             catch {
                 return JsonConvert.SerializeObject(new { suc = 0 });
             }
-            var emps = db.ei_users.Where(u => u.wx_openid == openId);
+            var emps = db.ei_users.Where(u => u.wx_openid == openId && u.wx_easy_login == true);
             if (emps.Count() == 0) {
-                return JsonConvert.SerializeObject(new { suc = 0, url = "" });
+                //没有绑定过的跳转到绑定界面
+                return JsonConvert.SerializeObject(new { suc = 0, url = MyUtils.AESEncrypt(wLoginUrl), logUrl = MyUtils.AESEncrypt(wSystemLoginUrl) });
             }
             var emp = emps.First();
-            string url = string.Format(redirectIndex,emp.card_number,MyUtils.getMD5(emp.card_number));
-            
-            return JsonConvert.SerializeObject(new { suc = 1, url = MyUtils.AESEncrypt(url) });
+            string url = string.Format(redirectIndex, emp.card_number, MyUtils.getMD5(emp.card_number));
+
+            //已绑定过的，返回系统主界面和解除绑定界面，由服务号选择使用
+            return JsonConvert.SerializeObject(new { suc = 1, url = MyUtils.AESEncrypt(url), ourl = MyUtils.AESEncrypt(wLogoutUrl), cardNo = MyUtils.AESEncrypt(emp.card_number) });
         }
 
-        public ActionResult WIndex(string cardnumber,string secret) {
+        //微信openid认证通过跳转的页面
+        public ActionResult WIndex(string cardnumber, string secret, string controllerName = "Home", string actionName = "Index",string param="")
+        {
             string msg = "";
             bool suc = false;
             if (!MyUtils.getMD5(cardnumber).Equals(secret)) {
@@ -53,60 +62,134 @@ namespace EmpInfo.Controllers
                             suc = true;
                             msg = "授权成功";
                             user.last_login_date = DateTime.Now;
-                            ViewBag.tip = user.name + ",你好！欢迎登陆主界面";
-                            setcookie(user, 1);
+                            setcookie(user, 100);
+                            Session["fromwx"] = true;
                         }
                     }
                 }
             }
-            WriteEventLog("微信公众号", "登陆" + (suc ? "成功" : "失败") + ";msg:" + msg);
+            WriteEventLog("微信公众号", "登陆" + (suc ? "成功" : "失败") + ";msg:" + msg + ";controler:" + controllerName + ";action:" + actionName);
             if (!suc) {
                 ViewBag.tip = msg;
                 return View("Error");
-            }            
+            }
+            return RedirectToAction(actionName, controllerName, new { param = param });
+        }
+
+        //绑定openid页面
+        public ActionResult WLogin(string openId)
+        {
+            if (string.IsNullOrEmpty(openId)) {
+                ViewBag.tip = "openId不能为空";
+                return View("Error");
+            }
+            try {
+                openId = MyUtils.AESDecrypt(openId);
+            }
+            catch {
+                ViewBag.tip = "openId不合法";
+                return View("Error");
+            }
+            ViewData["openid"] = openId;
             return View();
         }
 
-        public string BindOpenId(string cardNumber, string password, string openid)
+        //开始绑定
+        public JsonResult BindOpenId(string cardNumber, string password, string openid)
         {
-            try {
-                cardNumber = MyUtils.AESDecrypt(cardNumber);
-                password = MyUtils.AESDecrypt(password);
-                openid = MyUtils.AESDecrypt(openid);
-            }
-            catch {
-                return JsonConvert.SerializeObject(new { suc = 0, msg = "字段值不合法" });
-            }
-
+            
             string msg = "";
             bool suc = false;
-            string url = "";
-            var users = db.ei_users.Where(u => u.card_number == cardNumber).ToList();
-            if (users.Count() == 0) {
-                msg = "厂牌号不存在，请注册后再绑定";
+            if (string.IsNullOrEmpty(cardNumber)) {
+                msg = "厂牌号不能为空";
             }
             else {
-                var user=users.First();
-                int maxFailTimes = 5;
-                if (!MyUtils.getMD5(password).Equals(user.password)) {
-                    user.fail_times = user.fail_times == null ? 1 : user.fail_times + 1;
-                    if (user.fail_times >= maxFailTimes) {
-                        user.fail_times = 0;
-                        user.forbit_flag = true;
-                        msg = "连续" + maxFailTimes + "次密码输入错误，已禁用";
-                    }
-                    else {
-                        msg = "已连续" + user.fail_times + "次密码错误，你还剩下" + (maxFailTimes - user.fail_times) + "次尝试机会。";
-                    }
+                var users = db.ei_users.Where(u => u.card_number == cardNumber).ToList();
+                if (users.Count() == 0) {
+                    msg = "厂牌号不存在，请注册后再绑定";
                 }
                 else {
-                    suc = true;
-                    user.wx_openid = openid;
-                    url = string.Format(redirectIndex, user.card_number, MyUtils.getMD5(user.card_number));
+                    var user = users.First();
+                    int maxFailTimes = 5;
+                    if (!MyUtils.getMD5(password).Equals(user.password)) {
+                        user.fail_times = user.fail_times == null ? 1 : user.fail_times + 1;
+                        if (user.fail_times >= maxFailTimes) {
+                            user.fail_times = 0;
+                            user.forbit_flag = true;
+                            msg = "连续" + maxFailTimes + "次密码输入错误，已禁用";
+                        }
+                        else {
+                            msg = "已连续" + user.fail_times + "次密码错误，你还剩下" + (maxFailTimes - user.fail_times) + "次尝试机会。";
+                        }
+                    }
+                    else {
+                        suc = true;
+                        user.wx_openid = openid;
+                        user.wx_bind_date = DateTime.Now;
+                        user.wx_easy_login = true;
+                        user.wx_should_push_msg = true;
+
+                        user.wx_push_consume_info = true;//推送消费信息
+                        user.wx_push_flow_info = true;//推送业务流程信息
+                        user.wx_push_salary_info = true;//推送工资信息
+                        user.wx_check_salary_info = false;//免密工资查看
+                    }
                 }
             }
             WriteEventLog("微信服务号", "绑定openid：" + openid + ";card:" + cardNumber);
-            return JsonConvert.SerializeObject(new { suc = suc ? 1 : 0, msg = msg, url = MyUtils.AESEncrypt(url) });
+            return Json(new { suc = suc ? 1 : 0, msg = msg });
+        }
+
+        //解除绑定界面
+        public ActionResult WLogOut(string openId)
+        {
+            if (string.IsNullOrEmpty(openId)) {
+                ViewBag.tip = "openId 不能为空";
+                return View("Error");
+            }
+            try {
+                openId = MyUtils.AESDecrypt(openId);
+            }
+            catch {
+                ViewBag.tip = "openId不合法";
+                return View("Error");
+            }
+            var user = db.ei_users.Where(u => u.wx_openid == openId).ToList();
+            if (user.Count() == 0) {
+                ViewBag.tip = "没有绑定过，不能解绑";
+                return View("Error");
+            }
+            ViewData["bingDate"] = ((DateTime)user.First().wx_bind_date).ToString("yyyy-MM-dd HH:mm:ss");
+            ViewData["userName"] = user.First().name;
+            ViewData["userNumber"] = user.First().card_number;
+            ViewData["openid"] = openId;
+            return View();
+        }
+
+        public JsonResult UnBindOpenId(bool pushFlag, string openid)
+        {
+            var users = db.ei_users.Where(u => u.wx_openid == openid);
+            if (users.Count() == 0) {
+                return Json(new { suc = false, msg = "用户未绑定过" });
+            }
+            var user = users.First();
+
+            user.wx_easy_login = false;
+            user.wx_check_salary_info = false;//免密工资查看
+            if (pushFlag) {
+                user.wx_should_push_msg = false;
+                user.wx_push_consume_info = false; //推送消费信息
+                user.wx_push_flow_info = false; //推送业务流程信息
+                user.wx_push_salary_info = false; //推送工资信息
+            }
+            db.SaveChanges();
+            WriteEventLog("微信服务号", "解除绑定：" + openid);
+            return Json(new { suc = true });
+        }
+
+        public string AES(string str)
+        {
+            return Uri.EscapeDataString(MyUtils.AESEncrypt(str));
         }
 
     }

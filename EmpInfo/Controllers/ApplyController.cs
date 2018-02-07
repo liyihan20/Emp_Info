@@ -16,6 +16,8 @@ namespace EmpInfo.Controllers
     {
         const string DORM_REPAIR_BILL_TYPE="DP";
 
+        #region 宿舍维修申请
+
         [SessionTimeOutFilter]
         public ActionResult DormRepairIndex()
         {
@@ -118,19 +120,20 @@ namespace EmpInfo.Controllers
         {
             DateTime lastYear = DateTime.Now.AddYears(-1);
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            List<FlowMyAppliesModel> list = flow.GetMyApplyList(userInfo.cardNo, lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), "", new ArrayOfString() { "DP" }, "", "", 10, 20).ToList();
+            List<FlowMyAppliesModel> list = flow.GetMyApplyList(userInfo.cardNo, lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), "", new ArrayOfString() { DORM_REPAIR_BILL_TYPE }, "", "", 10, 20).ToList();
             ViewData["list"] = list;
 
             WriteEventLog("宿舍维修申请", "打开我申请的界面");
             return View();
         }
 
-        //我的代办
+        //我的待办
         [SessionTimeOutFilter]
         public ActionResult GetMyAuditingDPList()
         {
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 10 }, new ArrayOfString() { "DP" }, 100).ToList();
+            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 10 }, new ArrayOfString() { DORM_REPAIR_BILL_TYPE }, 100).ToList();
+            list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
             ViewData["list"] = list;
             WriteEventLog("宿舍维修申请", "打开我的代办界面");
             return View();
@@ -142,12 +145,28 @@ namespace EmpInfo.Controllers
         {
             DateTime lastYear = DateTime.Now.AddYears(-1);
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), new ArrayOfInt() { 1,-1 }, new ArrayOfInt() { 10 }, new ArrayOfString() { "DP" }, 100).ToList();
+            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), new ArrayOfInt() { 1, -1 }, new ArrayOfInt() { 10 }, new ArrayOfString() { DORM_REPAIR_BILL_TYPE }, 100).ToList();
             list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
 
             ViewData["list"] = list;
             WriteEventLog("宿舍维修申请", "打开我的已办界面");
             return View();
+        }
+
+        //撤销申请
+        [SessionTimeOutJsonFilter]
+        public JsonResult AbortDPApply(string sysNo) {
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+
+            var currentStep = flow.GetCurrentStep(sysNo);
+            if (!currentStep.stepName.Contains("舍友")) {
+                return Json(new SimpleResultModel() { suc = false, msg = "不能撤销，因为后勤部已接单" });
+            }
+
+            var result = flow.AbortFlow(userInfo.cardNo, sysNo);
+            WriteEventLog("宿舍维修申请", "撤销、中止流程：" + sysNo);
+
+            return Json(new SimpleResultModel() { suc = result.suc, msg = result.msg });
         }
 
         //查看和审核宿舍维修申请
@@ -177,7 +196,7 @@ namespace EmpInfo.Controllers
                 ViewData["userInfo"] = userInfoDetail;
             }
             records.ForEach(r => r.auditors = GetUserNameByCardNum(r.auditors));
-            form.fee_share_peple = GetUserNameByCardNum(form.fee_share_peple);
+            form.fee_share_peple = form.fee_share_peple == null ? "" : GetUserNameByCardNum(form.fee_share_peple);
 
             ViewData["records"] = records;
             ViewData["formData"] = form;
@@ -359,6 +378,57 @@ namespace EmpInfo.Controllers
             
             MyEmail.SendEmail(subject, emailAddrs, content);
         }
+        
+        #endregion
 
+        #region 请假申请
+
+        [SessionTimeOutFilter]
+        public ActionResult BeginApplyAL()
+        {
+            string depNum = userInfoDetail.depNum;
+            string depLongName = userInfoDetail.depLongName;
+            if (!depLongName.Equals(GetDepLongNameByNum(depNum))) {
+                ViewBag.tip = "部门组织结构已更新，请修改你的部门后再申请";
+                return View("Error");
+            }
+
+            ViewData["sysNum"] = GetNextSysNum("AL", 4);
+            ViewData["depName"] = depLongName;
+            ViewData["depNum"] = depNum;
+            ViewData["pLevels"] = db.ei_empLevel.OrderBy(e => e.level_no).ToList();
+            return View();
+        }
+
+        public JsonResult SaveApplyAL(FormCollection fc)
+        {
+            ei_askLeave al = new ei_askLeave();
+            MyUtils.SetFieldValueToModel(fc, al);
+            al.inform_man = GetUserCardByNameAndCardNum(al.inform_man);
+            al.agent_man = GetUserCardByNameAndCardNum(al.agent_man);
+            al.applier_name = userInfo.name;
+            al.applier_num = userInfo.cardNo;
+            
+            if (al.to_date == null || al.from_date == null) {
+                return Json(new SimpleResultModel() { suc = false, msg = "请假日期不合法" });
+            }
+            else if (al.to_date <= al.from_date) {
+                return Json(new SimpleResultModel() { suc = false, msg = "请检查请假期间" });
+            }
+
+
+            return Json(new SimpleResultModel() { suc = true });
+        }
+
+        #endregion
+
+        #region 出差申请
+
+        public ActionResult BeginApplyBT()
+        {
+            return View();
+        }
+
+        #endregion
     }
 }

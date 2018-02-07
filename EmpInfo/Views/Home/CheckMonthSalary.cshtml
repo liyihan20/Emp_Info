@@ -1,0 +1,89 @@
+﻿@section CSS{
+
+    <style type="text/css">
+        #salaryTb td:nth-child(2n+1){
+            background:#f4f4f4;
+        }
+    </style>
+
+}
+<script>
+    $(function () {        
+        var val = "@ViewData["yearMonth"]";w
+        if (val != "") {
+            $.post("@Url.Content("~/Home/CheckSalaryDetail")", { yearMonth: val }, function (data) {
+                if (!data.suc) {
+                    toastr.error(data.msg);
+                    return;
+                }
+                var result = data.result[0];
+                //通过遍历得到结果对象的字段名和字段值，字段名和html的span id一致即可动态赋值
+                for (var key in result) {
+                    $("#" + key).html(parseDecimal(result[key]));
+                }
+            });
+        }
+    });
+
+    function parseDecimal(value) {
+        if (isNaN(value)) return value;
+        if (value == 0 || value == "" || value == null) return "--";
+        var partInt = parseInt(value); //取出整数部分
+        var partDecimal = value.toString().split(".")[1]; //取出小数部分
+        var isInt = (value - partInt < 0.0000001); //原数字是否整数
+        //对整数部分加千分位逗号
+        var partIntStr = partInt.toString();
+        var result = "";
+        while (partIntStr.length > 3) {
+            result = "," + partIntStr.slice(-3) + result;
+            partIntStr = partIntStr.slice(0, partIntStr.length - 3);
+        }
+        if (partIntStr.length > 0) result = partIntStr + result;
+        //加上小数部分或者0
+        if (isInt) {
+            result = result + ".0";
+        } else {
+            result = result + "." + partDecimal;
+        }
+        return result;
+    }
+    
+</script>
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <h3 class="panel-title"><span class="glyphicon glyphicon-usd"></span> 工资明细(@ViewData["yearMonth"])</h3>
+    </div>
+    <div class="panel-body">
+        <table class="table table-bordered" id="salaryTb">
+            @{
+                    string[] texts = new string[] { "公司工日", "基本工资", "应发工资", "代扣工资", "实发工资",
+                                                     "工作工日", "计件工日", "请假", "迟到", "旷工",
+                                                    "津贴", "工值", "其它工资", "补扣款", "奖罚",
+                                                    "加班工资", "工龄奖", "伙食补贴", "房租", "其它扣款",
+                                                    "税金", "养老保险", "公积金"
+                    };
+                    string[] names = new string[] { "work_days", "basicSalary", "should_pay_salary", "withhold_salary", "real_salary",
+                                                    "monthly_work_days", "counter_days", "off_duty_days", "late_days", "run_away_days",
+                                                    "allowance", "work_value", "other_salary", "cut_money", "sanction",
+                                                    "overtime_salary", "work_years_salary", "dinner_welfare", "dorm_rent", "other_debit",
+                                                    "tax", "old_insurance", "public_reserve_funds"
+                    };
+                    int trCount=(int)Math.Ceiling(texts.Count()/2.0);
+                    for (var i = 0; i < trCount; i++) {
+                        <tr>
+                            <td class="text-center" style="width:25%;"><span style="color:#666666"> @texts[i * 2]</span></td>
+                            <td style="width:25%;"><b class="pull-right text-primary" id="@names[i*2]"></b></td>
+                            @if (i * 2 + 1 < texts.Count()) { 
+                                <td class="text-center" style="width:25%;"><span style="color:#666666">@texts[i*2+1]</span></td>
+                                <td style="width:25%;"><b class="pull-right text-primary" id="@names[i*2+1]"></b></td>
+                            }
+                            else {
+                                <td></td><td></td>
+                            }
+                        </tr>
+                    }
+                }
+        </table>
+    </div>
+</div>

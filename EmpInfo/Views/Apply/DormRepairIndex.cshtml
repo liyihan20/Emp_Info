@@ -92,9 +92,9 @@
                                     self.roomMates().push(new RoomMale(roomMaleArr[i]));
                                 }
                             }
-                        }                        
+                        }
                         $("#dpApplyModal").modal("show");
-                        setTimeout(function () { self.roomMates(self.roomMates());}, 50); //因为是异步操作，dom比ajax提前渲染，在这里通知dom更新
+                        setTimeout(function () { self.roomMates(self.roomMates()); }, 50); //因为是异步操作，dom比ajax提前渲染，在这里通知dom更新
                     } else {
                         toastr.error(data.msg);
                     }
@@ -103,7 +103,7 @@
 
             //修改维修类型
             self.ChangeRepairType = function (r) {
-                self.repairType(r);
+                self.repairType(r);                
             }
 
             //修改分摊类型
@@ -185,7 +185,8 @@
     <div class="panel-heading">
         <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
-            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>            
+            <li><a href="@Url.Content("~/Home/DormGroupIndex")">宿舍事务集合</a></li>
             <li class="active">宿舍维修申请</li>
         </ol>
     </div>
@@ -214,7 +215,13 @@
                 3. 对本次服务不确认评价，将不能再次申请维修，请配合给予评价。
             </p>
             <p>
-                4. 详细操作指引，<a href="@Url.Content("~/Content/doc/宿舍维修申请流程操作指引.pdf")" target="_blank">点此查看下载</a> 。
+                4. 维修工接单时间起24小时内完成维修，如遇节假日及特殊维修，将延期。
+            </p>
+            <p>
+                5. 后勤部联系电话：0660-3380021
+            </p>
+            <p>
+                6. 详细操作指引，<a href="@Url.Content("~/Content/doc/宿舍维修申请流程操作指引.pdf")" target="_blank">点此查看下载</a> 。
             </p>
         </div>
     </div>
@@ -231,19 +238,19 @@
                 <div class="modal-body">
                     <div class="b-div">
                         <span class="b-label">
-                            区号:
+                            区号：
                         </span>
                         <span data-bind="text:areaName" />
                     </div>
                     <div class="b-div">
                         <span class="b-label">
-                            宿舍号:
+                            宿舍号：
                         </span>
                         <span data-bind="text:dormNumber" />
                     </div>
                     <div class="b-div">
                         <span class="b-label">
-                            维修类型:
+                            维修类型：
                         </span>
                         <!--ko foreach: repairTypes-->
                         <button class="btn btn-sm btn-default" data-bind="css:{'btn-primary':$parent.repairType()==$data},click:$parent.ChangeRepairType" style="margin-right:12px;">
@@ -253,7 +260,7 @@
                         <!--/ko-->
                     </div>
                     <div class="b-div" data-bind="visible:repairType()=='预约维修'">
-                        <span class="b-label" style="vertical-align:top;">预约时间</span>
+                        <span class="b-label" style="vertical-align:top;">维修时间</span>
                         <span style="display:inline;width:70%;vertical-align:top;">
                             <span class="input-group date" style="display:inline-table;width:70%;" id="repairTimePicker">
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span> </span>
@@ -263,7 +270,7 @@
                     </div>
                     <div class="b-div">
                         <span class="b-label">
-                            费用承担:
+                            费用承担：
                         </span>
                         <!--ko foreach: feeShareTypes-->
                         <button class="btn btn-sm btn-default" data-bind="css:{'btn-danger':$parent.feeShareType()==$data},click:$parent.ChangeFeeShareType" style="margin-right:12px;">
@@ -274,7 +281,7 @@
                     </div>
                     <div class="b-div" data-bind="visible:feeShareType()=='舍友分摊'">
                         <span class="b-label">
-                            选择舍友:
+                            选择舍友：
                         </span>
                         <!--ko foreach: roomMates-->
                         <input type="checkbox" data-bind="value:$data.cardNumber,checked:$parent.checkedRoomMates" /><span data-bind="text:$data.name"></span>&nbsp;
@@ -282,7 +289,7 @@
                     </div>
                     <div class="b-div">
                         <span class="b-label">
-                            联系信息:
+                            联系信息：
                         </span>
                         <!--ko foreach: contactTypes-->
                         <button class="btn btn-sm btn-default" data-bind="css:{'btn-info':$parent.contactType()==$data},click:$parent.ChangeContactType" style="margin-right:12px;">
@@ -292,25 +299,25 @@
                         <!--/ko-->
                     </div>
                     <div class="b-div">
-                        <span class="b-label">联系人</span>
+                        <span class="b-label">联系人：</span>
                         <span style="display:inline-block;width:70%;">
                             <input type="text" class="form-control" data-bind="value:contactName" />
                         </span>
                     </div>
                     <div class="b-div">
-                        <span class="b-label">手机号码</span>
+                        <span class="b-label">手机号码：</span>
                         <span style="display:inline-block;width:70%;">
                             <input type="text" class="form-control" data-bind="value:phoneNumber" />
                         </span>
                     </div>
                     <div class="b-div">
-                        <span class="b-label">手机短号</span>
+                        <span class="b-label">手机短号：</span>
                         <span style="display:inline-block;width:70%;">
                             <input type="text" class="form-control" data-bind="value:shortPhoneNumber" />
                         </span>
                     </div>
                     <div class="b-div">
-                        <span class="b-label">维修内容</span>
+                        <span class="b-label">维修内容：</span>
                         <span style="display:inline-block;width:70%;">
                             <textarea class="form-control" rows="3" data-bind="value:repairContent"></textarea>
                         </span>

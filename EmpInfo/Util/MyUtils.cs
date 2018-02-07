@@ -15,6 +15,8 @@ namespace EmpInfo.Util
 {
     public class MyUtils
     {
+        private static string AES_128_key = "^*xxzx2018xlej*^";
+
         //生成随机数列
         public static string CreateValidateNumber(int length)
         {
@@ -436,6 +438,82 @@ namespace EmpInfo.Util
             objBitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
 
             return ms.ToArray();
+        }
+
+        //AES加密
+        public static string AESEncrypt(string toEncrypt)
+        {
+            byte[] keyArray = UTF8Encoding.UTF8.GetBytes(AES_128_key);
+            byte[] toEncryptArray = UTF8Encoding.UTF8.GetBytes(toEncrypt);
+
+            RijndaelManaged rDel = new RijndaelManaged();
+            rDel.Key = keyArray;
+            rDel.Mode = CipherMode.ECB;
+            rDel.Padding = PaddingMode.PKCS7;
+
+            ICryptoTransform cTransform = rDel.CreateEncryptor();
+            byte[] resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
+
+            return Convert.ToBase64String(resultArray, 0, resultArray.Length);
+        }
+
+        //AES解密
+        public static string AESDecrypt(string toDecrypt)
+        {            
+            byte[] keyArray = UTF8Encoding.UTF8.GetBytes(AES_128_key);
+            byte[] toEncryptArray = Convert.FromBase64String(toDecrypt);
+
+            RijndaelManaged rDel = new RijndaelManaged();
+            rDel.Key = keyArray;
+            rDel.Mode = CipherMode.ECB;
+            rDel.Padding = PaddingMode.PKCS7;
+
+            ICryptoTransform cTransform = rDel.CreateDecryptor();
+
+            byte[] resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
+            return UTF8Encoding.UTF8.GetString(resultArray);            
+
+        }
+
+        /// <summary>
+        /// 使用反射将表单的值设置到数据库对象中，根据字段名
+        /// </summary>
+        /// <param name="col">表单</param>
+        /// <param name="obj">数据库对象</param>
+        public static void SetFieldValueToModel(System.Web.Mvc.FormCollection col, object obj)
+        {
+            foreach (var p in obj.GetType().GetProperties()) {
+                string val = col.Get(p.Name);//字段值
+                string pType = p.PropertyType.FullName;//数据类型
+                if (string.IsNullOrEmpty(val) || val.Equals("null")) continue;
+                if (pType.Contains("DateTime")) {
+                    DateTime dt;
+                    if (DateTime.TryParse(val, out dt)) {
+                        p.SetValue(obj, dt, null);
+                    }
+                }
+                else if (pType.Contains("Int32")) {
+                    int i;
+                    if (int.TryParse(val, out i)) {
+                        p.SetValue(obj, i, null);
+                    }
+                }
+                else if (pType.Contains("Decimal")) {
+                    decimal dm;
+                    if (decimal.TryParse(val, out dm)) {
+                        p.SetValue(obj, dm, null);
+                    }
+                }
+                else if (pType.Contains("String")) {
+                    p.SetValue(obj, val.Trim(), null);
+                }
+                else if (pType.Contains("Bool")) {
+                    bool bl;
+                    if (bool.TryParse(val, out bl)) {
+                        p.SetValue(obj, bl, null);
+                    }
+                }
+            }
         }
 
     }

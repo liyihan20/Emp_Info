@@ -136,6 +136,31 @@ namespace EmpInfo.Controllers
             }
             return Json(new SimpleResultModel() { suc = true, msg = msg });
         }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult statisticsUsers()
+        {
+            DateTime lastYear = DateTime.Now.AddYears(-1);
+            DateTime lastMonth = DateTime.Now.AddMonths(-1);
+
+            int allUserCount = db.ei_users.Count();
+            int quitUserCount = db.vw_ei_simple_users.Where(v => v.dep_name == null).Count();
+            int wxBindUserCount = db.vw_push_users.Count();
+            int androidUserCount = db.ei_users_android.Select(a => a.card_number).Distinct().Count();
+            int yearActiveUserCount = db.ei_users.Where(u => u.last_login_date >= lastYear).Count();
+            int monthActiveUserCount = db.ei_users.Where(u => u.last_login_date >= lastMonth).Count();
+            return Json(new
+            {
+                suc = true,
+                allUserCount = allUserCount.ToString("N0"),
+                quitUserCount = quitUserCount.ToString("N0"),
+                wxBindUserCount = wxBindUserCount.ToString("N0"),
+                androidUserCount = androidUserCount.ToString("N0"),
+                yearActiveUserCount = yearActiveUserCount.ToString("N0"),
+                monthActiveUserCount = monthActiveUserCount.ToString("N0")
+            });
+        }
+
         #endregion
 
         #region 情景变换
@@ -481,5 +506,301 @@ namespace EmpInfo.Controllers
 
         #endregion
 
+        #region 部门管理
+
+        [SessionTimeOutFilter]
+        public ActionResult Department()
+        {
+            return View();
+        }
+
+        public JsonResult GetDepartmentTree()
+        {
+            var list = new List<Department>();
+            foreach (var d in db.ei_department.Where(d => d.FNumber.Length == 1).ToList()) {
+                list.Add(GetDepartment(d.FNumber));
+            }
+            return Json(list);
+        }
+
+        private Department GetDepartment(string rootNumber, bool isAdmin = false)
+        {
+            var rootDep = db.ei_department.Single(e => e.FNumber == rootNumber);
+            var theNodeIsAdmin = isAdmin; //是否管理员节点
+            Department dep = new Department();
+            dep.text = rootDep.FName;
+            dep.tags = new string[] { rootDep.FNumber };
+            dep.nodes = new List<Department>();
+            if (!theNodeIsAdmin) {
+                if (rootDep.FAdmin != null && rootDep.FAdmin.Contains(userInfo.cardNo)) {
+                    theNodeIsAdmin = true;
+                }
+            }
+            dep.selectable = theNodeIsAdmin;
+            if (rootDep.FIsForbit == true) {
+                dep.color = "#d9534f"; //被禁用显示红色
+            }
+            else if (theNodeIsAdmin) {
+                dep.color = "#5cb85c"; //有权限管理显示绿色
+            }
+            foreach (var child in db.ei_department
+                .Where(e => e.FParent == rootNumber && (e.FIsDeleted == null || e.FIsDeleted == false))
+                .OrderBy(e => e.FNumber).ToList()) {
+                dep.nodes.Add(GetDepartment(child.FNumber, theNodeIsAdmin)); //递归获取子节点
+            }
+            if (dep.nodes.Count() == 0) {
+                dep.nodes = null; //没有子节点
+            }
+            return dep;
+        }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult GetDepartmentInfo(string depNum)
+        {
+            var dep = db.ei_department.Single(e => e.FNumber == depNum);
+            var auditNode = dep.ei_departmentAuditNode.Count() > 0 ? dep.ei_departmentAuditNode.First() : null;
+            return Json(new
+            {
+                status = dep.FIsForbit == true ? "禁用" : "正常",
+                admin = GetUserNameAndCardByCardNum(dep.FAdmin),
+                creator = GetUserNameAndCardByCardNum(dep.FCreator),
+                createTime = ((DateTime)dep.FCreateDate).ToString("yyyy-MM-dd HH:mm"),
+                isAuditNode = dep.FIsAuditNode,
+                auditNodeName = auditNode == null ? "" : auditNode.FAuditNodeName,
+                auditNodeCounterSign = auditNode == null ? false : auditNode.FIsCounterSign
+            });
+        }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult ChangeDepartmentName(string depNum, string newName)
+        {            
+            var dep = db.ei_department.Single(e => e.FNumber == depNum);
+            dep.FName = newName;
+            WriteEventLog("部门管理", "修改名称:" + depNum + "," + dep.FName + "->" + newName);
+
+            db.SaveChanges();
+            return Json(new SimpleResultModel() { suc = true, msg = "部门名称修改成功" });
+        }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult DeleteDepartment(string depNum)
+        {
+            var dep = db.ei_department.Single(e => e.FNumber == depNum);
+            if (db.ei_department.Where(e => (e.FIsDeleted == null || e.FIsDeleted == false) && e.FNumber.StartsWith(dep.FNumber)).Count() > 0) {
+                return Json(new SimpleResultModel() { suc = false, msg = "存在子部门，不能删除！" });
+            }
+            dep.FIsDeleted = true;
+            db.SaveChanges();
+
+            WriteEventLog("部门管理", "删除部门："+depNum);
+            return Json(new SimpleResultModel() { suc = true, msg = "部门删除成功" });
+        }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult AddDepartment(string parentNum, string newDepName)
+        {
+            var eldest = db.ei_department.Where(e => e.FParent == parentNum).OrderByDescending(e => e.FNumber).ToList();
+            string childIndex = "01";
+            if (eldest.Count() > 0) {
+                childIndex =  (int.Parse(eldest.First().FNumber.Substring(parentNum.Length))+1).ToString().PadLeft(2,'0');
+            }
+            var dep = new ei_department();
+            dep.FNumber = parentNum + childIndex;
+            dep.FName = newDepName;
+            dep.FCreateDate = DateTime.Now;
+            dep.FCreator = userInfo.cardNo;
+            dep.FParent = parentNum;
+
+            db.ei_department.Add(dep);
+            db.SaveChanges();
+            WriteEventLog("部门管理", "新增部门：" + dep.FNumber + "," + newDepName);
+            return Json(new SimpleResultModel() { suc = true, msg = "部门新增成功" });
+        }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult ToggleDepartmentForbit(string depNum)
+        {
+            var dep = db.ei_department.Single(e => e.FNumber == depNum);
+            dep.FIsForbit = dep.FIsForbit == true ? false : true;
+            db.SaveChanges();
+
+            string opName = dep.FIsForbit == true ? "禁用" : "启用";
+            WriteEventLog("部门管理", opName + "部门：" + depNum);
+            return Json(new SimpleResultModel() { suc = true, msg = "部门" + opName + "成功" });
+        }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult ChangeDepAdmins(string depNum, string admins)
+        {
+            var dep = db.ei_department.Single(e => e.FNumber == depNum);
+            dep.FAdmin = GetUserCardByNameAndCardNum(admins);
+            db.SaveChanges();
+
+            WriteEventLog("部门管理", depNum+"变更管理员：" + admins);
+            return Json(new SimpleResultModel() { suc = true, msg = "管理员更新成功" });
+        }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult ToggleAuditNode(string depNum)
+        {
+            var dep = db.ei_department.Single(e => e.FNumber == depNum);
+            dep.FIsAuditNode = dep.FIsAuditNode == true ? false : true;
+            db.SaveChanges();
+            WriteEventLog("部门管理", "切换是否审批节点：" + depNum);
+            return Json(new SimpleResultModel() { suc = true });
+        }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult AlterAuditNodeName(string depNum, string nodeName)
+        {
+            var dep = db.ei_department.Single(e => e.FNumber == depNum);
+            var depNodes = dep.ei_departmentAuditNode.ToList();
+            ei_departmentAuditNode depNode;
+            if (depNodes.Count() > 0) {
+                depNode = depNodes.First();
+                if (depNode.ei_departmentAuditUser.Count() > 0 && string.IsNullOrEmpty(nodeName)) {
+                    return Json(new SimpleResultModel() { suc = false, msg = "存在审核人的情况下不能设置节点名称为空" });
+                }
+            }
+            else {   
+                depNode = new ei_departmentAuditNode();
+                depNode.ei_department = dep;
+                depNode.FIsCounterSign = false;
+                db.ei_departmentAuditNode.Add(depNode);
+            }
+            depNode.FAuditNodeName = nodeName;
+
+            db.SaveChanges();
+            WriteEventLog("部门管理", depNum+";变更名称：" + nodeName);
+            return Json(new SimpleResultModel() { suc = true });
+
+        }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult ToggleAuditCounterSign(string depNum)
+        {
+            var dep = db.ei_department.Single(e => e.FNumber == depNum);
+            var depNodes = dep.ei_departmentAuditNode.ToList();
+            ei_departmentAuditNode depNode;
+            if (depNodes.Count() > 0) {
+                depNode = depNodes.First();
+            }
+            else {
+                depNode = new ei_departmentAuditNode();
+                depNode.ei_department = dep;
+                depNode.FAuditNodeName = "";
+                db.ei_departmentAuditNode.Add(depNode);
+            }
+            depNode.FIsCounterSign = depNode.FIsCounterSign == true ? false : true;
+
+            db.SaveChanges();
+            WriteEventLog("部门管理", depNum + ";切换是否会签");
+            return Json(new SimpleResultModel() { suc = true });
+        }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult SaveDepAuditor(string depNum, int depAuditorId, string auditor, string bTime, string eTime)
+        {
+            if (DateTime.Parse(bTime) > DateTime.Parse(eTime)) {
+                return Json(new SimpleResultModel() { suc = false, msg = "生效日期不能晚于失效日期" });
+            }
+            ei_departmentAuditUser depAuditor;
+            if (depAuditorId == 0) {
+                var auditNode = db.ei_department.Single(d => d.FNumber == depNum).ei_departmentAuditNode.First();
+                depAuditor = new ei_departmentAuditUser();
+                depAuditor.ei_departmentAuditNode = auditNode;
+                db.ei_departmentAuditUser.Add(depAuditor);
+            }
+            else {
+                depAuditor = db.ei_departmentAuditUser.Single(d => d.id == depAuditorId);
+            }
+            depAuditor.FAuditorNumber = GetUserCardByNameAndCardNum(auditor);
+            depAuditor.FBeginTime = DateTime.Parse(bTime);
+            depAuditor.FEndTime = DateTime.Parse(eTime);
+
+            db.SaveChanges();
+            return Json(new SimpleResultModel() { suc = true, extra = depAuditor.id.ToString() });
+
+        }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult LoadDepAuditors(string depNum)
+        {
+            var dep = db.ei_department.Single(d => d.FNumber == depNum);
+            if (dep.ei_departmentAuditNode.Count() == 0) {
+                return Json(new { suc = false });
+            }
+            var node = dep.ei_departmentAuditNode.First();
+            if (node.ei_departmentAuditUser.Count() == 0) {
+                return Json(new { suc = false });
+            }
+            var list = (from u in node.ei_departmentAuditUser
+                        where u.isDeleted == null || u.isDeleted == false
+                        orderby u.FEndTime descending
+                        select new
+                        {
+                            id = u.id,
+                            auditorNum = u.FAuditorNumber,
+                            auditorName = GetUserNameByCardNum(u.FAuditorNumber),
+                            bTime = ((DateTime)u.FBeginTime).ToString("yyyy-MM-dd"),
+                            eTime = ((DateTime)u.FEndTime).ToString("yyyy-MM-dd"),
+                            isExpire = u.FEndTime < DateTime.Now
+                        }).ToList();
+            return Json(new { suc = true, list = list });
+        }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult RemoveDepAuditor(int depAuditorId)
+        {
+            var depAuditors = db.ei_departmentAuditUser.Where(d => d.id == depAuditorId);
+            
+            if(depAuditors.Count()>0){
+                depAuditors.First().isDeleted = true;                
+                db.SaveChanges();
+            }
+            else {
+                return Json(new SimpleResultModel() { suc = false, msg = "此审核人不存在" });
+            }
+            WriteEventLog("部门管理", "删除审核人：" + depAuditorId);
+            return Json(new SimpleResultModel() { suc = true });
+        }
+
+        public string InitDepartment()
+        {
+            ei_department dep = new ei_department();
+            dep.FName = "信利集团";
+            dep.FNumber = "1";
+            dep.FAdmin = "110428101";
+            dep.FCreator = "110428101";
+            dep.FCreateDate = DateTime.Now;
+
+            db.ei_department.Add(dep);
+
+            ei_department dep2 = new ei_department();
+            dep2.FName = "信利光电股份有限公司";
+            dep2.FNumber = "2";
+            dep2.FAdmin = "110428101";
+            dep2.FCreator = "110428101";
+            dep2.FCreateDate = DateTime.Now;
+
+            db.ei_department.Add(dep2);
+
+            string[] names = new string[] { "信利半导体有限公司","信利工业有限公司","信利仪器有限公司","信利工业有限公司","信息中心","采购中心","会计部","行政部" };
+            for(int i=1;i<=names.Length;i++){
+                var d = new ei_department();
+                d.FName = names[i-1];
+                d.FNumber = "1" + i.ToString().PadLeft(2, '0');
+                d.FAdmin = "110428101";
+                d.FCreator = "110428101";
+                d.FCreateDate = DateTime.Now;
+                d.FParent = "1";
+
+                db.ei_department.Add(d);
+            }
+            db.SaveChanges();
+            return "ok";
+        }
+
+        #endregion
     }
 }

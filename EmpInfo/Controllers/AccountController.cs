@@ -19,12 +19,12 @@ namespace EmpInfo.Controllers
         }
 
         [AllowAnonymous]
-        public ActionResult Login()
+        public ActionResult Login(string from = "")
         {
             TrulyEmpSvrSoapClient client = new TrulyEmpSvrSoapClient();
             string appUrl = client.GetAppUrl();
             ViewData["appUrl"] = appUrl;
-
+            Session["fromwx"] = "wx".Equals(from) ? true : false;
             return View();
         }
 
@@ -116,7 +116,7 @@ namespace EmpInfo.Controllers
                     thisUser = user.First();
                     thisUser.fail_times = 0;
                     thisUser.last_login_date = DateTime.Now;
-
+                    
                     //写入cookie
                     setcookie(thisUser, model.rememberDay);
 
@@ -184,11 +184,15 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = "此厂牌处于特殊保护状态，要注册请与管理员联系。谢谢！" });
             }
 
-            var infos = db.GetHREmpInfo(card_no).ToList() ;
+            var infos = db.GetHREmpInfo(card_no).ToList();
             if (infos.Count() < 1)
             {
                 WriteEventLogWithoutLogin(card_no, "用户注册[第一步]:厂牌编号不存在");
                 return Json(new { suc = false, msg = "厂牌编号不存在" });
+            }
+            else if (string.IsNullOrEmpty(infos.First().txm)) {
+                WriteEventLogWithoutLogin(card_no, "工资账号还未生效");
+                return Json(new { suc = false, msg = "用户注册[第一步]:工资账号未生效，请过几天再注册" });
             }
             else
             {

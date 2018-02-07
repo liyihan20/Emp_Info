@@ -24,16 +24,33 @@ namespace EmpInfo.Controllers
                         from gu in g.ei_groupUser
                         from ga in g.ei_groupAuthority
                         where ga.authority_id == a.id
-                        && gu.user_id == userInfo.id                        
+                        && gu.user_id == userInfo.id
                         select a.en_name).Distinct().ToArray();
             string autStr = string.Join(",", auts);
             ViewData["autStr"] = autStr;
 
             if ("06022701".Equals(userInfo.cardNo)) {
+                //审计来，吉全界面调整
                 bool auditorComing = bool.Parse(ConfigurationManager.AppSettings["auditorComing"]);
                 ViewData["auditorComing"] = auditorComing;
             }
-                        
+            bool fromWx = Session["fromwx"] == null ? false : (bool)Session["fromwx"];//是否从微信过来
+            ViewData["fromWx"] = fromWx; //是否从微信端访问
+
+            var pushUsers = db.vw_push_users.Where(v => v.id == userInfo.id).ToList();
+            ViewData["wxSetting"] = pushUsers.Count() > 0 ? "1" : "0"; //是否可以看到微信公众号的有关设置
+            
+            //查看工资是否需要再次确认密码
+            bool checkSalaryNeedPassword = false;
+            if (fromWx) {
+                if (pushUsers.Count() > 0) {
+                    if (pushUsers.First().wx_check_salary_info == false) {
+                        checkSalaryNeedPassword = true;
+                    }
+                }
+            }
+            ViewData["checkSalaryNeedPassword"] = checkSalaryNeedPassword;
+
             return View();
         }
 
@@ -93,13 +110,47 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = "原始密码错误" });
             }
             WriteEventLog("主界面", "验证旧密码，正确");
-            return Json(new { suc = true, phone = userInfoDetail.phone, email = userInfoDetail.email, shortPhone = userInfoDetail.shortPhone });
+            var pushUsers = db.vw_push_users.Where(v => v.id == userInfo.id).ToList();
+
+            bool checkSalaryInfo = false, pushSalaryInfo = false, pushConsumeInfo = false, pushFlowInfo = false;
+
+            if (pushUsers.Count() > 0) {
+                var pushUser=pushUsers.First();
+                checkSalaryInfo = pushUser.wx_check_salary_info ?? false;
+                pushSalaryInfo = pushUser.wx_push_salary_info ?? false;
+                pushConsumeInfo = pushUser.wx_push_consume_info ?? false;
+                pushFlowInfo = pushUser.wx_push_flow_info ?? false;
+            }
+            return Json(new
+            {
+                suc = true,
+                phone = userInfoDetail.phone,
+                email = userInfoDetail.email,
+                shortPhone = userInfoDetail.shortPhone,
+                depLongName = userInfoDetail.depLongName,
+                depNum = userInfoDetail.depNum,
+                checkSalaryInfo = checkSalaryInfo,
+                pushSalaryInfo = pushSalaryInfo,
+                pushConsumeInfo = pushConsumeInfo,
+                pushFlowInfo = pushFlowInfo
+            });
         }
 
         //更新个人信息
         [SessionTimeOutJsonFilter]
-        public JsonResult UpdatePersonalInfo(string phone, string email, string new_pass,string shortPhone)
+        public JsonResult UpdatePersonalInfo(FormCollection fc)
         {
+            string phone=fc.Get("phone");
+            string email = fc.Get("email");
+            string new_pass = fc.Get("new_pass");
+            string shortPhone = fc.Get("shortPhone");
+            string depNum = fc.Get("depNum");
+            string depLongName = fc.Get("depLongName");
+            string checkSalaryInfo = fc.Get("checkSalaryInfo");
+            string pushSalaryInfo = fc.Get("pushSalaryInfo");
+            string pushConsumeInfo = fc.Get("pushConsumeInfo");
+            string pushFlowInfo = fc.Get("pushFlowInfo");
+
             var user = db.ei_users.Single(u => u.card_number == userInfo.cardNo);
             if (!string.IsNullOrEmpty(email))
             {
@@ -140,6 +191,13 @@ namespace EmpInfo.Controllers
             if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(phone) && !string.IsNullOrEmpty(shortPhone)) {
                 db.InsertIntoYFEmp(email ?? "", phone ?? "", shortPhone ?? "", user.name, user.card_number);
             }
+            user.dep_no = depNum;
+            user.dep_long_name = depLongName;
+            user.wx_check_salary_info = bool.Parse(checkSalaryInfo);
+            user.wx_push_salary_info = bool.Parse(pushSalaryInfo);
+            user.wx_push_consume_info = bool.Parse(pushConsumeInfo);
+            user.wx_push_flow_info = bool.Parse(pushFlowInfo);
+
             db.SaveChanges();
             ClearUserInfoDetail();
             WriteEventLog("主界面", "用户信息更新成功");
@@ -404,7 +462,14 @@ namespace EmpInfo.Controllers
         [SessionTimeOutFilter]
         public ActionResult CheckSalary()
         {
-            int salaryNo=int.Parse(userInfoDetail.salaryNo);
+            int salaryNo = 0;
+            try {
+                salaryNo = int.Parse(userInfoDetail.salaryNo);
+            }
+            catch {
+                ViewBag.tip = "你的工资账号不存在";
+                return View("Error");
+            }
             ViewData["salaryNo"] = salaryNo;
             var info = db.GetSalaryInfo(salaryNo).ToList();
             ViewData["months"] = db.GetSalaryMonths(salaryNo).ToList();
@@ -430,12 +495,34 @@ namespace EmpInfo.Controllers
             DateTime lastDay = firstDay.AddMonths(1);
 
             WriteEventLog("工资查询", "查询工资月度明细:" + yearMonth);
-            return Json(db.GetSalaryDetail(salaryNo, firstDay, lastDay).ToList().First());
+            var result = db.GetSalaryAllDetail(salaryNo, firstDay, lastDay).ToList();
+            if (result.Count() == 0) {
+                return Json(new { suc = false, msg = "查询不到此月份的工资数据" });
+            }
+            return Json(new { suc = true, result = result });
+        }
+
+        public ActionResult CheckMonthSalary(string param)
+        {
+            int salaryNo=int.Parse(userInfoDetail.salaryNo);
+            DateTime dt;
+            if (!DateTime.TryParse(param, out dt)) {
+                ViewBag.tip = "参数出错";
+                return View("Error");
+            }
+            ViewData["yearMonth"] = dt.ToString("yyyy-MM");
+            
+            return View();
         }
 
         #endregion
 
         public ActionResult test()
+        {
+            return View();
+        }
+
+        public ActionResult DormGroupIndex()
         {
             return View();
         }
@@ -448,6 +535,6 @@ namespace EmpInfo.Controllers
         //    db.SaveChanges();
         //    return "suc";
         //}
-
+        
     }
 }

@@ -1,0 +1,63 @@
+﻿@{
+    Layout = null;
+}
+<link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-treeview.min.css")" />
+
+<script src="@Url.Content("~/Scripts/bootstrap-treeview.min.js")"></script>
+<script>
+    var cb;
+    var selectedDep;
+    function openSelectDepDialog(callback) {        
+        cb = callback;        
+        $("#depSelModal").modal("show");
+        GetTreeData();
+    }
+    function GetTreeData() {
+        $.post("@Url.Content("~/Item/GetDepartmentTreeForSel")", {}, function (data) {
+        $("#depTree").treeview({
+            data: data,
+            expandIcon: "fa fa-folder-o",
+            collapseIcon: "fa fa-folder-open-o",
+            emptyIcon: "fa fa-home",
+            onNodeSelected: function (event, node) {                
+                var num = node.tags[0];
+                var name = node.text;
+                var longName = name;
+                
+                var parent = $('#depTree').treeview('getParent', node);                
+                while (!isNaN(parent.nodeId)) {
+                    longName = parent.text + "/" + longName;
+                    parent = $('#depTree').treeview('getParent', parent);
+                }
+                selectedDep = { depNum: num, depShortName: name, depLongName: longName };
+            }
+        });        
+    });
+    }
+    $(function () {
+        $("#depSelBt").on("click", function () {
+            cb(selectedDep); //通过回调返回已选部门
+            $("#depSelModal").modal("hide");
+        });
+    });
+
+</script>
+<div class="modal fade" id="depSelModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="depSelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">选择部门</h4>
+            </div>
+            <div class="modal-body" style="min-height:280px;max-height:400px;overflow:auto;">
+
+                <div id="depTree"></div>
+
+            </div>
+            <div class="modal-footer">                
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-success" id="depSelBt">确认</button>
+            </div>
+        </div>
+    </div>
+</div>

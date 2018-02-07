@@ -17,6 +17,17 @@
         function CheckDetail(sysNo) {
             window.location.href = "CheckAndAuditDPApply?sysNo=" + sysNo;
         }
+        function AbortApply(sysNo) {
+            openConfirmDialog("确认要撤销/中止此维修申请吗？", function () {
+                $.post("@Url.Content("~/Apply/AbortDPApply")", { sysNo: sysNo }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+        }
         </script>
     }
 <div class="panel panel-success" id="applyDiv">
@@ -52,6 +63,9 @@
                               }
                             <p>审核结果：<b class="@textColor">@i.auditResult</b></p>
                             <p><button class="btn btn-primary btn-block" onclick="CheckDetail('@i.sysNo')"><i class="fa fa-search"></i> 查看详情</button></p>
+                            @if (i.auditResult == "审批中") {
+                                <p><button class="btn btn-danger btn-block" onclick="AbortApply('@i.sysNo')"><i class="fa fa-search"></i> 撤销申请</button></p>
+                            }
                         </div>
                     </div>
                 </div>
@@ -59,3 +73,6 @@
         </div>
     </div>
 </div>
+@section modal{
+    @Html.Partial("_ConfirmDialog")
+}

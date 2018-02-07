@@ -553,6 +553,82 @@ namespace EmpInfo.FlowSvr {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CurrentAuditModel", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class CurrentAuditModel : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private int stepField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string stepNameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string auditorsField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public int step {
+            get {
+                return this.stepField;
+            }
+            set {
+                if ((this.stepField.Equals(value) != true)) {
+                    this.stepField = value;
+                    this.RaisePropertyChanged("step");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string stepName {
+            get {
+                return this.stepNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.stepNameField, value) != true)) {
+                    this.stepNameField = value;
+                    this.RaisePropertyChanged("stepName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public string auditors {
+            get {
+                return this.auditorsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.auditorsField, value) != true)) {
+                    this.auditorsField = value;
+                    this.RaisePropertyChanged("auditors");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(Namespace="http://ic.truly.com.cn/", ConfigurationName="FlowSvr.FlowSvrSoap")]
     public interface FlowSvrSoap {
@@ -588,6 +664,14 @@ namespace EmpInfo.FlowSvr {
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 auditor 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetMyDealingApplyCount", ReplyAction="*")]
         EmpInfo.FlowSvr.GetMyDealingApplyCountResponse GetMyDealingApplyCount(EmpInfo.FlowSvr.GetMyDealingApplyCountRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetCurrentStep", ReplyAction="*")]
+        EmpInfo.FlowSvr.GetCurrentStepResponse GetCurrentStep(EmpInfo.FlowSvr.GetCurrentStepRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 userNumber 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/AbortFlow", ReplyAction="*")]
+        EmpInfo.FlowSvr.AbortFlowResponse AbortFlow(EmpInfo.FlowSvr.AbortFlowRequest request);
         
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 TestStarFlowResult 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestStarFlow", ReplyAction="*")]
@@ -1278,6 +1362,146 @@ namespace EmpInfo.FlowSvr {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetCurrentStepRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetCurrentStep", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.GetCurrentStepRequestBody Body;
+        
+        public GetCurrentStepRequest() {
+        }
+        
+        public GetCurrentStepRequest(EmpInfo.FlowSvr.GetCurrentStepRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetCurrentStepRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string sysNo;
+        
+        public GetCurrentStepRequestBody() {
+        }
+        
+        public GetCurrentStepRequestBody(string sysNo) {
+            this.sysNo = sysNo;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetCurrentStepResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetCurrentStepResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.GetCurrentStepResponseBody Body;
+        
+        public GetCurrentStepResponse() {
+        }
+        
+        public GetCurrentStepResponse(EmpInfo.FlowSvr.GetCurrentStepResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetCurrentStepResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public EmpInfo.FlowSvr.CurrentAuditModel GetCurrentStepResult;
+        
+        public GetCurrentStepResponseBody() {
+        }
+        
+        public GetCurrentStepResponseBody(EmpInfo.FlowSvr.CurrentAuditModel GetCurrentStepResult) {
+            this.GetCurrentStepResult = GetCurrentStepResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class AbortFlowRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="AbortFlow", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.AbortFlowRequestBody Body;
+        
+        public AbortFlowRequest() {
+        }
+        
+        public AbortFlowRequest(EmpInfo.FlowSvr.AbortFlowRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class AbortFlowRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string userNumber;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string sysNo;
+        
+        public AbortFlowRequestBody() {
+        }
+        
+        public AbortFlowRequestBody(string userNumber, string sysNo) {
+            this.userNumber = userNumber;
+            this.sysNo = sysNo;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class AbortFlowResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="AbortFlowResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.AbortFlowResponseBody Body;
+        
+        public AbortFlowResponse() {
+        }
+        
+        public AbortFlowResponse(EmpInfo.FlowSvr.AbortFlowResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class AbortFlowResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public EmpInfo.FlowSvr.FlowResultModel AbortFlowResult;
+        
+        public AbortFlowResponseBody() {
+        }
+        
+        public AbortFlowResponseBody(EmpInfo.FlowSvr.FlowResultModel AbortFlowResult) {
+            this.AbortFlowResult = AbortFlowResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class TestStarFlowRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="TestStarFlow", Namespace="http://ic.truly.com.cn/", Order=0)]
@@ -1752,6 +1976,33 @@ namespace EmpInfo.FlowSvr {
             inValue.Body.billType = billType;
             EmpInfo.FlowSvr.GetMyDealingApplyCountResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).GetMyDealingApplyCount(inValue);
             return retVal.Body.GetMyDealingApplyCountResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.FlowSvr.GetCurrentStepResponse EmpInfo.FlowSvr.FlowSvrSoap.GetCurrentStep(EmpInfo.FlowSvr.GetCurrentStepRequest request) {
+            return base.Channel.GetCurrentStep(request);
+        }
+        
+        public EmpInfo.FlowSvr.CurrentAuditModel GetCurrentStep(string sysNo) {
+            EmpInfo.FlowSvr.GetCurrentStepRequest inValue = new EmpInfo.FlowSvr.GetCurrentStepRequest();
+            inValue.Body = new EmpInfo.FlowSvr.GetCurrentStepRequestBody();
+            inValue.Body.sysNo = sysNo;
+            EmpInfo.FlowSvr.GetCurrentStepResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).GetCurrentStep(inValue);
+            return retVal.Body.GetCurrentStepResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.FlowSvr.AbortFlowResponse EmpInfo.FlowSvr.FlowSvrSoap.AbortFlow(EmpInfo.FlowSvr.AbortFlowRequest request) {
+            return base.Channel.AbortFlow(request);
+        }
+        
+        public EmpInfo.FlowSvr.FlowResultModel AbortFlow(string userNumber, string sysNo) {
+            EmpInfo.FlowSvr.AbortFlowRequest inValue = new EmpInfo.FlowSvr.AbortFlowRequest();
+            inValue.Body = new EmpInfo.FlowSvr.AbortFlowRequestBody();
+            inValue.Body.userNumber = userNumber;
+            inValue.Body.sysNo = sysNo;
+            EmpInfo.FlowSvr.AbortFlowResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).AbortFlow(inValue);
+            return retVal.Body.AbortFlowResult;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]

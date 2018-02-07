@@ -28,6 +28,8 @@ namespace EmpInfo.Models
         public string sex { get; set; }
 
         public string salaryNo { get; set; }
+        public string depNum { get; set; }
+        public string depLongName { get; set; }
 
     }
     public class LoginModel

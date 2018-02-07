@@ -6,7 +6,9 @@
     if (ViewData["auditorComing"] != null) {
         auditorComing = (bool)ViewData["auditorComing"];
     }
-    
+
+    bool isFromWx = (bool)ViewData["fromWx"];
+    int checkSalaryNeedPassword = ((bool)ViewData["checkSalaryNeedPassword"])?1:0;
 }
 @section CSS{
     <style type="text/css">
@@ -28,11 +30,16 @@
             .row .thumbnail .caption h3{
                 margin-top:10px;
             }
+            .caption h3{
+                text-align:center;
+                margin-bottom:0;
+            }
     </style>
     }
 @section Scripts {
     <script>
 
+        var checkSalaryNeedPassword = "@checkSalaryNeedPassword";
     $(function () {
 
         //每次打开主页先看邮箱是否有绑定
@@ -45,7 +52,7 @@
         $('#resetPassModal').on('shown.bs.modal', function () {
             $('#old_password').focus();
         });
-        //修改密码
+        //修改个人信息
         $("#updateInfoBt").click(function () {
             var new_password = $("#new_password").val();
             if (new_password!="" && new_password.length < 6) {
@@ -60,11 +67,23 @@
                 email: $("#emailAddr").val(),
                 shortPhone:$("#shortPhoneNumber").val(),
                 phone: $("#phoneNumber").val(),
-                new_pass: $("#new_password").val()
+                new_pass: $("#new_password").val(),
+                depNum: $("#depNum").val(),
+                depLongName: $("#depLongName").val(),
+                checkSalaryInfo: $("#check_salary_info").is(":checked"),
+                pushSalaryInfo: $("#push_salary_info").is(":checked"),
+                pushConsumeInfo: $("#push_consume_info").is(":checked"),
+                pushFlowInfo: $("#push_flow_info").is(":checked")
             }, function (res) {
                 if (res.suc) {
                     $("#resetPassModal").modal("hide");
                     toastr.success(res.msg);
+
+                    if ($("#check_salary_info").is(":checked")) {
+                        checkSalaryNeedPassword = "0";
+                    } else {
+                        checkSalaryNeedPassword = "1";
+                    }
                 } else {
                     toastr.error(res.msg);
                 }
@@ -72,39 +91,31 @@
         });
         //点击头像弹出密码修改框
         $("#people_img").click(function () {
-            $("#personalInfoFm input").val("");
-            $("#personalInfo").hide();
-            $("#personalInfoBts").hide();
-            $("#oldPasswordDiv").show();
-            $("#resetPassModal").modal('show');
+            openConfirmPasswordDialog(function (data) {
+                $("#emailAddr").val(data.email);
+                $("#phoneNumber").val(data.phone);
+                $("#shortPhoneNumber").val(data.shortPhone);
+                $("#depLongName").val(data.depLongName);
+                $("#depNum").val(data.depNum);
+                if ("@ViewData["wxSetting"]" == "1") {
+                    $("#wx_setting").show();
+                    $("#check_salary_info").prop("checked", data.checkSalaryInfo);
+                    $("#push_salary_info").prop("checked", data.pushSalaryInfo);
+                    $("#push_consume_info").prop("checked", data.pushConsumeInfo);
+                    $("#push_flow_info").prop("checked", data.pushFlowInfo);
+                } else {
+                    $("#wx_setting").hide();
+                }
+
+                $("#resetPassModal").modal("show");
+            });
         });
 
-        $("#old_password").keyup(function () {
-            if (event.keyCode == 13) {
-                $("#validatePasswordBt").click();
-            }
-        })
-
-        //验证原始密码按钮
-        $("#validatePasswordBt").click(function () {
-            var oldPass = $("#old_password").val();
-            if (oldPass.length < 6) {
-                toastr.error("请输入6位以上的原始密码进行验证");
-                return;
-            }
-            $(this).button('loading');
-            $.post("@Url.Content("~/Home/ValidateOldPassword")", { old_pass: oldPass }, function (data) {
-                $("#validatePasswordBt").button("reset");
-                if (data.suc) {
-                    $("#personalInfo").show();
-                    $("#personalInfoBts").show();
-                    $("#oldPasswordDiv").hide();
-                    $("#emailAddr").val(data.email);
-                    $("#phoneNumber").val(data.phone);
-                    $("#shortPhoneNumber").val(data.shortPhone);
-                } else {
-                    toastr.error(data.msg);
-                }
+        //选择部门
+        $("#depLongName").on("click", function () {
+            openSelectDepDialog(function (selectedDep) {
+                $("#depLongName").val(selectedDep.depLongName);
+                $("#depNum").val(selectedDep.depNum);
             });
         });
 
@@ -114,7 +125,7 @@
         });
 
         //进入宿舍查询界面
-        $("#dormitoryBt,#dormitoryImg").click(function () {
+        @*$("#dormitoryBt,#dormitoryImg").click(function () {
             $.post("@Url.Content("~/Home/ValidateDorm")", {}, function (data) {
                 if (data.suc) {
                     window.location.href = "@Url.Content("~/Home/CheckDormitory")";
@@ -123,7 +134,7 @@
                 }
             });
 
-        });
+        });*@
 
         //进入饭卡查询界面
         $("#diningCardBt,#mealImg").click(function () {
@@ -142,7 +153,13 @@
                 } else {
                     $.post("@Url.Content("~/Home/ValidatePhone")", {}, function (data) {
                         if (data.suc) {
-                            window.location.href = "@Url.Content("~/Home/CheckSalary")";
+                            if (checkSalaryNeedPassword == "1") {
+                                openConfirmPasswordDialog(function (data) {
+                                    window.location.href = "@Url.Content("~/Home/CheckSalary")";
+                                });
+                            } else {
+                                window.location.href = "@Url.Content("~/Home/CheckSalary")";
+                            }
                         } else {
                             toastr.error(data.msg);
                         }
@@ -179,8 +196,9 @@
         });*@
 
         //会所点餐
-        @*$("#ResImg,#ResBt").click(function () {
-            $.post("@Url.Content("~/Home/ValidatePhone")", {}, function (data) {
+        $("#ResImg,#ResBt").click(function () {
+            toastr.info("暂未开放");
+            @*$.post("@Url.Content("~/Home/ValidatePhone")", {}, function (data) {
                 if (data.suc) {
                     //2016-10-05 如果有部长点餐权限，即跳过选择直接进入会所
                     if ("@isMinister" == "1") {
@@ -192,16 +210,21 @@
                 } else {
                     toastr.error(data.msg);
                 }
-            });
-        });*@
+            });*@
+        });
 
         //维修申请
-        $("#repairImg,#repairBt").click(function () {
+        @*$("#repairImg,#repairBt").click(function () {
             window.location.href = "@Url.Content("~/Apply/DormRepairIndex")";
-        });
+        });*@
 
         $("#codeBt").click(function () {
             $("#codeModal").modal("show");
+        });
+
+        //宿舍集合
+        $("#dormGroupImg,#dormGroupBt").click(function () {
+            window.location.href = "@Url.Content("~/Home/DormGroupIndex")";
         });
 
     });
@@ -209,22 +232,24 @@
 </script>
 }
 
-<div style="background-image:url(@Url.Content("~/Content/images/index_bg.jpg"));background-repeat: round; height:176px;padding:15px;">
-    <img id="people_img" title="点击修改个人信息" class="img-circle center-block" style="background-color:#fff;border:1px solid #ddd;cursor:pointer;width:80px;height:90px;" alt="people image" src="@Url.Content("~/Home/GetEmpPortrait/")" />
-
-    <div class="center-block" style="margin-top:5px;">
-        <h5 class="text-center" style="color:white">@ViewData["username"]</h5>
-        <div class="row">
-            <div class="col-xs-4">
-
-            </div>
+<div style="text-align:center;position:relative; background-image:url(@Url.Content("~/Content/images/index_bg.jpg"));background-repeat: round; height:140px;padding:15px;">
+    @if (!isFromWx) { 
+    <div style="position:absolute;right:15px;top:15px;">
+        <button class="btn btn-sm" id="logoutBt"><i class="fa fa-sign-out"></i> 登出</button>
+    </div>
+    }
+    <img id="people_img" title="点击修改个人信息" class="img-circle" style="background-color:#fff;border:1px solid #ddd;cursor:pointer;width:80px;height:90px;" alt="people image" src="@Url.Content("~/Home/GetEmpPortrait/")" />
+    
+    <div style="margin-top:5px;">
+        <h5 style="color:white">@ViewData["username"]</h5>
+        @*<div class="row">
             <div class="col-xs-4">
                 <button class="btn btn-success btn-block btn-sm center-block"  style="width:100px;" id="logoutBt"><i class="fa fa-sign-out"></i> 安全退出</button>
             </div>
             <div class="col-xs-4">
                 <button class="btn btn-primary btn-block btn-sm center-block hidden"  style="width:100px;" id="codeBt"><i class="fa fa-barcode"></i> 饭卡付款码</button>
             </div>
-        </div>
+        </div>*@
         
     </div>
     
@@ -236,9 +261,9 @@
         <div class="thumbnail">
             <a href="#" id="SalaryImg"><img src="@Url.Content("~/Content/images/salary.png")" alt="salary"></a>
             <div class="caption">
-                <h3>个人工资查询</h3>
-                <p>可以查询本人的工资概况和最近半年内的发放明细记录</p>
-                <p><button class="btn btn-primary btn-block" id="SalaryBt">进入查询</button></p>
+                <h3>个人工资</h3>
+                @*<p>可以查询本人的工资概况和最近半年内的发放明细记录</p>
+                <p><button class="btn btn-primary btn-block" id="SalaryBt">进入查询</button></p>*@
             </div>
         </div>
     </div>
@@ -246,9 +271,9 @@
         <div class="thumbnail">
             <a href="#" id="mealImg"><img src="@Url.Content("~/Content/images/meal.png")" alt="meal"></a>
             <div class="caption">
-                <h3>饭卡消费查询</h3>
-                <p>可以查询本人的饭卡余额和最近的充值、消费历史记录</p>
-                <p><button class="btn btn-primary btn-block" id="diningCardBt">进入查询</button></p>
+                <h3>饭卡消费</h3>
+                @*<p>可以查询本人的饭卡余额和最近的充值、消费历史记录</p>
+                <p><button class="btn btn-primary btn-block" id="diningCardBt">进入查询</button></p>*@
             </div>
         </div>
     </div>
@@ -257,52 +282,20 @@
         <div class="thumbnail">
             <a href="#" id="K3Img"><img src="@Url.Content("~/Content/images/box.png")" alt="k3" ></a>
             <div class="caption">
-                <h3>K3用户重开</h3>
-                <p>可以处理K3用户的重新开通与重置登录密码</p>
-                <p><button class="btn btn-primary btn-block" id="K3Bt">进入处理</button></p>
+                <h3>K3用户</h3>
+                @*<p>可以处理K3用户的重新开通与重置登录密码</p>
+                <p><button class="btn btn-primary btn-block" id="K3Bt">进入处理</button></p>*@
             </div>
         </div>
     </div>
-    @if (!auditorComing) { 
+    @if (!auditorComing) {
     <div class="col-xs-6 col-sm-4">
         <div class="thumbnail">
-            <a href="#" id="repairImg"><img src="@Url.Content("~/Content/images/repair.png")" alt="repair"></a>
+            <a href="#" id="dormGroupImg"><img src="@Url.Content("~/Content/images/house.png")" alt="house"></a>
             <div class="caption">
-                <h3>宿舍维修申请</h3>
-                <p>可以预约宿舍维修服务，查询维修费用与历史记录</p>
-                <p><button class="btn btn-primary btn-block" id="repairBt">进入申请</button></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-xs-6 col-sm-4">
-        <div class="thumbnail">
-            <a href="#" id="packageImg"><img src="@Url.Content("~/Content/images/book.png")" alt="repair"></a>
-            <div class="caption">
-                <h3>宿舍来访预约</h3>
-                <p>可以对进入宿舍的外来人员进行来访预约</p>
-                <p><button class="btn btn-primary btn-block disabled" id="packageBt">进入预约(待开放)</button></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-xs-6 col-sm-4">
-        <div class="thumbnail">
-            <a href="#" id="packageImg"><img src="@Url.Content("~/Content/images/post.png")" alt="package"></a>
-            <div class="caption">
-                <h3>宿舍快件寄存</h3>
-                <p>可以预约登记派送到信利宿舍区的快件</p>
-                <p><button class="btn btn-primary btn-block disabled" id="packageBt">进入登记(待开放)</button></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-xs-6 col-sm-4">
-        <div class="thumbnail">
-            <a href="#" id="dormitoryImg">
-                <img src="@Url.Content("~/Content/images/dormitory_128.png")" alt="dormitory">
-            </a>
-            <div class="caption">
-                <h3>住宿费用查询</h3>
-                <p>可以查询本人最近半年内的房租明细</p>
-                <p><button class="btn btn-primary btn-block" id="dormitoryBt">进入查询</button></p>
+                <h3>后勤事务</h3>
+                @*<p>包含住宿费用查询、宿舍维修申请等服务</p>
+                <p><button class="btn btn-primary btn-block" id="dormGroupBt">进入查看</button></p>*@
             </div>
         </div>
     </div>
@@ -310,9 +303,9 @@
         <div class="thumbnail">
             <a href="#" id="ResImg"><img src="@Url.Content("~/Content/images/res_256.png")" alt="res" ></a>
             <div class="caption">
-                <h3>会所订餐服务</h3>
-                <p>可以在会所进行订餐，并查询自己的订餐记录</p>
-                <p><button class="btn btn-primary btn-block disabled" id="ResBt">进入系统(待开放)</button></p>
+                <h3>会所订餐</h3>
+                @*<p>可以在会所进行订餐，并查询自己的订餐记录</p>
+                <p><button class="btn btn-primary btn-block disabled" id="ResBt">进入系统(待开放)</button></p>*@
             </div>
         </div>
     </div>
@@ -322,9 +315,9 @@
         <div class="thumbnail">
             <a href="#" id="adminImg"><img src="@Url.Content("~/Content/images/admin.png")" alt="admin"></a>
             <div class="caption">
-                <h3>管理员入口</h3>
-                <p>用户、权限、组别等设置入口</p>
-                <p><button class="btn btn-primary btn-block" id="adminBt">进入查询</button></p>
+                <h3>管理员</h3>
+                @*<p>用户、权限、组别等设置入口</p>
+                <p><button class="btn btn-primary btn-block" id="adminBt">进入查询</button></p>*@
             </div>
         </div>
     </div>
@@ -334,9 +327,9 @@
             <div class="thumbnail">
                 <a href="#" id="chartImg"><img src="@Url.Content("~/Content/images/paint.png")" alt="paint"></a>
                 <div class="caption">
-                    <h3>图形报表查看</h3>
-                    <p>可直观形象地查看各种数据组成的图形报表</p>
-                    <p><button class="btn btn-primary btn-block" id="chartBt">进入查看</button></p>
+                    <h3>图形报表</h3>
+                    @*<p>可直观形象地查看各种数据组成的图形报表</p>
+                    <p><button class="btn btn-primary btn-block" id="chartBt">进入查看</button></p>*@
                 </div>
             </div>
         </div>
@@ -354,40 +347,52 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">修改个人信息</h4>
                 </div>
-                <div class="modal-body">
-                    <form id="personalInfoFm">
-                        <div id="oldPasswordDiv">
-                            <div class="form-group">
-                                <label for="recipient-name" class="control-label">先输入密码进行验证:</label>
-                                <div class="input-group">
-                                    <input type="password" class="form-control" id="old_password" />
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-danger" type="button" id="validatePasswordBt" data-loading-text="验证中...">验证</button>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                <div class="modal-body" style="max-height:400px;overflow:auto;">
+                    <form id="personalInfoFm">                        
                         <div id="personalInfo">
                             <div class="form-group">
-                                <label for="recipient-name" class="control-label">邮箱地址:</label>
+                                <label for="emailAddr" class="control-label">邮箱地址:</label>
                                 <input type="email" class="form-control" id="emailAddr" />
                             </div>
                             <div class="form-group">
-                                <label for="recipient-name" class="control-label">手机短号:</label>
+                                <label for="shortPhoneNumber" class="control-label">手机短号:</label>
                                 <input type="text" class="form-control" id="shortPhoneNumber" />
                             </div>
                             <div class="form-group">
-                                <label for="recipient-name" class="control-label">手机长号:</label>
+                                <label for="phoneNumber" class="control-label">手机长号:</label>
                                 <input type="text" class="form-control" id="phoneNumber" />
                             </div>
+                            @*<div class="form-group">
+                                <label for="recipient-name" class="control-label">部门名称:</label>
+                                <input type="text" class="form-control" id="depLongName" />
+                                <input type="hidden" id="depNum" />
+                            </div>*@
                             <div class="form-group">
-                                <label for="message-text" class="control-label">新密码（不填则不修改密码）:</label>
+                                <label for="new_password" class="control-label">新密码（不填则不修改密码）:</label>
                                 <input type="password" class="form-control" id="new_password" />
                             </div>
                             <div class="form-group">
-                                <label for="message-text" class="control-label">确认新密码:</label>
+                                <label for="confirm_password" class="control-label">确认新密码:</label>
                                 <input type="password" class="form-control" id="confirm_password" />
+                            </div>                            
+                            <div class="form-group" id="wx_setting">
+                                <label class="control-label">微信公众号设置：</label>
+                                <div class="row">
+                                    <div class="col-xs-6 text-center">
+                                    <input type="checkbox" id="check_salary_info" /> 免密查看工资
+                                    </div>
+                                    <div class="col-xs-6 text-center">
+                                        <input type="checkbox" id="push_salary_info" /> 推送工资信息
+                                    </div>
+                                    <div class="col-xs-6 text-center">
+                                        <input type="checkbox" id="push_consume_info" /> 推送消费信息
+                                    </div>
+                                    <div class="col-xs-6 text-center">
+                                        <input type="checkbox" id="push_flow_info" /> 推送流程信息
+                                    </div>                                        
+                                </div>
                             </div>
+                            
                         </div>
                     </form>
                 </div>
@@ -412,4 +417,7 @@
             </div>
         </div>
     </div>
+
+    @*@Html.Partial("_SelectDep")*@
+    @Html.Partial("_ConfirmPasswordDialog")
 }

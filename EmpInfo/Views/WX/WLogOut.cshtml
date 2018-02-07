@@ -1,0 +1,125 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>用户解除绑定</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/toastr.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/fontawesome/fontcss/font-awesome.min.css")" />
+        
+    <style type="text/css">
+        body, div, p, h1, h2, h3, h4, h5, h6, legend, input, button, a, label, span {
+            font-family: 'Microsoft YaHei','Courier New',Arial;
+        }
+
+        .container {
+            padding: 0;
+        }
+
+        .b-label {
+            display: inline-block;
+            width: 120px;
+            vertical-align: top;
+            color: gray;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+
+
+    <script src="@Url.Content("~/Scripts/jquery-1.11.3.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/toastr.min.js")"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="@Url.Content("~/Scripts/html5shiv.min.js")"></script>
+      <script src="@Url.Content("~/Scripts/respond.min.js")"></script>
+    <![endif]-->
+</head>
+<body>
+    <div class="container" id="topContainer">
+        <div class="container">
+            <div class="panel panel-primary" id="div_signin" style="max-width:420px;margin:20px auto 0 auto;">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-reply"></i> 用户解除绑定</h3>
+                </div>
+                <div class="panel-body">
+                    <img src="@Url.Content("~/Content/images/truly_home.gif")" alt="truly home" class="center-block" style="width:100px;height:100px;margin-bottom:20px;" />
+                    <div class="b-div">
+                        <span class="b-label">
+                            厂牌号：
+                        </span>
+                        <span>@ViewData["userNumber"]</span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            姓名：
+                        </span>
+                        <span>@ViewData["userName"]</span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            绑定时间：
+                        </span>
+                        <span>@ViewData["bingDate"]</span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            禁用免密登陆：
+                        </span>
+                        <input type="checkbox" id="easyLoginCk" checked="checked" disabled /> 
+                        <p class="text-danger small"><i class="fa fa-info-circle"></i> 勾选此项后将不能免密登陆此服务号各个应用</p>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            禁用推送服务：
+                        </span>
+                        <input type="checkbox" id="pushCk" /> 
+                        <p class="text-danger small"><i class="fa fa-info-circle"></i> 勾选此项后将不能接收到各项业务流程的审批通知</p>
+                    </div>
+                    <button class="btn btn-danger btn-lg btn-block" style="margin-top:15px;" id="btn_unlock" data-loading-text="解除绑定中...">
+                        <i class="fa fa-unlock"></i> 解除绑定
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script>
+    $(function () {
+        $("#btn_unlock").click(function () {
+            $(this).button('loading');
+            $.post("UnBindOpenId", {
+                pushFlag: $("#pushCk").is(":checked"),
+                openid: "@ViewData["openid"]"
+                }, function (res) {
+                    $("#btn_unlock").button('reset');
+                    if (!res.suc) {
+                        showMsg(res.msg);
+                    } else {
+                        window.location.href = "@Url.Content("~/Item/ShowPic?picName=unbind.gif")";
+                    }
+                });
+            });
+
+        });
+        //登陆错误显示信息
+        function showMsg(msg) {
+            toastr.error(msg);
+        }
+
+    </script>
+
+</body>
+</html>

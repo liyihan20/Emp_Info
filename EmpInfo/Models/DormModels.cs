@@ -36,6 +36,8 @@ namespace EmpInfo.Models
         public string phoneNumber { get; set; }
         public string shortPhoneNumber { get; set; }
         public string contactName { get; set; }
-    }        
+    }
+
+    
 
 }

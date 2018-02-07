@@ -232,6 +232,28 @@
           <Property Name="benefit_info" Type="varchar" MaxLength="200" />
           <Property Name="res_no" Type="varchar" MaxLength="20" />
         </EntityType>
+        <EntityType Name="ei_askLeave">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="varchar" MaxLength="50" />
+          <Property Name="dep_long_name" Type="varchar" MaxLength="500" />
+          <Property Name="dep_no" Type="varchar" MaxLength="50" />
+          <Property Name="emp_level" Type="int" />
+          <Property Name="is_direct_charge" Type="bit" />
+          <Property Name="leave_type" Type="varchar" MaxLength="50" />
+          <Property Name="from_date" Type="smalldatetime" />
+          <Property Name="to_date" Type="smalldatetime" />
+          <Property Name="work_days" Type="int" />
+          <Property Name="work_hours" Type="decimal" Precision="4" Scale="1" />
+          <Property Name="leave_reason" Type="nvarchar" MaxLength="2000" />
+          <Property Name="agent_man" Type="varchar" MaxLength="50" />
+          <Property Name="inform_man" Type="varchar" MaxLength="500" />
+          <Property Name="has_attachment" Type="bit" />
+        </EntityType>
         <EntityType Name="ei_authority">
           <Key>
             <PropertyRef Name="id" />
@@ -262,6 +284,41 @@
           <Property Name="status" Type="varchar" MaxLength="50" />
           <Property Name="is_finish" Type="bit" />
           <Property Name="packs" Type="int" />
+        </EntityType>
+        <EntityType Name="ei_department">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FNumber" Type="varchar" MaxLength="500" />
+          <Property Name="FName" Type="varchar" MaxLength="100" />
+          <Property Name="FAdmin" Type="varchar" MaxLength="500" />
+          <Property Name="FParent" Type="varchar" MaxLength="500" />
+          <Property Name="FIsDeleted" Type="bit" />
+          <Property Name="FIsForbit" Type="bit" />
+          <Property Name="FCreator" Type="varchar" MaxLength="50" />
+          <Property Name="FCreateDate" Type="datetime" />
+          <Property Name="FIsAuditNode" Type="bit" />
+        </EntityType>
+        <EntityType Name="ei_departmentAuditNode">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FDepartmentId" Type="int" />
+          <Property Name="FIsCounterSign" Type="bit" />
+          <Property Name="FAuditNodeName" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="ei_departmentAuditUser">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FDepartmentNodeId" Type="int" />
+          <Property Name="FAuditorNumber" Type="varchar" MaxLength="50" />
+          <Property Name="FBeginTime" Type="smalldatetime" />
+          <Property Name="FEndTime" Type="smalldatetime" />
+          <Property Name="isDeleted" Type="bit" />
         </EntityType>
         <EntityType Name="ei_dormRepair">
           <Key>
@@ -303,6 +360,14 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="card_number" Type="varchar" MaxLength="50" />
           <Property Name="zp" Type="image" />
+        </EntityType>
+        <EntityType Name="ei_empLevel">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="level_no" Type="int" />
+          <Property Name="level_name" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ei_event_log">
           <Key>
@@ -414,6 +479,26 @@
           <Property Name="short_phone" Type="varchar" MaxLength="50" />
           <Property Name="short_portrait" Type="image" />
           <Property Name="bank_card_no" Type="varchar" MaxLength="50" />
+          <Property Name="wx_openid" Type="varchar" MaxLength="200" />
+          <Property Name="wx_bind_date" Type="datetime" />
+          <Property Name="wx_should_push_msg" Type="bit" />
+          <Property Name="wx_easy_login" Type="bit" />
+          <Property Name="dep_no" Type="varchar" MaxLength="100" />
+          <Property Name="dep_long_name" Type="varchar" MaxLength="300" />
+          <Property Name="wx_push_salary_info" Type="bit" />
+          <Property Name="wx_push_consume_info" Type="bit" />
+          <Property Name="wx_push_flow_info" Type="bit" />
+          <Property Name="wx_check_salary_info" Type="bit" />
+        </EntityType>
+        <EntityType Name="ei_users_android">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="card_number" Type="varchar" MaxLength="50" />
+          <Property Name="name" Type="varchar" MaxLength="100" />
+          <Property Name="device_id" Type="varchar" MaxLength="200" />
+          <Property Name="login_time" Type="datetime" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_ei_simple_users”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -452,6 +537,34 @@
           <Property Name="dep_name" Type="varchar" MaxLength="100" />
           <Property Name="short_dep_name" Type="varchar" MaxLength="200" />
           <Property Name="short_phone" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“ICAudit.dbo.vw_getAllhrEmp”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vw_getAllhrEmp">
+          <Key>
+            <PropertyRef Name="emp_no" />
+            <PropertyRef Name="emp_name" />
+          </Key>
+          <Property Name="emp_no" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="emp_name" Type="varchar" MaxLength="56" Nullable="false" />
+          <Property Name="txm" Type="varchar" MaxLength="10" />
+          <Property Name="tp" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“ICAudit.dbo.vw_push_users”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vw_push_users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="card_number" Type="varchar" MaxLength="50" />
+          <Property Name="salary_no" Type="int" />
+          <Property Name="name" Type="varchar" MaxLength="100" />
+          <Property Name="wx_openid" Type="varchar" MaxLength="200" />
+          <Property Name="wx_push_salary_info" Type="bit" />
+          <Property Name="wx_push_consume_info" Type="bit" />
+          <Property Name="wx_push_flow_info" Type="bit" />
+          <Property Name="wx_check_salary_info" Type="bit" />
         </EntityType>
         <Association Name="FK_dn_discountInfoUsers_dn_discountInfo">
           <End Role="dn_discountInfo" Type="Self.dn_discountInfo" Multiplicity="0..1" />
@@ -534,6 +647,30 @@
             </Principal>
             <Dependent Role="ei_deliveryInfo">
               <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ei_departmentAuditNode_ei_department">
+          <End Role="ei_department" Type="Self.ei_department" Multiplicity="0..1" />
+          <End Role="ei_departmentAuditNode" Type="Self.ei_departmentAuditNode" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_department">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_departmentAuditNode">
+              <PropertyRef Name="FDepartmentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ei_departmentAuditUser_ei_departmentAuditNode">
+          <End Role="ei_departmentAuditNode" Type="Self.ei_departmentAuditNode" Multiplicity="0..1" />
+          <End Role="ei_departmentAuditUser" Type="Self.ei_departmentAuditUser" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_departmentAuditNode">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_departmentAuditUser">
+              <PropertyRef Name="FDepartmentNodeId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -623,6 +760,11 @@
         <Function Name="GetPOAccount" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="po_number" Type="varchar" Mode="In" />
         </Function>
+        <Function Name="GetSalaryAllDetail" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="salary_no" Type="int" Mode="In" />
+          <Parameter Name="begin_date" Type="datetime" Mode="In" />
+          <Parameter Name="end_date" Type="datetime" Mode="In" />
+        </Function>
         <Function Name="GetSalaryDetail" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="salary_no" Type="int" Mode="In" />
           <Parameter Name="begin_date" Type="datetime" Mode="In" />
@@ -671,10 +813,15 @@
           <EntitySet Name="dn_pointsRecord" EntityType="Self.dn_pointsRecord" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="dn_Restaurent" EntityType="Self.dn_Restaurent" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="dn_shoppingCar" EntityType="Self.dn_shoppingCar" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_askLeave" EntityType="Self.ei_askLeave" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_authority" EntityType="Self.ei_authority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_deliveryInfo" EntityType="Self.ei_deliveryInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_department" EntityType="Self.ei_department" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_departmentAuditNode" EntityType="Self.ei_departmentAuditNode" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_departmentAuditUser" EntityType="Self.ei_departmentAuditUser" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_dormRepair" EntityType="Self.ei_dormRepair" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_emp_portrait" EntityType="Self.ei_emp_portrait" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_empLevel" EntityType="Self.ei_empLevel" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_event_log" EntityType="Self.ei_event_log" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groupAuthority" EntityType="Self.ei_groupAuthority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groups" EntityType="Self.ei_groups" Schema="dbo" store:Type="Tables" />
@@ -685,6 +832,7 @@
           <EntitySet Name="ei_resVisitLog" EntityType="Self.ei_resVisitLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_specialUsers" EntityType="Self.ei_specialUsers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_users" EntityType="Self.ei_users" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_users_android" EntityType="Self.ei_users_android" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="vw_ei_simple_users" EntityType="Self.vw_ei_simple_users" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
 [vw_ei_simple_users].[id] AS [id], 
@@ -717,6 +865,27 @@ FROM [dbo].[vw_ei_simple_users] AS [vw_ei_simple_users]</DefiningQuery>
 [vw_ei_users].[short_phone] AS [short_phone]
 FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           </EntitySet>
+          <EntitySet Name="vw_getAllhrEmp" EntityType="Self.vw_getAllhrEmp" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vw_getAllhrEmp].[emp_no] AS [emp_no], 
+[vw_getAllhrEmp].[emp_name] AS [emp_name], 
+[vw_getAllhrEmp].[txm] AS [txm], 
+[vw_getAllhrEmp].[tp] AS [tp]
+FROM [dbo].[vw_getAllhrEmp] AS [vw_getAllhrEmp]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_push_users" EntityType="Self.vw_push_users" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vw_push_users].[id] AS [id], 
+[vw_push_users].[card_number] AS [card_number], 
+[vw_push_users].[salary_no] AS [salary_no], 
+[vw_push_users].[name] AS [name], 
+[vw_push_users].[wx_openid] AS [wx_openid], 
+[vw_push_users].[wx_push_salary_info] AS [wx_push_salary_info], 
+[vw_push_users].[wx_push_consume_info] AS [wx_push_consume_info], 
+[vw_push_users].[wx_push_flow_info] AS [wx_push_flow_info], 
+[vw_push_users].[wx_check_salary_info] AS [wx_check_salary_info]
+FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK_dn_discountInfoUsers_dn_discountInfo" Association="Self.FK_dn_discountInfoUsers_dn_discountInfo">
             <End Role="dn_discountInfo" EntitySet="dn_discountInfo" />
             <End Role="dn_discountInfoUsers" EntitySet="dn_discountInfoUsers" />
@@ -744,6 +913,14 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           <AssociationSet Name="FK_ei_deliveryInfo_ei_users" Association="Self.FK_ei_deliveryInfo_ei_users">
             <End Role="ei_users" EntitySet="ei_users" />
             <End Role="ei_deliveryInfo" EntitySet="ei_deliveryInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ei_departmentAuditNode_ei_department" Association="Self.FK_ei_departmentAuditNode_ei_department">
+            <End Role="ei_department" EntitySet="ei_department" />
+            <End Role="ei_departmentAuditNode" EntitySet="ei_departmentAuditNode" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ei_departmentAuditUser_ei_departmentAuditNode" Association="Self.FK_ei_departmentAuditUser_ei_departmentAuditNode">
+            <End Role="ei_departmentAuditNode" EntitySet="ei_departmentAuditNode" />
+            <End Role="ei_departmentAuditUser" EntitySet="ei_departmentAuditUser" />
           </AssociationSet>
           <AssociationSet Name="FK_ei_groupAuthority_ei_authority" Association="Self.FK_ei_groupAuthority_ei_authority">
             <End Role="ei_authority" EntitySet="ei_authority" />
@@ -908,6 +1085,27 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           <Parameter Name="dormNumber" Mode="In" Type="String" />
           </FunctionImport>
           <EntitySet Name="ei_dormRepair" EntityType="ICAuditModel.ei_dormRepair" />
+          <EntitySet Name="vw_getAllhrEmp" EntityType="ICAuditModel.vw_getAllhrEmp" />
+          <EntitySet Name="ei_department" EntityType="ICAuditModel.ei_department" />
+          <EntitySet Name="ei_departmentAuditUser" EntityType="ICAuditModel.ei_departmentAuditUser" />
+          <EntitySet Name="ei_departmentAuditNode" EntityType="ICAuditModel.ei_departmentAuditNode" />
+          <AssociationSet Name="FK_ei_departmentAuditNode_ei_department" Association="ICAuditModel.FK_ei_departmentAuditNode_ei_department">
+            <End Role="ei_department" EntitySet="ei_department" />
+            <End Role="ei_departmentAuditNode" EntitySet="ei_departmentAuditNode" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ei_departmentAuditUser_ei_departmentAuditNode" Association="ICAuditModel.FK_ei_departmentAuditUser_ei_departmentAuditNode">
+            <End Role="ei_departmentAuditNode" EntitySet="ei_departmentAuditNode" />
+            <End Role="ei_departmentAuditUser" EntitySet="ei_departmentAuditUser" />
+          </AssociationSet>
+          <EntitySet Name="ei_empLevel" EntityType="ICAuditModel.ei_empLevel" />
+          <EntitySet Name="ei_askLeave" EntityType="ICAuditModel.ei_askLeave" />
+          <FunctionImport Name="GetSalaryAllDetail" ReturnType="Collection(ICAuditModel.GetSalaryAllDetail_Result)">
+            <Parameter Name="salary_no" Mode="In" Type="Int32" />
+            <Parameter Name="begin_date" Mode="In" Type="DateTime" />
+            <Parameter Name="end_date" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <EntitySet Name="vw_push_users" EntityType="ICAuditModel.vw_push_users" />
+          <EntitySet Name="ei_users_android" EntityType="ICAuditModel.ei_users_android" />
         </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -931,6 +1129,16 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           <Property Name="short_portrait" Type="Binary" MaxLength="Max" FixedLength="false" />
           <NavigationProperty Name="ei_deliveryInfo" Relationship="ICAuditModel.FK_ei_deliveryInfo_ei_users" FromRole="ei_users" ToRole="ei_deliveryInfo" />
           <Property Name="bank_card_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="wx_openid" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="wx_bind_date" Type="DateTime" Precision="3" />
+          <Property Name="wx_should_push_msg" Type="Boolean" />
+          <Property Name="wx_easy_login" Type="Boolean" />
+          <Property Name="dep_no" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="dep_long_name" Type="String" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="wx_push_salary_info" Type="Boolean" />
+          <Property Name="wx_push_consume_info" Type="Boolean" />
+          <Property Name="wx_push_flow_info" Type="Boolean" />
+          <Property Name="wx_check_salary_info" Type="Boolean" />
         </EntityType>
         <EntityType Name="ei_event_log">
           <Key>
@@ -1597,6 +1805,158 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           <Property Name="applier_evaluation" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="applier_evaluation_score" Type="Int32" />
         </EntityType>
+        <EntityType Name="vw_getAllhrEmp">
+          <Key>
+            <PropertyRef Name="emp_no" />
+            <PropertyRef Name="emp_name" />
+          </Key>
+          <Property Name="emp_no" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="emp_name" Type="String" Nullable="false" MaxLength="56" FixedLength="false" Unicode="false" />
+          <Property Name="txm" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="tp" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ei_department">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FNumber" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="FName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="FAdmin" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="FParent" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="FIsDeleted" Type="Boolean" />
+          <Property Name="FIsForbit" Type="Boolean" />
+          <Property Name="FCreator" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FCreateDate" Type="DateTime" Precision="3" />
+          <Property Name="FIsAuditNode" Type="Boolean" />
+          <NavigationProperty Name="ei_departmentAuditNode" Relationship="ICAuditModel.FK_ei_departmentAuditNode_ei_department" FromRole="ei_department" ToRole="ei_departmentAuditNode" />
+        </EntityType>
+        <EntityType Name="ei_departmentAuditUser">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FDepartmentNodeId" Type="Int32" />
+          <Property Name="FAuditorNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FBeginTime" Type="DateTime" Precision="0" />
+          <Property Name="FEndTime" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="ei_departmentAuditNode" Relationship="ICAuditModel.FK_ei_departmentAuditUser_ei_departmentAuditNode" FromRole="ei_departmentAuditUser" ToRole="ei_departmentAuditNode" />
+          <Property Name="isDeleted" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="ei_departmentAuditNode">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FDepartmentId" Type="Int32" />
+          <Property Name="FIsCounterSign" Type="Boolean" />
+          <Property Name="FAuditNodeName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ei_department" Relationship="ICAuditModel.FK_ei_departmentAuditNode_ei_department" FromRole="ei_departmentAuditNode" ToRole="ei_department" />
+          <NavigationProperty Name="ei_departmentAuditUser" Relationship="ICAuditModel.FK_ei_departmentAuditUser_ei_departmentAuditNode" FromRole="ei_departmentAuditNode" ToRole="ei_departmentAuditUser" />
+        </EntityType>
+        <Association Name="FK_ei_departmentAuditNode_ei_department">
+          <End Type="ICAuditModel.ei_department" Role="ei_department" Multiplicity="0..1" />
+          <End Type="ICAuditModel.ei_departmentAuditNode" Role="ei_departmentAuditNode" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_department">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_departmentAuditNode">
+              <PropertyRef Name="FDepartmentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ei_departmentAuditUser_ei_departmentAuditNode">
+          <End Type="ICAuditModel.ei_departmentAuditNode" Role="ei_departmentAuditNode" Multiplicity="0..1" />
+          <End Type="ICAuditModel.ei_departmentAuditUser" Role="ei_departmentAuditUser" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_departmentAuditNode">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_departmentAuditUser">
+              <PropertyRef Name="FDepartmentNodeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ei_empLevel">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="level_no" Type="Int32" />
+          <Property Name="level_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ei_askLeave">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="dep_long_name" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="dep_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="emp_level" Type="Int32" />
+          <Property Name="is_direct_charge" Type="Boolean" />
+          <Property Name="leave_type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="from_date" Type="DateTime" Precision="0" />
+          <Property Name="to_date" Type="DateTime" Precision="0" />
+          <Property Name="work_days" Type="Int32" />
+          <Property Name="work_hours" Type="Decimal" Precision="4" Scale="1" />
+          <Property Name="leave_reason" Type="String" MaxLength="2000" FixedLength="false" Unicode="true" />
+          <Property Name="agent_man" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="inform_man" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="has_attachment" Type="Boolean" />
+        </EntityType>
+        <ComplexType Name="GetSalaryAllDetail_Result">
+          <Property Type="Decimal" Name="work_days" Nullable="true" Precision="4" Scale="1" />
+          <Property Type="Decimal" Name="monthly_work_days" Nullable="true" Precision="8" Scale="3" />
+          <Property Type="Decimal" Name="counter_days" Nullable="true" Precision="8" Scale="3" />
+          <Property Type="Decimal" Name="off_duty_days" Nullable="true" Precision="8" Scale="3" />
+          <Property Type="Decimal" Name="late_days" Nullable="true" Precision="8" Scale="3" />
+          <Property Type="Decimal" Name="run_away_days" Nullable="true" Precision="8" Scale="3" />
+          <Property Type="Decimal" Name="allowance" Nullable="true" Precision="10" Scale="3" />
+          <Property Type="Decimal" Name="work_value" Nullable="true" Precision="10" Scale="1" />
+          <Property Type="Decimal" Name="other_salary" Nullable="true" Precision="10" Scale="1" />
+          <Property Type="Decimal" Name="cut_money" Nullable="true" Precision="10" Scale="1" />
+          <Property Type="Decimal" Name="sanction" Nullable="true" Precision="10" Scale="1" />
+          <Property Type="Decimal" Name="overtime_salary" Nullable="true" Precision="10" Scale="1" />
+          <Property Type="Decimal" Name="work_years_salary" Nullable="true" Precision="10" Scale="1" />
+          <Property Type="Decimal" Name="dinner_welfare" Nullable="true" Precision="6" Scale="1" />
+          <Property Type="Decimal" Name="dorm_rent" Nullable="true" Precision="6" Scale="1" />
+          <Property Type="Decimal" Name="other_debit" Nullable="true" Precision="6" Scale="1" />
+          <Property Type="Decimal" Name="tax" Nullable="true" Precision="6" Scale="1" />
+          <Property Type="Decimal" Name="old_insurance" Nullable="true" Precision="10" Scale="1" />
+          <Property Type="Decimal" Name="public_reserve_funds" Nullable="true" Precision="6" Scale="1" />
+          <Property Type="Decimal" Name="basicSalary" Nullable="true" Precision="10" Scale="1" />
+          <Property Type="Decimal" Name="should_pay_salary" Nullable="true" Precision="10" Scale="1" />
+          <Property Type="Decimal" Name="withhold_salary" Nullable="true" Precision="10" Scale="1" />
+          <Property Type="Decimal" Name="real_salary" Nullable="true" Precision="10" Scale="1" />
+        </ComplexType>
+        <EntityType Name="vw_push_users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="card_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="salary_no" Type="Int32" />
+          <Property Name="name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="wx_openid" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="wx_push_salary_info" Type="Boolean" />
+          <Property Name="wx_push_consume_info" Type="Boolean" />
+          <Property Name="wx_push_flow_info" Type="Boolean" />
+          <Property Name="wx_check_salary_info" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="ei_users_android">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="card_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="device_id" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="login_time" Type="DateTime" Precision="3" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1606,6 +1966,16 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           <EntitySetMapping Name="ei_users">
             <EntityTypeMapping TypeName="ICAuditModel.ei_users">
               <MappingFragment StoreEntitySet="ei_users">
+                <ScalarProperty Name="wx_check_salary_info" ColumnName="wx_check_salary_info" />
+                <ScalarProperty Name="wx_push_flow_info" ColumnName="wx_push_flow_info" />
+                <ScalarProperty Name="wx_push_consume_info" ColumnName="wx_push_consume_info" />
+                <ScalarProperty Name="wx_push_salary_info" ColumnName="wx_push_salary_info" />
+                <ScalarProperty Name="dep_long_name" ColumnName="dep_long_name" />
+                <ScalarProperty Name="dep_no" ColumnName="dep_no" />
+                <ScalarProperty Name="wx_easy_login" ColumnName="wx_easy_login" />
+                <ScalarProperty Name="wx_should_push_msg" ColumnName="wx_should_push_msg" />
+                <ScalarProperty Name="wx_bind_date" ColumnName="wx_bind_date" />
+                <ScalarProperty Name="wx_openid" ColumnName="wx_openid" />
                 <ScalarProperty Name="bank_card_no" ColumnName="bank_card_no" />
                 <ScalarProperty Name="short_portrait" ColumnName="short_portrait" />
                 <ScalarProperty Name="short_phone" ColumnName="short_phone" />
@@ -2195,6 +2565,141 @@ FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
                 <ScalarProperty Name="applier_name" ColumnName="applier_name" />
                 <ScalarProperty Name="applier_num" ColumnName="applier_num" />
                 <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_getAllhrEmp">
+            <EntityTypeMapping TypeName="ICAuditModel.vw_getAllhrEmp">
+              <MappingFragment StoreEntitySet="vw_getAllhrEmp">
+                <ScalarProperty Name="tp" ColumnName="tp" />
+                <ScalarProperty Name="txm" ColumnName="txm" />
+                <ScalarProperty Name="emp_name" ColumnName="emp_name" />
+                <ScalarProperty Name="emp_no" ColumnName="emp_no" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_department">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_department">
+              <MappingFragment StoreEntitySet="ei_department">
+                <ScalarProperty Name="FIsAuditNode" ColumnName="FIsAuditNode" />
+                <ScalarProperty Name="FCreateDate" ColumnName="FCreateDate" />
+                <ScalarProperty Name="FCreator" ColumnName="FCreator" />
+                <ScalarProperty Name="FIsForbit" ColumnName="FIsForbit" />
+                <ScalarProperty Name="FIsDeleted" ColumnName="FIsDeleted" />
+                <ScalarProperty Name="FParent" ColumnName="FParent" />
+                <ScalarProperty Name="FAdmin" ColumnName="FAdmin" />
+                <ScalarProperty Name="FName" ColumnName="FName" />
+                <ScalarProperty Name="FNumber" ColumnName="FNumber" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_departmentAuditUser">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_departmentAuditUser">
+              <MappingFragment StoreEntitySet="ei_departmentAuditUser">
+                <ScalarProperty Name="isDeleted" ColumnName="isDeleted" />
+                <ScalarProperty Name="FEndTime" ColumnName="FEndTime" />
+                <ScalarProperty Name="FBeginTime" ColumnName="FBeginTime" />
+                <ScalarProperty Name="FAuditorNumber" ColumnName="FAuditorNumber" />
+                <ScalarProperty Name="FDepartmentNodeId" ColumnName="FDepartmentNodeId" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_departmentAuditNode">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_departmentAuditNode">
+              <MappingFragment StoreEntitySet="ei_departmentAuditNode">
+                <ScalarProperty Name="FAuditNodeName" ColumnName="FAuditNodeName" />
+                <ScalarProperty Name="FIsCounterSign" ColumnName="FIsCounterSign" />
+                <ScalarProperty Name="FDepartmentId" ColumnName="FDepartmentId" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_empLevel">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_empLevel">
+              <MappingFragment StoreEntitySet="ei_empLevel">
+                <ScalarProperty Name="level_name" ColumnName="level_name" />
+                <ScalarProperty Name="level_no" ColumnName="level_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_askLeave">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_askLeave">
+              <MappingFragment StoreEntitySet="ei_askLeave">
+                <ScalarProperty Name="has_attachment" ColumnName="has_attachment" />
+                <ScalarProperty Name="inform_man" ColumnName="inform_man" />
+                <ScalarProperty Name="agent_man" ColumnName="agent_man" />
+                <ScalarProperty Name="leave_reason" ColumnName="leave_reason" />
+                <ScalarProperty Name="work_hours" ColumnName="work_hours" />
+                <ScalarProperty Name="work_days" ColumnName="work_days" />
+                <ScalarProperty Name="to_date" ColumnName="to_date" />
+                <ScalarProperty Name="from_date" ColumnName="from_date" />
+                <ScalarProperty Name="leave_type" ColumnName="leave_type" />
+                <ScalarProperty Name="is_direct_charge" ColumnName="is_direct_charge" />
+                <ScalarProperty Name="emp_level" ColumnName="emp_level" />
+                <ScalarProperty Name="dep_no" ColumnName="dep_no" />
+                <ScalarProperty Name="dep_long_name" ColumnName="dep_long_name" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetSalaryAllDetail" FunctionName="ICAuditModel.Store.GetSalaryAllDetail">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetSalaryAllDetail_Result">
+                <ScalarProperty Name="work_days" ColumnName="work_days" />
+                <ScalarProperty Name="monthly_work_days" ColumnName="monthly_work_days" />
+                <ScalarProperty Name="counter_days" ColumnName="counter_days" />
+                <ScalarProperty Name="off_duty_days" ColumnName="off_duty_days" />
+                <ScalarProperty Name="late_days" ColumnName="late_days" />
+                <ScalarProperty Name="run_away_days" ColumnName="run_away_days" />
+                <ScalarProperty Name="allowance" ColumnName="allowance" />
+                <ScalarProperty Name="work_value" ColumnName="work_value" />
+                <ScalarProperty Name="other_salary" ColumnName="other_salary" />
+                <ScalarProperty Name="cut_money" ColumnName="cut_money" />
+                <ScalarProperty Name="sanction" ColumnName="sanction" />
+                <ScalarProperty Name="overtime_salary" ColumnName="overtime_salary" />
+                <ScalarProperty Name="work_years_salary" ColumnName="work_years_salary" />
+                <ScalarProperty Name="dinner_welfare" ColumnName="dinner_welfare" />
+                <ScalarProperty Name="dorm_rent" ColumnName="dorm_rent" />
+                <ScalarProperty Name="other_debit" ColumnName="other_debit" />
+                <ScalarProperty Name="tax" ColumnName="tax" />
+                <ScalarProperty Name="old_insurance" ColumnName="old_insurance" />
+                <ScalarProperty Name="public_reserve_funds" ColumnName="public_reserve_funds" />
+                <ScalarProperty Name="basicSalary" ColumnName="basicSalary" />
+                <ScalarProperty Name="should_pay_salary" ColumnName="should_pay_salary" />
+                <ScalarProperty Name="withhold_salary" ColumnName="withhold_salary" />
+                <ScalarProperty Name="real_salary" ColumnName="real_salary" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="vw_push_users">
+            <EntityTypeMapping TypeName="ICAuditModel.vw_push_users">
+              <MappingFragment StoreEntitySet="vw_push_users">
+                <ScalarProperty Name="wx_check_salary_info" ColumnName="wx_check_salary_info" />
+                <ScalarProperty Name="wx_push_flow_info" ColumnName="wx_push_flow_info" />
+                <ScalarProperty Name="wx_push_consume_info" ColumnName="wx_push_consume_info" />
+                <ScalarProperty Name="wx_push_salary_info" ColumnName="wx_push_salary_info" />
+                <ScalarProperty Name="wx_openid" ColumnName="wx_openid" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="salary_no" ColumnName="salary_no" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_users_android">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_users_android">
+              <MappingFragment StoreEntitySet="ei_users_android">
+                <ScalarProperty Name="login_time" ColumnName="login_time" />
+                <ScalarProperty Name="device_id" ColumnName="device_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

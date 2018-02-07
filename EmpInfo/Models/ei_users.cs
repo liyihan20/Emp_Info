@@ -36,6 +36,16 @@ namespace EmpInfo.Models
         public string short_phone { get; set; }
         public byte[] short_portrait { get; set; }
         public string bank_card_no { get; set; }
+        public string wx_openid { get; set; }
+        public Nullable<System.DateTime> wx_bind_date { get; set; }
+        public Nullable<bool> wx_should_push_msg { get; set; }
+        public Nullable<bool> wx_easy_login { get; set; }
+        public string dep_no { get; set; }
+        public string dep_long_name { get; set; }
+        public Nullable<bool> wx_push_salary_info { get; set; }
+        public Nullable<bool> wx_push_consume_info { get; set; }
+        public Nullable<bool> wx_push_flow_info { get; set; }
+        public Nullable<bool> wx_check_salary_info { get; set; }
     
         public virtual ICollection<ei_groupUser> ei_groupUser { get; set; }
         public virtual ICollection<ei_deliveryInfo> ei_deliveryInfo { get; set; }

@@ -1,4 +1,24 @@
-﻿@section Scripts {
+﻿@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 120px;
+            vertical-align: top;
+            color: gray;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+
+        .b-value{
+            color:#5cb85c;
+            font-weight:bold;
+        }
+
+    </style>
+}
+@section Scripts {
     <script>
         $(function () {
 
@@ -10,7 +30,7 @@
             //搜索按钮
             $("#searchBt").click(function () {
                 $(this).button("loading");
-                $.post("@Url.Content("~/Admin/GetUsers")", {searchContent:$.trim($("#searchText").val())}, function (data) {
+                $.post("@Url.Content("~/Admin/GetUsers")", { searchContent: $.trim($("#searchText").val()) }, function (data) {
                     //先更新页码
                     if (data.suc) {
                         $("#currentPage").html(1);
@@ -49,6 +69,21 @@
                     }
                 });
             });
+
+            //用户统计信息
+            $("#statisticsBt").on("click", function () {
+                $("#statisticsUserModal").modal("show");
+                $.post("@Url.Content("~/Admin/statisticsUsers")", {}, function (data) {
+                    if (data.suc) {
+                        for (var key in data) {
+                            $("#" + key).html(data[key]);
+                        }
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                })
+            });
+
         });
 
         //填充用户列表
@@ -58,7 +93,7 @@
             //加载数据
             for (var i = 0; i < rows.length; i++) {
                 var row = rows[i];
-                var item = "<a class='list-group-item' href='@Url.Content("~/Admin/CheckUserDetail?cardNo=")"+row.cardNo+"'><div class='media'><div class='media-left media-middle'>";
+                var item = "<a class='list-group-item' href='@Url.Content("~/Admin/CheckUserDetail?cardNo=")" + row.cardNo + "'><div class='media'><div class='media-left media-middle'>";
                 item += "<img class='media-object' src='@Url.Content("~/Content/images/contact.png")' alt='user_friend'></div><div class='media-body'><h4 class='media-heading'>";
                 item += row.name + " " + row.sex;
                 item += "</h4><div style='color:gray'>";
@@ -82,11 +117,14 @@
     </div>
     <div class="panel-body">
         <div class="input-group">
-            <input type="text" class="form-control" id="searchText" placeholder="现有用户 @ViewData["userCount"] 人，输入厂牌、姓名、身份证、工资号搜索">
+            <input type="text" class="form-control" id="searchText" placeholder="输入厂牌、姓名、身份证、工资号搜索">
             <span class="input-group-btn">
-                <button class="btn btn-primary" type="button" id="searchBt" data-loading-text="查询中..."><span class="glyphicon glyphicon-search"></span> Search</button>
+                <button class="btn btn-primary" type="button" id="searchBt" data-loading-text="查询中..."><span class="glyphicon glyphicon-search"></span> 搜索</button>
             </span>
-        </div><!-- /input-group -->
+            <span class="input-group-btn">
+                <button class="btn btn-info pull-right" type="button" id="statisticsBt"><i class="fa fa-line-chart"></i> 统计</button>
+            </span>
+        </div>
     </div>
     <div class="list-group" id="userList">
         @*存放用户列表*@
@@ -99,3 +137,46 @@
         </ul>
     </nav>
 </div>
+
+@section Modal {
+    <div class="modal fade" id="statisticsUserModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="statisticsUserLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="fa fa-line-chart"></i> 注册用户统计</h4>
+                </div>
+                <div class="modal-body" style="max-height:400px;overflow:auto;">                    
+                    <div class="b-div">
+                        <span class="b-label">已注册用户数：</span>
+                        <span class="b-value" id="allUserCount"><i class="fa fa-spinner fa-spin"></i></span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">已离职用户数：</span>
+                        <span class="b-value" id="quitUserCount"><i class="fa fa-spinner fa-spin"></i></span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">绑定微信用户数：</span>
+                        <span class="b-value" id="wxBindUserCount"><i class="fa fa-spinner fa-spin"></i></span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">安卓端用户数：</span>
+                        <span class="b-value" id="androidUserCount"><i class="fa fa-spinner fa-spin"></i></span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">月活跃用户数：</span>
+                        <span class="b-value" id="monthActiveUserCount"><i class="fa fa-spinner fa-spin"></i></span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">年活跃用户数：</span>
+                        <span class="b-value" id="yearActiveUserCount"><i class="fa fa-spinner fa-spin"></i></span>
+                    <p class="text-danger small" style="margin-top:4px;"><i class="fa fa-info-circle"></i> 月/年活跃用户数表示最近1月/年登陆成功的用户数，统计数据包括网页端、微信端和安卓客户端</p>
+                    </div>
+                </div>                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>                    
+                </div>
+            </div>
+        </div>
+    </div>
+}

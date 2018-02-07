@@ -1,7 +1,7 @@
 ﻿@using EmpInfo.Models;
 @{
     GetSalaryInfo_Result info = ((List<GetSalaryInfo_Result>)ViewData["info"]).First();
-    List<string> months = (List<string>)ViewData["months"];
+    List<string> months = (List<string>)ViewData["months"];    
 }
 
 <script>
@@ -13,10 +13,14 @@
             var val = $("#yearMonthSelect").val();
             if (val != "") {
                 $.post("@Url.Content("~/Home/CheckSalaryDetail")", { yearMonth: val }, function (data) {
-
+                    if (!data.suc) {
+                        toastr.error(data.msg);
+                        return;
+                    }
+                    var result = data.result[0];
                     //通过遍历得到结果对象的字段名和字段值，字段名和html的span id一致即可动态赋值
-                    for (var key in data) {
-                        $("#" + key).html(parseDecimal(data[key]));
+                    for (var key in result) {
+                        $("#" + key).html(parseDecimal(result[key]));
                     }
 
                     toastr.success("成功加载更多工资明细");
@@ -143,3 +147,5 @@
         }
     </div>
 </div>
+
+

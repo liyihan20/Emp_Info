@@ -211,6 +211,42 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="GetCurrentStep">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCurrentStepResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetCurrentStepResult" type="tns:CurrentAuditModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="CurrentAuditModel">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="step" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="stepName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="auditors" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="AbortFlow">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userNumber" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AbortFlowResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AbortFlowResult" type="tns:FlowResultModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="TestStarFlow">
         <s:complexType />
       </s:element>
@@ -319,6 +355,18 @@
   <wsdl:message name="GetMyDealingApplyCountSoapOut">
     <wsdl:part name="parameters" element="tns:GetMyDealingApplyCountResponse" />
   </wsdl:message>
+  <wsdl:message name="GetCurrentStepSoapIn">
+    <wsdl:part name="parameters" element="tns:GetCurrentStep" />
+  </wsdl:message>
+  <wsdl:message name="GetCurrentStepSoapOut">
+    <wsdl:part name="parameters" element="tns:GetCurrentStepResponse" />
+  </wsdl:message>
+  <wsdl:message name="AbortFlowSoapIn">
+    <wsdl:part name="parameters" element="tns:AbortFlow" />
+  </wsdl:message>
+  <wsdl:message name="AbortFlowSoapOut">
+    <wsdl:part name="parameters" element="tns:AbortFlowResponse" />
+  </wsdl:message>
   <wsdl:message name="TestStarFlowSoapIn">
     <wsdl:part name="parameters" element="tns:TestStarFlow" />
   </wsdl:message>
@@ -381,6 +429,14 @@
     <wsdl:operation name="GetMyDealingApplyCount">
       <wsdl:input message="tns:GetMyDealingApplyCountSoapIn" />
       <wsdl:output message="tns:GetMyDealingApplyCountSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCurrentStep">
+      <wsdl:input message="tns:GetCurrentStepSoapIn" />
+      <wsdl:output message="tns:GetCurrentStepSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AbortFlow">
+      <wsdl:input message="tns:AbortFlowSoapIn" />
+      <wsdl:output message="tns:AbortFlowSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="TestStarFlow">
       <wsdl:input message="tns:TestStarFlowSoapIn" />
@@ -470,6 +526,24 @@
     </wsdl:operation>
     <wsdl:operation name="GetMyDealingApplyCount">
       <soap:operation soapAction="http://ic.truly.com.cn/GetMyDealingApplyCount" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCurrentStep">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetCurrentStep" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AbortFlow">
+      <soap:operation soapAction="http://ic.truly.com.cn/AbortFlow" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -590,6 +664,24 @@
     </wsdl:operation>
     <wsdl:operation name="GetMyDealingApplyCount">
       <soap12:operation soapAction="http://ic.truly.com.cn/GetMyDealingApplyCount" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCurrentStep">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetCurrentStep" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AbortFlow">
+      <soap12:operation soapAction="http://ic.truly.com.cn/AbortFlow" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

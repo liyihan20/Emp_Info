@@ -58,6 +58,14 @@ namespace EmpInfo.Models
         public DbSet<ei_PushResponse> ei_PushResponse { get; set; }
         public DbSet<ei_k3RestLog> ei_k3RestLog { get; set; }
         public DbSet<ei_dormRepair> ei_dormRepair { get; set; }
+        public DbSet<vw_getAllhrEmp> vw_getAllhrEmp { get; set; }
+        public DbSet<ei_department> ei_department { get; set; }
+        public DbSet<ei_departmentAuditUser> ei_departmentAuditUser { get; set; }
+        public DbSet<ei_departmentAuditNode> ei_departmentAuditNode { get; set; }
+        public DbSet<ei_empLevel> ei_empLevel { get; set; }
+        public DbSet<ei_askLeave> ei_askLeave { get; set; }
+        public DbSet<vw_push_users> vw_push_users { get; set; }
+        public DbSet<ei_users_android> ei_users_android { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {
@@ -253,6 +261,23 @@ namespace EmpInfo.Models
                 new ObjectParameter("dormNumber", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetDormRoomMate_Result>("GetDormRoomMate", dormNumberParameter);
+        }
+    
+        public virtual ObjectResult<GetSalaryAllDetail_Result> GetSalaryAllDetail(Nullable<int> salary_no, Nullable<System.DateTime> begin_date, Nullable<System.DateTime> end_date)
+        {
+            var salary_noParameter = salary_no.HasValue ?
+                new ObjectParameter("salary_no", salary_no) :
+                new ObjectParameter("salary_no", typeof(int));
+    
+            var begin_dateParameter = begin_date.HasValue ?
+                new ObjectParameter("begin_date", begin_date) :
+                new ObjectParameter("begin_date", typeof(System.DateTime));
+    
+            var end_dateParameter = end_date.HasValue ?
+                new ObjectParameter("end_date", end_date) :
+                new ObjectParameter("end_date", typeof(System.DateTime));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSalaryAllDetail_Result>("GetSalaryAllDetail", salary_noParameter, begin_dateParameter, end_dateParameter);
         }
     }
 }

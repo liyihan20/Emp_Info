@@ -1,0 +1,18 @@
+﻿@{
+    Layout = null;
+    string picName = (string)ViewData["picName"];
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>消息提示</title>
+</head>
+<body>
+    <div style="text-align:center;">
+        <img src="@(string.Concat(Url.Content("~/Content/images/"),picName))" alt="pic" />
+    </div>
+</body>
+</html>

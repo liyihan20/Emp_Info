@@ -1,0 +1,138 @@
+﻿@{
+    Layout = null;
+}
+
+<style type="text/css">
+    .u_sel_selected_user {
+        padding: 2px;
+        margin-right: 8px;
+    }
+
+        .u_sel_selected_user i {
+            cursor: pointer;
+        }
+        #u_sel_tb th,#u_sel_tb td{
+            text-align:center;
+        }
+</style>
+
+<script>
+    var cb;
+    var selectedUser;
+    var uLimit = 1;
+    function openSelectUserDialog(selectedUsers,userLimit, callback) {
+        $("#u_sel_tb_users").empty();
+        $("#u_sel_selected_users .u_sel_selected_user").remove();
+        selectedUser = [];
+        cb = callback;
+        uLimit = userLimit;
+        var selectedUsersArr = selectedUsers.split(";");
+        for (var i = 0; i < selectedUsersArr.length; i++) {
+            if ($.trim(selectedUsersArr[i]) != "") {
+                selectedUser.push(selectedUsersArr[i]);
+                $("#u_sel_selected_users").append("<a class='u_sel_selected_user'><span>" + selectedUsersArr[i] + "</span> <i class='fa fa-remove'></i></a>");
+            }
+        }
+        $("#u_sel_num_limit").html(uLimit);
+        $("#userSelModal").modal("show");
+    }
+    $(function () {
+        $("#selBt").on("click", function () {
+            if (selectedUser.length > uLimit) {
+                toastr.error("所选人数不得超过" + uLimit + "人");
+                return;
+            }
+            cb(selectedUser.join(";")); //通过回调返回已选人员
+            $("#userSelModal").modal("hide");
+        });
+
+        //删除已选人员
+        $("#u_sel_selected_users").on("click", "a i", function () {
+            var deletedUser = $(this).parent("a").find("span").html();
+            if (selectedUser.indexOf(deletedUser) >= 0) {
+                selectedUser.splice(selectedUser.indexOf(deletedUser), 1);
+            }
+            $(this).parent("a").remove();
+        });
+
+        //选择表格人员
+        $("#u_sel_tb_users").on("click", "tr td button", function () {
+            var info = $(this).parents("tr").find("td");
+            var uNum = $(info[0]).html();
+            var uName = $(info[1]).html();
+            var u = uName + "(" + uNum + ")";
+            if (selectedUser.indexOf(u) < 0) {                
+                selectedUser.push(u);
+                $("#u_sel_selected_users").append("<a class='u_sel_selected_user'><span>" + u + "</span> <i class='fa fa-remove'></i></a>");
+            }            
+        });
+
+        //搜索人员
+        $("#u_sel_query_bt").on("click", function () {
+            var queryStr = $("#u_sel_query_str").val();
+            if (queryStr.length < 2) {
+                toastr.error("至少输入2个字符再搜索");
+                return;
+            }
+            $("#u_sel_tb_users").empty();
+            $.post("@Url.Content("~/Item/SearchWorkingEmp")", { queryString: queryStr }, function (data) {
+                if (!data.suc) {
+                    toastr.error(data.msg);
+                    return;
+                }
+                var emps = data.result;
+                if (emps.length == 0) {
+                    toastr.error("找不到符合条件的在职员工");
+                    return;
+                }
+                if (emps.length == 100) {
+                    toastr.info("只显示符合搜索条件的前100位员工");
+                }
+                for (var i = 0; i < emps.length; i++) {
+                    $("#u_sel_tb_users").append("<tr><td>" + emps[i].cardNumber + "</td><td>" + emps[i].userName + "</td><td>" + emps[i].depName + "</td><td><button type='button' class='btn btn-xs btn-default'><i class='fa fa-check'></i></button></td></tr>");
+                }
+            });
+        });
+    });
+</script>
+<div class="modal fade" id="userSelModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="userSelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">选择员工(人数限制：<span id="u_sel_num_limit"></span> )</h4>
+            </div>
+            <div class="modal-body" style="min-height:280px;max-height:400px;overflow:auto;">
+
+                <div class="input-group">
+                    <input type="text" class="form-control" id="u_sel_query_str" placeholder="输入厂牌或姓名搜索">
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="button" id="u_sel_query_bt">搜索</button>
+                    </span>
+                </div>
+                <table class="table table-condensed table-hover" id="u_sel_tb" style="margin:10px 0;">
+                    <thead>
+                        <tr>
+                            <th style="width:25%;">厂牌</th>
+                            <th style="width:25%;">姓名</th>
+                            <th style="width:40%;">部门</th>
+                            <th style="width:10%;">选择</th>
+                        </tr>
+                    </thead>
+                    <tbody id="u_sel_tb_users">
+                        @*搜索到的用户列表*@                        
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <div class="text-left" id="u_sel_selected_users">
+                    已选择人员：&nbsp;&nbsp;
+                    @*已选择人员*@
+                </div>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-success" id="selBt">确认</button>
+            </div>
+        </div>
+    </div>
+</div>

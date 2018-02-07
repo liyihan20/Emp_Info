@@ -156,6 +156,7 @@
     <Compile Include="Controllers\AndroidAppController.cs" />
     <Compile Include="Controllers\ApplyController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\FileController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
     <Compile Include="Controllers\K3Controller.cs" />
@@ -164,6 +165,7 @@
     <Compile Include="Controllers\RestaurantBaseController.cs" />
     <Compile Include="Controllers\RestaurantController.cs" />
     <Compile Include="Controllers\ChartController.cs" />
+    <Compile Include="Controllers\WXController.cs" />
     <Compile Include="Filter\SessionTimeOutFilter.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -231,13 +233,28 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DormModels.cs" />
+    <Compile Include="Models\ei_askLeave.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_authority.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_deliveryInfo.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_department.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_departmentAuditNode.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_departmentAuditUser.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_dormRepair.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_empLevel.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_emp_portrait.cs">
@@ -273,6 +290,9 @@
     <Compile Include="Models\ei_users.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_users_android.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\GetDormFeeByMonth_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -289,6 +309,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetPOAccount_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GetSalaryAllDetail_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetSalaryDetail_Result.cs">
@@ -344,6 +367,12 @@
     <Compile Include="Models\vw_ei_users.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\vw_getAllhrEmp.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\vw_push_users.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\EmpWebSvr\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -360,6 +389,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="bin\Gma.QrCodeNet.Encoding.Net35.dll" />
+    <Content Include="bin\TrulyEmail.dll" />
     <Content Include="Content\autocomplete.css" />
     <Content Include="Content\bootstrap-datetimepicker.min.css" />
     <Content Include="Content\bootstrap-select.min.css" />
@@ -367,6 +397,7 @@
     <Content Include="Content\bootstrap-switch.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap-treeview.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\flexslider\flexslider.css" />
@@ -375,9 +406,11 @@
     <Content Include="Content\fontawesome\fontcss\font-awesome.css" />
     <Content Include="Content\fontawesome\fontcss\font-awesome.min.css" />
     <Content Include="Content\fontawesome\fonts\fontawesome-webfont.svg" />
+    <Content Include="Content\images\bind.gif" />
     <Content Include="Content\images\book.png" />
     <Content Include="Content\images\box.png" />
     <Content Include="Content\images\bubble-sprite.png" />
+    <Content Include="Content\images\house.png" />
     <Content Include="Content\images\paint.png" />
     <Content Include="Content\images\post.png" />
     <Content Include="Content\images\PO_48.png" />
@@ -400,6 +433,8 @@
     <Content Include="Content\images\salary.png" />
     <Content Include="Content\images\salary1.png" />
     <Content Include="Content\images\statistics_48.png" />
+    <Content Include="Content\images\truly_home.gif" />
+    <Content Include="Content\images\unbind.gif" />
     <Content Include="Content\images\user_48.png" />
     <Content Include="Content\images\user_blue_48.png" />
     <Content Include="Content\images\user_friend.png" />
@@ -582,6 +617,8 @@
     <Content Include="Content\tooltipster\sideTip\themes\tooltipster-sideTip-noir.min.css" />
     <Content Include="Content\tooltipster\sideTip\themes\tooltipster-sideTip-punk.min.css" />
     <Content Include="Content\tooltipster\sideTip\themes\tooltipster-sideTip-shadow.min.css" />
+    <Content Include="Content\webupload\Uploader.swf" />
+    <Content Include="Content\webupload\webuploader.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -646,6 +683,7 @@
     <Content Include="Scripts\bootstrap-select.min.js" />
     <Content Include="Scripts\bootstrap-slider.min.js" />
     <Content Include="Scripts\bootstrap-switch.min.js" />
+    <Content Include="Scripts\bootstrap-treeview.min.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\echarts.js" />
     <Content Include="Scripts\echarts.simple.min.js" />
@@ -677,6 +715,7 @@
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="Scripts\tooltipster.bundle.min.js" />
+    <Content Include="Scripts\webuploader.withoutimage.js" />
     <Content Include="Scripts\_references.js" />
     <None Include="Service References\EmpWebSvr\TrulyEmpSvr.disco" />
     <None Include="Service References\EmpWebSvr\configuration91.svcinfo" />
@@ -695,6 +734,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Content>
     <Content Include="Service References\FlowSvr\EmpInfo.FlowSvr.FlowResultModel.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
+    <Content Include="Service References\FlowSvr\EmpInfo.FlowSvr.CurrentAuditModel.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Content>
     <None Include="Service References\FlowSvr\FlowSvr.disco" />
@@ -761,6 +803,16 @@
     <Content Include="Views\Apply\CheckAndAuditDPApply.cshtml" />
     <Content Include="Views\Apply\GetMyAuditedDPList.cshtml" />
     <Content Include="Views\Apply\GetMyAuditingDPList.cshtml" />
+    <Content Include="Views\Home\DormGroupIndex.cshtml" />
+    <Content Include="Views\Admin\Department.cshtml" />
+    <Content Include="Views\Apply\BeginApplyAL.cshtml" />
+    <Content Include="Views\Shared\_SelectUsers.cshtml" />
+    <Content Include="Views\WX\WLogin.cshtml" />
+    <Content Include="Views\WX\WLogOut.cshtml" />
+    <Content Include="Views\Item\ShowPic.cshtml" />
+    <Content Include="Views\Shared\_SelectDep.cshtml" />
+    <Content Include="Views\Home\CheckMonthSalary.cshtml" />
+    <Content Include="Views\Shared\_ConfirmPasswordDialog.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

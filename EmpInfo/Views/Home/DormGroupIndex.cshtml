@@ -1,0 +1,63 @@
+﻿@section CSS{
+    <style type="text/css">
+        #dormGroup img {
+            width: 48px;
+            height: 48px;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        $(function () {
+            $(".closeLink").click(function () {
+                toastr.info("此功能暂未开放");
+            });
+            $("#dormitoryLink").click(function () {
+                $.post("@Url.Content("~/Home/ValidateDorm")", {}, function (data) {
+                    if (data.suc) {
+                        window.location.href = "@Url.Content("~/Home/CheckDormitory")";
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+        });
+    </script>
+}
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li class="active">宿舍事务集合</li>
+        </ol>
+    </div>
+    <div class="panel-body" id="dormGroup">
+        <div class="row" style="margin: 0;">
+            <div class="col-xs-4 col-sm-3 col-md-2">
+                <a href="#" id="dormitoryLink">
+                    <img src="@Url.Content("~/Content/images/dormitory_128.png")" alt="dormitory" class="center-block" />
+                    <p class="text-center">住宿费用查询</p>
+                </a>
+            </div>
+            <div class="col-xs-4 col-sm-3 col-md-2">
+                <a href="@Url.Content("~/Apply/DormRepairIndex")">
+                    <img src="@Url.Content("~/Content/images/repair.png")" alt="repair" class="center-block" />
+                    <p class="text-center">宿舍维修申请</p>
+                </a>
+            </div>
+            <div class="col-xs-4 col-sm-3 col-md-2">
+                <a href="#" class="closeLink">
+                    <img src="@Url.Content("~/Content/images/book.png")" alt="book" class="center-block" />
+                    <p class="text-center">宿舍来访预约</p>
+                </a>
+            </div>
+            <div class="col-xs-4 col-sm-3 col-md-2">
+                <a href="#" class="closeLink">
+                    <img src="@Url.Content("~/Content/images/post.png")" alt="post" class="center-block" />
+                    <p class="text-center">宿舍快件寄存</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

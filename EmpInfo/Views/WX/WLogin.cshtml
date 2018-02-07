@@ -1,0 +1,116 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>用户绑定</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/toastr.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/fontawesome/fontcss/font-awesome.min.css")" />
+        
+    <style type="text/css">
+        #userName, #password {
+            padding: 10px;
+            font-size: 16px;
+            height: auto;
+        }
+    </style>
+    <style type="text/css">
+        body, div, p, h1, h2, h3, h4, h5, h6, legend, input, button, a, label, span {
+            font-family: 'Microsoft YaHei','Courier New',Arial;
+        }
+
+        .container {
+            padding: 0;
+        }
+    </style>
+
+
+    <script src="@Url.Content("~/Scripts/jquery-1.11.3.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/toastr.min.js")"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="@Url.Content("~/Scripts/html5shiv.min.js")"></script>
+      <script src="@Url.Content("~/Scripts/respond.min.js")"></script>
+    <![endif]-->
+</head>
+<body>
+    <div class="container" id="topContainer">
+        <div class="container">
+            <div class="panel panel-primary" id="div_signin" style="max-width:420px;margin:20px auto 0 auto;">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> 用户绑定</h3>
+                </div>
+                <div class="panel-body">
+                    <img src="@Url.Content("~/Content/images/truly_home.gif")" alt="truly home" class="center-block" style="width:100px;height:100px;margin-bottom:20px;" />
+                    <div class="form-signin" id="form_signin">
+                        <label for="userName" class="sr-only">用户名</label>
+                        <div class="input-group">
+                            <div class="input-group-addon"><span class="glyphicon glyphicon-user"></span></div>
+                            <input type="text" id="userName" name="userName" class="form-control" placeholder="请输入厂牌" autocomplete="off" required autofocus />
+                        </div>
+                        <label for="password" class="sr-only">密码</label>
+                        <div class="input-group">
+                            <div class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></div>
+                            <input type="password" id="password" name="password" class="form-control" placeholder="请输入密码" required />
+                        </div>
+                        <button class="btn btn-primary btn-lg btn-block" style="margin-top:15px;" id="btn_submit" data-loading-text="绑定中...">
+                            <i class="fa fa-lock"></i> 绑 定
+                        </button>
+                        <p class="small text-danger" style="margin:6px 0 4px 0;"><i class="fa fa-info-circle"></i> 输入员工信息查询系统之厂牌和密码与本服务号绑定成功后，即可轻松访问信利e家服务号各信息系统应用和收取业务通知信息</p>
+                        <p class="small text-danger"><i class="fa fa-info-circle"></i> <a href="@Url.Content("~/Account/Login")">如提示用户未注册，可点击此链接跳转到信利员工信息查询系统登陆界面注册</a> </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        document.onkeydown = function (event) {
+            var e = event || window.event || arguments.callee.caller.arguments[0];
+            if (e && e.keyCode == 13) { // enter 键
+                if ($("#password").val() == "") {
+                    $("#password").focus();
+                } else {
+                    $("#btn_submit").click();
+                }
+            }
+        };
+        $(function () {
+            $("#btn_submit").click(function () {
+                $(this).button('loading');
+                $.post("BindOpenId", {
+                    cardNumber: $("#userName").val(),
+                    password: $("#password").val(),
+                    openid: "@ViewData["openid"]"
+                }, function (res) {
+                    $("#btn_submit").button('reset');
+                    if (!res.suc) {
+                        showMsg(res.msg);
+                    } else {
+                        window.location.href = "@Url.Content("~/Item/ShowPic?picName=bind.gif")";
+                    }
+                });
+            });
+
+        });
+        //登陆错误显示信息
+        function showMsg(msg) {
+            $("#password").val("");
+            toastr.error(msg);
+        }
+
+
+    </script>
+
+</body>
+</html>

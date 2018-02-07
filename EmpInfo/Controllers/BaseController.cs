@@ -54,7 +54,7 @@ namespace EmpInfo.Controllers
                         _userInfo = new UserInfo();
                         _userInfo.id = Int32.Parse(cookie.Values.Get("userid"));
                         _userInfo.name = MyUtils.DecodeToUTF8(cookie.Values.Get("username"));
-                        _userInfo.cardNo = cookie.Values.Get("cardno");                        
+                        _userInfo.cardNo = cookie.Values.Get("cardno");
                     }
                     Session["userInfo"] = _userInfo;                    
                 }
@@ -81,6 +81,8 @@ namespace EmpInfo.Controllers
                         _userInfoDetail.phone = user.phone;
                         _userInfoDetail.idNumber = user.id_number;
                         _userInfoDetail.salaryNo = user.salary_no;
+                        _userInfoDetail.depNum = user.dep_no;
+                        _userInfoDetail.depLongName = user.dep_long_name;
                     }
                     Session["userInfoDetail"] = _userInfoDetail;
                 }
@@ -211,13 +213,13 @@ namespace EmpInfo.Controllers
         }
 
         //获取流水号
-        protected string GetNextSysNum(string billType)
+        protected string GetNextSysNum(string billType, int digitPerDay = 3)
         {
             string result = billType + DateTime.Now.ToString("yyMMdd");
             var maxNumRecords = db.all_maxNum.Where(a => a.bill_type == billType && a.date_str == result);
             if (maxNumRecords.Count() > 0) {
                 var maxNumRecord = maxNumRecords.First();
-                result += string.Format("{0:D3}", maxNumRecord.max_num);
+                result += string.Format("{0:D" + digitPerDay + "}", maxNumRecord.max_num);
                 maxNumRecord.max_num = maxNumRecord.max_num + 1;
             }
             else {
@@ -227,7 +229,7 @@ namespace EmpInfo.Controllers
                 maxNumRecord.max_num = 2;
                 db.all_maxNum.Add(maxNumRecord);
 
-                result += "001";
+                result += string.Format("{0:D" + digitPerDay + "}", 1);
             }
 
             db.SaveChanges();
@@ -253,12 +255,13 @@ namespace EmpInfo.Controllers
         //根据厂牌获取姓名
         protected string GetUserNameByCardNum(string cardNumbers)
         {
+            if (string.IsNullOrEmpty(cardNumbers)) return "";
             string names = "";
-            foreach (var num in cardNumbers.Split(new char[] { ';' })) {
+            foreach (var num in cardNumbers.Split(new char[] { ';','；' })) {
                 if (!string.IsNullOrEmpty(num)) {
-                    var emp = db.GetHREmpInfo(num).ToList();
+                    var emp = db.vw_getAllhrEmp.Where(v => v.emp_no == num).ToList();
                     if (emp.Count() > 0) {
-                        if (!string.IsNullOrEmpty(names)) names += ",";
+                        if (!string.IsNullOrEmpty(names)) names += ";";
                         names += emp.First().emp_name;
                     }
                 }
@@ -266,11 +269,40 @@ namespace EmpInfo.Controllers
             return names;
         }
 
+        //根据厂牌获取姓名(厂牌)
+        protected string GetUserNameAndCardByCardNum(string cardNumbers)
+        {
+            if (string.IsNullOrEmpty(cardNumbers)) return "";
+            string names = "";
+            foreach (var num in cardNumbers.Split(new char[] { ';', '；' })) {
+                if (!string.IsNullOrEmpty(num)) {
+                    var emp = db.vw_getAllhrEmp.Where(v => v.emp_no == num).ToList();
+                    if (emp.Count() > 0) {
+                        if (!string.IsNullOrEmpty(names)) names += ";";
+                        names += emp.First().emp_name + "(" + num + ")";
+                    }
+                }
+            }
+            return names;
+        }
+
+        //根据姓名(厂牌)取得厂牌
+        protected string GetUserCardByNameAndCardNum(string nameAndCards)
+        {
+            if (string.IsNullOrEmpty(nameAndCards)) return "";
+            string cards = "";
+            foreach (var num in nameAndCards.Split(new char[] { ';', '；' },StringSplitOptions.RemoveEmptyEntries)) {
+                if (!string.IsNullOrEmpty(cards)) cards += ";";
+                cards += num.Split(new char[]{'(',')'})[1];
+            }
+            return cards;
+        }
+
         //根据厂牌获取邮箱
         protected string GetUserEmailByCardNum(string cardNumbers)
         {
             string emails = "";
-            foreach (var num in cardNumbers.Split(new char[] { ';' })) {
+            foreach (var num in cardNumbers.Split(new char[] { ';', '；' })) {
                 if (!string.IsNullOrEmpty(num)) {
                     var user = db.ei_users.Where(u => u.card_number == num);
                     if (user.Count() > 0) {
@@ -280,6 +312,19 @@ namespace EmpInfo.Controllers
                 }
             }
             return emails;
+        }
+
+        //根据部门编码获得部门长名称
+        protected string GetDepLongNameByNum(string depNum)
+        {
+            var dep = db.ei_department.Single(d => d.FNumber == depNum);
+            string depName = dep.FName;
+            while (dep.FParent != null) {
+                dep = db.ei_department.Single(d => d.FNumber == dep.FParent);
+                depName = dep.FName + "/" + depName;
+            }
+
+            return depName;
         }
 
     }

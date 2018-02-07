@@ -31,4 +31,13 @@ namespace EmpInfo.Models
         public string autDes{get;set;}
     }
 
+    public class Department
+    {
+        public string text { get; set; }
+        public List<Department> nodes { get; set; }
+        public string[] tags { get; set; }        
+        public string color { get; set; }
+        public bool selectable { get; set; }
+    }    
+
 }
