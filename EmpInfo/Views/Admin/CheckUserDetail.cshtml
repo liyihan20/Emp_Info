@@ -17,9 +17,13 @@
             });
 
             $("#activeBtn").click(function () {
+                var st = $("#status").html();
+                if (st == "禁用" && $("#depName").val() == "") {
+                    toastr.error("此员工已离职，不能解禁");
+                    return;
+                }
                 $.post("@Url.Content("~/Admin/activeUser")", { id: "@user.id" }, function (data) {
-                    if (data.suc) {
-                        var st = $("#status").html();
+                    if (data.suc) {                        
                         st = st == "正常" ? "禁用" : "正常";
                         $("#status").html(st);
                         toastr.success(data.msg);
@@ -53,7 +57,7 @@
         <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>姓名：</span><span class="pull-right">@user.name</span></li>
         <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>厂牌：</span><span class="pull-right">@user.card_number</span></li>
         <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>性别：</span><span class="pull-right">@user.sex</span></li>
-        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>部门：</span><span class="pull-right">@user.short_dep_name</span></li>
+        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>部门：</span><span class="pull-right" id="depName">@user.short_dep_name</span></li>
         <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>长部门：</span><span class="pull-right">@user.dep_name</span></li>
         <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>身份证：</span><span class="pull-right">@user.id_number</span></li>
         <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>条形码：</span><span class="pull-right">@user.salary_no</span></li>

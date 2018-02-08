@@ -56,7 +56,7 @@ namespace EmpInfo.Controllers
                     }
                     else {
                         if (db.GetHREmpStatus(cardnumber).Count() == 0) {
-                            msg = "用户已离职，不能使用";
+                            msg = "用户已离职，不能使用此系统";
                         }
                         else {
                             suc = true;
@@ -123,16 +123,22 @@ namespace EmpInfo.Controllers
                         }
                     }
                     else {
-                        suc = true;
-                        user.wx_openid = openid;
-                        user.wx_bind_date = DateTime.Now;
-                        user.wx_easy_login = true;
-                        user.wx_should_push_msg = true;
+                        string passwordInfo = MyUtils.ValidatePassword(user.password);
+                        if (!string.IsNullOrEmpty(passwordInfo)) {
+                            msg = "密码不符合复杂度规则验证，请先登录系统修改密码后再绑定";
+                        }
+                        else {
+                            suc = true;
+                            user.wx_openid = openid;
+                            user.wx_bind_date = DateTime.Now;
+                            user.wx_easy_login = true;
+                            user.wx_should_push_msg = true;
 
-                        user.wx_push_consume_info = true;//推送消费信息
-                        user.wx_push_flow_info = true;//推送业务流程信息
-                        user.wx_push_salary_info = true;//推送工资信息
-                        user.wx_check_salary_info = false;//免密工资查看
+                            user.wx_push_consume_info = true;//推送消费信息
+                            user.wx_push_flow_info = true;//推送业务流程信息
+                            user.wx_push_salary_info = true;//推送工资信息
+                            user.wx_check_salary_info = false;//免密工资查看
+                        }
                     }
                 }
             }
