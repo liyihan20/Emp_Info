@@ -18,7 +18,7 @@
 
             $("#activeBtn").click(function () {
                 var st = $("#status").html();
-                if (st == "禁用" && $("#depName").val() == "") {
+                if (st == "禁用" && $("#depName").html() == "") {
                     toastr.error("此员工已离职，不能解禁");
                     return;
                 }

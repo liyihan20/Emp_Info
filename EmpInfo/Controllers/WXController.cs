@@ -95,7 +95,7 @@ namespace EmpInfo.Controllers
         }
 
         //开始绑定
-        public JsonResult BindOpenId(string cardNumber, string password, string openid)
+        public JsonResult BindOpenId(string cardNumber, string password, string openid, bool checkSalaryInfo, bool pushSalaryInfo, bool pushConsumeInfo, bool pushFlowInfo)
         {
             
             string msg = "";
@@ -134,10 +134,10 @@ namespace EmpInfo.Controllers
                             user.wx_easy_login = true;
                             user.wx_should_push_msg = true;
 
-                            user.wx_push_consume_info = true;//推送消费信息
-                            user.wx_push_flow_info = true;//推送业务流程信息
-                            user.wx_push_salary_info = true;//推送工资信息
-                            user.wx_check_salary_info = false;//免密工资查看
+                            user.wx_push_consume_info = pushConsumeInfo;//推送消费信息
+                            user.wx_push_flow_info = pushFlowInfo;//推送业务流程信息
+                            user.wx_push_salary_info = pushSalaryInfo;//推送工资信息
+                            user.wx_check_salary_info = checkSalaryInfo;//免密工资查看
                         }
                     }
                 }

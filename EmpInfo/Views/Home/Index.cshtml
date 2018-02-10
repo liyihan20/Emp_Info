@@ -34,6 +34,16 @@
                 text-align:center;
                 margin-bottom:0;
             }
+        .b-label {
+            display: inline-block;
+            width: 80px;
+            vertical-align: top;
+            color: gray;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
     </style>
     }
 @section Scripts {
@@ -350,32 +360,43 @@
                 <div class="modal-body" style="max-height:400px;overflow:auto;">
                     <form id="personalInfoFm">                        
                         <div id="personalInfo">
-                            <div class="form-group">
-                                <label for="emailAddr" class="control-label">邮箱地址:</label>
-                                <input type="email" class="form-control" id="emailAddr" />
+                            <div class="b-div">
+                                <label class="b-label control-label">邮箱地址:</label>
+                                <span style="display:inline-block;width:77%">
+                                    <input type="email" class="form-control" id="emailAddr" />
+                                </span>
                             </div>
-                            <div class="form-group">
-                                <label for="shortPhoneNumber" class="control-label">手机短号:</label>
-                                <input type="text" class="form-control" id="shortPhoneNumber" />
+                            <div class="b-div">
+                                <label class="b-label control-label">手机短号:</label>
+                                <span style="display:inline-block;width:77%">
+                                    <input type="text" class="form-control" id="shortPhoneNumber" />
+                                </span>
                             </div>
-                            <div class="form-group">
-                                <label for="phoneNumber" class="control-label">手机长号:</label>
-                                <input type="text" class="form-control" id="phoneNumber" />
+                            <div class="b-div">
+                                <label class="b-label control-label">手机长号:</label>
+                                <span style="display:inline-block;width:77%">
+                                    <input type="text" class="form-control" id="phoneNumber" />
+                                </span>
                             </div>
                             @*<div class="form-group">
                                 <label for="recipient-name" class="control-label">部门名称:</label>
                                 <input type="text" class="form-control" id="depLongName" />
                                 <input type="hidden" id="depNum" />
                             </div>*@
-                            <div class="form-group">
-                                <label for="new_password" class="control-label">新密码（不填则不修改密码）:</label>
-                                <input type="password" class="form-control" id="new_password" />
+                            <div class="b-div">
+                                <label class="b-label control-label">新密码:</label>
+                                <div style="display:inline-block;width:77%">
+                                    <input type="password" class="form-control" id="new_password" placeholder="不填则不修改密码" />                                    
+                                </div>                                
                             </div>
-                            <div class="form-group">
-                                <label for="confirm_password" class="control-label">确认新密码:</label>
-                                <input type="password" class="form-control" id="confirm_password" />
-                            </div>                            
-                            <div class="form-group" id="wx_setting">
+                            <div class="b-div">
+                                <label class="b-label control-label">确认新密码:</label>
+                                <span style="display:inline-block;width:77%">
+                                    <input type="password" class="form-control" id="confirm_password" placeholder="必须与新密码保持一致" />
+                                </span>
+                            </div>          
+                            <div class="panel panel-default" id="wx_setting" style="margin-bottom:0;">
+                                <div class="panel-body">
                                 <label class="control-label">微信公众号设置：</label>
                                 <div class="row">
                                     <div class="col-xs-6 text-center">
@@ -385,12 +406,13 @@
                                         <input type="checkbox" id="push_salary_info" /> 推送工资信息
                                     </div>
                                     <div class="col-xs-6 text-center">
-                                        <input type="checkbox" id="push_consume_info" /> 推送消费信息
+                                        <input type="checkbox" id="push_consume_info" /> 推送饭卡信息
                                     </div>
                                     <div class="col-xs-6 text-center">
                                         <input type="checkbox" id="push_flow_info" /> 推送流程信息
                                     </div>                                        
                                 </div>
+                                    </div>
                             </div>
                             
                         </div>

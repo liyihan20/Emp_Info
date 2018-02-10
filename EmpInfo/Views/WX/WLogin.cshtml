@@ -56,24 +56,40 @@
                         <label for="userName" class="sr-only">用户名</label>
                         <div class="input-group">
                             <div class="input-group-addon"><span class="glyphicon glyphicon-user"></span></div>
-                            <input type="text" id="userName" name="userName" class="form-control" placeholder="请输入厂牌" autocomplete="off" required autofocus />
+                            <input type="text" id="userName" name="userName" class="form-control" placeholder="请输入员工信息查询系统厂牌" autocomplete="off" required autofocus />
                         </div>
                         <label for="password" class="sr-only">密码</label>
                         <div class="input-group">
                             <div class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></div>
-                            <input type="password" id="password" name="password" class="form-control" placeholder="请输入密码" required />
+                            <input type="password" id="password" name="password" class="form-control" placeholder="请输入员工信息查询系统密码" required />
                         </div>
-                        <button class="btn btn-primary btn-lg btn-block" style="margin-top:15px;" id="btn_submit" data-loading-text="绑定中...">
+                        <div class="row" style="margin-top:6px;">
+                            <div class="col-xs-6 text-center">
+                                <input type="checkbox" id="check_salary_info" /> 免密查看工资
+                            </div>
+                            <div class="col-xs-6 text-center">
+                                <input type="checkbox" id="push_salary_info" checked="checked" /> 推送工资信息
+                            </div>
+                            <div class="col-xs-6 text-center">
+                                <input type="checkbox" id="push_consume_info" checked="checked" /> 推送饭卡信息
+                            </div>
+                            <div class="col-xs-6 text-center">
+                                <input type="checkbox" id="push_flow_info" checked="checked" /> 推送流程信息
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-lg btn-block" style="margin-top:8px;" id="btn_submit" data-loading-text="绑定中...">
                             <i class="fa fa-lock"></i> 绑 定
                         </button>
-                        <p class="small text-danger" style="margin:6px 0 4px 0;"><i class="fa fa-info-circle"></i> 输入员工信息查询系统之厂牌和密码与本服务号绑定成功后，即可轻松访问信利e家服务号各信息系统应用和收取业务通知信息</p>
-                        <p class="small text-danger"><i class="fa fa-info-circle"></i> <a href="@Url.Content("~/Account/Login")">如提示用户未注册，可点击此链接跳转到信利员工信息查询系统登陆界面注册</a> </p>
+                        <p class="small text-danger" style="margin:6px 0 4px 0;"><i class="fa fa-info-circle"></i> 对以上4个设置参数有疑问？<a href="#" id="paramSetQuestion">点此查看详细说明</a></p>                        
+                        @*<p class="small text-danger" style="margin:6px 0 4px 0;"><i class="fa fa-info-circle"></i> 输入员工信息查询系统之厂牌和密码与本服务号绑定成功后，即可轻松访问信利e家服务号各信息系统应用和收取业务通知信息</p>*@
+                        <p class="small text-danger" style="margin:6px 0 4px 0;"><i class="fa fa-info-circle"></i> 如提示用户未注册，可跳转到【信利员工信息查询系统】登陆界面注册: <a href="@Url.Content("~/Account/Login")">点此链接跳转</a> </p>
                     </div>
                 </div>
             </div>
         </div>
 
     </div>
+    @Html.Partial("_MessageDialog")
     <script>
         document.onkeydown = function (event) {
             var e = event || window.event || arguments.callee.caller.arguments[0];
@@ -91,7 +107,11 @@
                 $.post("BindOpenId", {
                     cardNumber: $("#userName").val(),
                     password: $("#password").val(),
-                    openid: "@ViewData["openid"]"
+                    openid: "@ViewData["openid"]",
+                    checkSalaryInfo: $("#check_salary_info").is(":checked"),
+                    pushSalaryInfo: $("#push_salary_info").is(":checked"),
+                    pushConsumeInfo: $("#push_consume_info").is(":checked"),
+                    pushFlowInfo: $("#push_flow_info").is(":checked")
                 }, function (res) {
                     $("#btn_submit").button('reset');
                     if (!res.suc) {
@@ -100,6 +120,15 @@
                         window.location.href = "@Url.Content("~/Item/ShowPic?picName=bind.gif")";
                     }
                 });
+            });
+
+            $("#paramSetQuestion").on("click", function () {
+                var content = "<p class='small' style='margin:6px 0 4px 0;'><i class='fa fa-info-circle text-danger'></i> 1. 免密查看工资：免密登陆员工查询系统后，查询工资信息必须再次输入密码确认后方能查询。若勾上即无需再输密码也能查询工资信息</p>";
+                content += "<p class='small' style='margin:6px 0 4px 0;'><i class='fa fa-info-circle text-danger'></i> 2. 推送工资信息：勾上即能收到每月工资发放的最新信息。去掉即表示不收取此类信息</p>";
+                content += "<p class='small' style='margin:6px 0 4px 0;'><i class='fa fa-info-circle text-danger'></i> 3. 推送饭卡信息：勾上即能收到饭卡50元以上大额消费通知和每次充值的信息。去掉即表示不收取此类信息</p>";
+                content += "<p class='small' style='margin:6px 0 4px 0;'><i class='fa fa-info-circle text-danger'></i> 4. 推送流程信息：勾上即能收到涉及本人之公司业务流程的申请、待审批和已审批信息。去掉即表示不收取此类信息</p>";
+                content += "<p class='small' style='margin:6px 0 4px 0;'><i class='fa fa-info-circle text-danger'></i> 5. 以上4个参数绑定后还可在【信利员工信息查询系统】个人信息设置界面（点击主页头像）进行修改</p>";
+                openMessageDialog(content, "参数设置帮助");
             });
 
         });
@@ -111,6 +140,6 @@
 
 
     </script>
-
 </body>
+
 </html>
