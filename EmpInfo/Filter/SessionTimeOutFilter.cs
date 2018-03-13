@@ -15,7 +15,7 @@ namespace EmpInfo.Filter
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            var ctx = filterContext.HttpContext;
+            var ctx = filterContext.HttpContext;            
             if (ctx.Session != null)
             {
                 var cookie = ctx.Request.Cookies[ConfigurationManager.AppSettings["cookieName"]];
@@ -30,7 +30,18 @@ namespace EmpInfo.Filter
                     }
                 }
             }
-            filterContext.Result = new RedirectResult("~/Account/Login");
+            //将访问的url作为参数保存起来，登陆后直接跳转到此url
+            string returnUrl = filterContext.ActionDescriptor.ControllerDescriptor.ControllerName + "/" + filterContext.ActionDescriptor.ActionName;
+            if (filterContext.ActionParameters.Keys.Count() > 0) {
+                returnUrl += "?";
+                foreach (var k in filterContext.ActionParameters.Keys) {
+                    var v = filterContext.ActionParameters[k];
+                    returnUrl += k + "=" + v.ToString() + "&";
+                }
+                returnUrl = returnUrl.Substring(0, returnUrl.Length - 1); // 将最后的&去掉
+            }
+
+            filterContext.Result = new RedirectResult("~/Account/Login?returnUrl=" + Uri.EscapeDataString(returnUrl));
             //ctx.Response.Redirect("~/Account/Login");--虽可正常运行，但在调试模式下回出错，因为还是会在Action里面继续执行。
         }
                 

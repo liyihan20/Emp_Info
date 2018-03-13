@@ -1,5 +1,5 @@
 ﻿@section CSS {
-    <link rel="stylesheet" href="@Url.Content("~/Content/login.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/login.css")" />    
 }
 @section Scripts {
 
@@ -50,7 +50,13 @@
                             //弹出密码设置窗口
                             $("#passwordModal").modal("show");
                         } else {
-                            window.location.href = "@Url.Content("~/Home/index")";
+                            var urlParam = window.location.search;
+                            if (urlParam.length > 0) {
+                                var url = unescape(urlParam.substr(urlParam.indexOf("=") + 1));
+                                window.location.href = "@Url.Content("~/")" + url;
+                            } else {
+                                window.location.href = "@Url.Content("~/Home/index")";
+                            }
                         }
                     }
                 });
