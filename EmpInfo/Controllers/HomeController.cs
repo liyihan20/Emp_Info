@@ -144,8 +144,8 @@ namespace EmpInfo.Controllers
             string email = fc.Get("email");
             string new_pass = fc.Get("new_pass");
             string shortPhone = fc.Get("shortPhone");
-            string depNum = fc.Get("depNum");
-            string depLongName = fc.Get("depLongName");
+            //string depNum = fc.Get("depNum");
+            //string depLongName = fc.Get("depLongName");
             string checkSalaryInfo = fc.Get("checkSalaryInfo");
             string pushSalaryInfo = fc.Get("pushSalaryInfo");
             string pushConsumeInfo = fc.Get("pushConsumeInfo");
@@ -154,6 +154,7 @@ namespace EmpInfo.Controllers
             var user = db.ei_users.Single(u => u.card_number == userInfo.cardNo);
             if (!string.IsNullOrEmpty(email))
             {
+                email = email.Trim();
                 var emailR = new Regex(@"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$");
                 if (!emailR.IsMatch(email))
                 {
@@ -167,8 +168,9 @@ namespace EmpInfo.Controllers
             if (!string.IsNullOrEmpty(phone))
             {
                 var phoneR = new Regex(@"^\d{11}$");
+                phone = phone.Trim();
                 if (!phoneR.IsMatch(phone))
-                {
+                {                    
                     return Json(new SimpleResultModel() { suc = false, msg = "手机长号必须是11位数字" });
                 }
                 if (db.ei_users.Where(u => u.phone == phone && u.id != userInfo.id && u.name != userInfo.name).Count() > 0) {
@@ -191,8 +193,8 @@ namespace EmpInfo.Controllers
             if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(phone) && !string.IsNullOrEmpty(shortPhone)) {
                 db.InsertIntoYFEmp(email ?? "", phone ?? "", shortPhone ?? "", user.name, user.card_number);
             }
-            user.dep_no = depNum;
-            user.dep_long_name = depLongName;
+            //user.dep_no = depNum;
+            //user.dep_long_name = depLongName;
             user.wx_check_salary_info = bool.Parse(checkSalaryInfo);
             user.wx_push_salary_info = bool.Parse(pushSalaryInfo);
             user.wx_push_consume_info = bool.Parse(pushConsumeInfo);
@@ -474,7 +476,7 @@ namespace EmpInfo.Controllers
             var info = db.GetSalaryInfo(salaryNo).ToList();
             ViewData["months"] = db.GetSalaryMonths(salaryNo).ToList();
             ViewData["info"] = info;
-            WriteEventLog("工资查询", "进入工资查询页面:"+info.First().basicSalary);
+            WriteEventLog("工资查询", "进入工资查询页面:" + info.First().basicSalary);
             return View();
         }
 
@@ -522,8 +524,34 @@ namespace EmpInfo.Controllers
             return View();
         }
 
+        [SessionTimeOutFilter]
         public ActionResult DormGroupIndex()
         {
+            var auts = (from a in db.ei_authority
+                        from g in db.ei_groups
+                        from gu in g.ei_groupUser
+                        from ga in g.ei_groupAuthority
+                        where ga.authority_id == a.id
+                        && gu.user_id == userInfo.id
+                        select a.en_name).Distinct().ToArray();
+            string autStr = string.Join(",", auts);
+            ViewData["autStr"] = autStr;
+            ViewData["aesOpenId"] = userInfoDetail.AesOpenId;
+            return View();
+        }
+
+        [SessionTimeOutFilter]
+        public ActionResult WorkGroupIndex()
+        {
+            var auts = (from a in db.ei_authority
+                        from g in db.ei_groups
+                        from gu in g.ei_groupUser
+                        from ga in g.ei_groupAuthority
+                        where ga.authority_id == a.id
+                        && gu.user_id == userInfo.id
+                        select a.en_name).Distinct().ToArray();
+            string autStr = string.Join(",", auts);
+            ViewData["autStr"] = autStr;
             return View();
         }
 

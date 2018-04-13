@@ -131,6 +131,7 @@
           <s:element minOccurs="0" maxOccurs="1" name="billType" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="auditResult" type="s:string" />
           <s:element minOccurs="1" maxOccurs="1" name="finishTime" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="isUserAobrt" type="s:boolean" />
         </s:sequence>
       </s:complexType>
       <s:element name="GetAuditList">
@@ -179,6 +180,9 @@
           <s:element minOccurs="0" maxOccurs="1" name="stepName" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="auditResult" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="finalResult" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="auditors" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="finalAuditors" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="isUserAobrt" type="s:boolean" />
         </s:sequence>
       </s:complexType>
       <s:element name="GetMyApplyCount">
@@ -232,6 +236,60 @@
           <s:element minOccurs="0" maxOccurs="1" name="auditors" type="s:string" />
         </s:sequence>
       </s:complexType>
+      <s:element name="ApplyHasAudit">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="step" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="auditorNumber" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ApplyHasAuditResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ApplyHasAuditResult" type="tns:HasAuditModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="HasAuditModel">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="suc" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="isPass" nillable="true" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="opinion" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="msg" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="stepName" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="ApplyHasBeenAudited">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ApplyHasBeenAuditedResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="ApplyHasBeenAuditedResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCertainStepAuditors">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="step" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCertainStepAuditorsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetCertainStepAuditorsResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="AbortFlow">
         <s:complexType>
           <s:sequence>
@@ -244,6 +302,35 @@
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="AbortFlowResult" type="tns:FlowResultModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetFlowQueue">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="formJson" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetFlowQueueResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetFlowQueueResult" type="tns:FlowResultModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AbortAfterFinish">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="reason" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AbortAfterFinishResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AbortAfterFinishResult" type="tns:FlowResultModel" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -361,11 +448,41 @@
   <wsdl:message name="GetCurrentStepSoapOut">
     <wsdl:part name="parameters" element="tns:GetCurrentStepResponse" />
   </wsdl:message>
+  <wsdl:message name="ApplyHasAuditSoapIn">
+    <wsdl:part name="parameters" element="tns:ApplyHasAudit" />
+  </wsdl:message>
+  <wsdl:message name="ApplyHasAuditSoapOut">
+    <wsdl:part name="parameters" element="tns:ApplyHasAuditResponse" />
+  </wsdl:message>
+  <wsdl:message name="ApplyHasBeenAuditedSoapIn">
+    <wsdl:part name="parameters" element="tns:ApplyHasBeenAudited" />
+  </wsdl:message>
+  <wsdl:message name="ApplyHasBeenAuditedSoapOut">
+    <wsdl:part name="parameters" element="tns:ApplyHasBeenAuditedResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetCertainStepAuditorsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetCertainStepAuditors" />
+  </wsdl:message>
+  <wsdl:message name="GetCertainStepAuditorsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetCertainStepAuditorsResponse" />
+  </wsdl:message>
   <wsdl:message name="AbortFlowSoapIn">
     <wsdl:part name="parameters" element="tns:AbortFlow" />
   </wsdl:message>
   <wsdl:message name="AbortFlowSoapOut">
     <wsdl:part name="parameters" element="tns:AbortFlowResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetFlowQueueSoapIn">
+    <wsdl:part name="parameters" element="tns:GetFlowQueue" />
+  </wsdl:message>
+  <wsdl:message name="GetFlowQueueSoapOut">
+    <wsdl:part name="parameters" element="tns:GetFlowQueueResponse" />
+  </wsdl:message>
+  <wsdl:message name="AbortAfterFinishSoapIn">
+    <wsdl:part name="parameters" element="tns:AbortAfterFinish" />
+  </wsdl:message>
+  <wsdl:message name="AbortAfterFinishSoapOut">
+    <wsdl:part name="parameters" element="tns:AbortAfterFinishResponse" />
   </wsdl:message>
   <wsdl:message name="TestStarFlowSoapIn">
     <wsdl:part name="parameters" element="tns:TestStarFlow" />
@@ -434,9 +551,29 @@
       <wsdl:input message="tns:GetCurrentStepSoapIn" />
       <wsdl:output message="tns:GetCurrentStepSoapOut" />
     </wsdl:operation>
+    <wsdl:operation name="ApplyHasAudit">
+      <wsdl:input message="tns:ApplyHasAuditSoapIn" />
+      <wsdl:output message="tns:ApplyHasAuditSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ApplyHasBeenAudited">
+      <wsdl:input message="tns:ApplyHasBeenAuditedSoapIn" />
+      <wsdl:output message="tns:ApplyHasBeenAuditedSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCertainStepAuditors">
+      <wsdl:input message="tns:GetCertainStepAuditorsSoapIn" />
+      <wsdl:output message="tns:GetCertainStepAuditorsSoapOut" />
+    </wsdl:operation>
     <wsdl:operation name="AbortFlow">
       <wsdl:input message="tns:AbortFlowSoapIn" />
       <wsdl:output message="tns:AbortFlowSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetFlowQueue">
+      <wsdl:input message="tns:GetFlowQueueSoapIn" />
+      <wsdl:output message="tns:GetFlowQueueSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AbortAfterFinish">
+      <wsdl:input message="tns:AbortAfterFinishSoapIn" />
+      <wsdl:output message="tns:AbortAfterFinishSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="TestStarFlow">
       <wsdl:input message="tns:TestStarFlowSoapIn" />
@@ -542,8 +679,53 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="ApplyHasAudit">
+      <soap:operation soapAction="http://ic.truly.com.cn/ApplyHasAudit" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ApplyHasBeenAudited">
+      <soap:operation soapAction="http://ic.truly.com.cn/ApplyHasBeenAudited" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCertainStepAuditors">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetCertainStepAuditors" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="AbortFlow">
       <soap:operation soapAction="http://ic.truly.com.cn/AbortFlow" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetFlowQueue">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetFlowQueue" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AbortAfterFinish">
+      <soap:operation soapAction="http://ic.truly.com.cn/AbortAfterFinish" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -680,8 +862,53 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="ApplyHasAudit">
+      <soap12:operation soapAction="http://ic.truly.com.cn/ApplyHasAudit" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ApplyHasBeenAudited">
+      <soap12:operation soapAction="http://ic.truly.com.cn/ApplyHasBeenAudited" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCertainStepAuditors">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetCertainStepAuditors" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="AbortFlow">
       <soap12:operation soapAction="http://ic.truly.com.cn/AbortFlow" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetFlowQueue">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetFlowQueue" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AbortAfterFinish">
+      <soap12:operation soapAction="http://ic.truly.com.cn/AbortAfterFinish" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

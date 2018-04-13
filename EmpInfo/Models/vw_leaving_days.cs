@@ -12,26 +12,16 @@ namespace EmpInfo.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class ei_askLeave
+    public partial class vw_leaving_days
     {
         public int id { get; set; }
-        public string sys_no { get; set; }
         public string applier_num { get; set; }
         public string applier_name { get; set; }
-        public string dep_long_name { get; set; }
-        public string dep_no { get; set; }
-        public Nullable<int> emp_level { get; set; }
-        public Nullable<bool> is_direct_charge { get; set; }
         public string leave_type { get; set; }
         public Nullable<System.DateTime> from_date { get; set; }
         public Nullable<System.DateTime> to_date { get; set; }
         public Nullable<int> work_days { get; set; }
         public Nullable<decimal> work_hours { get; set; }
-        public string leave_reason { get; set; }
-        public string agent_man { get; set; }
-        public string inform_man { get; set; }
-        public Nullable<bool> has_attachment { get; set; }
         public Nullable<System.DateTime> apply_time { get; set; }
-        public Nullable<int> dep_id { get; set; }
     }
 }

@@ -9,7 +9,7 @@
 }
 <script>
     $(function () {        
-        var val = "@ViewData["yearMonth"]";w
+        var val = "@ViewData["yearMonth"]";
         if (val != "") {
             $.post("@Url.Content("~/Home/CheckSalaryDetail")", { yearMonth: val }, function (data) {
                 if (!data.suc) {

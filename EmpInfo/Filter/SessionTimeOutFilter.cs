@@ -36,7 +36,9 @@ namespace EmpInfo.Filter
                 returnUrl += "?";
                 foreach (var k in filterContext.ActionParameters.Keys) {
                     var v = filterContext.ActionParameters[k];
-                    returnUrl += k + "=" + v.ToString() + "&";
+                    if (v != null) {
+                        returnUrl += k + "=" + v.ToString() + "&";
+                    }
                 }
                 returnUrl = returnUrl.Substring(0, returnUrl.Length - 1); // 将最后的&去掉
             }
@@ -76,6 +78,11 @@ namespace EmpInfo.Filter
     {
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
+            //先执行session拦截器，没有登陆则跳转到登陆界面
+            new SessionTimeOutFilterAttribute().OnActionExecuting(filterContext);
+            if (filterContext.Result != null) return;
+
+            //如果已登陆，再判断是否有权限
             string actionName = filterContext.ActionDescriptor.ActionName;
             string controlerName = filterContext.ActionDescriptor.ControllerDescriptor.ControllerName;
 

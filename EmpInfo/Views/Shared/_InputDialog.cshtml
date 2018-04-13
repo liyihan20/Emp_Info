@@ -1,0 +1,47 @@
+﻿@{
+    Layout = null;
+}
+
+<div class="modal fade" id="inputModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="inputModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="inputModalLabel"><i class="fa fa-question-circle"></i> <span id="it_text_title">信息输入</span></h4>
+            </div>
+            <div class="modal-body">
+                <p id="input_tip" class="text-danger"></p>
+                <input class="form-control" type="text" id="it_input_content" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-mail-reply"></i> <span id="it_text_cancel">取消</span></button>
+                <button id="it_bt_confirm" type="button" class="btn btn-success"><i class="fa fa-check"></i> <span id="it_text_confirm">确定</span></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //打开信息输入对话框，content是提示内容，callback是点击确认之后的回调方法
+    var itcb;
+    function openInputDialog(inputTip, callback, title, cancelText, confirmText) {
+        $("#it_text_title").html(title ? title : "信息输入");
+        $("#it_text_cancel").html(cancelText ? cancelText : "取消");
+        $("#it_text_confirm").html(confirmText ? confirmText : "确定");
+        
+        $("#inputModal").modal("show");
+        $("#input_tip").html(inputTip);
+        itcb = callback;
+    }
+    $(function () {
+        $("#it_bt_confirm").on("click", function () {
+            var content = $("#it_input_content").val();
+            if ($.trim(content) == "") {
+                toastr.error("请先输入内容");
+                return;
+            }
+            $("#inputModal").modal("hide");
+            itcb(content);
+        });
+    });
+</script>

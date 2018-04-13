@@ -275,6 +275,9 @@
     <Compile Include="Models\ei_k3RestLog.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_leaveDayExceedPushLog.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_pushMsg.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -370,7 +373,13 @@
     <Compile Include="Models\vw_getAllhrEmp.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\vw_leaving_days.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\vw_push_users.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\wx_pushMsg.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -411,6 +420,8 @@
     <Content Include="Content\images\box.png" />
     <Content Include="Content\images\bubble-sprite.png" />
     <Content Include="Content\images\house.png" />
+    <Content Include="Content\images\leave.png" />
+    <Content Include="Content\images\office.png" />
     <Content Include="Content\images\paint.png" />
     <Content Include="Content\images\post.png" />
     <Content Include="Content\images\PO_48.png" />
@@ -715,6 +726,7 @@
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="Scripts\tooltipster.bundle.min.js" />
+    <Content Include="Scripts\webuploader.min.js" />
     <Content Include="Scripts\webuploader.withoutimage.js" />
     <Content Include="Scripts\_references.js" />
     <None Include="Service References\EmpWebSvr\TrulyEmpSvr.disco" />
@@ -737,6 +749,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Content>
     <Content Include="Service References\FlowSvr\EmpInfo.FlowSvr.CurrentAuditModel.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
+    <Content Include="Service References\FlowSvr\EmpInfo.FlowSvr.HasAuditModel.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Content>
     <None Include="Service References\FlowSvr\FlowSvr.disco" />
@@ -813,6 +828,15 @@
     <Content Include="Views\Shared\_SelectDep.cshtml" />
     <Content Include="Views\Home\CheckMonthSalary.cshtml" />
     <Content Include="Views\Shared\_ConfirmPasswordDialog.cshtml" />
+    <Content Include="Views\Apply\AskLeaveIndex.cshtml" />
+    <Content Include="Views\Apply\GetMyApplyALList.cshtml" />
+    <Content Include="Views\Apply\CheckALApply.cshtml" />
+    <Content Include="Views\Home\WorkGroupIndex.cshtml" />
+    <Content Include="Views\Apply\GetMyAuditingALList.cshtml" />
+    <Content Include="Views\Apply\BeginAuditALApply.cshtml" />
+    <Content Include="Views\Apply\GetMyAuditedALList.cshtml" />
+    <Content Include="Views\Apply\CheckFlowRecord.cshtml" />
+    <Content Include="Views\Shared\_InputDialog.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

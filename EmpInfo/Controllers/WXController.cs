@@ -5,6 +5,8 @@ using System.Web;
 using System.Web.Mvc;
 using EmpInfo.Util;
 using Newtonsoft.Json;
+using EmpInfo.Filter;
+using EmpInfo.Models;
 
 namespace EmpInfo.Controllers
 {
@@ -14,6 +16,7 @@ namespace EmpInfo.Controllers
         private string wLoginUrl = "http://emp.truly.com.cn/Emp/WX/WLogin?openId=";
         private string wLogoutUrl = "http://emp.truly.com.cn/Emp/WX/WLogout?openId=";
         private string wSystemLoginUrl = "http://emp.truly.com.cn/Emp/Account/Login?from=wx";
+        private string wWorkUrl = "http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}&controllerName=Home&actionName=WorkGroupIndex";
 
         //查询openid是否已登记
         public string QueryOpenId(string openId)
@@ -34,6 +37,71 @@ namespace EmpInfo.Controllers
 
             //已绑定过的，返回系统主界面和解除绑定界面，由服务号选择使用
             return JsonConvert.SerializeObject(new { suc = 1, url = MyUtils.AESEncrypt(url), ourl = MyUtils.AESEncrypt(wLogoutUrl), cardNo = MyUtils.AESEncrypt(emp.card_number) });
+        }
+
+        //进入智慧办公的接口
+        public string WorkGroupInterface(string openId)
+        {
+            try {
+                openId = MyUtils.AESDecrypt(openId);
+            }
+            catch {
+                return JsonConvert.SerializeObject(new { suc = 0,msg="openid不合法" });
+            }
+            var emps = db.ei_users.Where(u => u.wx_openid == openId && u.wx_easy_login == true);
+            if (emps.Count() == 0) {
+                return JsonConvert.SerializeObject(new { suc = 0, msg = "用户未绑定" });
+            }
+            var emp = emps.First();
+            string url = string.Format(wWorkUrl, emp.card_number, MyUtils.getMD5(emp.card_number));
+
+            //已绑定过的，返回系统主界面和解除绑定界面，由服务号选择使用
+            return JsonConvert.SerializeObject(new { suc = 1, url = MyUtils.AESEncrypt(url) });
+        }
+
+        //查询宿舍的接口
+        public string QueryDormInfo(string openId)
+        {
+            try {
+                openId = MyUtils.AESDecrypt(openId);
+            }
+            catch {
+                return JsonConvert.SerializeObject(new { suc = 0, msg = "openId不合法" });
+            }
+            var emps = db.ei_users.Where(u => u.wx_openid == openId && u.wx_easy_login == true);
+            if (emps.Count() == 0) {
+                return JsonConvert.SerializeObject(new { suc = 0, msg = "请绑定微信公众号【信利e家】后再操作" });
+            }
+            var emp = emps.First();
+
+            //测试
+            if (HasGotPower("ModuelTest",emp.id)) {
+                return JsonConvert.SerializeObject(
+                new
+                {
+                    suc = 1,
+                    cardNumber = emp.card_number,
+                    userName = emp.name,
+                    dormNumber = "A103",
+                    areaNumber = "一区",
+                    imgLink = "http://emp.truly.com.cn/Emp/Home/GetEmpPortrait?card_no=" + emp.card_number
+                });
+            }
+
+            var info = db.GetEmpDormInfo(emp.card_number).ToList();
+            if (info.Count() == 0) {
+                return JsonConvert.SerializeObject(new { suc = 0, msg = "员工当前没有住宿，不能申请快件寄存" });
+            }
+            return JsonConvert.SerializeObject(
+                new
+                {
+                    suc = 1,
+                    cardNumber = emp.card_number,
+                    userName = emp.name,
+                    dormNumber = info.First().dorm_number,
+                    areaNumber = info.First().area,
+                    imgLink = "http://emp.truly.com.cn/Emp/Home/GetEmpPortrait?card_no=" + emp.card_number
+                });
         }
 
         //微信openid认证通过跳转的页面
@@ -193,9 +261,52 @@ namespace EmpInfo.Controllers
             return Json(new { suc = true });
         }
 
+        //取消关注公众号事件中需要调用的接口
+        public string UnsubscribeWx(string openId)
+        {
+            if (string.IsNullOrEmpty(openId)) {
+                return JsonConvert.SerializeObject(new { suc = false, msg = "openId不能为空" });
+            }
+            try {
+                openId = MyUtils.AESDecrypt(openId);
+            }
+            catch {
+                return JsonConvert.SerializeObject(new { suc = false, msg = "openId不合法" });
+            }
+
+            var users = db.ei_users.Where(u => u.wx_openid == openId);
+            if (users.Count() == 0) {
+                return JsonConvert.SerializeObject(new { suc = false, msg = "用户未绑定过" });
+            }
+            var user = users.First();
+
+            user.wx_easy_login = false;
+            user.wx_check_salary_info = false;//免密工资查看            
+            user.wx_should_push_msg = false;
+            user.wx_push_consume_info = false; //推送消费信息
+            user.wx_push_flow_info = false; //推送业务流程信息
+            user.wx_push_salary_info = false; //推送工资信息
+            
+            db.SaveChanges();
+            WriteEventLog("微信服务号", "取消关注：" + openId);
+            return JsonConvert.SerializeObject(new { suc = true });
+        }
+        
+        public JsonResult HasBindWx()
+        {
+            bool hasBind = db.vw_push_users.Where(v => v.card_number == userInfo.cardNo).Count() > 0;
+            string msg = hasBind ? "" : "必须绑定【信利e家】微信公众号之后才能进行请假申请";
+            return Json(new SimpleResultModel() { suc = hasBind, msg = msg });
+        }
+
         public string AES(string str)
         {
             return Uri.EscapeDataString(MyUtils.AESEncrypt(str));
+        }
+
+        public string AESD(string str)
+        {
+            return MyUtils.AESDecrypt(str);
         }
 
     }

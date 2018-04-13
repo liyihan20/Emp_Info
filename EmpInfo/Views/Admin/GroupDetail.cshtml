@@ -4,7 +4,7 @@
     List<GroupAutModel> autList = (List<GroupAutModel>)ViewData["groupAuts"];
 }
 @section CSS{
-    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-select.min.css")" />
+    @*<link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-select.min.css")" />*@
     <style>
         .badge {
             color: #337ab7;
@@ -13,7 +13,7 @@
     </style>
 }
 @section Scripts{
-    <script src="@Url.Content("~/Scripts/bootstrap-select.min.js")"></script>
+    @*<script src="@Url.Content("~/Scripts/bootstrap-select.min.js")"></script>*@
     <script>
     $(function () {
                 
@@ -95,7 +95,25 @@
 
         //添加用户到组
         $("#addUserBt").click(function () {
-            $("#groupUserModal").modal("show");
+            openSelectUserDialog("", 100, function (data) {
+                var arr = data.split(";");
+                for (var i = 0; i < arr.length; i++) {
+                    $.post("@Url.Content("~/Admin/AddUserToGroup")", { group_id: "@ViewData["groupId"]", user_name_no: arr[i] }, function (data) {
+                        if (data.result.suc) {
+                            var node = "<a class='list-group-item'><div class='media'><div class='media-left media-middle'><img class='media-object' src='@Url.Content("~/Content/images/user_blue_48.png")' alt='user_blue_48'></div><div class='media-body'><h4 class='media-heading'><span class='u_name'>";
+                            node += data.groupUser.userName;
+                            node += "</span></h4><div><span class='u_no'>";
+                            node += data.groupUser.cardNo;
+                            node += "</span><input type='hidden' class='u_id' value='";
+                            node += data.groupUser.id;
+                            node += "' /></div></div><div class='media-right'><span class='badge hidden'><i class='glyphicon glyphicon-ok'></i></span></div></div></a>";
+                            $("#userList").append(node);                            
+                        } 
+                    });
+                }
+                toastr.success("已处理");
+            });
+            @*$("#groupUserModal").modal("show");
             if ($("#userSelect option").length < 1) {
                 $.post("@Url.Content("~/Item/GetUserBySelect")", {}, function (data) {
                     for (var i = 0; i < data.length; i++) {
@@ -104,9 +122,9 @@
                     }
                     $('#userSelect').selectpicker({ liveSearch: 'true' });
                 });
-            }
+            }*@
         });
-        $("#bt_groupUser").click(function () {
+        @*$("#bt_groupUser").click(function () {
             var id = $("#userSelect").val();
             $.post("@Url.Content("~/Admin/AddUserToGroup")", { group_id: "@ViewData["groupId"]", user_id: id }, function (data) {
                 if (data.result.suc) {
@@ -123,7 +141,7 @@
                     toastr.error(data.result.msg);
                 }
             });
-        });
+        });*@
 
         //移除组内用户
         $("#removeUserBt").click(function () {
@@ -364,7 +382,7 @@
     </div>
 </div>
 @section Modal{
-    <div class="modal fade" id="groupUserModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupUserModal" aria-hidden="true">
+    @*<div class="modal fade" id="groupUserModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupUserModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -381,7 +399,7 @@
             </div>
         </div>
     </div>
-</div>
+</div>*@
     
 <div class="modal fade" id="groupAutModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupAutModal" aria-hidden="true">
     <div class="modal-dialog">
@@ -400,5 +418,6 @@
         </div>
     </div>
 </div>
-    @Html.Partial("_ConfirmDialog");    
+    @Html.Partial("_ConfirmDialog");
+    @Html.Partial("_SelectUsers")
 }

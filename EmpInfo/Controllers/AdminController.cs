@@ -15,8 +15,7 @@ namespace EmpInfo.Controllers
     public class AdminController : BaseController
     {
         int pageNumber = 30;
-
-        [SessionTimeOutFilter]
+        
         [AuthorityFilter]
         public ActionResult AdminIndex()
         {
@@ -33,8 +32,7 @@ namespace EmpInfo.Controllers
             return View();
         }
 
-        #region 用户管理
-        [SessionTimeOutFilter]
+        #region 用户管理        
         [AuthorityFilter]
         public ActionResult UserManagement()
         {
@@ -164,8 +162,7 @@ namespace EmpInfo.Controllers
         #endregion
 
         #region 情景变换
-        [SessionTimeOutJsonFilter]
-        [AuthorityFilter]
+        [SessionTimeOutJsonFilter]        
         public JsonResult ChangeUser(string card_no)
         {
             if (db.ei_users.Where(u => u.card_number == card_no).Count() != 1)
@@ -180,8 +177,7 @@ namespace EmpInfo.Controllers
         #endregion
 
         #region 权限管理
-
-        [SessionTimeOutFilter]
+        
         [AuthorityFilter]
         public ActionResult Authorities(string searchContent)
         {
@@ -290,9 +286,7 @@ namespace EmpInfo.Controllers
         #endregion
 
         #region 分组管理
-
-
-        [SessionTimeOutFilter]
+        
         [AuthorityFilter]
         public ActionResult Groups()
         {
@@ -388,7 +382,15 @@ namespace EmpInfo.Controllers
         }
 
         [SessionTimeOutJsonFilter]
-        public JsonResult AddUserToGroup(int group_id, int user_id) {
+        public JsonResult AddUserToGroup(int group_id, int? user_id, string user_name_no)
+        {
+            if (user_id == null && string.IsNullOrEmpty(user_name_no)) {
+                return Json(new { result = new SimpleResultModel() { suc = false, msg = "请先选择用户" } });
+            }
+            if (user_id == null && !string.IsNullOrEmpty(user_name_no)) {
+                string userNumber = GetUserCardByNameAndCardNum(user_name_no);
+                user_id = db.vw_ei_users.Single(v => v.card_number == userNumber).id;
+            }
             try
             {
                 if (db.ei_groupUser.Where(gu => gu.group_id == group_id && gu.user_id == user_id).Count() > 0)
@@ -479,9 +481,7 @@ namespace EmpInfo.Controllers
         #endregion
 
         #region PO单归属
-
-
-        [SessionTimeOutFilter]
+        
         [AuthorityFilter]
         public ActionResult POAccountInfo()
         {
@@ -662,10 +662,11 @@ namespace EmpInfo.Controllers
                     return Json(new SimpleResultModel() { suc = false, msg = "存在审核人的情况下不能设置节点名称为空" });
                 }
             }
-            else {   
+            else {
                 depNode = new ei_departmentAuditNode();
                 depNode.ei_department = dep;
                 depNode.FIsCounterSign = false;
+                depNode.FProcessName = "请假";
                 db.ei_departmentAuditNode.Add(depNode);
             }
             depNode.FAuditNodeName = nodeName;
@@ -689,6 +690,7 @@ namespace EmpInfo.Controllers
                 depNode = new ei_departmentAuditNode();
                 depNode.ei_department = dep;
                 depNode.FAuditNodeName = "";
+                depNode.FProcessName = "请假";
                 db.ei_departmentAuditNode.Add(depNode);
             }
             depNode.FIsCounterSign = depNode.FIsCounterSign == true ? false : true;
@@ -704,7 +706,13 @@ namespace EmpInfo.Controllers
             if (DateTime.Parse(bTime) > DateTime.Parse(eTime)) {
                 return Json(new SimpleResultModel() { suc = false, msg = "生效日期不能晚于失效日期" });
             }
+            string auditorNumber = GetUserCardByNameAndCardNum(auditor);
+            if (string.IsNullOrEmpty(GetUserEmailByCardNum(auditorNumber))) {
+                return Json(new SimpleResultModel() { suc = false, msg = "此审核人没有登记邮箱，不能设置" });
+            }
+
             ei_departmentAuditUser depAuditor;
+            
             if (depAuditorId == 0) {
                 var auditNode = db.ei_department.Single(d => d.FNumber == depNum).ei_departmentAuditNode.First();
                 depAuditor = new ei_departmentAuditUser();
@@ -714,7 +722,7 @@ namespace EmpInfo.Controllers
             else {
                 depAuditor = db.ei_departmentAuditUser.Single(d => d.id == depAuditorId);
             }
-            depAuditor.FAuditorNumber = GetUserCardByNameAndCardNum(auditor);
+            depAuditor.FAuditorNumber = auditorNumber;
             depAuditor.FBeginTime = DateTime.Parse(bTime);
             depAuditor.FEndTime = DateTime.Parse(eTime);
 

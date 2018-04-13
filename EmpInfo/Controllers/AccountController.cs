@@ -84,45 +84,40 @@ namespace EmpInfo.Controllers
                 thisUser.forbit_flag = true;
                 msg = "你在人事系统不是【在职】状态，不能登陆";
             }
-            else if (user.Where(u => u.last_login_date != null && u.last_login_date < lastSixMonth).Count() > 0)
-            {
+            else if (user.Where(u => u.last_login_date != null && u.last_login_date < lastSixMonth && u.wx_openid != null).Count() > 0) {
                 thisUser = user.First();
                 thisUser.forbit_flag = true;
                 msg = "连续六个月未登录，被系统禁用";
             }
-            else if (user.Where(u => u.password == md5Password).Count() < 1)
-            {
+            else if (user.Where(u => u.password == md5Password).Count() < 1) {
                 thisUser = user.First();
                 if (thisUser.fail_times == null)
                     thisUser.fail_times = 1;
                 else
                     thisUser.fail_times = thisUser.fail_times + 1;
 
-                if (thisUser.fail_times >= maxFailTimes)
-                {
+                if (thisUser.fail_times >= maxFailTimes) {
                     thisUser.forbit_flag = true;
                     thisUser.fail_times = 0;
                     msg = "连续" + maxFailTimes + "次密码错误，用户被禁用!";
                 }
-                else
-                {
+                else {
                     msg = "已连续" + thisUser.fail_times + "次密码错误，你还剩下" + (maxFailTimes - thisUser.fail_times) + "次尝试机会。";
                 }
                 errorMsg = "密码错误：" + model.Password + ";" + msg;
             }
-            else
-            {
+            else {
                 //成功登录
-                    thisUser = user.First();
-                    thisUser.fail_times = 0;
-                    thisUser.last_login_date = DateTime.Now;
-                    
-                    //写入cookie
-                    setcookie(thisUser, model.rememberDay);
+                thisUser = user.First();
+                thisUser.fail_times = 0;
+                thisUser.last_login_date = DateTime.Now;
 
-                    msg = "登陆成功";
-                    suc = true;
-                
+                //写入cookie
+                setcookie(thisUser, model.rememberDay);
+
+                msg = "登陆成功";
+                suc = true;
+
             }
             if (suc)
             {

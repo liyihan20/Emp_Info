@@ -1,4 +1,7 @@
-﻿@section CSS{
+﻿@{
+    string auts = (string)ViewData["autStr"];
+}
+@section CSS{
     <style type="text/css">
         #dormGroup img {
             width: 48px;
@@ -8,20 +11,30 @@
 }
 @section Scripts {
     <script>
-        $(function () {
-            $(".closeLink").click(function () {
-                toastr.info("此功能暂未开放");
-            });
-            $("#dormitoryLink").click(function () {
-                $.post("@Url.Content("~/Home/ValidateDorm")", {}, function (data) {
-                    if (data.suc) {
-                        window.location.href = "@Url.Content("~/Home/CheckDormitory")";
-                    } else {
-                        toastr.error(data.msg);
-                    }
-                });
+    $(function () {
+        $(".closeLink").click(function () {
+            toastr.info("此功能暂未开放");
+        });
+        $("#dormitoryLink").click(function () {
+            $.post("@Url.Content("~/Home/ValidateDorm")", {}, function (data) {
+                if (data.suc) {
+                    window.location.href = "@Url.Content("~/Home/CheckDormitory")";
+                } else {
+                    toastr.error(data.msg);
+                }
             });
         });
+        $("#postLink").click(function () {
+            $.post("@Url.Content("~/WX/HasBindWx")", {}, function (data) {
+                if (data.suc) {
+                    window.location.href = "http://emp.truly.com.cn:91/TrusteeshipAdd/Trusteeship?openid=@ViewData["aesOpenId"]";
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+
+        });
+    });
     </script>
 }
 <div class="panel panel-danger">
@@ -52,12 +65,22 @@
                     <p class="text-center">宿舍来访预约</p>
                 </a>
             </div>
-            <div class="col-xs-4 col-sm-3 col-md-2">
-                <a href="#" class="closeLink">
-                    <img src="@Url.Content("~/Content/images/post.png")" alt="post" class="center-block" />
-                    <p class="text-center">宿舍快件寄存</p>
-                </a>
-            </div>
+            @if (auts.IndexOf("ModuelTest") >= 0) {
+                <div class="col-xs-4 col-sm-3 col-md-2">
+                    <a href="#" id="postLink">
+                        <img src="@Url.Content("~/Content/images/post.png")" alt="post" class="center-block" />
+                        <p class="text-center">宿舍快件寄存</p>
+                    </a>
+                </div>
+            }
+            else {
+                <div class="col-xs-4 col-sm-3 col-md-2">
+                    <a href="#" class="closeLink">
+                        <img src="@Url.Content("~/Content/images/post.png")" alt="post" class="center-block" />
+                        <p class="text-center">宿舍快件寄存</p>
+                    </a>
+                </div>
+            }
         </div>
     </div>
 </div>

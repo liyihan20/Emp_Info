@@ -51,7 +51,8 @@
                             $("#passwordModal").modal("show");
                         } else {
                             var urlParam = window.location.search;
-                            if (urlParam.length > 0) {
+                            //排除掉微信自动添加的?from=wx
+                            if (urlParam.length > 0 & urlParam.indexOf("from=wx")<0) {
                                 var url = unescape(urlParam.substr(urlParam.indexOf("=") + 1));
                                 window.location.href = "@Url.Content("~/")" + url;
                             } else {

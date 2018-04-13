@@ -19,4 +19,12 @@ namespace EmpInfo.Models
         public string msg { get; set; }
         public string extra { get; set; }
     }
+
+    public class RedirectModel
+    {
+        public string actionName { get; set; }
+        public string controllerName { get; set; }
+        public object routetValues { get; set; }
+    }
+
 }

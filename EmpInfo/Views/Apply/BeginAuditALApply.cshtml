@@ -1,0 +1,166 @@
+﻿@using EmpInfo.Models;
+@{
+    BeginAuditModel bam = (BeginAuditModel)ViewData["bam"];
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+}
+@section Scripts {
+    <script>
+        $(function () {
+
+            $("#applyContent").load("@Url.Content("~/Apply/CheckALApply?")", { sysNo: "@bam.sysNum" }, function () {
+                $("#applyContent .panel-heading").html("<i class='fa fa-list'></i> 请假申请单详情");
+                $("#waiting").remove();
+                $(".auditContent").css("visibility", "visible");
+            });
+            $("#opinionOpt").on("change", function () {
+                $("#opinion").val($("#opinionOpt").val());
+            });
+            $("#opinionOpt").val("同意！");
+            $("#opinionOpt").trigger("change");
+        });
+        function audit(isPass) {
+            openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此申请吗？", function () {
+                $.post("@Url.Content("~/Apply/HandleAlApply")", {
+                    sysNo: "@bam.sysNum",
+                    step: "@bam.step",
+                    isPass: isPass,
+                    opinion: $("#opinion").val()
+                }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        setTimeout(function () { window.location.href = "@Url.Content("~/Apply/GetMyAuditingALList")"; }, 2000);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+        }
+    </script>
+    @if (bam.isPass != null) {
+        <script>
+            $(function () {
+                $("#opinion").prop("readonly", "readonly").prop("placeholder", "");
+                $("#opinion").val("@bam.opinion");
+            });
+        </script>
+
+    }
+
+    @if (bam.isPass == null && bam.stepName == "行政审批") {
+        <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+        <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+        <script>
+            $(function () {
+                getSendMsgLog();
+
+                $("#bookTimePicker").datetimepicker({
+                    language: 'zh-CN',
+                    format: "yyyy-mm-dd hh:ii",
+                    autoclose: true,
+                    startView: 2,
+                    maxView: 2,
+                    minuteStep: 30,
+                });
+
+                $("#sendMsgBt").on("click", function () {
+                    var bookTime = $("#bookTime").val();
+                    if (bookTime == "") {
+                        toastr.error("请先选择预约时间");
+                        return;
+                    }
+                    $.post("@Url.Content("~/Apply/LeaveDayExceedPush")", { sysNo: "@bam.sysNum", bookTime: bookTime }, function (data) {
+                        if (data.suc) {
+                            toastr.success("已成功发送预约面谈通知");
+                            setTimeout(getSendMsgLog, 1000);
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                });
+
+            });
+
+            function getSendMsgLog() {
+                $.post("@Url.Content("~/Apply/GetLeaveDaysExceedLog")", { sysNo: "@bam.sysNum" }, function (data) {
+                    if (data.suc) {
+                        $("#msgLog").html(data.msg);
+                    } else {
+                        $("#msgLog").html("此申请单未发送过预约信息");
+                    }
+                });
+            }
+
+        </script>
+    }
+
+}
+@*通过load获取申请单内容*@
+<div class="text-center text-danger" id="waiting"><i class="fa fa-3x fa-spinner fa-pulse"></i></div>
+<div id="applyContent"></div>
+
+@*行政审批，需发送信息*@
+@if (bam.isPass == null && bam.stepName == "行政审批") {
+    <div class="row auditContent" style="visibility:hidden;">
+        <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="auditHead">
+                    <i class='fa fa-suitcase'></i> 行政约谈
+                </div>
+                <div class="panel-body">
+                    <div class="input-group date" id="bookTimePicker">
+                        <input class="form-control" type="text" id="bookTime" placeholder="请点击选择约谈时间" />
+                        <span class="input-group-addon"><span class="fa fa-calendar"></span> </span>
+                    </div>
+                    <button type="button" class="btn btn-success form-control" style="margin:6px 0;" id="sendMsgBt">发送预约信息</button>
+                    <p class="small text-danger"><i class="fa fa-info-circle"></i> <span id="msgLog"></span> </p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+    @*审批信息*@
+    <div class="row auditContent" style="visibility:hidden;">
+        <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="auditHead">
+                    <i class='fa fa-pencil'></i> 审核请假申请单
+                </div>
+                <div class="panel-body">
+                    @if (bam.isPass == null) {
+                        <select class="form-control" id="opinionOpt">
+                            <option value="">--选择常用处理意见--</option>
+                            <option value="同意！">同意！</option>
+                            <option value="不同意！">不同意！</option>
+                            <option value="不同意，所属部门选择错误！">不同意，所属部门选择错误！</option>
+                            <option value="不同意，职位级别选择错误！">不同意，职位级别选择错误！</option>
+                        </select>
+                    }
+
+                    <textarea class="form-control" rows="2" id="opinion" placeholder="请在此处输入审核意见"></textarea>
+                    <div style="margin-top:12px;"></div>
+                    @if (bam.isPass == null) {
+                        <div class="btn-group btn-group-justified" role="group">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
+                            </div>
+                        </div>
+                    }
+                    else if ((bool)bam.isPass) {
+                        <button type="button" class="btn btn-block btn-success disabled">已同意此申请</button>
+                    }
+                    else {
+                        <button type="button" class="btn btn-block btn-danger disabled">已拒绝此申请</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    @section Modal {
+        @Html.Partial("_ConfirmDialog")
+    }

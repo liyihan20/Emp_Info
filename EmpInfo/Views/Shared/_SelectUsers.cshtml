@@ -37,6 +37,12 @@
         $("#userSelModal").modal("show");
     }
     $(function () {
+        $("#u_sel_query_str").keyup(function () {
+            if (event.keyCode == 13) {
+                $("#u_sel_query_bt").trigger("click");
+            }
+        });
+
         $("#selBt").on("click", function () {
             if (selectedUser.length > uLimit) {
                 toastr.error("所选人数不得超过" + uLimit + "人");

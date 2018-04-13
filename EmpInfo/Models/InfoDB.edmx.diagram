@@ -50,13 +50,16 @@
         <EntityTypeShape EntityType="ICAuditModel.vw_getAllhrEmp" Width="1.5" PointX="11.75" PointY="10.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_department" Width="1.5" PointX="0.75" PointY="5.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_departmentAuditUser" Width="1.5" PointX="5.25" PointY="5.5" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_departmentAuditNode" Width="1.5" PointX="3" PointY="5.5" IsExpanded="false" />
-        <AssociationConnector Association="ICAuditModel.FK_ei_departmentAuditNode_ei_department" />
-        <AssociationConnector Association="ICAuditModel.FK_ei_departmentAuditUser_ei_departmentAuditNode" />
         <EntityTypeShape EntityType="ICAuditModel.ei_empLevel" Width="1.5" PointX="11.375" PointY="11.75" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_askLeave" Width="1.5" PointX="0.75" PointY="4.25" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_push_users" Width="1.5" PointX="10.5" PointY="4.625" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_users_android" Width="1.5" PointX="8" PointY="1.125" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_departmentAuditNode" Width="1.5" PointX="3.125" PointY="5.5" IsExpanded="false" />
+        <AssociationConnector Association="ICAuditModel.FK_ei_departmentAuditNode_ei_department" />
+        <AssociationConnector Association="ICAuditModel.FK_ei_departmentAuditUser_ei_departmentAuditNode" />
+        <EntityTypeShape EntityType="ICAuditModel.wx_pushMsg" Width="1.5" PointX="10.75" PointY="0.625" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_leaveDayExceedPushLog" Width="1.5" PointX="13.375" PointY="0.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_leaving_days" Width="1.5" PointX="0.75" PointY="13.75" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

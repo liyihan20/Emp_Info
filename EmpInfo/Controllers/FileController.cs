@@ -6,28 +6,18 @@ using System.Web.Mvc;
 using System.Configuration;
 using System.IO;
 using EmpInfo.Models;
+using EmpInfo.Util;
 
 namespace EmpInfo.Controllers
 {
     public class FileController : BaseController
     {
-        
-        private string GetAttachmentFolder(string sysNum)
-        {
-            return Path.Combine(
-                ConfigurationManager.AppSettings["AttachmentPath"],
-                sysNum.Substring(0, 2),
-                DateTime.Now.ToString("yyyy"),
-                DateTime.Now.ToString("MM"),
-                sysNum
-            );            
-        }
 
         [AcceptVerbs(HttpVerbs.Post)]
         public JsonResult BeginUpload(HttpPostedFileBase file,string sysNum)
         {
             try {
-                string folder = GetAttachmentFolder(sysNum);
+                string folder = MyUtils.GetAttachmentFolder(sysNum);
                 if (!Directory.Exists(folder)) {
                     Directory.CreateDirectory(folder);
                 }
@@ -44,7 +34,7 @@ namespace EmpInfo.Controllers
         public JsonResult RemoveUploadedFile(string sysNum, string fileName)
         {
             try {
-                string fileDirectory = Path.Combine(GetAttachmentFolder(sysNum), fileName);
+                string fileDirectory = Path.Combine(MyUtils.GetAttachmentFolder(sysNum), fileName);
                 if (System.IO.File.Exists(fileDirectory)) {
                     System.IO.File.Delete(fileDirectory);
                 }
@@ -54,6 +44,23 @@ namespace EmpInfo.Controllers
             }
             return Json(new SimpleResultModel() { suc = true });
         }
+
+        public FileStreamResult DownLoadFile(string sysNum, string fileName)
+        {
+            try {
+                string fileDirectory = Path.Combine(MyUtils.GetAttachmentFolder(sysNum), fileName);
+                if (System.IO.File.Exists(fileDirectory)) {
+                    return File(new FileStream(fileDirectory, FileMode.Open), "application/octet-stream", Server.UrlEncode(fileName));
+                }
+                else {
+                    return null;
+                }
+            }
+            catch {
+                return null;
+            }
+        }
+        
 
     }
 }

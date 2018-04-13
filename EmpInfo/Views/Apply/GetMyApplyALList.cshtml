@@ -15,18 +15,25 @@
 @section Scripts{
     <script>
         function CheckDetail(sysNo) {
-            window.location.href = "CheckAndAuditDPApply?sysNo=" + sysNo;
+            window.location.href = "CheckALApply?sysNo=" + sysNo;
         }
-        function AbortApply(sysNo) {
-            openConfirmDialog("确认要撤销/中止此维修申请吗？", function () {
-                $.post("@Url.Content("~/Apply/AbortDPApply")", { sysNo: sysNo }, function (data) {
+        function AbortApply(sysNo, reason) {
+            if (!reason) reason = "";
+            openConfirmDialog("确认要撤销此请假申请吗？", function () {
+                $.post("@Url.Content("~/Apply/AbortALApply")", { sysNo: sysNo, reason: reason }, function (data) {
                     if (data.suc) {
                         toastr.success(data.msg);
+                        setTimeout(function () { location.reload(true); }, 2000);
                     } else {
                         toastr.error(data.msg);
                     }
                 });
             });
+        }
+        function AbortApplyAfterFinish(sysNo) {
+            openInputDialog("请输入撤销请假申请的原因：", function (reason) {
+                AbortApply(sysNo, reason);
+            },"撤销原因输入");
         }
         </script>
     }
@@ -35,7 +42,8 @@
         <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
-            <li><a href="@Url.Content("~/Apply/DormRepairIndex")">宿舍维修申请</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Apply/AskLeaveIndex")">请假申请单</a></li>
             <li class="active">我申请的</li>
         </ol>
     </div>
@@ -51,21 +59,29 @@
         <div class="row">
             @foreach (var i in list) {
                 <div class="col-xs-12 col-md-3 col-sm-4">
-                    <div class="thumbnail">                        
-                        <img src="@Url.Content("~/Content/images/repair.png")" alt="repair">                        
+                    <div class="thumbnail">
+                        <img src="@Url.Content("~/Content/images/leave.png")" alt="leave">
                         <div class="caption">
                             <h3>@i.sysNo</h3>
                             <p>申请时间：@(((DateTime)i.applyTime).ToString("yyyy-MM-dd HH:mm:ss"))</p>
-                            <p>宿舍号：@i.subTitle</p>
+                            <p>请假时间：@i.subTitle</p>
                             @{var textColor = "text-default";
                               if (i.auditResult == "成功") { textColor = "text-success"; }
-                              if (i.auditResult == "失败") { textColor = "text-danger"; }
-                              }
+                              if (i.auditResult == "失败") { textColor = "text-danger"; }                              
+                             }
                             <p>审核结果：<b class="@textColor">@i.auditResult</b></p>
-                            <p><button class="btn btn-primary btn-block" onclick="CheckDetail('@i.sysNo')"><i class="fa fa-search"></i> 查看详情</button></p>
-                            @if (i.auditResult == "审批中") {
+                            <p><button class="btn btn-primary btn-block" onclick="CheckDetail('@i.sysNo')"><i class="fa fa-search"></i> 查看详情</button></p>                            
+                            @if (i.auditResult == "成功") {
+                                DateTime fromDate = DateTime.Parse(i.subTitle.Split(new char[] { '~' })[0].Trim());
+                                if (DateTime.Now < fromDate) {
+                                    <p><button class="btn btn-danger btn-block" onclick="AbortApplyAfterFinish('@i.sysNo')"><i class="fa fa-reply"></i> 撤销申请</button></p>
+                                }
+                            }
+                            else if (i.auditResult == "审批中") {
                                 <p><button class="btn btn-danger btn-block" onclick="AbortApply('@i.sysNo')"><i class="fa fa-reply"></i> 撤销申请</button></p>
                             }
+
+                            
                         </div>
                     </div>
                 </div>
@@ -75,4 +91,5 @@
 </div>
 @section modal{
     @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_InputDialog")
 }

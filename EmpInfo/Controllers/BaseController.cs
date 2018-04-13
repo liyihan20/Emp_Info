@@ -83,6 +83,7 @@ namespace EmpInfo.Controllers
                         _userInfoDetail.salaryNo = user.salary_no;
                         _userInfoDetail.depNum = user.dep_no;
                         _userInfoDetail.depLongName = user.dep_long_name;
+                        _userInfoDetail.AesOpenId = string.IsNullOrEmpty(user.wx_openid) ? null : Uri.EscapeDataString(MyUtils.AESEncrypt(user.wx_openid));
                     }
                     Session["userInfoDetail"] = _userInfoDetail;
                 }
@@ -238,12 +239,15 @@ namespace EmpInfo.Controllers
         }
 
         //是否拥有某权限
-        protected bool HasGotPower(string powerName)
+        protected bool HasGotPower(string powerName,int userId=0)
         {
+            if (userId == 0) {
+                userId = userInfo.id;
+            }
             var powers = (from g in db.ei_groups
                           from a in g.ei_groupAuthority
                           from gu in g.ei_groupUser
-                          where gu.user_id == userInfo.id
+                          where gu.user_id == userId
                           && a.ei_authority.en_name == powerName
                           select a).ToList();
             if (powers.Count() > 0) {
@@ -318,6 +322,12 @@ namespace EmpInfo.Controllers
         protected string GetDepLongNameByNum(string depNum)
         {
             var dep = db.ei_department.Single(d => d.FNumber == depNum);
+            if (dep.FIsDeleted == true) {
+                return "已删除部门";
+            }
+            if (dep.FIsForbit == true) {
+                return "已禁用部门";
+            }
             string depName = dep.FName;
             while (dep.FParent != null) {
                 dep = db.ei_department.Single(d => d.FNumber == dep.FParent);

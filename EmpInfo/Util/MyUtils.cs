@@ -10,6 +10,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Gma.QrCodeNet.Encoding;
 using Gma.QrCodeNet.Encoding.Windows.Render;
+using System.Configuration;
+using System.Collections.Generic;
+
 
 namespace EmpInfo.Util
 {
@@ -514,6 +517,47 @@ namespace EmpInfo.Util
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 获取申请单号所在的附件文件夹
+        /// </summary>
+        /// <param name="sysNum">申请单号</param>
+        /// <returns></returns>
+        public static string GetAttachmentFolder(string sysNum)
+        {
+            return Path.Combine(
+                ConfigurationManager.AppSettings["AttachmentPath"],
+                sysNum.Substring(0, 2),
+                "20"+sysNum.Substring(2,2),
+                sysNum.Substring(4, 2),
+                sysNum
+            );
+        }
+
+        /// <summary>
+        /// 获取某申请单号的所有附件列表
+        /// </summary>
+        /// <param name="sysNo">申请单号</param>
+        /// <returns></returns>
+        public static List<AttachmentModel> GetAttachmentInfo(string sysNo)
+        {
+            var list = new List<AttachmentModel>();
+            var folder = GetAttachmentFolder(sysNo);
+
+            DirectoryInfo di = new DirectoryInfo(folder);
+            foreach (FileInfo fi in di.GetFiles()) {
+                if (fi.Name.Contains(".db")) {
+                    continue; //将目录自动生成的thumb.db文件过滤掉
+                }
+                list.Add(new AttachmentModel()
+                {
+                    fileName = fi.Name,                    
+                    fileSize = fi.Length / 1024 + " K"
+                });
+            }
+
+            return list;
         }
 
     }

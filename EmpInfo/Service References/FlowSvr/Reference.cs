@@ -248,6 +248,8 @@ namespace EmpInfo.FlowSvr {
         
         private System.Nullable<System.DateTime> finishTimeField;
         
+        private bool isUserAobrtField;
+        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -349,6 +351,19 @@ namespace EmpInfo.FlowSvr {
             }
         }
         
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=7)]
+        public bool isUserAobrt {
+            get {
+                return this.isUserAobrtField;
+            }
+            set {
+                if ((this.isUserAobrtField.Equals(value) != true)) {
+                    this.isUserAobrtField = value;
+                    this.RaisePropertyChanged("isUserAobrt");
+                }
+            }
+        }
+        
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
         protected void RaisePropertyChanged(string propertyName) {
@@ -402,6 +417,14 @@ namespace EmpInfo.FlowSvr {
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string finalResultField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string auditorsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string finalAuditorsField;
+        
+        private bool isUserAobrtField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -543,6 +566,45 @@ namespace EmpInfo.FlowSvr {
             }
         }
         
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=10)]
+        public string auditors {
+            get {
+                return this.auditorsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.auditorsField, value) != true)) {
+                    this.auditorsField = value;
+                    this.RaisePropertyChanged("auditors");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=11)]
+        public string finalAuditors {
+            get {
+                return this.finalAuditorsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.finalAuditorsField, value) != true)) {
+                    this.finalAuditorsField = value;
+                    this.RaisePropertyChanged("finalAuditors");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=12)]
+        public bool isUserAobrt {
+            get {
+                return this.isUserAobrtField;
+            }
+            set {
+                if ((this.isUserAobrtField.Equals(value) != true)) {
+                    this.isUserAobrtField = value;
+                    this.RaisePropertyChanged("isUserAobrt");
+                }
+            }
+        }
+        
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
         protected void RaisePropertyChanged(string propertyName) {
@@ -629,6 +691,113 @@ namespace EmpInfo.FlowSvr {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="HasAuditModel", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class HasAuditModel : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private bool sucField;
+        
+        private System.Nullable<bool> isPassField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string opinionField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string msgField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string stepNameField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public bool suc {
+            get {
+                return this.sucField;
+            }
+            set {
+                if ((this.sucField.Equals(value) != true)) {
+                    this.sucField = value;
+                    this.RaisePropertyChanged("suc");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
+        public System.Nullable<bool> isPass {
+            get {
+                return this.isPassField;
+            }
+            set {
+                if ((this.isPassField.Equals(value) != true)) {
+                    this.isPassField = value;
+                    this.RaisePropertyChanged("isPass");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public string opinion {
+            get {
+                return this.opinionField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.opinionField, value) != true)) {
+                    this.opinionField = value;
+                    this.RaisePropertyChanged("opinion");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string msg {
+            get {
+                return this.msgField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.msgField, value) != true)) {
+                    this.msgField = value;
+                    this.RaisePropertyChanged("msg");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        public string stepName {
+            get {
+                return this.stepNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.stepNameField, value) != true)) {
+                    this.stepNameField = value;
+                    this.RaisePropertyChanged("stepName");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(Namespace="http://ic.truly.com.cn/", ConfigurationName="FlowSvr.FlowSvrSoap")]
     public interface FlowSvrSoap {
@@ -669,9 +838,29 @@ namespace EmpInfo.FlowSvr {
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetCurrentStep", ReplyAction="*")]
         EmpInfo.FlowSvr.GetCurrentStepResponse GetCurrentStep(EmpInfo.FlowSvr.GetCurrentStepRequest request);
         
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/ApplyHasAudit", ReplyAction="*")]
+        EmpInfo.FlowSvr.ApplyHasAuditResponse ApplyHasAudit(EmpInfo.FlowSvr.ApplyHasAuditRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/ApplyHasBeenAudited", ReplyAction="*")]
+        EmpInfo.FlowSvr.ApplyHasBeenAuditedResponse ApplyHasBeenAudited(EmpInfo.FlowSvr.ApplyHasBeenAuditedRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetCertainStepAuditors", ReplyAction="*")]
+        EmpInfo.FlowSvr.GetCertainStepAuditorsResponse GetCertainStepAuditors(EmpInfo.FlowSvr.GetCertainStepAuditorsRequest request);
+        
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 userNumber 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/AbortFlow", ReplyAction="*")]
         EmpInfo.FlowSvr.AbortFlowResponse AbortFlow(EmpInfo.FlowSvr.AbortFlowRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 formJson 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetFlowQueue", ReplyAction="*")]
+        EmpInfo.FlowSvr.GetFlowQueueResponse GetFlowQueue(EmpInfo.FlowSvr.GetFlowQueueRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/AbortAfterFinish", ReplyAction="*")]
+        EmpInfo.FlowSvr.AbortAfterFinishResponse AbortAfterFinish(EmpInfo.FlowSvr.AbortAfterFinishRequest request);
         
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 TestStarFlowResult 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestStarFlow", ReplyAction="*")]
@@ -1430,6 +1619,222 @@ namespace EmpInfo.FlowSvr {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class ApplyHasAuditRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="ApplyHasAudit", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.ApplyHasAuditRequestBody Body;
+        
+        public ApplyHasAuditRequest() {
+        }
+        
+        public ApplyHasAuditRequest(EmpInfo.FlowSvr.ApplyHasAuditRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class ApplyHasAuditRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string sysNo;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public int step;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public string auditorNumber;
+        
+        public ApplyHasAuditRequestBody() {
+        }
+        
+        public ApplyHasAuditRequestBody(string sysNo, int step, string auditorNumber) {
+            this.sysNo = sysNo;
+            this.step = step;
+            this.auditorNumber = auditorNumber;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class ApplyHasAuditResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="ApplyHasAuditResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.ApplyHasAuditResponseBody Body;
+        
+        public ApplyHasAuditResponse() {
+        }
+        
+        public ApplyHasAuditResponse(EmpInfo.FlowSvr.ApplyHasAuditResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class ApplyHasAuditResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public EmpInfo.FlowSvr.HasAuditModel ApplyHasAuditResult;
+        
+        public ApplyHasAuditResponseBody() {
+        }
+        
+        public ApplyHasAuditResponseBody(EmpInfo.FlowSvr.HasAuditModel ApplyHasAuditResult) {
+            this.ApplyHasAuditResult = ApplyHasAuditResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class ApplyHasBeenAuditedRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="ApplyHasBeenAudited", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.ApplyHasBeenAuditedRequestBody Body;
+        
+        public ApplyHasBeenAuditedRequest() {
+        }
+        
+        public ApplyHasBeenAuditedRequest(EmpInfo.FlowSvr.ApplyHasBeenAuditedRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class ApplyHasBeenAuditedRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string sysNo;
+        
+        public ApplyHasBeenAuditedRequestBody() {
+        }
+        
+        public ApplyHasBeenAuditedRequestBody(string sysNo) {
+            this.sysNo = sysNo;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class ApplyHasBeenAuditedResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="ApplyHasBeenAuditedResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.ApplyHasBeenAuditedResponseBody Body;
+        
+        public ApplyHasBeenAuditedResponse() {
+        }
+        
+        public ApplyHasBeenAuditedResponse(EmpInfo.FlowSvr.ApplyHasBeenAuditedResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class ApplyHasBeenAuditedResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
+        public bool ApplyHasBeenAuditedResult;
+        
+        public ApplyHasBeenAuditedResponseBody() {
+        }
+        
+        public ApplyHasBeenAuditedResponseBody(bool ApplyHasBeenAuditedResult) {
+            this.ApplyHasBeenAuditedResult = ApplyHasBeenAuditedResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetCertainStepAuditorsRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetCertainStepAuditors", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.GetCertainStepAuditorsRequestBody Body;
+        
+        public GetCertainStepAuditorsRequest() {
+        }
+        
+        public GetCertainStepAuditorsRequest(EmpInfo.FlowSvr.GetCertainStepAuditorsRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetCertainStepAuditorsRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string sysNo;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public int step;
+        
+        public GetCertainStepAuditorsRequestBody() {
+        }
+        
+        public GetCertainStepAuditorsRequestBody(string sysNo, int step) {
+            this.sysNo = sysNo;
+            this.step = step;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetCertainStepAuditorsResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetCertainStepAuditorsResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.GetCertainStepAuditorsResponseBody Body;
+        
+        public GetCertainStepAuditorsResponse() {
+        }
+        
+        public GetCertainStepAuditorsResponse(EmpInfo.FlowSvr.GetCertainStepAuditorsResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetCertainStepAuditorsResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string GetCertainStepAuditorsResult;
+        
+        public GetCertainStepAuditorsResponseBody() {
+        }
+        
+        public GetCertainStepAuditorsResponseBody(string GetCertainStepAuditorsResult) {
+            this.GetCertainStepAuditorsResult = GetCertainStepAuditorsResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class AbortFlowRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="AbortFlow", Namespace="http://ic.truly.com.cn/", Order=0)]
@@ -1495,6 +1900,146 @@ namespace EmpInfo.FlowSvr {
         
         public AbortFlowResponseBody(EmpInfo.FlowSvr.FlowResultModel AbortFlowResult) {
             this.AbortFlowResult = AbortFlowResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetFlowQueueRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetFlowQueue", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.GetFlowQueueRequestBody Body;
+        
+        public GetFlowQueueRequest() {
+        }
+        
+        public GetFlowQueueRequest(EmpInfo.FlowSvr.GetFlowQueueRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetFlowQueueRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string formJson;
+        
+        public GetFlowQueueRequestBody() {
+        }
+        
+        public GetFlowQueueRequestBody(string formJson) {
+            this.formJson = formJson;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetFlowQueueResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetFlowQueueResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.GetFlowQueueResponseBody Body;
+        
+        public GetFlowQueueResponse() {
+        }
+        
+        public GetFlowQueueResponse(EmpInfo.FlowSvr.GetFlowQueueResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetFlowQueueResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public EmpInfo.FlowSvr.FlowResultModel GetFlowQueueResult;
+        
+        public GetFlowQueueResponseBody() {
+        }
+        
+        public GetFlowQueueResponseBody(EmpInfo.FlowSvr.FlowResultModel GetFlowQueueResult) {
+            this.GetFlowQueueResult = GetFlowQueueResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class AbortAfterFinishRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="AbortAfterFinish", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.AbortAfterFinishRequestBody Body;
+        
+        public AbortAfterFinishRequest() {
+        }
+        
+        public AbortAfterFinishRequest(EmpInfo.FlowSvr.AbortAfterFinishRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class AbortAfterFinishRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string sysNo;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string reason;
+        
+        public AbortAfterFinishRequestBody() {
+        }
+        
+        public AbortAfterFinishRequestBody(string sysNo, string reason) {
+            this.sysNo = sysNo;
+            this.reason = reason;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class AbortAfterFinishResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="AbortAfterFinishResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.AbortAfterFinishResponseBody Body;
+        
+        public AbortAfterFinishResponse() {
+        }
+        
+        public AbortAfterFinishResponse(EmpInfo.FlowSvr.AbortAfterFinishResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class AbortAfterFinishResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public EmpInfo.FlowSvr.FlowResultModel AbortAfterFinishResult;
+        
+        public AbortAfterFinishResponseBody() {
+        }
+        
+        public AbortAfterFinishResponseBody(EmpInfo.FlowSvr.FlowResultModel AbortAfterFinishResult) {
+            this.AbortAfterFinishResult = AbortAfterFinishResult;
         }
     }
     
@@ -1992,6 +2537,48 @@ namespace EmpInfo.FlowSvr {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.FlowSvr.ApplyHasAuditResponse EmpInfo.FlowSvr.FlowSvrSoap.ApplyHasAudit(EmpInfo.FlowSvr.ApplyHasAuditRequest request) {
+            return base.Channel.ApplyHasAudit(request);
+        }
+        
+        public EmpInfo.FlowSvr.HasAuditModel ApplyHasAudit(string sysNo, int step, string auditorNumber) {
+            EmpInfo.FlowSvr.ApplyHasAuditRequest inValue = new EmpInfo.FlowSvr.ApplyHasAuditRequest();
+            inValue.Body = new EmpInfo.FlowSvr.ApplyHasAuditRequestBody();
+            inValue.Body.sysNo = sysNo;
+            inValue.Body.step = step;
+            inValue.Body.auditorNumber = auditorNumber;
+            EmpInfo.FlowSvr.ApplyHasAuditResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).ApplyHasAudit(inValue);
+            return retVal.Body.ApplyHasAuditResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.FlowSvr.ApplyHasBeenAuditedResponse EmpInfo.FlowSvr.FlowSvrSoap.ApplyHasBeenAudited(EmpInfo.FlowSvr.ApplyHasBeenAuditedRequest request) {
+            return base.Channel.ApplyHasBeenAudited(request);
+        }
+        
+        public bool ApplyHasBeenAudited(string sysNo) {
+            EmpInfo.FlowSvr.ApplyHasBeenAuditedRequest inValue = new EmpInfo.FlowSvr.ApplyHasBeenAuditedRequest();
+            inValue.Body = new EmpInfo.FlowSvr.ApplyHasBeenAuditedRequestBody();
+            inValue.Body.sysNo = sysNo;
+            EmpInfo.FlowSvr.ApplyHasBeenAuditedResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).ApplyHasBeenAudited(inValue);
+            return retVal.Body.ApplyHasBeenAuditedResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.FlowSvr.GetCertainStepAuditorsResponse EmpInfo.FlowSvr.FlowSvrSoap.GetCertainStepAuditors(EmpInfo.FlowSvr.GetCertainStepAuditorsRequest request) {
+            return base.Channel.GetCertainStepAuditors(request);
+        }
+        
+        public string GetCertainStepAuditors(string sysNo, int step) {
+            EmpInfo.FlowSvr.GetCertainStepAuditorsRequest inValue = new EmpInfo.FlowSvr.GetCertainStepAuditorsRequest();
+            inValue.Body = new EmpInfo.FlowSvr.GetCertainStepAuditorsRequestBody();
+            inValue.Body.sysNo = sysNo;
+            inValue.Body.step = step;
+            EmpInfo.FlowSvr.GetCertainStepAuditorsResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).GetCertainStepAuditors(inValue);
+            return retVal.Body.GetCertainStepAuditorsResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         EmpInfo.FlowSvr.AbortFlowResponse EmpInfo.FlowSvr.FlowSvrSoap.AbortFlow(EmpInfo.FlowSvr.AbortFlowRequest request) {
             return base.Channel.AbortFlow(request);
         }
@@ -2003,6 +2590,33 @@ namespace EmpInfo.FlowSvr {
             inValue.Body.sysNo = sysNo;
             EmpInfo.FlowSvr.AbortFlowResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).AbortFlow(inValue);
             return retVal.Body.AbortFlowResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.FlowSvr.GetFlowQueueResponse EmpInfo.FlowSvr.FlowSvrSoap.GetFlowQueue(EmpInfo.FlowSvr.GetFlowQueueRequest request) {
+            return base.Channel.GetFlowQueue(request);
+        }
+        
+        public EmpInfo.FlowSvr.FlowResultModel GetFlowQueue(string formJson) {
+            EmpInfo.FlowSvr.GetFlowQueueRequest inValue = new EmpInfo.FlowSvr.GetFlowQueueRequest();
+            inValue.Body = new EmpInfo.FlowSvr.GetFlowQueueRequestBody();
+            inValue.Body.formJson = formJson;
+            EmpInfo.FlowSvr.GetFlowQueueResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).GetFlowQueue(inValue);
+            return retVal.Body.GetFlowQueueResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.FlowSvr.AbortAfterFinishResponse EmpInfo.FlowSvr.FlowSvrSoap.AbortAfterFinish(EmpInfo.FlowSvr.AbortAfterFinishRequest request) {
+            return base.Channel.AbortAfterFinish(request);
+        }
+        
+        public EmpInfo.FlowSvr.FlowResultModel AbortAfterFinish(string sysNo, string reason) {
+            EmpInfo.FlowSvr.AbortAfterFinishRequest inValue = new EmpInfo.FlowSvr.AbortAfterFinishRequest();
+            inValue.Body = new EmpInfo.FlowSvr.AbortAfterFinishRequestBody();
+            inValue.Body.sysNo = sysNo;
+            inValue.Body.reason = reason;
+            EmpInfo.FlowSvr.AbortAfterFinishResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).AbortAfterFinish(inValue);
+            return retVal.Body.AbortAfterFinishResult;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]

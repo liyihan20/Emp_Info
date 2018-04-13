@@ -348,6 +348,7 @@
             $("#dep_audit_users").empty();
             $.post("@Url.Content("~/Admin/LoadDepAuditors")", { depNum: dNum }, function (data) {
                 if (data.suc) {
+                    $("#dep_audit_users").empty(); //清理多一次，解决很快点击两个部门，会显示这两个部门的审核人的bug
                     var list = data.list;
                     for (var i = 0; i < list.length; i++) {
                         var tbContent = "<tr";
@@ -372,7 +373,17 @@
     </script>
 
 }
-<div class="row">
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Admin/AdminIndex")">管理员工具栏</a></li>
+            <li class="active">组织机构</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row">
     <div class="col-md-6 col-xs-12">
         <div id="depTree"></div>
     </div>
@@ -468,6 +479,9 @@
         </div>
     </div>
 </div>
+    </div>
+</div>
+
 
 @section Modal {
     @*修改部门名称*@

@@ -23,6 +23,7 @@ namespace EmpInfo.Models
         public Nullable<int> FDepartmentId { get; set; }
         public Nullable<bool> FIsCounterSign { get; set; }
         public string FAuditNodeName { get; set; }
+        public string FProcessName { get; set; }
     
         public virtual ei_department ei_department { get; set; }
         public virtual ICollection<ei_departmentAuditUser> ei_departmentAuditUser { get; set; }

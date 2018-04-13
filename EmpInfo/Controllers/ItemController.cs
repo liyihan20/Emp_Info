@@ -75,7 +75,7 @@ namespace EmpInfo.Controllers
             var rootDep = db.ei_department.Single(e => e.FNumber == rootNumber);            
             Department dep = new Department();            
             dep.text = rootDep.FName;
-            dep.tags = new string[] { rootDep.FNumber };
+            dep.tags = new string[] { rootDep.FNumber,rootDep.id.ToString() };
             dep.selectable = true;
 
             dep.nodes = new List<Department>();            

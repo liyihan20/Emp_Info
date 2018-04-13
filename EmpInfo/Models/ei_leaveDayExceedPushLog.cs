@@ -12,17 +12,12 @@ namespace EmpInfo.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class vw_push_users
+    public partial class ei_leaveDayExceedPushLog
     {
         public int id { get; set; }
-        public string card_number { get; set; }
-        public Nullable<int> salary_no { get; set; }
-        public string name { get; set; }
-        public string wx_openid { get; set; }
-        public Nullable<bool> wx_push_salary_info { get; set; }
-        public Nullable<bool> wx_push_consume_info { get; set; }
-        public Nullable<bool> wx_push_flow_info { get; set; }
-        public Nullable<bool> wx_check_salary_info { get; set; }
-        public string salary_no_str { get; set; }
+        public string sys_no { get; set; }
+        public Nullable<System.DateTime> send_date { get; set; }
+        public Nullable<System.DateTime> book_date { get; set; }
+        public string send_user { get; set; }
     }
 }

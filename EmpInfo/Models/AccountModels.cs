@@ -30,6 +30,7 @@ namespace EmpInfo.Models
         public string salaryNo { get; set; }
         public string depNum { get; set; }
         public string depLongName { get; set; }
+        public string AesOpenId { get; set; }
 
     }
     public class LoginModel

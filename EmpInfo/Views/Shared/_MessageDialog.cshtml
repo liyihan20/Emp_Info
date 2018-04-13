@@ -10,7 +10,7 @@
                 <h4 class="modal-title text-info"><i class="fa fa-info-circle"></i> <span id="labelTip">信息提示</span></h4>
             </div>
             <div class="modal-body">
-                <p id="confirm_content"></p>
+                <p id="message_content"></p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
@@ -26,6 +26,6 @@
         if (label) {
             $("#labelTip").html(label);
         }
-        $("#confirm_content").html(content);        
+        $("#message_content").html(content);
     }
 </script>

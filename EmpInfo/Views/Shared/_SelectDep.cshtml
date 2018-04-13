@@ -5,10 +5,10 @@
 
 <script src="@Url.Content("~/Scripts/bootstrap-treeview.min.js")"></script>
 <script>
-    var cb;
+    var sdcb;
     var selectedDep;
-    function openSelectDepDialog(callback) {        
-        cb = callback;        
+    function openSelectDepDialog(callback) {
+        sdcb = callback;
         $("#depSelModal").modal("show");
         GetTreeData();
     }
@@ -19,8 +19,9 @@
             expandIcon: "fa fa-folder-o",
             collapseIcon: "fa fa-folder-open-o",
             emptyIcon: "fa fa-home",
-            onNodeSelected: function (event, node) {                
+            onNodeSelected: function (event, node) {
                 var num = node.tags[0];
+                var id = node.tags[1];
                 var name = node.text;
                 var longName = name;
                 
@@ -29,16 +30,17 @@
                     longName = parent.text + "/" + longName;
                     parent = $('#depTree').treeview('getParent', parent);
                 }
-                selectedDep = { depNum: num, depShortName: name, depLongName: longName };
+                selectedDep = { depNum: num, depShortName: name, depLongName: longName, depId: id };
             }
         });        
     });
     }
     $(function () {
         $("#depSelBt").on("click", function () {
-            cb(selectedDep); //通过回调返回已选部门
+            sdcb(selectedDep); //通过回调返回已选部门
             $("#depSelModal").modal("hide");
         });
+        
     });
 
 </script>
@@ -50,7 +52,7 @@
                 <h4 class="modal-title">选择部门</h4>
             </div>
             <div class="modal-body" style="min-height:280px;max-height:400px;overflow:auto;">
-
+                <p class="small text-danger"><i class="fa fa-info-circle"></i> 点击文件夹图标可展开子部门，选择正确部门后点击确认按钮返回。</p>
                 <div id="depTree"></div>
 
             </div>

@@ -37,7 +37,7 @@
 @section Scripts {
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
-    <script src="@Url.Content("~/Scripts/webuploader.withoutimage.js")"></script>
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
 
     <script>
 
@@ -66,8 +66,10 @@
             //选择部门
             $("#eDepName").on("click", function () {
                 openSelectDepDialog(function (selectedDep) {
+                    console.log(selectedDep);
                     $("#eDepName").val(selectedDep.depLongName);
                     $("#eDepNum").val(selectedDep.depNum);
+                    $("#eDepId").val(selectedDep.depId);
                 });
             });
 
@@ -98,19 +100,43 @@
 
                 $("#hasAttachment").val($("#al_file_list").children().length > 0);
                 $(this).button("loading");
-                var formParam = $("#alForm").serialize();               
+                var formParam = $("#alForm").serialize();
                 $.ajax({
                     type: 'post',
-                    url: '@Url.Content("~/Apply/SaveApplyAL")',
+                    url: '@Url.Content("~/Apply/GetALFlowQueue")',
                     data: formParam,
                     cache: false,
                     dataType: 'json',
                     success: function (data) {
                         if (data.suc) {
-                            toastr.success("提交申请成功");
-                            
-                        } else {                            
-                            toastr.error("提交失败："+ data.msg);
+                            var q = data.list;
+                            var div = "";
+                            for (var i = 0; i < q.length; i++) {
+                                div += "<div>" + q[i].step + ". 【" + q[i].step_name + "】 " + q[i].auditors + "</div>";
+                            }
+                            openConfirmDialog(div, function () {
+                                $("#apply_bt").button("loading");
+                                $.ajax({
+                                    type: 'post',
+                                    url: '@Url.Content("~/Apply/SaveApplyAL")',
+                                    data: formParam,
+                                    cache: false,
+                                    dataType: 'json',
+                                    success: function (data) {
+                                        $("#apply_bt").button("reset");
+                                        if (data.suc) {
+                                            toastr.success("提交成功:" + data.msg);
+                                            setTimeout(function () { window.location.href = "@Url.Content("~/Apply/AskLeaveIndex")"; }, 2000);
+                                        } else {
+                                            toastr.error("提交失败：" + data.msg);
+                                            $("#apply_bt").button("reset");
+                                        }
+
+                                    }
+                                });
+                            }, "审批流程预览", "返回修改", "确认提交");
+                        } else {
+                            toastr.error(data.msg);
                         }
                         $("#apply_bt").button("reset");
                     }
@@ -153,8 +179,8 @@
             if (hours == "") {
                 toastr.error("必须填写[小时]数");
                 return false;
-            }            
-            if (isNaN(hours) || hours<0) {
+            }
+            if (isNaN(hours) || hours < 0) {
                 toastr.error("[小时]必须填写大于0的数字");
                 return false;
             }
@@ -169,9 +195,22 @@
                 toastr.error("请假时间不能都是0");
                 return false;
             }
+            if ($($("input[name='leave_type']:checked")[0]).val() == "病假" && $("#al_file_list tr").length < 1) {
+                toastr.error("当[请假类型]是病假时，必须上传医院诊断证明等附件");
+                return false;
+            }
             return true;
         }
 
+        function showDepName() {
+            var name = $("#eDepName").val();
+            var no = $("#eDepNum").val();
+            if (name == "") {
+                toastr.info("请先选择所属部门");
+                return;
+            }
+            openMessageDialog("<div>名称：<span class='text-danger'>" + name + "</span></div><div>编码：<span class='text-danger'>" + no + "</span></div>", "当前所选部门信息");
+        }
     </script>
 
     <script>
@@ -179,7 +218,7 @@
 
             $("#al_file_panel").hide();
             var maxNum = 3; //最多上传3个文件
-            var maxSingleSize = 5 * 1024 * 1024; //单个文件最多5M
+            var maxSingleSize = 10 * 1024 * 1024; //单个文件最多10M,会自动压缩的
             var uploader = WebUploader.create({
                 swf: '@Url.Content("~/Content/webupload/Uploader.swf")',
                 server: '@Url.Content("~/File/BeginUpload")',
@@ -188,7 +227,12 @@
                 auto: true,
                 formData: { sysNum: '@ViewData["sysNum"]' },
                 fileNumLimit: maxNum,
-                fileSingleSizeLimit: maxSingleSize
+                fileSingleSizeLimit: maxSingleSize,
+                accept: {
+                    title: 'Images',
+                    extensions: 'gif,jpg,jpeg,bmp,png',
+                    mimeTypes: 'image/*'
+                }
             });
 
             uploader.on('fileQueued', function (file) {
@@ -225,7 +269,7 @@
             uploader.on("error", function (type) {
                 switch (type) {
                     case "F_EXCEED_SIZE":
-                        toastr.error("单个文件大小必须少于5M");
+                        toastr.error("单个文件大小必须少于10M");
                         break;
                     case "F_DUPLICATE":
                         toastr.error("不能重复上传文件");
@@ -242,7 +286,7 @@
             //移除已上传文件
             $("#al_file_list").on("click", "td i", function () {
                 var fileTD = $(this).parents("tr").find("td")[0];
-                openConfirmDialog("确定要移除此上传的文件吗？", function () {                    
+                openConfirmDialog("确定要移除此上传的文件吗？", function () {
                     var fileId = $(fileTD).attr("id");
                     var fileName = $(fileTD).attr("data-fd");
 
@@ -250,7 +294,12 @@
                         if (data.suc) {
                             toastr.success("文件移除成功");
                             uploader.removeFile(fileId);
-                            $(fileTD).parent().fadeOut(1000);                     
+                            $(fileTD).parent().fadeOut(1000, function () {
+                                var st = uploader.getStats();
+                                if (st.successNum == st.cancelNum) {
+                                    $("#al_file_panel").fadeOut(1000);
+                                }
+                            });
                         } else {
                             toastr.error("移除失败：" + data.msg);
                         }
@@ -267,10 +316,16 @@
     <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12">
         <div class="panel panel-danger">
             <div class="panel-heading">
-                请假申请单
+                <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                    <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                    <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                    <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+                    <li><a href="@Url.Content("~/Apply/AskLeaveIndex")">请假申请单</a></li>
+                    <li class="active">开始申请</li>
+                </ol>
             </div>
             <div class="panel-body">
-                <form id="alForm">
+                <form id="alForm" style="margin-top:-12px;">
                     <div class="b-div">
                         <span class="b-label">
                             <button class="btn btn-block btn-default" disabled>申请流水号</button>
@@ -284,32 +339,40 @@
                         <span class="b-label">
                             <button class="btn btn-block btn-default" disabled>所属部门</button>
                         </span>
-                        <span style="display:inline-block;width:70%">
-                            <input type="text" class="form-control" id="eDepName" name="dep_long_name" value="@ViewData["depName"]" />
+                        <div style="display:inline-block;width:70%">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="eDepName" name="dep_long_name" value="@ViewData["depName"]" placeholder="点击此处选择部门"/>
+                                <span class="input-group-addon" style="cursor:pointer;" onclick="showDepName()"><i class="fa fa-info text-danger"></i></span>
+                            </div>
                             <input type="hidden" id="eDepNum" name="dep_no" value="@ViewData["depNum"]" />
-                        </span>
+                            <input type="hidden" id="eDepId" name="dep_id" value="@ViewData["depId"]" />
+                        </div>
+                        <p class="small text-danger"><i class="fa fa-info-circle"></i> 请准确选择所属部门,一年内选错三次将被禁止申请</p>
                     </div>
                     <div class="b-div">
                         <span class="b-label">
                             <button class="btn btn-block btn-default" disabled>职位级别</button>
                         </span>
-                        <span style="display:inline-block;width:30%">
+                        <div style="display:inline-block;width:70%">
                             <select class="form-control" id="eLevel" name="emp_level">
                                 <option></option>
                                 @foreach (var el in empLevels) {
-                                    <option value="@el.level_no">@el.level_name</option>
+                                    if (ViewData["empLevel"] != null && el.level_no == (int)ViewData["empLevel"]) {
+                                        <option value="@el.level_no" selected="selected">@el.level_name</option>
+                                    }
+                                    else {
+                                        <option value="@el.level_no">@el.level_name</option>
+                                    }
                                 }
                             </select>
-                        </span>
-                        <span style="display:inline-block;width:30%;text-align:center;" id="directSpan">
-                            <input type="checkbox" id="isDirect" name="is_direct_charge" value="true"/> 董事/总裁办直管
-                        </span>
+                            <div style="margin-top:6px;"><span id="directSpan"><input type="checkbox" id="isDirect" name="is_direct_charge" value="true" /> 董事/总经理办公室直管 </span></div>
+                        </div>
                     </div>
                     <div class="b-div">
                         <span class="b-label">
                             <button class="btn btn-block btn-default" disabled>请假类型</button>
                         </span>
-                        <span style="display:inline-block;width:70%">
+                        <div style="display:inline-block;width:70%">
                             <span style="display:block" class="row">
                                 @{
                                     string[] types = new string[] { "事假", "病假", "年假", "探亲", "婚假", "产假", "工伤", "丧假" };
@@ -318,9 +381,10 @@
                                             <input type="radio" name="leave_type" value="@ty" /> @ty
                                         </span>
                                     }
-                                }                                
+                                }
                             </span>
-                        </span>
+                            <p class="small text-danger" style="margin-top:4px;"><i class="fa fa-info-circle"></i> 最近30天累计请假 @ViewData["times"] 次，合计 @ViewData["days"] 天 @ViewData["hours"] 小时。</p>
+                        </div>
                     </div>
                     <div class="b-div" style="vertical-align:middle;">
                         <span class="b-label">
@@ -329,24 +393,24 @@
                         <div style="display:inline-block;width:70%;vertical-align:top;">
                             <div class="input-group date" id="beginTimePicker">
                                 <span class="input-group-addon">从 </span>
-                                <input class="form-control" type="text" id="beginTime" name="from_date"/>
+                                <input class="form-control" type="text" id="beginTime" name="from_date" />
                                 <span class="input-group-addon"><span class="fa fa-calendar"></span> </span>
                             </div>
                             <div class="input-group date" id="endTimePicker">
                                 <span class="input-group-addon">到 </span>
-                                <input class="form-control" type="text" id="endTime" name="to_date"/>
+                                <input class="form-control" type="text" id="endTime" name="to_date" />
                                 <span class="input-group-addon"><span class="fa fa-calendar"></span> </span>
                             </div>
                             <div style="display:inline-block;width:60%;">
                                 <div class="input-group">
                                     <span class="input-group-addon">共</span>
-                                    <input class="form-control" type="text" id="days" name="work_days"/>
+                                    <input class="form-control" type="text" id="days" name="work_days" />
                                     <span class="input-group-addon">工作日</span>
                                 </div>
                             </div>
                             <div style="display:inline-block;width:38%;margin-left:-5px;">
                                 <div class="input-group">
-                                    <input class="form-control" type="text" id="hours" name="work_hours"/>
+                                    <input class="form-control" type="text" id="hours" name="work_hours" />
                                     <span class="input-group-addon">小时</span>
                                 </div>
                             </div>
@@ -365,8 +429,9 @@
                             <button class="btn btn-block btn-default" disabled>工作代理</button>
                         </span>
                         <span style="display:inline-block;width:70%">
-                            <input type="text" class="form-control" id="agentMan" name="agent_man"/>
+                            <input type="text" class="form-control" id="agentMan" name="agent_man" />
                         </span>
+                        <p class="small text-danger" style="margin-top:4px;"><i class="fa fa-info-circle"></i> 如设置了代理人，流程完成后，代理人可代替自己审批流程</p>
                     </div>
                     <div class="b-div">
                         <span class="b-label">
@@ -375,6 +440,7 @@
                         <span style="display:inline-block;width:70%">
                             <textarea type="text" class="form-control" rows="2" id="informMan" name="inform_man"></textarea>
                         </span>
+                        <p class="small text-danger"><i class="fa fa-info-circle"></i> 如设置了知会人，流程完成后，系统会通知知会人</p>
                     </div>
                     <input type="hidden" name="has_attachment" id="hasAttachment" />
                 </form>
@@ -387,6 +453,7 @@
                             <div id="picker"> + </div>
                         </div>
                     </div>
+                    <p class="small text-danger"><i class="fa fa-info-circle"></i> 病假必须上传诊断报告（图片格式），最多可上传3张</p>
                     <div class="panel panel-default" id="al_file_panel">
                         <div class="panel-heading">附件信息</div>
                         <div class="panel-body" style="padding:0 8px;">
@@ -404,7 +471,6 @@
                     </div>
 
                 </div>
-                <br/>
                 <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..."><i class="fa fa-check-circle-o"></i> 提交请假申请</button>
             </div>
         </div>
@@ -414,4 +480,5 @@
     @Html.Partial("_SelectDep")
     @Html.Partial("_SelectUsers")
     @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_MessageDialog")
 }

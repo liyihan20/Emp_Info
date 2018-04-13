@@ -1,0 +1,63 @@
+﻿@{
+    string auts = (string)ViewData["autStr"];
+}
+@section CSS{
+    <style type="text/css">
+        #workGroup img {
+            width: 48px;
+            height: 48px;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        $(function () {
+            $(".closeLink").click(function () {
+                toastr.info("此功能暂未开放");
+            });
+            //K3重置密码
+            $("#K3Img").click(function () {
+                $.post("@Url.Content("~/Home/ValidateEmail")", {}, function (data) {
+                    if (!data.suc) {
+                        toastr.error(data.msg);
+                    } else {
+                        $.post("@Url.Content("~/Home/ValidatePhone")", {}, function (data) {
+                            if (data.suc) {
+                                window.location.href = "@Url.Content("~/K3/AccountReset")";
+                            } else {
+                                toastr.error(data.msg);
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li class="active">智慧办公集合</li>
+        </ol>
+    </div>
+    <div class="panel-body" id="workGroup">
+        <div class="row" style="margin: 0;">
+            @*@if (auts.IndexOf("ModuelTest") >= 0) {*@
+            <div class="col-xs-4 col-sm-3 col-md-2">
+                <a href="@Url.Content("~/Apply/AskLeaveIndex")">
+                    <img src="@Url.Content("~/Content/images/leave.png")" alt="leave" class="center-block" />
+                    <p class="text-center">请假申请单</p>
+                </a>
+            </div>
+            @*}*@
+            <div class="col-xs-4 col-sm-3 col-md-2">
+                <a href="#" id="K3Img">
+                    <img src="@Url.Content("~/Content/images/box.png")" alt="leave" class="center-block" />
+                    <p class="text-center">K3用户重置</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
