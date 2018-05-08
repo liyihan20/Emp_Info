@@ -6,41 +6,56 @@
 <script src="@Url.Content("~/Scripts/bootstrap-treeview.min.js")"></script>
 <script>
     var sdcb;
+    var sdurl = "";
     var selectedDep;
-    function openSelectDepDialog(callback) {
+    function openSelectDepDialog(typ, callback) {
+        if (typ == 0) {
+            sdurl = "@Url.Content("~/Item/GetDepartmentTreeForSel")";
+        } else if (typ == 1) {
+            sdurl = "@Url.Content("~/Item/GetAdminDepartmentTreeForSel")";
+        }
+
         sdcb = callback;
         $("#depSelModal").modal("show");
         GetTreeData();
     }
     function GetTreeData() {
-        $.post("@Url.Content("~/Item/GetDepartmentTreeForSel")", {}, function (data) {
-        $("#depTree").treeview({
-            data: data,
-            expandIcon: "fa fa-folder-o",
-            collapseIcon: "fa fa-folder-open-o",
-            emptyIcon: "fa fa-home",
-            onNodeSelected: function (event, node) {
-                var num = node.tags[0];
-                var id = node.tags[1];
-                var name = node.text;
-                var longName = name;
-                
-                var parent = $('#depTree').treeview('getParent', node);                
-                while (!isNaN(parent.nodeId)) {
-                    longName = parent.text + "/" + longName;
-                    parent = $('#depTree').treeview('getParent', parent);
+        if ($("#depTree").html()!=""){
+            return;
+        }
+        if (!sdurl) {
+            toastr.error("部门选择模块出错");
+            return;
+        }
+        $.post(sdurl, {}, function (data) {
+            $("#depTree").treeview({
+                levels:1,
+                data: data,
+                expandIcon: "fa fa-folder-o",
+                collapseIcon: "fa fa-folder-open-o",
+                emptyIcon: "fa fa-home",
+                onNodeSelected: function (event, node) {
+                    var num = node.tags[0];
+                    var id = node.tags[1];
+                    var name = node.text;
+                    var longName = name;
+
+                    var parent = $('#depTree').treeview('getParent', node);
+                    while (!isNaN(parent.nodeId)) {
+                        longName = parent.text + "/" + longName;
+                        parent = $('#depTree').treeview('getParent', parent);
+                    }
+                    selectedDep = { depNum: num, depShortName: name, depLongName: longName, depId: id };
                 }
-                selectedDep = { depNum: num, depShortName: name, depLongName: longName, depId: id };
-            }
-        });        
-    });
+            });
+        });
     }
     $(function () {
         $("#depSelBt").on("click", function () {
             sdcb(selectedDep); //通过回调返回已选部门
             $("#depSelModal").modal("hide");
         });
-        
+
     });
 
 </script>
