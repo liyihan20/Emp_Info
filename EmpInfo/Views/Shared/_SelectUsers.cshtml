@@ -43,7 +43,7 @@
             }
         });
 
-        $("#selBt").on("click", function () {
+        $("#u_sel_btn").on("click", function () {
             if (selectedUser.length > uLimit) {
                 toastr.error("所选人数不得超过" + uLimit + "人");
                 return;
@@ -137,7 +137,7 @@
                     @*已选择人员*@
                 </div>
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-success" id="selBt">确认</button>
+                <button type="button" class="btn btn-success" id="u_sel_btn">确认</button>
             </div>
         </div>
     </div>

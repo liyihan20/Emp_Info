@@ -586,7 +586,7 @@ namespace EmpInfo.Controllers
         public JsonResult DeleteDepartment(string depNum)
         {
             var dep = db.ei_department.Single(e => e.FNumber == depNum);
-            if (db.ei_department.Where(e => (e.FIsDeleted == null || e.FIsDeleted == false) && e.FNumber.StartsWith(dep.FNumber)).Count() > 0) {
+            if (db.ei_department.Where(e => (e.FIsDeleted == null || e.FIsDeleted == false) && e.FNumber!=dep.FNumber && e.FNumber.StartsWith(dep.FNumber)).Count() > 0) {
                 return Json(new SimpleResultModel() { suc = false, msg = "存在子部门，不能删除！" });
             }
             dep.FIsDeleted = true;
@@ -634,9 +634,23 @@ namespace EmpInfo.Controllers
         {
             var dep = db.ei_department.Single(e => e.FNumber == depNum);
             dep.FAdmin = GetUserCardByNameAndCardNum(admins);
+
+            //设置审核人有看到组织架构的权限
+            foreach (var admin in admins.Split(new char[] { ';' },StringSplitOptions.RemoveEmptyEntries)) {
+                var adminNum = GetUserCardByNameAndCardNum(admin);
+                var adminUser = db.ei_users.Single(u => u.card_number == adminNum);
+                if (db.ei_groupUser.Where(g => g.group_id == 8 && g.user_id == adminUser.id).Count() == 0) {
+                    db.ei_groupUser.Add(new ei_groupUser()
+                    {
+                        group_id = 8, //组织架构的组别id
+                        user_id = adminUser.id
+                    });
+                }
+            }
+
             db.SaveChanges();
 
-            WriteEventLog("部门管理", depNum+"变更管理员：" + admins);
+            WriteEventLog("部门管理", depNum + "变更管理员：" + admins);
             return Json(new SimpleResultModel() { suc = true, msg = "管理员更新成功" });
         }
 

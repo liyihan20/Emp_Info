@@ -126,7 +126,7 @@
                     toastr.error("请先选择部门");
                     return;
                 }
-                openSelectUserDialog($("#depAdmin").html(), 4, function (result) {
+                openSelectUserDialog($("#depAdmin").html(), 6, function (result) {
                     $.post("@Url.Content("~/Admin/ChangeDepAdmins")", { depNum: dNum, admins: result }, function (data) {
                         if (data.suc) {
                             $("#depAdmin").html(result);
@@ -273,9 +273,7 @@
                             toastr.error(data.msg);
                         }
                     });
-            });
-
-
+            });            
 
         });
 
@@ -288,7 +286,7 @@
                     emptyIcon: "fa fa-home",
                     onNodeSelected: function (event, node) {
                         resetForm();
-                        $("#depStatus").html("<i class='fa fa-spinner fa-pulse fa-fw'></i>");
+                        $("#depStatus").html("<i class='fa fa-spinner fa-pulse fa-fw'></i>");                                               
 
                         currentNodeId = node.nodeId;
                         var num = node.tags[0];

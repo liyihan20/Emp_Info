@@ -1,7 +1,18 @@
 ﻿@{
     Layout = null;
 }
-
+<script>
+    var t = 5;
+    var iv = setInterval(function () {
+        t--;
+        if (t < 0) {
+            clearInterval(iv);
+            window.location.href = "@Url.Content("~/Home/Index")";
+        } else {
+            document.getElementById("ts").innerHTML = t;
+        }
+    }, 1000);
+</script>
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,8 +23,8 @@
 <body>
     <hgroup>
         <h1>错误。</h1>
-        <h2>处理你的请求时出错。</h2>
-        <h3>原因：@ViewBag.tip</h3>
+        <h2>处理你的请求时出错；<span id="ts">5</span> 秒后会自动跳转到主界面。</h2>
+        <h3>出错原因：@ViewBag.tip</h3>
     </hgroup>
 </body>
 </html>

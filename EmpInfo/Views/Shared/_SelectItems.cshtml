@@ -1,0 +1,87 @@
+﻿@{
+    Layout = null;
+}
+
+<style type="text/css">
+    .u_sel_selected_user {
+        padding: 2px;
+        margin-right: 8px;
+    }
+        
+        #item_sel_tb th,#item_sel_tb td{
+            text-align:center;
+        }
+</style>
+
+<script>
+    var itemCb;
+    var uMinLimit = 1;
+    var uMaxLimit = 999;
+    function openSelectItemDialog(selectedItems,minLimit,maxLimit, callback) {
+        $("#item_sel_tb_content").empty();
+        itemCb = callback;
+        uMinLimit = minLimit;
+        uMaxLimit = maxLimit;
+        var items = selectedItems.split(";");
+        for (var i = 0; i < items.length; i++) {
+            if ($.trim(items[i]) != "") {                
+                $("#item_sel_tb_content").append("<tr><td>" + items[i] + "</td><td><input type='checkbox' /></td></tr>");
+            }
+        }
+        $("#u_sel_min_limit").html(uMinLimit);
+        $("#u_sel_max_limit").html(uMaxLimit);
+        $("#itemSelModal").modal("show");
+    }
+    $(function () {        
+
+        $("#item_sel_btn").on("click", function () {
+            var selectedItem = $("#item_sel_tb_content tr").has("td input:checked");
+            var itemStrs = "";            
+            if (selectedItem.length > uMaxLimit) {
+                toastr.error("所选内容数量不得超过" + uMaxLimit);
+                return;
+            }
+            if (selectedItem.length < uMinLimit) {
+                toastr.error("所选内容数量不得少于" + uMinLimit);
+                return;
+            }
+            for (var i = 0; i < selectedItem.length; i++) {
+                if (i > 0) {
+                    itemStrs += ";";
+                }
+                itemStrs += $($(selectedItem[i]).find("td")[0]).html();
+            }            
+            itemCb(itemStrs); //通过回调返回已选人员
+            $("#itemSelModal").modal("hide");
+        });
+        
+    });
+</script>
+<div class="modal fade" id="itemSelModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="itemSelLabel" aria-hidden="true" style="z-index:1080">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">选择内容(限制：<span id="u_sel_min_limit"></span> ~ <span id="u_sel_max_limit"></span>)</h4>
+            </div>
+            <div class="modal-body" style="min-height:280px;max-height:400px;overflow:auto;">                
+                <table class="table table-condensed table-hover" id="item_sel_tb" style="margin:10px 0;">
+                    <thead>
+                        <tr>
+                            <th style="width:80%;">内容</th>
+                            <th style="width:20%;">选择</th>
+                        </tr>
+                    </thead>
+                    <tbody id="item_sel_tb_content">
+                        @*内容列表*@
+                    </tbody>
+                </table>
+
+            </div>  
+            <div class="modal-footer">                
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-success" id="item_sel_btn">确认</button>
+            </div>          
+        </div>
+    </div>
+</div>

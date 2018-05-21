@@ -60,6 +60,9 @@
         <EntityTypeShape EntityType="ICAuditModel.wx_pushMsg" Width="1.5" PointX="10.75" PointY="0.625" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_leaveDayExceedPushLog" Width="1.5" PointX="13.375" PointY="0.75" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_leaving_days" Width="1.5" PointX="0.75" PointY="13.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_askLeaveReport" Width="1.5" PointX="13.375" PointY="2.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.flow_applyEntryQueue" Width="1.5" PointX="3.375" PointY="13.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_stockAdminApply" Width="1.5" PointX="5.375" PointY="13.75" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

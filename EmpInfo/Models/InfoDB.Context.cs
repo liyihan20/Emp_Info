@@ -69,6 +69,9 @@ namespace EmpInfo.Models
         public DbSet<wx_pushMsg> wx_pushMsg { get; set; }
         public DbSet<ei_leaveDayExceedPushLog> ei_leaveDayExceedPushLog { get; set; }
         public DbSet<vw_leaving_days> vw_leaving_days { get; set; }
+        public DbSet<vw_askLeaveReport> vw_askLeaveReport { get; set; }
+        public DbSet<flow_applyEntryQueue> flow_applyEntryQueue { get; set; }
+        public DbSet<ei_stockAdminApply> ei_stockAdminApply { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {
@@ -281,6 +284,29 @@ namespace EmpInfo.Models
                 new ObjectParameter("end_date", typeof(System.DateTime));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSalaryAllDetail_Result>("GetSalaryAllDetail", salary_noParameter, begin_dateParameter, end_dateParameter);
+        }
+    
+        public virtual ObjectResult<string> GetSalaryBankCard(string salary_no)
+        {
+            var salary_noParameter = salary_no != null ?
+                new ObjectParameter("salary_no", salary_no) :
+                new ObjectParameter("salary_no", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("GetSalaryBankCard", salary_noParameter);
+        }
+    
+        public virtual ObjectResult<GetK3StockAccountList_Result> GetK3StockAccoutList()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetK3StockAccountList_Result>("GetK3StockAccoutList");
+        }
+    
+        public virtual ObjectResult<GetK3StockAuditor_Result> GetK3StockAuditor(string accountName)
+        {
+            var accountNameParameter = accountName != null ?
+                new ObjectParameter("accountName", accountName) :
+                new ObjectParameter("accountName", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetK3StockAuditor_Result>("GetK3StockAuditor", accountNameParameter);
         }
     }
 }

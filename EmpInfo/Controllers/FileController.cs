@@ -38,6 +38,7 @@ namespace EmpInfo.Controllers
                 if (System.IO.File.Exists(fileDirectory)) {
                     System.IO.File.Delete(fileDirectory);
                 }
+                WriteEventLog("删除附件", "成功：" + sysNum + ":" + fileName);
             }
             catch (Exception ex) {
                 return Json(new SimpleResultModel() { suc = false, msg = ex.Message });

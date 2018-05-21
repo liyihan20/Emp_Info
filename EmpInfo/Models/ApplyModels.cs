@@ -54,6 +54,7 @@ namespace EmpInfo.Models
 
     public class FlowQueueModel
     {
+        public string sys_no { get; set; }
         public int step { get; set; }
         public string step_name { get; set; }
         public string auditors { get; set; }
@@ -67,5 +68,6 @@ namespace EmpInfo.Models
         public bool? isPass { get; set; }
         public string opinion { get; set; }
     }
+        
 
 }

@@ -76,7 +76,7 @@ namespace EmpInfo.Controllers
             }
             else if (user.Where(u => u.forbit_flag == true).Count() > 0)
             {
-                msg = "用户名已被禁用，登陆失败!";
+                msg = "用户名已被禁用，登陆失败！可点击密码输入框右边的【禁用/忘记密码】链接自行处理。";
             }
             else if (db.GetHREmpStatus(model.UserName).Count() == 0 || (db.GetHREmpStatus(model.UserName).Count()>0 && db.GetHREmpStatus(model.UserName).ToList().First() != "在职"))
             {
@@ -380,7 +380,7 @@ namespace EmpInfo.Controllers
         }
 
         //验证邮箱验证码与身份证后6位是否正确,如果正确可以解禁或者重置密码
-        public JsonResult ResetValidate(string card_no, string email_code, string idNumber, string opType)
+        public JsonResult ResetValidate(string card_no, string email_code, string idNumber, string opType,string bankCardNumber)
         {
             var users = db.ei_users.Where(u => u.card_number == card_no);
             if (users.Count() != 1) {
@@ -388,42 +388,52 @@ namespace EmpInfo.Controllers
             }
             else {
                 var user = users.First();
-                if (!ValidateEmailCode(email_code)) {
-                    WriteEventLogWithoutLogin(card_no, "重置密码-邮箱验证失败", -1);
-                    return Json(new SimpleResultModel() { suc = false, msg = "邮箱验证失败，请重试" });
-                }
-                if (!user.id_number.EndsWith(idNumber)) {
+                //if (!ValidateEmailCode(email_code)) {
+                //    WriteEventLogWithoutLogin(card_no, "重置密码-邮箱验证失败", -1);
+                //    return Json(new SimpleResultModel() { suc = false, msg = "邮箱验证失败，请重试" });
+                //}
+                if (!user.id_number.Equals(idNumber)) {
                     WriteEventLogWithoutLogin(card_no, "重置密码-身份证验证失败", -1);
-                    return Json(new SimpleResultModel() { suc = false, msg = "身份证后六位错误，验证失败" });
+                    return Json(new SimpleResultModel() { suc = false, msg = "身份证错误，验证失败" });
                 }
-                else {
-                    //验证成功
-                    if (opType.IndexOf("active") >= 0) {
-                        user.forbit_flag = false;
-                        user.last_login_date = DateTime.Now;
-                        db.SaveChanges();
-                    }
-                    WriteEventLogWithoutLogin(card_no, "重置密码-验证成功；type:" + opType);
-                    string okMsg = "";
-                    string isReset = "0";
-                    switch (opType) {
-                        case "reset":
-                            okMsg = "验证通过，请重新设置密码";
-                            isReset = "1";
-                            break;
-                        case "active":
-                            okMsg = "验证通过，用户已解禁，请重新登陆";
-                            break;
-                        case "active_reset":
-                            okMsg = "验证通过，用户已解禁，请重新设置密码";
-                            isReset = "1";
-                            break;
-                        default:
-                            okMsg = "验证通过";
-                            break;
-                    }
-                    return Json(new SimpleResultModel() { suc = true, msg = okMsg, extra = isReset });
+                //验证工资卡号
+                if(string.IsNullOrEmpty(user.salary_no)){
+                    return Json(new SimpleResultModel() { suc = false, msg = "你没有条形码，不能自行处理，请联系管理员" });
                 }
+                var bankCards = db.GetSalaryBankCard(user.salary_no).ToList();
+                if(bankCards.Count()==0){
+                    return Json(new SimpleResultModel() { suc = false, msg = "工资卡号不存在" });
+                }
+                if(!bankCardNumber.Equals(bankCards.First())){
+                    return Json(new SimpleResultModel() { suc = false, msg = "工资银行卡号错误，验证失败" });
+                }
+                //验证成功
+                if (opType.IndexOf("active") >= 0) {
+                    user.forbit_flag = false;
+                    user.last_login_date = DateTime.Now;
+                    db.SaveChanges();
+                }
+                WriteEventLogWithoutLogin(card_no, "重置密码-验证成功；type:" + opType);
+                string okMsg = "";
+                string isReset = "0";
+                switch (opType) {
+                    case "reset":
+                        okMsg = "验证通过，请重新设置密码";
+                        isReset = "1";
+                        break;
+                    case "active":
+                        okMsg = "验证通过，用户已解禁，请重新登陆";
+                        break;
+                    case "active_reset":
+                        okMsg = "验证通过，用户已解禁，请重新设置密码";
+                        isReset = "1";
+                        break;
+                    default:
+                        okMsg = "验证通过";
+                        break;
+                }
+                return Json(new SimpleResultModel() { suc = true, msg = okMsg, extra = isReset });
+                
             }
         }
 

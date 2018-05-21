@@ -27,6 +27,7 @@ namespace EmpInfo.Controllers
             catch {
                 return JsonConvert.SerializeObject(new { suc = 0 });
             }
+
             var emps = db.ei_users.Where(u => u.wx_openid == openId && u.wx_easy_login == true);
             if (emps.Count() == 0) {
                 //没有绑定过的跳转到绑定界面
@@ -249,6 +250,7 @@ namespace EmpInfo.Controllers
             var user = users.First();
 
             user.wx_easy_login = false;
+            user.wx_openid = null;
             user.wx_check_salary_info = false;//免密工资查看
             if (pushFlag) {
                 user.wx_should_push_msg = false;

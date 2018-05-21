@@ -1,0 +1,203 @@
+﻿@using EmpInfo.Models;
+@{
+    List<K3AccountModel> accs = (List<K3AccountModel>)ViewData["stockAccounts"];
+}
+@section CSS{
+    <style type="text/css">
+        .accountName{
+            cursor:pointer;
+        }        
+    </style>
+    }
+@section Scripts {
+<script>
+    var needToValidateEmail = true;
+    $(function () {
+        $("input[name='k3Account']").iCheck({
+            radioClass: 'iradio_square-green'
+        });
+
+        $("input[name='k3Account']").on("ifChecked", function () {
+            var acc = $("input[name='k3Account']:checked").val();
+            $("#stockName").empty();
+            $.post("@Url.Content("~/Apply/GetStockAndAdminByAccount")", { accName: acc }, function (data) {
+                if (data.suc) {
+                    var result = data.result;
+                    if (result.length < 1) {
+                        toastr.error("此账套不存在任何仓库，请联系管理员");
+                        return;
+                    }
+                    $("#stockName").append("<option value=''>----点击选择----</option>");
+                    for (var i = 0; i < result.length; i++) {
+                        var res = result[i];
+                        $("#stockName").append("<option value='" + res.stockNum + "' data-aname='" + res.auditorName + "' data-anum='" + res.auditorNum + "' data-sname='" + res.stockName + "'>" + res.stockName + "(" + res.stockNum + ")</option>");
+                    }
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+        });
+
+        $("#stockName").on("change", function (data) {
+            var stockOpt = $("#stockName")[0].selectedOptions[0];
+            var auditorName = $(stockOpt).attr("data-aname");
+            $("#stockAuditor").html(auditorName == "" ? "无" : auditorName);
+        });
+
+        $("#dealBt").click(function () {
+            var account = $("input[name='k3Account']:checked").val();
+            if (!account) {
+                toastr.error("请选择一个K3账套");
+                return;
+            }
+            if ($("#stockName").val() == "") {
+                toastr.error("请先选择一个仓库");
+                return;
+            }
+
+            var stockOpt = $("#stockName")[0].selectedOptions[0];
+            var stockNum = $(stockOpt).attr("value");
+            var stockName = $(stockOpt).attr("data-sname");
+            var auditorName = $(stockOpt).attr("data-aname");
+            var auditorNum = $(stockOpt).attr("data-anum");
+
+            if (auditorNum == "") {
+                toastr.error("所选择的仓库没有设置审核人，请联系管理员处理");
+                return;
+            }
+
+            openConfirmDialog("确认要申请仓库：" + stockName + "(" + stockNum + ")的管理员权限吗？", function () {
+                $("#dealBt").button("loading");
+                $.post("@Url.Content("~/Apply/SaveApplySA")", {
+                    sysNum: "@ViewData["sysNum"]",
+                    stockNum: stockNum,
+                    stockName: stockName,
+                    auditorName: auditorName,
+                    auditorNum: auditorNum,
+                    accountName: account,
+                    comment: $("#comment").val()
+                }, function (data) {
+                    if (data.suc) {
+                        toastr.success("申请已成功提交，请等待审批");
+                        setTimeout(function () { location.reload(true); }, 3000);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+
+        });
+
+        $(".accountName").click(function () {
+            var ck = $(this).parent().find("input")[0];
+            $(ck).iCheck("check");
+        });
+
+    });
+
+
+</script>
+    }
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>            
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
+            <li><a href="@Url.Content("~/Apply/StockAdminIndex")">仓管权限</a></li>
+            <li class="active">开始申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <h4 style="margin-bottom:12px;" class="text-danger"><i class="fa fa-question-circle"></i> 请选择K3账套:</h4>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="text-success"><i class="fa fa-flag"></i> 半导体 </div>
+                <div class="row">
+                    @foreach (var acc in accs.Where(a => a.number.Contains("semi"))) {
+                        <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
+                            <input type="radio" name="k3Account" value="@acc.name" /> <span class="accountName"> @acc.number | @acc.name </span>
+                        </div>
+                    }
+                </div>
+                @if (accs.Where(a => a.number.Contains("HT")).Count() > 0) {
+                <div class="text-success" style="margin-top:16px;"><i class="fa fa-flag"></i> 香港 </div>
+                <div class="row">
+                    @foreach (var acc in accs.Where(a => a.number.Contains("HT"))) {
+                        <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
+                            <input type="radio" name="k3Account" value="@acc.name" /> <span class="accountName"> @acc.number | @acc.name </span>
+                        </div>
+                    }
+                </div>
+                }
+                @if (accs.Where(a => a.number.Contains("truly")).Count() > 0) {
+                <div class="text-success" style="margin-top:16px;"><i class="fa fa-flag"></i> 集团 </div>
+                <div class="row">
+                    @foreach (var acc in accs.Where(a => a.number.Contains("truly"))) {
+                        <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
+                            <input type="radio" name="k3Account" value="@acc.name" /> <span class="accountName"> @acc.number | @acc.name </span>
+                        </div>
+                    }
+                </div>
+                }
+                @if (accs.Where(a => a.number.Contains("OPTO")).Count() > 0) {
+                    <div class="text-success" style="margin-top:16px;"><i class="fa fa-flag"></i> 光电 </div>
+                    <div class="row">
+                        @foreach (var acc in accs.Where(a => a.number.Contains("OPTO"))) {
+                            <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
+                                <input type="radio" name="k3Account" value="@acc.name" /> <span class="accountName"> @acc.number | @acc.name </span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+        <h4 style="margin-bottom:12px;" class="text-danger"><i class="fa fa-question-circle"></i> 申请流水号:</h4>
+        <div class="row">
+            <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
+                <input type="text" class="form-control" value="@ViewData["sysNum"]" readonly/>
+            </div>
+        </div>
+        <h4 style="margin-bottom:12px;" class="text-danger"><i class="fa fa-question-circle"></i> 请选择仓库:</h4>
+        <div class="row">
+            <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
+                <select class="form-control" id="stockName">                    
+                </select>
+                <small class="text-warning"><i class="fa fa-info-circle"></i> 当前仓库审核人：<span id="stockAuditor"></span></small>
+            </div>
+        </div>
+        <h4 style="margin-bottom:12px;" class="text-danger"><i class="fa fa-question-circle"></i> 申请原因:</h4>
+        <div class="row">
+            <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
+                <textarea class="form-control" rows="3" id="comment"></textarea>
+            </div>
+        </div>
+        <div>
+            <button class="btn btn-success btn-block" style="margin-top:16px;" id="dealBt" data-loading-text="处理中..."><i class="fa fa-check"></i> 提交申请</button>
+        </div>
+
+        <div class="panel panel-default" style="margin-top:16px;">
+            <div class="panel-body">
+                <h4 class="text-danger"><i class="fa fa-info-circle"></i> 功能说明 </h4>
+                <div style="margin-left:18px;padding-top:6px;" class="text-danger">
+                    <p>
+                        1. 申请流程步骤：申请人提交申请--->对应仓库审核人审批--->K3管理员（赖吉全）审批--->系统授权--->流程结束
+                    </p>
+                    <p>
+                        2. 选择了仓库之后，必须存在此仓库的审核人才能提交申请
+                    </p>
+                    <p>
+                        3. 本功能只能申请自己的K3仓库管理权限。如需帮其他人代申请，请登陆OA走流程，流程名是：仓库管理权限申请
+                    </p>
+                    <p>
+                        4. 如果有其它问题，请联系K3管理员：赖吉全（座机：3009；邮箱：laijiquan@trulyopto.cn）
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+@section Modal {
+@Html.Partial("_ConfirmDialog")
+}

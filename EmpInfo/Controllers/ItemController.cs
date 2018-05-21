@@ -60,7 +60,7 @@ namespace EmpInfo.Controllers
             return View();
         }
 
-        //选择部门
+        //选择部门,用于用户选择
         public JsonResult GetDepartmentTreeForSel()
         {
             var list = new List<Department>();
@@ -78,9 +78,9 @@ namespace EmpInfo.Controllers
             dep.tags = new string[] { rootDep.FNumber,rootDep.id.ToString() };
             dep.selectable = true;
 
-            dep.nodes = new List<Department>();            
+            dep.nodes = new List<Department>();
             foreach (var child in db.ei_department
-                .Where(e => e.FParent == rootNumber && (e.FIsDeleted == null || e.FIsDeleted == false) && (e.FIsForbit==null || e.FIsForbit==false))
+                .Where(e => e.FParent == rootNumber && (e.FIsDeleted == null || e.FIsDeleted == false) && (e.FIsForbit == null || e.FIsForbit == false))
                 .OrderBy(e => e.FNumber).ToList()) {
                 dep.nodes.Add(GetDepartment(child.FNumber)); //递归获取子节点
             }
@@ -89,5 +89,16 @@ namespace EmpInfo.Controllers
             }
             return dep;
         }
+
+        //选择部门，用于部门管理员选择后做报表，只能看到自己的
+        public JsonResult GetAdminDepartmentTreeForSel()
+        {
+            var list = new List<Department>();
+            foreach (var d in db.ei_department.Where(d => d.FAdmin.Contains(userInfo.cardNo)).ToList()) {
+                list.Add(GetDepartment(d.FNumber));
+            }
+            return Json(list);
+        }
+                
     }
 }

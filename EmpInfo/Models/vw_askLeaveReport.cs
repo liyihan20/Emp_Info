@@ -12,7 +12,7 @@ namespace EmpInfo.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class ei_askLeave
+    public partial class vw_askLeaveReport
     {
         public int id { get; set; }
         public string sys_no { get; set; }
@@ -33,7 +33,11 @@ namespace EmpInfo.Models
         public Nullable<bool> has_attachment { get; set; }
         public Nullable<System.DateTime> apply_time { get; set; }
         public Nullable<int> dep_id { get; set; }
-        public string auditor_queues { get; set; }
+        public string status { get; set; }
+        public string salary_no { get; set; }
+        public string current_auditors { get; set; }
+        public Nullable<System.DateTime> finish_date { get; set; }
+        public string level_name { get; set; }
         public Nullable<bool> check1 { get; set; }
         public Nullable<bool> check2 { get; set; }
     }

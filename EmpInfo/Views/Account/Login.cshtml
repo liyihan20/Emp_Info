@@ -190,15 +190,15 @@
                     toastr.error("请先输入厂牌号");
                     return;
                 }
-                $.post("@Url.Content("~/Account/UserHasEmail")", { card_no: cardNo }, function (data) {
+                @*$.post("@Url.Content("~/Account/UserHasEmail")", { card_no: cardNo }, function (data) {
                     if (data.suc) {
-                        $("#r_email_addr").val(data.extra);
+                        $("#r_email_addr").val(data.extra);*@
                         $("#ResetActiveModal").modal("show");
                         toastr.info("请先验证用户信息");
-                    } else {
-                        toastr.error(data.msg);
-                    }
-                })
+                //    } else {
+                //        toastr.error(data.msg);
+                //    }
+                //})
             });
 
             //忘记密码发送邮箱验证码
@@ -210,24 +210,33 @@
             $("#resetActiveBtn").click(function () {
                 var opType = $("#op_type").val();
                 var idNumber = $("#r_id_number").val();
-                var emailCode = $("#r_email_code").val();
+                //var emailCode = $("#r_email_code").val();
+                var bankCardNumber=$("#r_bank_number").val();
 
-                if (idNumber == "" || idNumber.length != 6) {
-                    toastr.error("请输入身份证号后6位");
+                if (idNumber == "") {
+                    toastr.error("请输入完整身份证号");
                     $("#r_id_number").focus();
                     return;
                 }
-                if (emailCode == "") {
-                    toastr.error("请输入邮箱验证码");
-                    $("#r_email_code").focus();
+
+                if(bankCardNumber==""){
+                    toastr.error("请输入发放工资的银行卡号");
+                    $("#r_bank_number").focus();
                     return;
                 }
 
+                //if (emailCode == "") {
+                //    toastr.error("请输入邮箱验证码");
+                //    $("#r_email_code").focus();
+                //    return;
+                //}
+
                 $.post("@Url.Content("~/Account/ResetValidate")", {
                     card_no: $("#userName").val(),
-                    email_code: emailCode,
+                    //email_code: emailCode,
                     idNumber: idNumber,
-                    opType: opType
+                    opType: opType,
+                    bankCardNumber: bankCardNumber
                 }, function (data) {
                     if (data.suc) {
                         $("#ResetActiveModal").modal("hide");
@@ -552,10 +561,17 @@
                             <label for="r_id_number" class="sr-only">身份证号</label>
                             <div class="input-group">
                                 <div class="input-group-addon"><span class="fa fa-credit-card"></span></div>
-                                <input type="text" id="r_id_number" class="form-control" placeholder="请输入身份证号后6位" required />
+                                <input type="text" id="r_id_number" class="form-control" placeholder="请输入完整身份证号" required />
                             </div>
                         </div>
                         <div class="form-group">
+                            <label for="r_id_number" class="sr-only">工资银行卡号</label>
+                            <div class="input-group">
+                                <div class="input-group-addon"><span class="fa fa-bank"></span></div>
+                                <input type="text" id="r_bank_number" class="form-control" placeholder="请输入发放工资的银行卡号" required />
+                            </div>
+                        </div>
+                        @*<div class="form-group">
                             <label for="r_email_addr" class="sr-only">邮箱地址：</label>
                             <div class="input-group">
                                 <div class="input-group-addon"><span class="fa fa-envelope"></span></div>
@@ -570,7 +586,7 @@
                                     <button class="btn btn-default" type="button" id="resetSendCodeBtn" data-loading-text="邮件发送中...">发送验证码</button>
                                 </span>
                             </div>
-                        </div>
+                        </div>*@
                     </div>
                 </div>
                 <div class="modal-footer">

@@ -506,7 +506,7 @@ namespace EmpInfo.Controllers
 
         public ActionResult CheckMonthSalary(string param)
         {
-            int salaryNo=int.Parse(userInfoDetail.salaryNo);
+            int salaryNo = int.Parse(userInfoDetail.salaryNo);
             DateTime dt;
             if (!DateTime.TryParse(param, out dt)) {
                 ViewBag.tip = "参数出错";
@@ -552,6 +552,9 @@ namespace EmpInfo.Controllers
                         select a.en_name).Distinct().ToArray();
             string autStr = string.Join(",", auts);
             ViewData["autStr"] = autStr;
+
+            ViewData["isDepAdmin"] = db.ei_department.Where(d => d.FAdmin.Contains(userInfo.cardNo)).Count() > 0;
+
             return View();
         }
 

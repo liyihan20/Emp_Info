@@ -1,0 +1,37 @@
+﻿@section CSS{
+    <style type="text/css">        
+        .badge {
+            background-color: #3399CC;
+        }
+    </style>
+}
+
+@section Scripts{
+    <script>
+    $(function () {
+        if (parseInt($("#dealingBadge").html()) > 0) {
+            $("#dealingBadge").css("visibility", "visible");
+        }
+    });
+    </script>
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
+            <li class="active">仓管权限</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <i> 点击以下列表选择相应的服务:</i>
+    </div>
+    <div class="list-group">
+        <a href="@Url.Content("~/Apply/BeginApplySA")" class="list-group-item" ><span class="text-danger"><i class="fa fa-fw fa-pencil"></i> 开始申请</span></a>
+        <a href="@Url.Content("~/Apply/GetMyApplySAList")" class="list-group-item"><i class="fa fa-fw fa-th"></i> 我申请的</a>
+        <a href="@Url.Content("~/Apply/GetMyAuditingSAList")" class="list-group-item"><i class="fa fa-fw fa-th-list"></i> 我的待办 <span class="badge" id="dealingBadge" style="visibility:hidden;" >@ViewData["dealingCount"]</span></a>
+        <a href="@Url.Content("~/Apply/GetMyAuditedSAList")" class="list-group-item"><i class="fa fa-fw fa-th-large"></i> 我的已办</a>
+    </div>
+</div>

@@ -54,6 +54,10 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="org.in2bits.MyXls, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\org.in2bits.MyXls.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
@@ -162,6 +166,7 @@
     <Compile Include="Controllers\K3Controller.cs" />
     <Compile Include="Controllers\PackageController.cs" />
     <Compile Include="Controllers\PushController.cs" />
+    <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\RestaurantBaseController.cs" />
     <Compile Include="Controllers\RestaurantController.cs" />
     <Compile Include="Controllers\ChartController.cs" />
@@ -290,10 +295,16 @@
     <Compile Include="Models\ei_specialUsers.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_stockAdminApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_users.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_users_android.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\flow_applyEntryQueue.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetDormFeeByMonth_Result.cs">
@@ -309,6 +320,12 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetK3AccoutList_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GetK3StockAccountList_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GetK3StockAuditor_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetPOAccount_Result.cs">
@@ -357,11 +374,15 @@
     <Compile Include="Models\ljq20160323_003_Result.cs">
       <DependentUpon>Canteen.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ReportModels.cs" />
     <Compile Include="Models\ResModels.cs" />
     <Compile Include="Models\t_UserConfig.cs">
       <DependentUpon>Canteen.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ValidateDormStatus_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\vw_askLeaveReport.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_ei_simple_users.cs">
@@ -440,10 +461,12 @@
     <Content Include="Content\images\index_bg.jpg" />
     <Content Include="Content\images\index_bg2.jpg" />
     <Content Include="Content\images\repair.png" />
+    <Content Include="Content\images\report.png" />
     <Content Include="Content\images\res_256.png" />
     <Content Include="Content\images\salary.png" />
     <Content Include="Content\images\salary1.png" />
     <Content Include="Content\images\statistics_48.png" />
+    <Content Include="Content\images\stock.png" />
     <Content Include="Content\images\truly_home.gif" />
     <Content Include="Content\images\unbind.gif" />
     <Content Include="Content\images\user_48.png" />
@@ -837,6 +860,15 @@
     <Content Include="Views\Apply\GetMyAuditedALList.cshtml" />
     <Content Include="Views\Apply\CheckFlowRecord.cshtml" />
     <Content Include="Views\Shared\_InputDialog.cshtml" />
+    <Content Include="Views\Report\ALReport.cshtml" />
+    <Content Include="Views\Shared\_SelectItems.cshtml" />
+    <Content Include="Views\Apply\StockAdminIndex.cshtml" />
+    <Content Include="Views\Apply\BeginApplySA.cshtml" />
+    <Content Include="Views\Apply\GetMyApplySAList.cshtml" />
+    <Content Include="Views\Apply\GetMyAuditedSAList.cshtml" />
+    <Content Include="Views\Apply\GetMyAuditingSAList.cshtml" />
+    <Content Include="Views\Apply\CheckSAApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditSAApply.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

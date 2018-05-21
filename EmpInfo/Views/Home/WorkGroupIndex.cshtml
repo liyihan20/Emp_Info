@@ -11,19 +11,19 @@
 }
 @section Scripts {
     <script>
-        $(function () {
-            $(".closeLink").click(function () {
-                toastr.info("此功能暂未开放");
-            });
-            //K3重置密码
-            $("#K3Img").click(function () {
-                $.post("@Url.Content("~/Home/ValidateEmail")", {}, function (data) {
-                    if (!data.suc) {
-                        toastr.error(data.msg);
-                    } else {
-                        $.post("@Url.Content("~/Home/ValidatePhone")", {}, function (data) {
-                            if (data.suc) {
-                                window.location.href = "@Url.Content("~/K3/AccountReset")";
+    $(function () {
+        $(".closeLink").click(function () {
+            toastr.info("此功能暂未开放");
+        });
+        //K3重置密码
+        $("#K3Img").click(function () {
+            $.post("@Url.Content("~/Home/ValidateEmail")", {}, function (data) {
+                if (!data.suc) {
+                    toastr.error(data.msg);
+                } else {
+                    $.post("@Url.Content("~/Home/ValidatePhone")", {}, function (data) {
+                        if (data.suc) {
+                            window.location.href = "@Url.Content("~/K3/AccountReset")";
                             } else {
                                 toastr.error(data.msg);
                             }
@@ -31,6 +31,18 @@
                     }
                 });
             });
+
+            //请假报表
+            $("#alReport").on("click", function () {
+                var w = $(document).width();
+                console.log("width:"+w);
+                if (w > 900) {
+                    window.location.href = "@Url.Content("~/Report/ALReport")";
+                } else {
+                    toastr.error("此功能必须在大屏幕显示器操作");
+                }
+            });
+
         });
     </script>
 }
@@ -43,21 +55,35 @@
         </ol>
     </div>
     <div class="panel-body" id="workGroup">
-        <div class="row" style="margin: 0;">
-            @*@if (auts.IndexOf("ModuelTest") >= 0) {*@
+        <div class="row" style="margin: 0;">            
             <div class="col-xs-4 col-sm-3 col-md-2">
                 <a href="@Url.Content("~/Apply/AskLeaveIndex")">
                     <img src="@Url.Content("~/Content/images/leave.png")" alt="leave" class="center-block" />
                     <p class="text-center">请假申请单</p>
                 </a>
             </div>
-            @*}*@
+            @if ((bool)ViewData["isDepAdmin"]) { 
+                <div class="col-xs-4 col-sm-3 col-md-2">
+                    <a id="alReport" href="#">
+                        <img src="@Url.Content("~/Content/images/report.png")" alt="leave" class="center-block" />
+                        <p class="text-center">请假报表</p>
+                    </a>
+                </div>
+            }
             <div class="col-xs-4 col-sm-3 col-md-2">
                 <a href="#" id="K3Img">
                     <img src="@Url.Content("~/Content/images/box.png")" alt="leave" class="center-block" />
                     <p class="text-center">K3用户重置</p>
                 </a>
             </div>
+            @*@if (auts.IndexOf("ModuelTest") >= 0) {*@
+                <div class="col-xs-4 col-sm-3 col-md-2">
+                    <a href="@Url.Content("~/Apply/StockAdminIndex")">
+                        <img src="@Url.Content("~/Content/images/stock.png")" alt="leave" class="center-block" />
+                        <p class="text-center">仓管权限申请</p>
+                    </a>
+                </div>
+            @*}*@
         </div>
     </div>
 </div>

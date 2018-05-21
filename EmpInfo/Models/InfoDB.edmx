@@ -255,6 +255,9 @@
           <Property Name="has_attachment" Type="bit" />
           <Property Name="apply_time" Type="datetime" />
           <Property Name="dep_id" Type="int" />
+          <Property Name="auditor_queues" Type="nvarchar(max)" />
+          <Property Name="check1" Type="bit" />
+          <Property Name="check2" Type="bit" />
         </EntityType>
         <EntityType Name="ei_authority">
           <Key>
@@ -472,6 +475,23 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="card_no" Type="varchar" MaxLength="50" />
         </EntityType>
+        <EntityType Name="ei_stockAdminApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="varchar" MaxLength="100" />
+          <Property Name="apply_time" Type="datetime" />
+          <Property Name="k3_account_num" Type="varchar" MaxLength="50" />
+          <Property Name="k3_account_name" Type="varchar" MaxLength="100" />
+          <Property Name="k3_stock_num" Type="varchar" MaxLength="50" />
+          <Property Name="k3_stock_name" Type="varchar" MaxLength="50" />
+          <Property Name="stock_auditor_num" Type="varchar" MaxLength="50" />
+          <Property Name="stock_auditor_name" Type="varchar" MaxLength="100" />
+          <Property Name="comment" Type="varchar" MaxLength="1000" />
+        </EntityType>
         <EntityType Name="ei_users">
           <Key>
             <PropertyRef Name="id" />
@@ -513,6 +533,18 @@
           <Property Name="device_id" Type="varchar" MaxLength="200" />
           <Property Name="login_time" Type="datetime" />
         </EntityType>
+        <EntityType Name="flow_applyEntryQueue">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="step" Type="int" />
+          <Property Name="step_name" Type="varchar" MaxLength="50" />
+          <Property Name="auditors" Type="varchar" MaxLength="500" />
+          <Property Name="countersign" Type="bit" />
+          <Property Name="flow_template_entry_id" Type="int" />
+        </EntityType>
         <EntityType Name="wx_pushMsg">
           <Key>
             <PropertyRef Name="id" />
@@ -536,6 +568,40 @@
           <Property Name="FKeyWord8" Type="nvarchar" MaxLength="200" />
           <Property Name="FRemark" Type="nvarchar" MaxLength="200" />
           <Property Name="FUrl" Type="varchar" MaxLength="500" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“ICAudit.dbo.vw_askLeaveReport”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vw_askLeaveReport">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="status" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="varchar" MaxLength="50" />
+          <Property Name="dep_long_name" Type="varchar" MaxLength="500" />
+          <Property Name="dep_no" Type="varchar" MaxLength="50" />
+          <Property Name="emp_level" Type="int" />
+          <Property Name="is_direct_charge" Type="bit" />
+          <Property Name="leave_type" Type="varchar" MaxLength="50" />
+          <Property Name="from_date" Type="smalldatetime" />
+          <Property Name="to_date" Type="smalldatetime" />
+          <Property Name="work_days" Type="int" />
+          <Property Name="work_hours" Type="decimal" Precision="4" Scale="1" />
+          <Property Name="leave_reason" Type="nvarchar" MaxLength="2000" />
+          <Property Name="agent_man" Type="varchar" MaxLength="50" />
+          <Property Name="inform_man" Type="varchar" MaxLength="500" />
+          <Property Name="has_attachment" Type="bit" />
+          <Property Name="apply_time" Type="datetime" />
+          <Property Name="dep_id" Type="int" />
+          <Property Name="status" Type="varchar" MaxLength="6" Nullable="false" />
+          <Property Name="salary_no" Type="varchar" MaxLength="20" />
+          <Property Name="current_auditors" Type="varchar" MaxLength="500" />
+          <Property Name="finish_date" Type="datetime" />
+          <Property Name="level_name" Type="varchar" MaxLength="50" />
+          <Property Name="check1" Type="bit" />
+          <Property Name="check2" Type="bit" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_ei_simple_users”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -811,6 +877,10 @@
           <Parameter Name="card_no" Type="varchar" Mode="In" />
         </Function>
         <Function Name="GetK3AccoutList" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="GetK3StockAccoutList" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="GetK3StockAuditor" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="accountName" Type="varchar" Mode="In" />
+        </Function>
         <Function Name="GetPOAccount" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="po_number" Type="varchar" Mode="In" />
         </Function>
@@ -818,6 +888,9 @@
           <Parameter Name="salary_no" Type="int" Mode="In" />
           <Parameter Name="begin_date" Type="datetime" Mode="In" />
           <Parameter Name="end_date" Type="datetime" Mode="In" />
+        </Function>
+        <Function Name="GetSalaryBankCard" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="salary_no" Type="varchar" Mode="In" />
         </Function>
         <Function Name="GetSalaryDetail" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="salary_no" Type="int" Mode="In" />
@@ -886,9 +959,41 @@
           <EntitySet Name="ei_PushResponse" EntityType="Self.ei_PushResponse" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_resVisitLog" EntityType="Self.ei_resVisitLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_specialUsers" EntityType="Self.ei_specialUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_stockAdminApply" EntityType="Self.ei_stockAdminApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_users" EntityType="Self.ei_users" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_users_android" EntityType="Self.ei_users_android" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="flow_applyEntryQueue" EntityType="Self.flow_applyEntryQueue" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="wx_pushMsg" EntityType="Self.wx_pushMsg" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="vw_askLeaveReport" EntityType="Self.vw_askLeaveReport" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vw_askLeaveReport].[id] AS [id], 
+[vw_askLeaveReport].[sys_no] AS [sys_no], 
+[vw_askLeaveReport].[applier_num] AS [applier_num], 
+[vw_askLeaveReport].[applier_name] AS [applier_name], 
+[vw_askLeaveReport].[dep_long_name] AS [dep_long_name], 
+[vw_askLeaveReport].[dep_no] AS [dep_no], 
+[vw_askLeaveReport].[emp_level] AS [emp_level], 
+[vw_askLeaveReport].[is_direct_charge] AS [is_direct_charge], 
+[vw_askLeaveReport].[leave_type] AS [leave_type], 
+[vw_askLeaveReport].[from_date] AS [from_date], 
+[vw_askLeaveReport].[to_date] AS [to_date], 
+[vw_askLeaveReport].[work_days] AS [work_days], 
+[vw_askLeaveReport].[work_hours] AS [work_hours], 
+[vw_askLeaveReport].[leave_reason] AS [leave_reason], 
+[vw_askLeaveReport].[agent_man] AS [agent_man], 
+[vw_askLeaveReport].[inform_man] AS [inform_man], 
+[vw_askLeaveReport].[has_attachment] AS [has_attachment], 
+[vw_askLeaveReport].[apply_time] AS [apply_time], 
+[vw_askLeaveReport].[dep_id] AS [dep_id], 
+[vw_askLeaveReport].[status] AS [status], 
+[vw_askLeaveReport].[salary_no] AS [salary_no], 
+[vw_askLeaveReport].[current_auditors] AS [current_auditors], 
+[vw_askLeaveReport].[finish_date] AS [finish_date], 
+[vw_askLeaveReport].[level_name] AS [level_name], 
+[vw_askLeaveReport].[check1] AS [check1], 
+[vw_askLeaveReport].[check2] AS [check2]
+FROM [dbo].[vw_askLeaveReport] AS [vw_askLeaveReport]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="vw_ei_simple_users" EntityType="Self.vw_ei_simple_users" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
 [vw_ei_simple_users].[id] AS [id], 
@@ -1179,6 +1284,16 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
           <EntitySet Name="wx_pushMsg" EntityType="ICAuditModel.wx_pushMsg" />
           <EntitySet Name="ei_leaveDayExceedPushLog" EntityType="ICAuditModel.ei_leaveDayExceedPushLog" />
           <EntitySet Name="vw_leaving_days" EntityType="ICAuditModel.vw_leaving_days" />
+          <FunctionImport Name="GetSalaryBankCard" ReturnType="Collection(String)">
+          <Parameter Name="salary_no" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="vw_askLeaveReport" EntityType="ICAuditModel.vw_askLeaveReport" />
+          <EntitySet Name="flow_applyEntryQueue" EntityType="ICAuditModel.flow_applyEntryQueue" />
+          <FunctionImport Name="GetK3StockAccoutList" ReturnType="Collection(ICAuditModel.GetK3StockAccountList_Result)" />
+          <FunctionImport Name="GetK3StockAuditor" ReturnType="Collection(ICAuditModel.GetK3StockAuditor_Result)">
+          <Parameter Name="accountName" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="ei_stockAdminApply" EntityType="ICAuditModel.ei_stockAdminApply" />
         </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -1947,6 +2062,9 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
           <Property Name="has_attachment" Type="Boolean" />
           <Property Name="apply_time" Type="DateTime" Precision="3" />
           <Property Name="dep_id" Type="Int32" />
+          <Property Name="auditor_queues" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="check1" Type="Boolean" />
+          <Property Name="check2" Type="Boolean" />
         </EntityType>
         <ComplexType Name="GetSalaryAllDetail_Result">
           <Property Type="Decimal" Name="work_days" Nullable="true" Precision="4" Scale="1" />
@@ -2081,6 +2199,77 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
           <Property Name="work_days" Type="Int32" />
           <Property Name="work_hours" Type="Decimal" Precision="4" Scale="1" />
           <Property Name="apply_time" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="vw_askLeaveReport">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="status" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="dep_long_name" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="dep_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="emp_level" Type="Int32" />
+          <Property Name="is_direct_charge" Type="Boolean" />
+          <Property Name="leave_type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="from_date" Type="DateTime" Precision="0" />
+          <Property Name="to_date" Type="DateTime" Precision="0" />
+          <Property Name="work_days" Type="Int32" />
+          <Property Name="work_hours" Type="Decimal" Precision="4" Scale="1" />
+          <Property Name="leave_reason" Type="String" MaxLength="2000" FixedLength="false" Unicode="true" />
+          <Property Name="agent_man" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="inform_man" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="has_attachment" Type="Boolean" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="dep_id" Type="Int32" />
+          <Property Name="status" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="salary_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="current_auditors" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="finish_date" Type="DateTime" Precision="3" />
+          <Property Name="level_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="check1" Type="Boolean" />
+          <Property Name="check2" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="flow_applyEntryQueue">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="step" Type="Int32" />
+          <Property Name="step_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="auditors" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="countersign" Type="Boolean" />
+          <Property Name="flow_template_entry_id" Type="Int32" />
+        </EntityType>
+        <ComplexType Name="GetK3StockAccountList_Result" >
+          <Property Type="String" Name="FAcctName" Nullable="false" />
+          <Property Type="String" Name="FAcctNumber" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="GetK3StockAuditor_Result" >
+          <Property Type="String" Name="FNumber" Nullable="true" />
+          <Property Type="String" Name="FName" Nullable="true" />
+          <Property Type="String" Name="FCheckName" Nullable="true" />
+          <Property Type="String" Name="FCheckNo" Nullable="true" />
+        </ComplexType>
+        <EntityType Name="ei_stockAdminApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="k3_account_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="k3_account_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="k3_stock_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="k3_stock_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="stock_auditor_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="stock_auditor_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="comment" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -2744,6 +2933,9 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
           <EntitySetMapping Name="ei_askLeave">
             <EntityTypeMapping TypeName="ICAuditModel.ei_askLeave">
               <MappingFragment StoreEntitySet="ei_askLeave">
+                <ScalarProperty Name="check2" ColumnName="check2" />
+                <ScalarProperty Name="check1" ColumnName="check1" />
+                <ScalarProperty Name="auditor_queues" ColumnName="auditor_queues" />
                 <ScalarProperty Name="dep_id" ColumnName="dep_id" />
                 <ScalarProperty Name="apply_time" ColumnName="apply_time" />
                 <ScalarProperty Name="has_attachment" ColumnName="has_attachment" />
@@ -2880,6 +3072,84 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
                 <ScalarProperty Name="leave_type" ColumnName="leave_type" />
                 <ScalarProperty Name="applier_name" ColumnName="applier_name" />
                 <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetSalaryBankCard" FunctionName="ICAuditModel.Store.GetSalaryBankCard" />
+          <EntitySetMapping Name="vw_askLeaveReport">
+            <EntityTypeMapping TypeName="ICAuditModel.vw_askLeaveReport">
+              <MappingFragment StoreEntitySet="vw_askLeaveReport">
+                <ScalarProperty Name="check2" ColumnName="check2" />
+                <ScalarProperty Name="check1" ColumnName="check1" />
+                <ScalarProperty Name="level_name" ColumnName="level_name" />
+                <ScalarProperty Name="finish_date" ColumnName="finish_date" />
+                <ScalarProperty Name="current_auditors" ColumnName="current_auditors" />
+                <ScalarProperty Name="salary_no" ColumnName="salary_no" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="dep_id" ColumnName="dep_id" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="has_attachment" ColumnName="has_attachment" />
+                <ScalarProperty Name="inform_man" ColumnName="inform_man" />
+                <ScalarProperty Name="agent_man" ColumnName="agent_man" />
+                <ScalarProperty Name="leave_reason" ColumnName="leave_reason" />
+                <ScalarProperty Name="work_hours" ColumnName="work_hours" />
+                <ScalarProperty Name="work_days" ColumnName="work_days" />
+                <ScalarProperty Name="to_date" ColumnName="to_date" />
+                <ScalarProperty Name="from_date" ColumnName="from_date" />
+                <ScalarProperty Name="leave_type" ColumnName="leave_type" />
+                <ScalarProperty Name="is_direct_charge" ColumnName="is_direct_charge" />
+                <ScalarProperty Name="emp_level" ColumnName="emp_level" />
+                <ScalarProperty Name="dep_no" ColumnName="dep_no" />
+                <ScalarProperty Name="dep_long_name" ColumnName="dep_long_name" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="flow_applyEntryQueue">
+            <EntityTypeMapping TypeName="ICAuditModel.flow_applyEntryQueue">
+              <MappingFragment StoreEntitySet="flow_applyEntryQueue">
+                <ScalarProperty Name="flow_template_entry_id" ColumnName="flow_template_entry_id" />
+                <ScalarProperty Name="countersign" ColumnName="countersign" />
+                <ScalarProperty Name="auditors" ColumnName="auditors" />
+                <ScalarProperty Name="step_name" ColumnName="step_name" />
+                <ScalarProperty Name="step" ColumnName="step" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetK3StockAccoutList" FunctionName="ICAuditModel.Store.GetK3StockAccoutList" >
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetK3StockAccountList_Result" />
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetK3StockAuditor" FunctionName="ICAuditModel.Store.GetK3StockAuditor" >
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetK3StockAuditor_Result">
+                <ScalarProperty Name="FNumber" ColumnName="FNumber" />
+                <ScalarProperty Name="FName" ColumnName="FName" />
+                <ScalarProperty Name="FCheckName" ColumnName="FCheckName" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="ei_stockAdminApply">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_stockAdminApply">
+              <MappingFragment StoreEntitySet="ei_stockAdminApply">
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="stock_auditor_name" ColumnName="stock_auditor_name" />
+                <ScalarProperty Name="stock_auditor_num" ColumnName="stock_auditor_num" />
+                <ScalarProperty Name="k3_stock_name" ColumnName="k3_stock_name" />
+                <ScalarProperty Name="k3_stock_num" ColumnName="k3_stock_num" />
+                <ScalarProperty Name="k3_account_name" ColumnName="k3_account_name" />
+                <ScalarProperty Name="k3_account_num" ColumnName="k3_account_num" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
