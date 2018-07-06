@@ -64,25 +64,29 @@ namespace EmpInfo.Controllers
         public JsonResult GetDepartmentTreeForSel()
         {
             var list = new List<Department>();
-            foreach (var d in db.ei_department.Where(d => d.FNumber.Length == 1).ToList()) {
-                list.Add(GetDepartment(d.FNumber));
+            var deps = db.ei_department.Where(d => (d.FIsDeleted == null || d.FIsDeleted == false) && (d.FIsForbit == null || d.FIsForbit == false)).ToList();
+            foreach (var d in db.ei_department.Where(d => d.FNumber.Length == 1 && (d.FIsDeleted == null || d.FIsDeleted == false) && (d.FIsForbit == null || d.FIsForbit == false)).ToList()) {
+                list.Add(GetDepartment(deps,d.FNumber));
             }
             return Json(list);
         }
 
-        private Department GetDepartment(string rootNumber)
+        private Department GetDepartment(List<ei_department> deps, string rootNumber)
         {
-            var rootDep = db.ei_department.Single(e => e.FNumber == rootNumber);            
+            var rootDep = deps.Single(e => e.FNumber == rootNumber);            
             Department dep = new Department();            
             dep.text = rootDep.FName;
             dep.tags = new string[] { rootDep.FNumber,rootDep.id.ToString() };
             dep.selectable = true;
+            if (rootDep.FIsForbit == true) {
+                dep.color = "#d9534f"; //被禁用显示红色
+            }
 
             dep.nodes = new List<Department>();
-            foreach (var child in db.ei_department
-                .Where(e => e.FParent == rootNumber && (e.FIsDeleted == null || e.FIsDeleted == false) && (e.FIsForbit == null || e.FIsForbit == false))
+            foreach (var child in deps
+                .Where(e => e.FParent == rootNumber)
                 .OrderBy(e => e.FNumber).ToList()) {
-                dep.nodes.Add(GetDepartment(child.FNumber)); //递归获取子节点
+                dep.nodes.Add(GetDepartment(deps,child.FNumber)); //递归获取子节点
             }
             if (dep.nodes.Count() == 0) {
                 dep.nodes = null; //没有子节点
@@ -94,11 +98,12 @@ namespace EmpInfo.Controllers
         public JsonResult GetAdminDepartmentTreeForSel()
         {
             var list = new List<Department>();
-            foreach (var d in db.ei_department.Where(d => d.FAdmin.Contains(userInfo.cardNo)).ToList()) {
-                list.Add(GetDepartment(d.FNumber));
+            var deps = db.ei_department.Where(d => d.FIsDeleted == null || d.FIsDeleted == false).ToList();
+            foreach (var d in db.ei_department.Where(d => d.FReporter.Contains(userInfo.cardNo) && (d.FIsDeleted == false || d.FIsDeleted == null)).Distinct().ToList()) {
+                list.Add(GetDepartment(deps, d.FNumber));
             }
             return Json(list);
         }
-                
+        
     }
 }

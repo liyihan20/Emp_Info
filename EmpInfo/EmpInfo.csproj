@@ -170,6 +170,7 @@
     <Compile Include="Controllers\RestaurantBaseController.cs" />
     <Compile Include="Controllers\RestaurantController.cs" />
     <Compile Include="Controllers\ChartController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Controllers\WXController.cs" />
     <Compile Include="Filter\SessionTimeOutFilter.cs" />
     <Compile Include="Global.asax.cs">
@@ -304,7 +305,7 @@
     <Compile Include="Models\ei_users_android.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\flow_applyEntryQueue.cs">
+    <Compile Include="Models\GenTrulyDeliveryBill_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetDormFeeByMonth_Result.cs">
@@ -326,6 +327,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetK3StockAuditor_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GetOutStockBillsForAudit1_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetPOAccount_Result.cs">
@@ -376,6 +380,9 @@
     </Compile>
     <Compile Include="Models\ReportModels.cs" />
     <Compile Include="Models\ResModels.cs" />
+    <Compile Include="Models\StockbillAudit1_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\t_UserConfig.cs">
       <DependentUpon>Canteen.tt</DependentUpon>
     </Compile>
@@ -440,10 +447,12 @@
     <Content Include="Content\images\book.png" />
     <Content Include="Content\images\box.png" />
     <Content Include="Content\images\bubble-sprite.png" />
+    <Content Include="Content\images\gear.png" />
     <Content Include="Content\images\house.png" />
     <Content Include="Content\images\leave.png" />
     <Content Include="Content\images\office.png" />
     <Content Include="Content\images\paint.png" />
+    <Content Include="Content\images\paper.png" />
     <Content Include="Content\images\post.png" />
     <Content Include="Content\images\PO_48.png" />
     <Content Include="Content\images\admin.png" />
@@ -741,6 +750,7 @@
     <Content Include="Scripts\knockout-3.4.0.debug.js" />
     <Content Include="Scripts\knockout-3.4.0.js" />
     <Content Include="Scripts\lazysizes.min.js" />
+    <Content Include="Scripts\list.min.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\respond.min.js" />
@@ -775,6 +785,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Content>
     <Content Include="Service References\FlowSvr\EmpInfo.FlowSvr.HasAuditModel.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
+    <Content Include="Service References\FlowSvr\EmpInfo.FlowSvr.ArrayOfFlow_applyEntryQueue.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Content>
     <None Include="Service References\FlowSvr\FlowSvr.disco" />
@@ -851,24 +864,21 @@
     <Content Include="Views\Shared\_SelectDep.cshtml" />
     <Content Include="Views\Home\CheckMonthSalary.cshtml" />
     <Content Include="Views\Shared\_ConfirmPasswordDialog.cshtml" />
-    <Content Include="Views\Apply\AskLeaveIndex.cshtml" />
-    <Content Include="Views\Apply\GetMyApplyALList.cshtml" />
     <Content Include="Views\Apply\CheckALApply.cshtml" />
     <Content Include="Views\Home\WorkGroupIndex.cshtml" />
-    <Content Include="Views\Apply\GetMyAuditingALList.cshtml" />
     <Content Include="Views\Apply\BeginAuditALApply.cshtml" />
-    <Content Include="Views\Apply\GetMyAuditedALList.cshtml" />
     <Content Include="Views\Apply\CheckFlowRecord.cshtml" />
     <Content Include="Views\Shared\_InputDialog.cshtml" />
-    <Content Include="Views\Report\ALReport.cshtml" />
     <Content Include="Views\Shared\_SelectItems.cshtml" />
-    <Content Include="Views\Apply\StockAdminIndex.cshtml" />
     <Content Include="Views\Apply\BeginApplySA.cshtml" />
-    <Content Include="Views\Apply\GetMyApplySAList.cshtml" />
-    <Content Include="Views\Apply\GetMyAuditedSAList.cshtml" />
-    <Content Include="Views\Apply\GetMyAuditingSAList.cshtml" />
     <Content Include="Views\Apply\CheckSAApply.cshtml" />
     <Content Include="Views\Apply\BeginAuditSAApply.cshtml" />
+    <Content Include="Views\K3\StockBillAudit.cshtml" />
+    <Content Include="Views\Report\ALReport.cshtml" />
+    <Content Include="Views\Apply\ApplyIndex.cshtml" />
+    <Content Include="Views\Apply\GetMyApplyList.cshtml" />
+    <Content Include="Views\Apply\GetMyAuditingList.cshtml" />
+    <Content Include="Views\Apply\GetMyAuditedList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

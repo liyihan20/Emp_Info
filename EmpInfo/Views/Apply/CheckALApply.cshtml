@@ -28,22 +28,51 @@
 }
 @section Scripts {
     <script>
-        $(function () {
-            $("#al_file_list").on("click", "td i", function () {
-                var fileTD = $(this).parents("tr").find("td")[0];
-                var fileName = $(fileTD).attr("data-fd");
-                //window.location.href = "@Url.Content("~/File/DownLoadFile?sysNum=")" + "@al.sysNo" + "&fileName=" + fileName; 
-                //直接打开网页查看图片，不下载
-                var sn = "@al.sysNo";
-                var path = sn.substr(0, 2) + "/20" + sn.substr(2, 2) + "/" + sn.substr(4, 2) + "/" + sn + "/" + fileName;
-                window.location.href = "@Url.Content("~/Att/")" + path;
+    $(function () {
+        $("#al_file_list").on("click", "td i", function () {
+            var fileTD = $(this).parents("tr").find("td")[0];
+            var fileName = $(fileTD).attr("data-fd");
+            //window.location.href = "@Url.Content("~/File/DownLoadFile?sysNum=")" + "@al.sysNo" + "&fileName=" + fileName;
+            //直接打开网页查看图片，不下载
+            var sn = "@al.sysNo";
+            var path = sn.substr(0, 2) + "/20" + sn.substr(2, 2) + "/" + sn.substr(4, 2) + "/" + sn + "/" + fileName;
+            window.location.href = "@Url.Content("~/Att/")" + path;
+        });
+        $("#flowRecordBt").on("click", function () {
+            var box = $("<div></div>");
+            $(box).load("@Url.Content("~/Apply/CheckFlowRecord") .list-group", { sysNo: "@al.sysNo" }, function () {
+                openMessageDialog($(box).html(), "查看流转记录");
             });
-            $("#flowRecordBt").on("click", function () {                
-                var box = $("<div></div>");
-                $(box).load("@Url.Content("~/Apply/CheckFlowRecord") .list-group", { sysNo: "@al.sysNo" }, function () {
-                    openMessageDialog($(box).html(), "查看流转记录");
+
+        });
+        $("#leaveRecordBt").on("click", function () {
+
+            $.post("@Url.Content("~/Apply/GetLeaveRecordsInOneYear")", { applierNameAndCard: "@al.applierNameAndCard" }, function (data) {
+                    if (data.suc) {
+                        var trs = data.list;
+                        if (trs.length == 0) {
+                            toastr.error("最近1年没有已通过的请假记录");
+                            return;
+                        }
+                        var table = "<table width='100%' class='table'><thead><tr><th style='width:35%'>流水号/日期</th><th style='width:65%'>请假内容</th></tr></thead><tbody>";
+
+                        for (var i = 0; i < trs.length; i++) {
+                            table += "<tr>";
+                            table += "<td><a href='@Url.Content("~/Apply/checkALApply?sysNo=")" + trs[i].sysNo + "' target='_blank'>" + trs[i].sysNo + "</a><br/>" + trs[i].applyTime + "</td>";
+                            table += "<td>" + trs[i].leaveType + " : " + trs[i].leaveDays + "<br/>" + trs[i].leaveDateSpan + "</td>";
+                            table += "</tr>";
+                        }
+
+                        table += "</tbody></table>";
+                        openMessageDialog(table, "查看最近1年已通过请假记录");
+                    } else {
+                        toastr.error(data.msg);
+                    }
+
+
                 });
-                
+
+
             });
         });
 </script>
@@ -56,7 +85,7 @@
                     <li><span class="glyphicon glyphicon-hand-right"></span></li>
                     <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
                     <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-                    <li><a href="@Url.Content("~/Apply/AskLeaveIndex")">请假申请单</a></li>
+                    <li><a href="@string.Concat(Url.Content("~/Apply/ApplyIndex?billType=AL&billName="),Uri.EscapeDataString("请假申请单"))">请假申请单</a></li>
                     <li class="active">查看详情</li>
                 </ol>
             </div>
@@ -79,13 +108,15 @@
                     <tr>
                         <th>申请流水号</th>
                         <td>
-                            @al.sysNo
-                            
+                            @al.sysNo                            
                         </td>
                     </tr>                    
                     <tr>
                         <th>申请人</th>
-                        <td>@al.applierNameAndCard</td>
+                        <td>
+                            <span class="pull-left" style="margin-top:5px;">@al.applierNameAndCard</span>   
+                            <button type="button" class="btn btn-default btn-sm pull-right" id="leaveRecordBt"><i class="fa fa-book"></i> 请假记录</button>
+                        </td>
                     </tr>                    
                     <tr>
                         <th>申请时间</th>

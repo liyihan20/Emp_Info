@@ -1,0 +1,46 @@
+﻿@section CSS{
+    <style type="text/css">
+        .badge {
+            background-color: #3399CC;
+        }
+    </style>
+}
+
+@section Scripts{
+    <script>
+    $(function () {
+        if (parseInt($("#dealingBadge").html()) > 0) {
+            $("#dealingBadge").css("visibility", "visible");
+        }
+        $("#beginApplyLink").on("click", function () {
+            $.post("@Url.Content("~/WX/HasBindWx")", {}, function (data) {
+                    if (data.suc) {
+                        window.location.href = "@Url.Content("~/Apply/BeginApply?billType=")" + "@ViewData["billType"]";
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li class="active">@ViewData["billName"]</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <i> 点击以下列表选择相应的服务:</i>
+    </div>
+    <div class="list-group">
+        <a href="#" class="list-group-item" id="beginApplyLink"><span class="text-danger"><i class="fa fa-fw fa-pencil"></i> 开始申请</span></a>
+        <a href="@string.Concat(Url.Content("~/Apply/GetMyApplyList?billType="),ViewData["billType"])" class="list-group-item"><i class="fa fa-fw fa-th"></i> 我申请的</a>
+        <a href="@string.Concat(Url.Content("~/Apply/GetMyAuditingList?billType="),ViewData["billType"])" class="list-group-item"><i class="fa fa-fw fa-th-list"></i> 我的待办 <span class="badge" id="dealingBadge" style="visibility:hidden;">@ViewData["dealingCount"]</span></a>
+        <a href="@string.Concat(Url.Content("~/Apply/GetMyAuditedList?billType="), ViewData["billType"])" class="list-group-item"><i class="fa fa-fw fa-th-large"></i> 我的已办</a>
+    </div>
+</div>

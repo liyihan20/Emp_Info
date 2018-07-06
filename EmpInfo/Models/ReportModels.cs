@@ -21,6 +21,8 @@ namespace EmpInfo.Models
         public string auditStatus { get; set; }
         public int empLeve { get; set; }
         public string empName { get; set; }
+        public string sysNum { get; set; }
+        public string salaryNo { get; set; }
     }
 
 }

@@ -385,17 +385,18 @@ namespace EmpInfo.Controllers
 
         #region 请假申请 AL
 
-        [SessionTimeOutFilter]
-        public ActionResult AskLeaveIndex()
-        {
-            FlowSvrSoapClient client = new FlowSvrSoapClient();
-            int myDealingApplyCount = client.GetMyDealingApplyCount(userInfo.cardNo, new ArrayOfString() { ASK_LEAVE_BILL_TYPE });
+        //[SessionTimeOutFilter]
+        //public ActionResult AskLeaveIndex()
+        //{
+        //    FlowSvrSoapClient client = new FlowSvrSoapClient();
+        //    int myDealingApplyCount = client.GetMyDealingApplyCount(userInfo.cardNo, new ArrayOfString() { ASK_LEAVE_BILL_TYPE });
 
-            ViewData["dealingCount"] = myDealingApplyCount;
+        //    ViewData["dealingCount"] = myDealingApplyCount;
 
-            WriteEventLog("请假申请", "打开主界面");
-            return View();
-        }
+        //    WriteEventLog("请假申请", "打开主界面");
+        //    return View();
+        //}
+        
 
         [SessionTimeOutFilter]
         public ActionResult BeginApplyAL()
@@ -411,6 +412,7 @@ namespace EmpInfo.Controllers
                 }
             }
 
+            //最近30天请假天数
             int days = 0;
             decimal hours = 0;
             DateTime aMonthAgo = DateTime.Now.AddDays(-30);
@@ -423,11 +425,21 @@ namespace EmpInfo.Controllers
                     hours = hours % 8;
                 }
             }
+            
+            //剩余年假天数            
+
             ViewData["times"] = vwLeaveDays.Count();
             ViewData["days"] = days;
             ViewData["hours"] = hours;
             ViewData["sysNum"] = GetNextSysNum(ASK_LEAVE_BILL_TYPE, 4);
             ViewData["pLevels"] = db.ei_empLevel.OrderBy(e => e.level_no).ToList();
+            try {
+                ViewData["vacationDaysLeft"] = db.GetVacationDaysLeftProc(userInfo.cardNo).First();
+            }
+            catch (Exception ex) {
+                ViewBag.tip = "计算本年度剩余年休假时出现错误，请联系部门负责做考勤的文员确认，错误信息：" + ex.Message;
+                return View("Error");
+            }
             return View();
         }
 
@@ -441,10 +453,20 @@ namespace EmpInfo.Controllers
             al.applier_num = userInfo.cardNo;
             al.apply_time = DateTime.Now;
             
+            //一线员工必须选择到最底层的部门
+            if (al.emp_level == 0) {
+                if (db.ei_department.Where(d => d.FParent == al.dep_no && (d.FIsDeleted == null || d.FIsDeleted == false) && (d.FIsForbit == null || d.FIsForbit == false)).Count() > 0) {
+                    return Json(new SimpleResultModel() { suc = false, msg = "存在子级部门，请展开部门文件夹继续选择" });
+                }
+            }
+            
             //处理一下审核队列,将姓名（厂牌）格式更换为厂牌
             if (!string.IsNullOrEmpty(al.auditor_queues)) {
                 var queueList = JsonConvert.DeserializeObject<List<flow_applyEntryQueue>>(al.auditor_queues);
                 queueList.ForEach(q => q.auditors = GetUserCardByNameAndCardNum(q.auditors));
+                if (queueList.Where(q => q.auditors.Contains("离职")).Count() > 0) {
+                    return Json(new SimpleResultModel() { suc = false, msg = "流程审核人中存在已离职的员工，请联系部门管理员处理" });
+                }
                 al.auditor_queues = JsonConvert.SerializeObject(queueList);
             }
             
@@ -467,56 +489,59 @@ namespace EmpInfo.Controllers
 
                 db.SaveChanges();
 
-                ALEmail(al, result);
+                //ALEmail(al, result);
                 return Json(new SimpleResultModel() { suc = true, msg = "申请编号是：" + al.sys_no });
             }
             else {
+                //将生成的流程表记录删除
+                client.DeleteApplyForFailure(al.sys_no);
                 return Json(new SimpleResultModel() { suc = false, msg = "原因是：" + result.msg });
             }         
             //return Json(new SimpleResultModel() { suc = false, msg = "test"});
         }
 
-        //我申请的
-        [SessionTimeOutFilter]
-        public ActionResult GetMyApplyALList()
-        {
-            DateTime lastYear = DateTime.Now.AddYears(-1);
-            FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            List<FlowMyAppliesModel> list = flow.GetMyApplyList(userInfo.cardNo, lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), "", new ArrayOfString() { ASK_LEAVE_BILL_TYPE }, "", "", 10, 100).ToList();
-            ViewData["list"] = list;
+        ////我申请的
+        //[SessionTimeOutFilter]
+        //public ActionResult GetMyApplyALList()
+        //{
+        //    DateTime lastYear = DateTime.Now.AddYears(-1);
+        //    FlowSvrSoapClient flow = new FlowSvrSoapClient();
+        //    List<FlowMyAppliesModel> list = flow.GetMyApplyList(userInfo.cardNo, lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), "", new ArrayOfString() { ASK_LEAVE_BILL_TYPE }, "", "", 10, 100).ToList();
+        //    ViewData["list"] = list;
 
-            WriteEventLog("请假申请单", "打开我申请的界面");
-            return View();
-        }
+        //    WriteEventLog("请假申请单", "打开我申请的界面");
+        //    return View();
+        //}
 
-        //我的待办
-        [SessionTimeOutFilter]
-        public ActionResult GetMyAuditingALList()
-        {
-            FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { ASK_LEAVE_BILL_TYPE }, 100).ToList();
-            list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
-            ViewData["list"] = list;
-            WriteEventLog("请假申请单", "打开我的代办界面");
-            return View();
-        }
+        ////我的待办
+        //[SessionTimeOutFilter]
+        //public ActionResult GetMyAuditingALList()
+        //{
+        //    FlowSvrSoapClient flow = new FlowSvrSoapClient();
+        //    var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { ASK_LEAVE_BILL_TYPE }, 100).ToList();
+        //    list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
+        //    ViewData["list"] = list;
+        //    WriteEventLog("请假申请单", "打开我的代办界面");
+        //    return View();
+        //}
 
-        //我的已办
-        [SessionTimeOutFilter]
-        public ActionResult GetMyAuditedALList()
-        {
-            DateTime lastYear = DateTime.Now.AddYears(-1);
-            FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), new ArrayOfInt() { 1, -1 }, new ArrayOfInt() { 10 }, new ArrayOfString() { ASK_LEAVE_BILL_TYPE }, 100).ToList();
-            list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
+        ////我的已办
+        //[SessionTimeOutFilter]
+        //public ActionResult GetMyAuditedALList()
+        //{
+        //    DateTime lastYear = DateTime.Now.AddYears(-1);
+        //    FlowSvrSoapClient flow = new FlowSvrSoapClient();
+        //    var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), new ArrayOfInt() { 1, -1 }, new ArrayOfInt() { 10 }, new ArrayOfString() { ASK_LEAVE_BILL_TYPE }, 300).ToList();
+        //    list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
 
-            ViewData["list"] = list;
-            WriteEventLog("请假申请单", "打开我的已办界面");
-            return View();
-        }
+        //    ViewData["list"] = list;
+        //    WriteEventLog("请假申请单", "打开我的已办界面");
+        //    return View();
+        //}
 
         //撤销申请
         [SessionTimeOutJsonFilter]
+        
         public JsonResult AbortALApply(string sysNo, string reason = "")
         {
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
@@ -525,24 +550,24 @@ namespace EmpInfo.Controllers
             if (flow.ApplyHasBeenAudited(sysNo)) {
                 var auditStatus = flow.GetApplyResult(sysNo);
                 if (auditStatus.Contains("审批中")) {
-                    return Json(new SimpleResultModel() { suc = false, msg = "流程正在审批中，不能撤销，请联系当前处理人NG" });
+                    return Json(new SimpleResultModel() { suc = false, msg = "流程正在审批中，不能撤销，请联系当前处理人NG" },JsonRequestBehavior.AllowGet);
                 }
                 else if (auditStatus.Contains("撤销")) {
-                    return Json(new SimpleResultModel() { suc = false, msg = "流程已经撤销，不能再次操作" });
+                    return Json(new SimpleResultModel() { suc = false, msg = "流程已经撤销，不能再次操作" }, JsonRequestBehavior.AllowGet);
                 }
                 else if (auditStatus.Contains("拒绝")) {
-                    return Json(new SimpleResultModel() { suc = false, msg = "流程已被拒绝，不需要再撤销" });
+                    return Json(new SimpleResultModel() { suc = false, msg = "流程已被拒绝，不需要再撤销" }, JsonRequestBehavior.AllowGet);
                 }
                 else if (auditStatus.Contains("通过")) {
                     if (db.ei_askLeave.Where(a => a.sys_no == sysNo && a.from_date < DateTime.Now).Count() > 0) {
-                        return Json(new SimpleResultModel() { suc = false, msg = "当前请假时间已生效，不能撤销" });
+                        return Json(new SimpleResultModel() { suc = false, msg = "当前请假时间已生效，不能撤销" }, JsonRequestBehavior.AllowGet);
                     }
                     else {
                         result = flow.AbortAfterFinish(sysNo, reason);
                     }
                 }
                 else {
-                    return Json(new SimpleResultModel() { suc = false, msg = "不能撤销，当前状态是：" + auditStatus });
+                    return Json(new SimpleResultModel() { suc = false, msg = "不能撤销，当前状态是：" + auditStatus }, JsonRequestBehavior.AllowGet);
                 }
             }
             else {
@@ -553,7 +578,7 @@ namespace EmpInfo.Controllers
             WriteEventLog("请假申请单", "撤销、中止流程：" + sysNo);
 
             ALEmail(db.ei_askLeave.Single(a => a.sys_no == sysNo), result);
-            return Json(new SimpleResultModel() { suc = result.suc, msg = result.msg });
+            return Json(new SimpleResultModel() { suc = result.suc, msg = result.msg }, JsonRequestBehavior.AllowGet);
         }
 
         //查看申请
@@ -628,30 +653,7 @@ namespace EmpInfo.Controllers
             WriteEventLog("请假申请单", "处理申请单:" + sysNo + ";step:" + step + ";isPass:" + isPass);
             return Json(new SimpleResultModel() { suc = result.suc, msg = result.msg });
         }
-
-        //查看流转记录
-        [SessionTimeOutFilter]
-        public ActionResult CheckFlowRecord(string sysNo)
-        {
-            FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            var result = flow.GetFlowRecord(sysNo).ToList();
-            result.ForEach(r => r.auditors = GetUserNameByCardNum(r.auditors));
-
-            if (flow.GetApplyResult(sysNo) == "已通过") {
-                result.Add(new FlowRecordModels()
-                {
-                    stepName = "完成申请",
-                    auditors = "系统",
-                    auditResult = "成功",
-                    auditTimes = result.OrderByDescending(r => r.auditTimes).First().auditTimes,
-                    opinions = ""
-                });
-            }
-
-            ViewData["record"] = result;
-            
-            return View();
-        }
+                
 
         [SessionTimeOutJsonFilter]
         public JsonResult GetALFlowQueue(FormCollection fc)
@@ -669,6 +671,11 @@ namespace EmpInfo.Controllers
             }
             else if (al.to_date <= al.from_date) {
                 return Json(new SimpleResultModel() { suc = false, msg = "请检查请假期间" });
+            }
+
+            var daySpan = ((DateTime)al.to_date - (DateTime)al.from_date).Days;
+            if (daySpan - al.work_days > 4 || al.work_days - daySpan > 1) {
+                return Json(new SimpleResultModel() { suc = false, msg = "请检查请假期间和请假天数是否对应" });
             }
 
             if (!string.IsNullOrEmpty(al.agent_man)) {
@@ -811,6 +818,16 @@ namespace EmpInfo.Controllers
                 receviers += ";" + step1Auditors;
             }
 
+            string addr, phone;
+            if (al.dep_no.StartsWith("106")) {
+                addr = "研发楼一楼行政及人力资源部";
+                phone = "0752-6568888/7888";
+            }
+            else {
+                addr = "写字楼（行政大楼）一楼行政部";
+                phone = "3003";
+            }
+
             //发微信
             foreach (var ad in receviers.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
                 var pushUsers = db.vw_push_users.Where(u => u.card_number == ad).ToList();
@@ -820,14 +837,14 @@ namespace EmpInfo.Controllers
                 var pushUser = pushUsers.First();
                 wx_pushMsg pm = new wx_pushMsg();
                 pm.FCardNumber = ad;
-                pm.FFirst = string.Format("{0}，请您于下述时间，前往写字楼（行政大楼）一楼行政部与{1}面谈。", al.applier_name, userInfo.name);
+                pm.FFirst = string.Format("{0}，请您于下述时间，前往{2}与{1}面谈。", al.applier_name, userInfo.name,addr);
                 pm.FHasSend = false;
                 pm.FInTime = DateTime.Now;
                 pm.FkeyWord1 = "请假时间超过公司规定天数";
                 pm.FKeyWord2 = dt.ToString("yyyy-MM-dd HH:mm");
                 pm.FOpenId = pushUser.wx_openid;
                 pm.FPushType = "行政面谈";
-                pm.FRemark = "请您准时到达，如有疑问。请致电行政部" + userInfo.name + "，内线电话：3003";
+                pm.FRemark = "请您准时到达，如有疑问。请致电行政部" + userInfo.name + "，电话：" + phone;
                 db.wx_pushMsg.Add(pm);
             }
             db.SaveChanges();
@@ -837,8 +854,7 @@ namespace EmpInfo.Controllers
             string emailAddrs = GetUserEmailByCardNum(al.applier_num);
             string ccEmails = GetUserEmailByCardNum(step1Auditors);
             string content = "<div>" + string.Format("{0}，你好！", al.applier_name) + "</div>";
-            content += "<div style='margin-left:30px;'>请您于下述时间，前往写字楼（行政大楼）一楼行政部与" + userInfo.name + "面谈。<br /> 面谈内容：请假时间超过公司规定天数 <br/> 预约时间：" + dt.ToString("yyyy-MM-dd HH:mm") + "</div>";
-
+            content += "<div style='margin-left:30px;'>请您于下述时间，前往" + addr + "与" + userInfo.name + "面谈。<br /> 面谈内容：请假时间超过公司规定天数 <br/> 预约时间：" + dt.ToString("yyyy-MM-dd HH:mm") + "</div>";
             MyEmail.SendEmail(subject, emailAddrs, content, ccEmails);
 
             WriteEventLog("请假条申请", al.sys_no + ">发送行政面谈邮件，地址：" + emailAddrs + ";content:" + content);
@@ -854,6 +870,35 @@ namespace EmpInfo.Controllers
             }
             var log = logs.Last();
             return Json(new SimpleResultModel() { suc = true, msg = string.Format("【发送记录】发送人：{0}；发送时间：{1}；预约时间：{2}",log.send_user,((DateTime)log.send_date).ToString("yyyy-MM-dd HH:mm"),((DateTime)log.book_date).ToString("yyyy-MM-dd HH:mm")) });
+        }
+
+        //查看最近1年内的申请记录
+        [SessionTimeOutJsonFilter]
+        public JsonResult GetLeaveRecordsInOneYear(string applierNameAndCard)
+        {
+            DateTime aYearAgo = DateTime.Now.AddYears(-1);
+            string applierNumber = GetUserCardByNameAndCardNum(applierNameAndCard);
+
+            var result = (from v in db.vw_askLeaveReport
+                          where v.applier_num == applierNumber
+                          && v.status == "已通过"
+                          && v.apply_time >= aYearAgo
+                          && !(v.work_days == 0 && v.work_hours == 0)
+                          orderby v.apply_time descending
+                          select v
+                          ).ToList();
+
+            var list = (from r in result
+                        select new ALRecordModel()
+                        {
+                            sysNo = r.sys_no,
+                            applyTime = ((DateTime)r.apply_time).ToString("yyyy-MM-dd"),
+                            leaveType = r.leave_type,
+                            leaveDays = r.work_days + "天" + r.work_hours + "小时",
+                            leaveDateSpan = ((DateTime)r.from_date).ToString("MM-dd HH:mm") + " ~ " + ((DateTime)r.to_date).ToString("MM-dd HH:mm")
+                        }).ToList();
+
+            return Json(new { suc = true, list = list });
         }
 
         public string testalemail()
@@ -875,17 +920,17 @@ namespace EmpInfo.Controllers
 
         #region 仓管权限申请 SA
 
-        [SessionTimeOutFilter]
-        public ActionResult StockAdminIndex()
-        {
-            FlowSvrSoapClient client = new FlowSvrSoapClient();
-            int myDealingApplyCount = client.GetMyDealingApplyCount(userInfo.cardNo, new ArrayOfString() { STOCK_ADMIN_BILL_TYPE });
+        //[SessionTimeOutFilter]
+        //public ActionResult StockAdminIndex()
+        //{
+        //    FlowSvrSoapClient client = new FlowSvrSoapClient();
+        //    int myDealingApplyCount = client.GetMyDealingApplyCount(userInfo.cardNo, new ArrayOfString() { STOCK_ADMIN_BILL_TYPE });
 
-            ViewData["dealingCount"] = myDealingApplyCount;
+        //    ViewData["dealingCount"] = myDealingApplyCount;
 
-            WriteEventLog("仓管权限申请", "打开主界面");
-            return View();
-        }
+        //    WriteEventLog("仓管权限申请", "打开主界面");
+        //    return View();
+        //}
 
         [SessionTimeOutFilter]
         public ActionResult BeginApplySA()
@@ -949,44 +994,44 @@ namespace EmpInfo.Controllers
             //return Json(new SimpleResultModel() { suc = false, msg = "test"});
         }
 
-        //我申请的
-        [SessionTimeOutFilter]
-        public ActionResult GetMyApplySAList()
-        {
-            DateTime lastYear = DateTime.Now.AddYears(-1);
-            FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            List<FlowMyAppliesModel> list = flow.GetMyApplyList(userInfo.cardNo, lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), "", new ArrayOfString() { STOCK_ADMIN_BILL_TYPE }, "", "", 10, 100).ToList();
-            ViewData["list"] = list;
+        ////我申请的
+        //[SessionTimeOutFilter]
+        //public ActionResult GetMyApplySAList()
+        //{
+        //    DateTime lastYear = DateTime.Now.AddYears(-1);
+        //    FlowSvrSoapClient flow = new FlowSvrSoapClient();
+        //    List<FlowMyAppliesModel> list = flow.GetMyApplyList(userInfo.cardNo, lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), "", new ArrayOfString() { STOCK_ADMIN_BILL_TYPE }, "", "", 10, 100).ToList();
+        //    ViewData["list"] = list;
 
-            WriteEventLog("仓管权限申请", "打开我申请的界面");
-            return View();
-        }
+        //    WriteEventLog("仓管权限申请", "打开我申请的界面");
+        //    return View();
+        //}
 
-        //我的待办
-        [SessionTimeOutFilter]
-        public ActionResult GetMyAuditingSAList()
-        {
-            FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { STOCK_ADMIN_BILL_TYPE }, 100).ToList();
-            list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
-            ViewData["list"] = list;
-            WriteEventLog("仓管权限申请", "打开我的代办界面");
-            return View();
-        }
+        ////我的待办
+        //[SessionTimeOutFilter]
+        //public ActionResult GetMyAuditingSAList()
+        //{
+        //    FlowSvrSoapClient flow = new FlowSvrSoapClient();
+        //    var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { STOCK_ADMIN_BILL_TYPE }, 100).ToList();
+        //    list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
+        //    ViewData["list"] = list;
+        //    WriteEventLog("仓管权限申请", "打开我的代办界面");
+        //    return View();
+        //}
 
-        //我的已办
-        [SessionTimeOutFilter]
-        public ActionResult GetMyAuditedSAList()
-        {
-            DateTime lastYear = DateTime.Now.AddYears(-1);
-            FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), new ArrayOfInt() { 1, -1 }, new ArrayOfInt() { 10 }, new ArrayOfString() { STOCK_ADMIN_BILL_TYPE }, 100).ToList();
-            list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
+        ////我的已办
+        //[SessionTimeOutFilter]
+        //public ActionResult GetMyAuditedSAList()
+        //{
+        //    DateTime lastYear = DateTime.Now.AddYears(-1);
+        //    FlowSvrSoapClient flow = new FlowSvrSoapClient();
+        //    var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), new ArrayOfInt() { 1, -1 }, new ArrayOfInt() { 10 }, new ArrayOfString() { STOCK_ADMIN_BILL_TYPE }, 100).ToList();
+        //    list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
 
-            ViewData["list"] = list;
-            WriteEventLog("仓管权限申请", "打开我的已办界面");
-            return View();
-        }
+        //    ViewData["list"] = list;
+        //    WriteEventLog("仓管权限申请", "打开我的已办界面");
+        //    return View();
+        //}
                 
 
         //查看申请
@@ -1145,5 +1190,136 @@ namespace EmpInfo.Controllers
         }
 
         #endregion
+
+        #region 所有流程共享方法 除了宿舍维修流程
+
+        // 主界面
+        public ActionResult ApplyIndex(string billType,string billName)
+        {
+            FlowSvrSoapClient client = new FlowSvrSoapClient();
+            int myDealingApplyCount = client.GetMyDealingApplyCount(userInfo.cardNo, new ArrayOfString() { billType });
+
+            ViewData["dealingCount"] = myDealingApplyCount;
+            ViewData["billType"] = billType;
+            ViewData["billName"] = billName;
+
+            WriteEventLog(billName, "打开主界面");
+
+            return View();
+        }
+
+        //开始申请
+        public ActionResult BeginApply(string billType)
+        {
+            return RedirectToAction("BeginApply" + billType);
+        }
+
+        //我申请的
+        public ActionResult GetMyApplyList(string billType)
+        {
+            DateTime lastYear = DateTime.Now.AddYears(-1);
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            List<FlowMyAppliesModel> list = flow.GetMyApplyList(userInfo.cardNo, lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), "", new ArrayOfString() { billType }, "", "", 10, 200).ToList();
+            ViewData["list"] = list;
+            ViewData["billType"] = billType;
+
+            WriteEventLog(billType, "打开我申请的界面");
+            return View();
+        }
+
+        //查看申请详情
+        public ActionResult CheckApply(string sysNo)
+        {
+            string billType = sysNo.Substring(0, 2);
+            string actionName = "Check" + billType + "Apply";
+            return RedirectToAction(actionName, new { sysNo = sysNo });
+        }
+
+        //我的代办
+        public ActionResult GetMyAuditingList(string billType)
+        {
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 10 }, new ArrayOfString() { billType }, 100).ToList();
+            list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
+            ViewData["list"] = list;
+            WriteEventLog(billType, "打开我的代办界面");
+
+            return View();
+        }
+
+        //开始审批
+        public ActionResult BeginAuditApply(string sysNo, int? step)
+        {
+            string billType = sysNo.Substring(0, 2);
+            string actionName = "BeginAudit" + billType + "Apply";            
+            return RedirectToAction(actionName, new { sysNo = sysNo, step = step });
+        }
+
+        //我的已办
+        public ActionResult GetMyAuditedList(string billType)
+        {
+            DateTime lastYear = DateTime.Now.AddYears(-1);
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), new ArrayOfInt() { 1, -1 }, new ArrayOfInt() { 10 }, new ArrayOfString() { billType }, 300).ToList();
+            list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
+
+            ViewData["list"] = list;
+            WriteEventLog(billType, "打开我的已办界面");
+            return View();
+        }
+
+        //撤销申请
+        [SessionTimeOutJsonFilter]
+        public ActionResult AbortApply(string sysNo, string reason = "")
+        {
+            string billType = sysNo.Substring(0, 2);
+
+            if ("AL".Equals(billType)) {
+                return RedirectToAction("AbortALApply", new { sysNo = sysNo, reason = reason });
+            }
+
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            FlowResultModel result;
+
+            if (flow.ApplyHasBeenAudited(sysNo)) {
+                var auditStatus = flow.GetApplyResult(sysNo);                
+                return Json(new SimpleResultModel() { suc = false, msg = "不能撤销，当前状态是：" + auditStatus });                
+            }
+            else {
+                //流程还未审批可以直接撤销
+                result = flow.AbortFlow(userInfo.cardNo, sysNo);
+            }
+
+            WriteEventLog(billType, "撤销、中止流程：" + sysNo);
+            
+            return Json(new SimpleResultModel() { suc = result.suc, msg = result.msg });
+        }
+
+        //查看流转记录
+        [SessionTimeOutFilter]
+        public ActionResult CheckFlowRecord(string sysNo)
+        {
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            var result = flow.GetFlowRecord(sysNo).ToList();
+            result.ForEach(r => r.auditors = GetUserNameByCardNum(r.auditors));
+
+            if (flow.GetApplyResult(sysNo) == "已通过") {
+                result.Add(new FlowRecordModels()
+                {
+                    stepName = "完成申请",
+                    auditors = "系统",
+                    auditResult = "成功",
+                    auditTimes = result.OrderByDescending(r => r.auditTimes).First().auditTimes,
+                    opinions = ""
+                });
+            }
+
+            ViewData["record"] = result;
+
+            return View();
+        }
+
+        #endregion
+
     }
 }

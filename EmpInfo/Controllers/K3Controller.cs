@@ -5,12 +5,17 @@ using System.Web;
 using System.Web.Mvc;
 using EmpInfo.Models;
 using EmpInfo.Filter;
+using Newtonsoft.Json;
+using EmpInfo.Util;
 
 namespace EmpInfo.Controllers
 {
     [SessionTimeOutFilter]
     public class K3Controller : BaseController
     {
+
+        #region 重置k3密码和解禁
+
         public ActionResult AccountReset()
         {
             WriteEventLog("K3重开通/重置", "打开处理界面");
@@ -66,6 +71,134 @@ namespace EmpInfo.Controllers
 
             return Json(new SimpleResultModel() { suc = true });
         }
+
+        #endregion
+
+        #region 光电/半导体/电子 销售出库单一审和生成送货单
+
+        [SessionTimeOutFilter]
+        public ActionResult StockBillAudit()
+        {
+            StBillSearchParamModel spm;
+            var cookie = Request.Cookies["stBillAcc"];
+            if (cookie == null) {
+                spm = new StBillSearchParamModel();
+                spm.account = "半导体";
+                spm.fromDate = DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd");
+                spm.toDate = DateTime.Now.ToString("yyyy-MM-dd");
+            }
+            else {
+                spm = JsonConvert.DeserializeObject<StBillSearchParamModel>(cookie.Values.Get("spm"));
+                spm.account = MyUtils.DecodeToUTF8(spm.account);
+            }
+
+            WriteEventLog("出库单一审", "打开主界面");
+
+            ViewData["spm"] = spm;
+
+            return View();
+        }
+
+        [SessionTimeOutFilter]
+        public ActionResult SearchStockBillList(string account, DateTime fromDate, DateTime toDate)
+        {
+            //保存cookie
+            var spm = new StBillSearchParamModel()
+            {
+                account = MyUtils.EncodeToUTF8(account),
+                fromDate = fromDate.ToString("yyyy-MM-dd"),
+                toDate = toDate.ToString("yyyy-MM-dd")
+            };
+            var cookie = new HttpCookie("stBillAcc");
+            cookie.Values.Add("spm", JsonConvert.SerializeObject(spm));
+            cookie.Expires.AddDays(7);
+            Response.AppendCookie(cookie);
+
+            var result = db.GetOutStockBillsForAudit1(account, fromDate, toDate).ToList();
+
+            var list = (from r in result
+                        select new StBillResultModel()
+                        {
+                            stId = r.interId,
+                            stNumber = r.billNo,
+                            stDate = r.billDate,
+                            customerName = r.customerName,
+                            customerNumber = r.customerNumber,
+                            saleStyle = r.saleType,
+                            srNumber = r.saleReqNo
+                        }).Distinct(new stBillComparer()).ToList();
+            list.ForEach(l =>
+            {
+                var entry = from r in result
+                            where r.interId == l.stId
+                            select new
+                            {
+                                r.itemName,
+                                r.itemModel,
+                                r.price,
+                                r.qty,
+                                r.ammount,
+                                r.unitName
+                            };
+                l.entryJson = JsonConvert.SerializeObject(entry);
+            });
+
+            spm.account = account;
+
+            WriteEventLog("出库单一审", account + ":" + fromDate + "~" + toDate);
+
+            ViewData["list"] = list;
+            ViewData["spm"] = spm;
+            return View("StockBillAudit");
+
+        }
+
+        //StBillResultModel的比较器，如果id相等，即两个类重复
+        private class stBillComparer : IEqualityComparer<StBillResultModel>
+        {
+
+            public bool Equals(StBillResultModel x, StBillResultModel y)
+            {
+                return x.stId == x.stId;
+            }
+
+            public int GetHashCode(StBillResultModel obj)
+            {
+                return obj.stId.GetHashCode();
+            }
+        }
+
+        //开始一审k3销售出库单
+        [SessionTimeOutJsonFilter]
+        public JsonResult BeginAuditStockBill(string account, int interid)
+        {
+            try {
+                var result = db.StockbillAudit1(account, interid, userInfo.name).First();
+                WriteEventLog("出库单一审", "一审:"+interid + (result.suc == true ? "成功" : "失败") + ";msg" + result.msg);
+                return Json(new SimpleResultModel() { suc = (bool)result.suc, msg = result.msg });
+            }
+            catch (Exception ex) {
+                WriteEventLog("出库单一审", "一审失败：" + interid + ex.Message);
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+        }
+
+        //开始生成送货单，电子没有，只有半导体和光电
+        [SessionTimeOutJsonFilter]
+        public JsonResult GenTrulyDelivery(string account, string billNo, string srNo)
+        {
+            try {
+                var result = db.GenTrulyDeliveryBill(account, billNo, srNo).First();
+                WriteEventLog("出库单一审", "生成送货单:"+billNo + (result.suc == 1 ? "成功" : "失败") + ";msg" + result.msg);
+                return Json(new SimpleResultModel() { suc = result.suc == 1, msg = result.msg });
+            }
+            catch (Exception ex) {
+                WriteEventLog("出库单一审", "生成送货单：" + billNo + ex.Message);
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+        }
+
+        #endregion
 
     }
 }

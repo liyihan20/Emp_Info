@@ -29,6 +29,7 @@ namespace EmpInfo.Models
         public string FCreator { get; set; }
         public Nullable<System.DateTime> FCreateDate { get; set; }
         public Nullable<bool> FIsAuditNode { get; set; }
+        public string FReporter { get; set; }
     
         public virtual ICollection<ei_departmentAuditNode> ei_departmentAuditNode { get; set; }
     }

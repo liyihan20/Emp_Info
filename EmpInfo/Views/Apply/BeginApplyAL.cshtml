@@ -1,6 +1,10 @@
 ﻿@using EmpInfo.Models;
 @{
     List<ei_empLevel> empLevels = (List<ei_empLevel>)ViewData["pLevels"];
+    int empLevel = -1;
+    if (ViewData["empLevel"] != null) {
+        empLevel = (int)ViewData["empLevel"];
+    }
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
@@ -40,210 +44,225 @@
     <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
 
     <script>
-        var queue;
-        $(function () {
-            $("#beginTimePicker,#endTimePicker").datetimepicker({
-                language: 'zh-CN',
-                format: "yyyy-mm-dd hh:ii",
-                autoclose: true,
-                startView: 2,
-                maxView: 2,
-                minuteStep: 5,
-            });
-
-            $("#directSpan").hide();
-            //$("#eLevel").val("2");
-
-            //经理级别以上才能选择是否直管
-            $("#eLevel").on("change", function () {
-                if ($("#eLevel").val() >= 7) {
-                    $("#directSpan").show();
-                } else {
-                    $("#directSpan").hide();
-                }
-            });
-
-            //选择部门
-            $("#eDepName").on("click", function () {
-                openSelectDepDialog(0,function (selectedDep) {
-                    console.log(selectedDep);
-                    $("#eDepName").val(selectedDep.depLongName);
-                    $("#eDepNum").val(selectedDep.depNum);
-                    $("#eDepId").val(selectedDep.depId);
-                });
-            });
-
-            //选择代理人
-            $("#agentMan").on("click", function () {
-                openSelectUserDialog($("#agentMan").val(), 1, function (result) {
-                    $("#agentMan").val(result);
-                });
-            });
-
-            //选择知会人
-            $("#informMan").on("click", function () {
-                openSelectUserDialog($("#informMan").val(), 10, function (result) {
-                    $("#informMan").val(result);
-                });
-            });
-
-            //请假类型变更
-            $("input[name='leave_type']").on("change", function () {
-                console.log($("input[name='leave_type']:checked").val());
-            });
-
-            //提交申请
-            $("#apply_bt").on("click", function () {
-                if (!validateForm()) {
-                    return;
-                }
-
-                $("#hasAttachment").val($("#al_file_list").children().length > 0);
-                $(this).button("loading");
-                var formParam = $("#alForm").serialize();
-                $.ajax({
-                    type: 'post',
-                    url: '@Url.Content("~/Apply/GetALFlowQueue")',
-                    data: formParam,
-                    cache: false,
-                    dataType: 'json',
-                    success: function (data) {
-                        if (data.suc) {
-                            var q = data.list;
-                            queue = q;
-                            var div = "";
-                            var canSelectAuditor = false;
-                            var depNo = $("#eDepNum").val();
-                            if (depNo.indexOf("212") == 0 || depNo.indexOf("21501") == 0 || depNo.indexOf("10112") == 0) {
-                                canSelectAuditor = true;
-                            }
-                            for (var i = 0; i < q.length; i++) {
-                                div += "<div>" + q[i].step + ".";                                
-                                div += "【" + q[i].step_name + "】 <span class='auditors'>" + q[i].auditors + "</span>";
-                                if (q[i].auditors.indexOf(";") >= 0 && q[i].countersign != true && canSelectAuditor) {
-                                    div += " <span class='changeAuditor text-primary' data-idx= '" + i + "' style='cursor:pointer;'>修改审核人</span>"
-                                }
-                                div += "</div>";
-                            }
-                            openConfirmDialog(div, function () {
-                                $("#apply_bt").button("loading");
-                                $.ajax({
-                                    type: 'post',
-                                    url: '@Url.Content("~/Apply/SaveApplyAL")',
-                                    data: formParam + "&auditor_queues=" + JSON.stringify(queue),
-                                    cache: false,
-                                    dataType: 'json',
-                                    success: function (data) {
-                                        $("#apply_bt").button("reset");
-                                        if (data.suc) {
-                                            toastr.success("提交成功:" + data.msg);
-                                            setTimeout(function () { window.location.href = "@Url.Content("~/Apply/AskLeaveIndex")"; }, 2000);
-                                        } else {
-                                            toastr.error("提交失败：" + data.msg);
-                                            $("#apply_bt").button("reset");
-                                        }
-
-                                    }
-                                });
-                            }, "审批流程预览", "返回修改", "确认提交");
-                        } else {
-                            toastr.error(data.msg);
-                        }
-                        $("#apply_bt").button("reset");
-                    }
-                });
-            });
-
-            //选择审批人员
-            $("#confirm_content").on("click", ".changeAuditor", function () {
-                var idx = $(this).attr("data-idx");
-                var finalAuditors = $(this).parent().find(".auditors");
-                openSelectItemDialog(queue[idx].auditors, 1, 10, function (aus) {                    
-                    $(finalAuditors).html(aus);
-                    queue[idx].auditors = aus;
-                });
-            });
-
+    var queue;
+    $(function () {
+        $("#beginTimePicker,#endTimePicker").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd hh:ii",
+            autoclose: true,
+            startView: 2,
+            maxView: 2,
+            minuteStep: 5,
         });
 
-        
-
-        //验证表单
-        function validateForm() {
-            if ($("#eDepNum").val() == "") {
-                toastr.error("必须选择[所属部门]");
-                return false;
-            }
-            if ($("#eLevel").val() == "") {
-                toastr.error("必须选择[职位级别]");
-                return false;
-            }
-            if ($("input[name='leave_type']:checked").length < 1) {
-                toastr.error("必须选择[请假类型]");
-                return false;
-            }
-            if ($("#beginTime").val() == "") {
-                toastr.error("必须填写请假[开始时间]");
-                return false;
-            }
-            if ($("#endTime").val() == "") {
-                toastr.error("必须填写请假[结束时间]");
-                return false;
-            }
-            var days = $("#days").val(), hours = $("#hours").val();
-            if (days == "") {
-                toastr.error("必须填写[请假天数]");
-                return false;
-            }
-            if (isNaN(days)) {
-                toastr.error("[请假天数]必须填写数字");
-                return false;
-            }
-            if (days < 0 || days % 1 != 0) {
-                toastr.error("[请假天数]必须为正整数");
-                return false;
-            }
-            if (days > 300) {
-                toastr.error("[请假天数]必须少于300天")
-            }
-            if (hours == "") {
-                toastr.error("必须填写[小时]数");
-                return false;
-            }
-            if (isNaN(hours) || hours < 0) {
-                toastr.error("[小时]必须填写大于0的数字");
-                return false;
-            }
-            if (hours > 24) {
-                toastr.error("[小时]必须少于24小时")
-            }
-            if ($($("input[name='leave_type']:checked")[0]).val() == "年假" && hours % 4 != 0) {
-                toastr.error("当[请假类型]是年假时，[小时]数必须是4的整数倍");
-                return false;
-            } else if (hours % 0.5 != 0) {
-                toastr.error("[小时]必须为0.5的整数倍");
-                return false;
-            }
-            if (days == 0 && hours == 0) {
-                toastr.error("请假时间不能都是0");
-                return false;
-            }
-            if ($($("input[name='leave_type']:checked")[0]).val() == "病假" && $("#al_file_list tr").length < 1) {
-                toastr.error("当[请假类型]是病假时，必须上传医院诊断证明等附件");
-                return false;
-            }
-            return true;
+        if ("@empLevel" < "7") {
+            $("#directSpan").hide();
         }
 
-        function showDepName() {
-            var name = $("#eDepName").val();
-            var no = $("#eDepNum").val();
-            if (name == "") {
-                toastr.info("请先选择所属部门");
+        //$("#eLevel").val("2");
+
+        //经理级别以上才能选择是否直管
+        $("#eLevel").on("change", function () {
+            if ($("#eLevel").val() >= 7) {
+                $("#directSpan").show();
+            } else {
+                $("#directSpan").hide();
+            }
+        });
+
+        //选择部门
+        $("#eDepName").on("click", function () {
+            openSelectDepDialog(0, function (selectedDep) {
+                console.log(selectedDep);
+                $("#eDepName").val(selectedDep.depLongName);
+                $("#eDepNum").val(selectedDep.depNum);
+                $("#eDepId").val(selectedDep.depId);
+            });
+        });
+
+        //选择代理人
+        $("#agentMan").on("click", function () {
+            openSelectUserDialog($("#agentMan").val(), 1, function (result) {
+                $("#agentMan").val(result);
+            });
+        });
+
+        //选择知会人
+        $("#informMan").on("click", function () {
+            openSelectUserDialog($("#informMan").val(), 10, function (result) {
+                $("#informMan").val(result);
+            });
+        });
+
+        //请假类型变更
+        $("input[name='leave_type']").on("change", function () {
+            var tp = $("input[name='leave_type']:checked").val();
+            if (tp == "年假") {
+                $("#vacationInfo").slideDown(400);
+            } else {
+                $("#vacationInfo").slideUp(400);
+            }
+        });
+
+        //提交申请
+        $("#apply_bt").on("click", function () {
+            if (!validateForm()) {
                 return;
             }
-            openMessageDialog("<div>名称：<span class='text-danger'>" + name + "</span></div><div>编码：<span class='text-danger'>" + no + "</span></div>", "当前所选部门信息");
+
+            $("#hasAttachment").val($("#al_file_list").children().length > 0);
+            $(this).button("loading");
+            var formParam = $("#alForm").serialize();
+            $.ajax({
+                type: 'post',
+                url: '@Url.Content("~/Apply/GetALFlowQueue")',
+                data: formParam,
+                cache: false,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.suc) {
+                        var q = data.list;
+                        queue = q;
+                        var div = "";
+                        var canSelectAuditor = false;
+                        var depNo = $("#eDepNum").val();
+                        if (depNo.indexOf("212") == 0 || depNo.indexOf("21501") == 0 || depNo.indexOf("10112") == 0) {
+                            canSelectAuditor = true;
+                        }
+                        for (var i = 0; i < q.length; i++) {
+                            div += "<div>" + q[i].step + ".";
+                            div += "【" + q[i].step_name + "】 <span class='auditors'>" + q[i].auditors + "</span>";
+                            if (q[i].auditors.indexOf(";") >= 0 && q[i].countersign != true && canSelectAuditor) {
+                                div += " <span class='changeAuditor text-primary' data-idx= '" + i + "' style='cursor:pointer;'>修改审核人</span>"
+                            }
+                            div += "</div>";
+                        }
+                        openConfirmDialog(div, function () {
+                            $("#apply_bt").button("loading");
+                            $.ajax({
+                                type: 'post',
+                                url: '@Url.Content("~/Apply/SaveApplyAL")',
+                                data: formParam + "&auditor_queues=" + JSON.stringify(queue),
+                                cache: false,
+                                dataType: 'json',
+                                success: function (data) {
+                                    $("#apply_bt").button("reset");
+                                    if (data.suc) {
+                                        toastr.success("提交成功:" + data.msg);
+                                        setTimeout(function () { window.location.href = "@string.Concat(Url.Content("~/Apply/ApplyIndex?billType=AL&billName="),Uri.EscapeDataString("请假申请单"))"; }, 2000);
+                                    } else {
+                                        toastr.error("提交失败：" + data.msg);
+                                        $("#apply_bt").button("reset");
+                                    }
+
+                                }
+                            });
+                        }, "审批流程预览", "返回修改", "确认提交");
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                    $("#apply_bt").button("reset");
+                }
+            });
+        });
+
+        //选择审批人员
+        $("#confirm_content").on("click", ".changeAuditor", function () {
+            var idx = $(this).attr("data-idx");
+            var finalAuditors = $(this).parent().find(".auditors");
+            openSelectItemDialog(queue[idx].auditors, 1, 10, function (aus) {
+                $(finalAuditors).html(aus);
+                queue[idx].auditors = aus;
+            });
+        });
+
+    });
+
+
+
+    //验证表单
+    function validateForm() {
+        if ($("#eDepNum").val() == "") {
+            toastr.error("必须选择[所属部门]");
+            return false;
         }
+        if ($("#eLevel").val() == "") {
+            toastr.error("必须选择[职位级别]");
+            return false;
+        }
+        if ($("input[name='leave_type']:checked").length < 1) {
+            toastr.error("必须选择[请假类型]");
+            return false;
+        }
+        if ($("#beginTime").val() == "") {
+            toastr.error("必须填写请假[开始时间]");
+            return false;
+        }
+        if ($("#endTime").val() == "") {
+            toastr.error("必须填写请假[结束时间]");
+            return false;
+        }
+        var days = $("#days").val(), hours = $("#hours").val();
+        if (days == "") {
+            toastr.error("必须填写[请假天数]");
+            return false;
+        }
+        if (isNaN(days)) {
+            toastr.error("[请假天数]必须填写数字");
+            return false;
+        }
+        if (days < 0 || days % 1 != 0) {
+            toastr.error("[请假天数]必须为正整数");
+            return false;
+        }
+        if (days > 300) {
+            toastr.error("[请假天数]必须少于300天")
+        }
+        if (hours == "") {
+            toastr.error("必须填写[小时]数");
+            return false;
+        }
+        if (isNaN(hours) || hours < 0) {
+            toastr.error("[小时]必须填写大于0的数字");
+            return false;
+        }
+        if (hours > 24) {
+            toastr.error("[小时]必须少于24小时")
+        }
+        if ($($("input[name='leave_type']:checked")[0]).val() == "年假") {
+            if (hours % 4 != 0) {
+                toastr.error("当[请假类型]是年假时，[小时]数必须是4的整数倍");
+                return false;
+            }
+            if (parseInt(days) + hours / 8.0 > parseFloat("@ViewData["vacationDaysLeft"]")) {
+                toastr.error("当前年休假天数少于请假天数，提交失败");
+                return false;
+            }
+
+        } else if (hours % 0.5 != 0) {
+            toastr.error("[小时]必须为0.5的整数倍");
+            return false;
+        }
+        if (days == 0 && hours == 0) {
+            toastr.error("请假时间不能都是0");
+            return false;
+        }
+        if ($($("input[name='leave_type']:checked")[0]).val() == "病假" && $("#al_file_list tr").length < 1) {
+            toastr.error("当[请假类型]是病假时，必须上传医院诊断证明等附件");
+            return false;
+        }
+        return true;
+    }
+
+    function showDepName() {
+        var name = $("#eDepName").val();
+        var no = $("#eDepNum").val();
+        if (name == "") {
+            toastr.info("请先选择所属部门");
+            return;
+        }
+        openMessageDialog("<div>名称：<span class='text-danger'>" + name + "</span></div><div>编码：<span class='text-danger'>" + no + "</span></div>", "当前所选部门信息");
+    }
 </script>
 
     <script>
@@ -346,15 +365,15 @@
     </script>
 }
 
-<div class="row">
-    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12">
+<div class="row" style="margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
         <div class="panel panel-danger">
             <div class="panel-heading">
                 <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
                     <li><span class="glyphicon glyphicon-hand-right"></span></li>
                     <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
                     <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-                    <li><a href="@Url.Content("~/Apply/AskLeaveIndex")">请假申请单</a></li>
+                    <li><a href="@string.Concat(Url.Content("~/Apply/ApplyIndex?billType=AL&billName="),Uri.EscapeDataString("请假申请单"))">请假申请单</a></li>
                     <li class="active">开始申请</li>
                 </ol>
             </div>
@@ -391,7 +410,7 @@
                             <select class="form-control" id="eLevel" name="emp_level">
                                 <option></option>
                                 @foreach (var el in empLevels) {
-                                    if (ViewData["empLevel"] != null && el.level_no == (int)ViewData["empLevel"]) {
+                                    if (el.level_no == empLevel) {
                                         <option value="@el.level_no" selected="selected">@el.level_name</option>
                                     }
                                     else {
@@ -407,17 +426,25 @@
                             <button class="btn btn-block btn-default" disabled>请假类型</button>
                         </span>
                         <div style="display:inline-block;width:70%">
-                            <span style="display:block" class="row">
+                            <span style="display:block;margin:0;" class="row">
                                 @{
-                                    string[] types = new string[] { "事假", "病假", "年假", "探亲", "婚假", "产假", "工伤", "丧假" };
+                                    string[] types = new string[] { "事假", "病假", "年假", "探亲", "婚假", "产假", "工伤", "丧假", "产假延期" };
                                     foreach (var ty in types) {
-                                        <span class="col-xs-3 text-center" style="padding:0 4px;">
-                                            <input type="radio" name="leave_type" value="@ty" /> @ty
-                                        </span>
+                                        if (ty == "产假延期") {
+                                            <span class="col-xs-6" style="padding:0 4px;">
+                                                <input type="radio" name="leave_type" value="@ty" /> @ty
+                                            </span>
+                                        }
+                                        else {
+                                            <span class="col-xs-3" style="padding:0 4px;">
+                                                <input type="radio" name="leave_type" value="@ty" /> @ty
+                                            </span>
+                                        }
                                     }
                                 }
                             </span>
-                            <p class="small text-danger" style="margin-top:4px;"><i class="fa fa-info-circle"></i> 最近30天累计请假 @ViewData["times"] 次，合计 @ViewData["days"] 天 @ViewData["hours"] 小时。</p>
+                            <p class="small text-danger" style="margin:4px 0;"><i class="fa fa-info-circle"></i> 最近30天累计请假 @ViewData["times"] 次，合计 @ViewData["days"] 天 @ViewData["hours"] 小时。</p>
+                            <p class="small text-danger" style="display:none;" id="vacationInfo"><i class="fa fa-info-circle"></i> 你当前年休假天数剩余 @ViewData["vacationDaysLeft"] 天 </p>
                         </div>
                     </div>
                     <div class="b-div" style="vertical-align:middle;">
@@ -435,16 +462,16 @@
                                 <input class="form-control" type="text" id="endTime" name="to_date" />
                                 <span class="input-group-addon"><span class="fa fa-calendar"></span> </span>
                             </div>
-                            <div style="display:inline-block;width:50%;">
+                            <div style="display:inline-block;width:50%;">                       
                                 <div class="input-group">
                                     <span class="input-group-addon">共</span>
-                                    <input class="form-control" type="text" id="days" name="work_days" />
+                                    <input class="form-control" type="text" id="days" name="work_days" style="padding-left:4px;padding-right:4px;" />
                                     <span class="input-group-addon">天</span>
                                 </div>
                             </div>
-                            <div style="display:inline-block;width:48%;margin-left:-5px;">
+                            <div style="display:inline-block;width:48%;margin-left:-5px;">                       
                                 <div class="input-group">
-                                    <input class="form-control" type="text" id="hours" name="work_hours" />
+                                    <input class="form-control" type="text" id="hours" name="work_hours" style="padding-left:4px;padding-right:4px;" />
                                     <span class="input-group-addon">小时</span>
                                 </div>
                             </div>

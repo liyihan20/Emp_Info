@@ -39,7 +39,8 @@
         });
 
         $("#stockName").on("change", function (data) {
-            var stockOpt = $("#stockName")[0].selectedOptions[0];
+            var stockOpt = $('#stockName option:selected');
+            //var stockOpt = $("#stockName")[0].selectedOptions[0];
             var auditorName = $(stockOpt).attr("data-aname");
             $("#stockAuditor").html(auditorName == "" ? "无" : auditorName);
         });
@@ -55,7 +56,8 @@
                 return;
             }
 
-            var stockOpt = $("#stockName")[0].selectedOptions[0];
+            var stockOpt = $('#stockName option:selected');
+            //var stockOpt = $("#stockName")[0].selectedOptions[0];
             var stockNum = $(stockOpt).attr("value");
             var stockName = $(stockOpt).attr("data-sname");
             var auditorName = $(stockOpt).attr("data-aname");
@@ -104,7 +106,7 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>            
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
-            <li><a href="@Url.Content("~/Apply/StockAdminIndex")">仓管权限</a></li>
+            <li><a href="@string.Concat(Url.Content("~/Apply/ApplyIndex?billType=SA&billName="), Uri.EscapeDataString("仓管权限申请"))">仓管权限</a></li>
             <li class="active">开始申请</li>
         </ol>
     </div>
@@ -187,10 +189,7 @@
                         2. 选择了仓库之后，必须存在此仓库的审核人才能提交申请
                     </p>
                     <p>
-                        3. 本功能只能申请自己的K3仓库管理权限。如需帮其他人代申请，请登陆OA走流程，流程名是：仓库管理权限申请
-                    </p>
-                    <p>
-                        4. 如果有其它问题，请联系K3管理员：赖吉全（座机：3009；邮箱：laijiquan@trulyopto.cn）
+                        3. 如果有其它问题，请联系K3管理员：赖吉全（座机：3009；邮箱：laijiquan@trulyopto.cn）
                     </p>
                 </div>
             </div>

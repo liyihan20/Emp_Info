@@ -304,6 +304,7 @@
           <Property Name="FCreator" Type="varchar" MaxLength="50" />
           <Property Name="FCreateDate" Type="datetime" />
           <Property Name="FIsAuditNode" Type="bit" />
+          <Property Name="FReporter" Type="varchar" MaxLength="500" />
         </EntityType>
         <EntityType Name="ei_departmentAuditNode">
           <Key>
@@ -533,18 +534,6 @@
           <Property Name="device_id" Type="varchar" MaxLength="200" />
           <Property Name="login_time" Type="datetime" />
         </EntityType>
-        <EntityType Name="flow_applyEntryQueue">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="sys_no" Type="varchar" MaxLength="50" />
-          <Property Name="step" Type="int" />
-          <Property Name="step_name" Type="varchar" MaxLength="50" />
-          <Property Name="auditors" Type="varchar" MaxLength="500" />
-          <Property Name="countersign" Type="bit" />
-          <Property Name="flow_template_entry_id" Type="int" />
-        </EntityType>
         <EntityType Name="wx_pushMsg">
           <Key>
             <PropertyRef Name="id" />
@@ -660,6 +649,7 @@
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
           <Property Name="applier_num" Type="varchar" MaxLength="50" />
           <Property Name="applier_name" Type="varchar" MaxLength="50" />
           <Property Name="leave_type" Type="varchar" MaxLength="50" />
@@ -859,6 +849,11 @@
           <Parameter Name="card_number" Type="varchar" Mode="In" />
           <Parameter Name="k3_account" Type="varchar" Mode="In" />
         </Function>
+        <Function Name="GenTrulyDeliveryBill" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="account" Type="varchar" Mode="In" />
+          <Parameter Name="orderNumber" Type="varchar" Mode="In" />
+          <Parameter Name="SRNumber" Type="varchar" Mode="In" />
+        </Function>
         <Function Name="GetDormChargeMonth" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="GetDormFeeByMonth" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="yearMonth" Type="varchar" Mode="In" />
@@ -880,6 +875,11 @@
         <Function Name="GetK3StockAccoutList" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="GetK3StockAuditor" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="accountName" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="GetOutStockBillsForAudit1" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="account" Type="varchar" Mode="In" />
+          <Parameter Name="fd" Type="smalldatetime" Mode="In" />
+          <Parameter Name="td" Type="smalldatetime" Mode="In" />
         </Function>
         <Function Name="GetPOAccount" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="po_number" Type="varchar" Mode="In" />
@@ -908,6 +908,9 @@
           <Parameter Name="begin_date" Type="datetime" Mode="In" />
           <Parameter Name="end_date" Type="datetime" Mode="In" />
         </Function>
+        <Function Name="GetVacationDaysLeftProc" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="empNo" Type="varchar" Mode="In" />
+        </Function>
         <Function Name="InsertIntoYFEmp" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="email" Type="varchar" Mode="In" />
           <Parameter Name="mobilephone" Type="varchar" Mode="In" />
@@ -921,6 +924,11 @@
           <Parameter Name="phone" Type="varchar" Mode="In" />
           <Parameter Name="k3_account" Type="varchar" Mode="In" />
           <Parameter Name="op_type" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="StockbillAudit1" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="account" Type="varchar" Mode="In" />
+          <Parameter Name="interid" Type="int" Mode="In" />
+          <Parameter Name="name" Type="varchar" Mode="In" />
         </Function>
         <Function Name="ValidateDormStatus" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="account" Type="varchar" Mode="In" />
@@ -962,7 +970,6 @@
           <EntitySet Name="ei_stockAdminApply" EntityType="Self.ei_stockAdminApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_users" EntityType="Self.ei_users" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_users_android" EntityType="Self.ei_users_android" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="flow_applyEntryQueue" EntityType="Self.flow_applyEntryQueue" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="wx_pushMsg" EntityType="Self.wx_pushMsg" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="vw_askLeaveReport" EntityType="Self.vw_askLeaveReport" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
@@ -1037,6 +1044,7 @@ FROM [dbo].[vw_getAllhrEmp] AS [vw_getAllhrEmp]</DefiningQuery>
           <EntitySet Name="vw_leaving_days" EntityType="Self.vw_leaving_days" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
 [vw_leaving_days].[id] AS [id], 
+[vw_leaving_days].[sys_no] AS [sys_no], 
 [vw_leaving_days].[applier_num] AS [applier_num], 
 [vw_leaving_days].[applier_name] AS [applier_name], 
 [vw_leaving_days].[leave_type] AS [leave_type], 
@@ -1288,12 +1296,33 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
           <Parameter Name="salary_no" Mode="In" Type="String" />
           </FunctionImport>
           <EntitySet Name="vw_askLeaveReport" EntityType="ICAuditModel.vw_askLeaveReport" />
-          <EntitySet Name="flow_applyEntryQueue" EntityType="ICAuditModel.flow_applyEntryQueue" />
           <FunctionImport Name="GetK3StockAccoutList" ReturnType="Collection(ICAuditModel.GetK3StockAccountList_Result)" />
           <FunctionImport Name="GetK3StockAuditor" ReturnType="Collection(ICAuditModel.GetK3StockAuditor_Result)">
           <Parameter Name="accountName" Mode="In" Type="String" />
           </FunctionImport>
           <EntitySet Name="ei_stockAdminApply" EntityType="ICAuditModel.ei_stockAdminApply" />
+          <FunctionImport Name="GenTrulyDeliveryBill" ReturnType="Collection(ICAuditModel.GenTrulyDeliveryBill_Result)">
+            <Parameter Name="account" Mode="In" Type="String" />
+            <Parameter Name="orderNumber" Mode="In" Type="String" />
+            <Parameter Name="SRNumber" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="GetOutStockBillsForAudit1" ReturnType="Collection(ICAuditModel.GetOutStockBillsForAudit1_Result)">
+            <Parameter Name="account" Mode="In" Type="String" />
+            <Parameter Name="fd" Mode="In" Type="DateTime" />
+            <Parameter Name="td" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <FunctionImport Name="StockbillAudit1" ReturnType="Collection(ICAuditModel.StockbillAudit1_Result)">
+            <Parameter Name="account" Mode="In" Type="String" />
+            <Parameter Name="interid" Mode="In" Type="Int32" />
+            <Parameter Name="name" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="AddUser">
+            <Parameter Name="card_number" Mode="In" Type="String" />
+            <Parameter Name="accountset" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="GetVacationDaysLeftProc" ReturnType="Collection(Decimal)">
+            <Parameter Name="empNo" Mode="In" Type="String" />
+          </FunctionImport>
         </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -2018,6 +2047,7 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
           <Property Name="FCreateDate" Type="DateTime" Precision="3" />
           <Property Name="FIsAuditNode" Type="Boolean" />
           <NavigationProperty Name="ei_departmentAuditNode" Relationship="ICAuditModel.FK_ei_departmentAuditNode_ei_department" FromRole="ei_department" ToRole="ei_departmentAuditNode" />
+          <Property Name="FReporter" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="ei_departmentAuditUser">
           <Key>
@@ -2199,6 +2229,7 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
           <Property Name="work_days" Type="Int32" />
           <Property Name="work_hours" Type="Decimal" Precision="4" Scale="1" />
           <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="vw_askLeaveReport">
           <Key>
@@ -2232,18 +2263,6 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
           <Property Name="check1" Type="Boolean" />
           <Property Name="check2" Type="Boolean" />
         </EntityType>
-        <EntityType Name="flow_applyEntryQueue">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="step" Type="Int32" />
-          <Property Name="step_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="auditors" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="countersign" Type="Boolean" />
-          <Property Name="flow_template_entry_id" Type="Int32" />
-        </EntityType>
         <ComplexType Name="GetK3StockAccountList_Result" >
           <Property Type="String" Name="FAcctName" Nullable="false" />
           <Property Type="String" Name="FAcctNumber" Nullable="false" />
@@ -2271,6 +2290,29 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
           <Property Name="stock_auditor_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="comment" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
         </EntityType>
+        <ComplexType Name="GenTrulyDeliveryBill_Result">
+          <Property Type="String" Name="msg" Nullable="true" MaxLength="500" />
+          <Property Type="Int32" Name="suc" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="GetOutStockBillsForAudit1_Result">
+          <Property Type="Int32" Name="interId" Nullable="false" />
+          <Property Type="String" Name="billNo" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="billDate" Nullable="true" />
+          <Property Type="String" Name="saleType" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="customerNumber" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="customerName" Nullable="true" MaxLength="80" />
+          <Property Type="String" Name="saleReqNo" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="itemName" Nullable="false" MaxLength="80" />
+          <Property Type="String" Name="itemModel" Nullable="true" MaxLength="255" />
+          <Property Type="Decimal" Name="qty" Nullable="false" Precision="28" Scale="10" />
+          <Property Type="Decimal" Name="price" Nullable="false" Precision="28" Scale="10" />
+          <Property Type="Decimal" Name="ammount" Nullable="false" Precision="20" Scale="2" />
+          <Property Type="String" Name="unitName" Nullable="false" MaxLength="80" />
+        </ComplexType>
+        <ComplexType Name="StockbillAudit1_Result">
+          <Property Type="Boolean" Name="suc" Nullable="true" />
+          <Property Type="String" Name="msg" Nullable="true" MaxLength="500" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -2896,6 +2938,7 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
           <EntitySetMapping Name="ei_department">
             <EntityTypeMapping TypeName="ICAuditModel.ei_department">
               <MappingFragment StoreEntitySet="ei_department">
+                <ScalarProperty Name="FReporter" ColumnName="FReporter" />
                 <ScalarProperty Name="FIsAuditNode" ColumnName="FIsAuditNode" />
                 <ScalarProperty Name="FCreateDate" ColumnName="FCreateDate" />
                 <ScalarProperty Name="FCreator" ColumnName="FCreator" />
@@ -3064,6 +3107,7 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
           <EntitySetMapping Name="vw_leaving_days">
             <EntityTypeMapping TypeName="ICAuditModel.vw_leaving_days">
               <MappingFragment StoreEntitySet="vw_leaving_days">
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
                 <ScalarProperty Name="apply_time" ColumnName="apply_time" />
                 <ScalarProperty Name="work_hours" ColumnName="work_hours" />
                 <ScalarProperty Name="work_days" ColumnName="work_days" />
@@ -3109,19 +3153,6 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="flow_applyEntryQueue">
-            <EntityTypeMapping TypeName="ICAuditModel.flow_applyEntryQueue">
-              <MappingFragment StoreEntitySet="flow_applyEntryQueue">
-                <ScalarProperty Name="flow_template_entry_id" ColumnName="flow_template_entry_id" />
-                <ScalarProperty Name="countersign" ColumnName="countersign" />
-                <ScalarProperty Name="auditors" ColumnName="auditors" />
-                <ScalarProperty Name="step_name" ColumnName="step_name" />
-                <ScalarProperty Name="step" ColumnName="step" />
-                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <FunctionImportMapping FunctionImportName="GetK3StockAccoutList" FunctionName="ICAuditModel.Store.GetK3StockAccoutList" >
             <ResultMapping>
               <ComplexTypeMapping TypeName="ICAuditModel.GetK3StockAccountList_Result" />
@@ -3154,6 +3185,42 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GenTrulyDeliveryBill" FunctionName="ICAuditModel.Store.GenTrulyDeliveryBill">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GenTrulyDeliveryBill_Result">
+                <ScalarProperty Name="msg" ColumnName="msg" />
+                <ScalarProperty Name="suc" ColumnName="suc" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetOutStockBillsForAudit1" FunctionName="ICAuditModel.Store.GetOutStockBillsForAudit1">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetOutStockBillsForAudit1_Result">
+                <ScalarProperty Name="interId" ColumnName="interId" />
+                <ScalarProperty Name="billNo" ColumnName="billNo" />
+                <ScalarProperty Name="billDate" ColumnName="billDate" />
+                <ScalarProperty Name="saleType" ColumnName="saleType" />
+                <ScalarProperty Name="customerNumber" ColumnName="customerNumber" />
+                <ScalarProperty Name="customerName" ColumnName="customerName" />
+                <ScalarProperty Name="saleReqNo" ColumnName="saleReqNo" />
+                <ScalarProperty Name="itemName" ColumnName="itemName" />
+                <ScalarProperty Name="itemModel" ColumnName="itemModel" />
+                <ScalarProperty Name="qty" ColumnName="qty" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="ammount" ColumnName="ammount" />
+                <ScalarProperty Name="unitName" ColumnName="unitName" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="StockbillAudit1" FunctionName="ICAuditModel.Store.StockbillAudit1">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.StockbillAudit1_Result">
+                <ScalarProperty Name="suc" ColumnName="suc" />
+                <ScalarProperty Name="msg" ColumnName="msg" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetVacationDaysLeftProc" FunctionName="ICAuditModel.Store.GetVacationDaysLeftProc" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

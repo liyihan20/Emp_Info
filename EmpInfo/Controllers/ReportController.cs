@@ -32,6 +32,8 @@ namespace EmpInfo.Controllers
                 sm.auditStatus = MyUtils.DecodeToUTF8(sm.auditStatus);
                 sm.empName = MyUtils.DecodeToUTF8(sm.empName);
                 sm.depName = MyUtils.DecodeToUTF8(sm.depName);
+                sm.salaryNo = string.IsNullOrEmpty(sm.salaryNo) ? "" : MyUtils.DecodeToUTF8(sm.salaryNo);
+                sm.sysNum = string.IsNullOrEmpty(sm.sysNum) ? "" : MyUtils.DecodeToUTF8(sm.sysNum);
             }
 
             ViewData["sm"] = sm;
@@ -39,7 +41,7 @@ namespace EmpInfo.Controllers
             return View();
         }
 
-        private List<vw_askLeaveReport> GetALDatas(int depId, DateTime fromDate, DateTime toDate, string auditStatus, int eLevel, string empName = "")
+        private List<vw_askLeaveReport> GetALDatas(int depId, DateTime fromDate, DateTime toDate, string auditStatus, int eLevel, string empName = "", string sysNum = "", string salaryNo = "")
         {
             var dep = db.ei_department.Single(d => d.id == depId);
 
@@ -52,8 +54,10 @@ namespace EmpInfo.Controllers
                 toDate = toDate.ToString("yyyy-MM-dd"),
                 auditStatus = MyUtils.EncodeToUTF8(auditStatus),
                 empLeve = eLevel,
-                empName = MyUtils.EncodeToUTF8(empName)
-            };            
+                empName = MyUtils.EncodeToUTF8(empName),
+                sysNum = MyUtils.EncodeToUTF8(sysNum),
+                salaryNo = MyUtils.EncodeToUTF8(salaryNo)
+            };         
             var cookie = new HttpCookie("alReport");
             cookie.Values.Add("sm", JsonConvert.SerializeObject(sm));
             cookie.Expires = DateTime.Now.AddDays(7);
@@ -66,6 +70,8 @@ namespace EmpInfo.Controllers
                           && (auditStatus == "所有" || v.status == auditStatus)
                           && (eLevel == -1 || v.emp_level == eLevel)
                           && v.applier_name.Contains(empName)
+                          && v.sys_no.Contains(sysNum)
+                          && v.salary_no.Contains(salaryNo)
                           orderby v.from_date
                           select v).ToList();
 
@@ -74,11 +80,11 @@ namespace EmpInfo.Controllers
         }
 
         [SessionTimeOutFilter]
-        public ActionResult CheckALDatas(int depId, DateTime fromDate, DateTime toDate, string auditStatus, int eLevel, string empName = "")
+        public ActionResult CheckALDatas(int depId, DateTime fromDate, DateTime toDate, string auditStatus, int eLevel, string empName = "",string sysNum="",string salaryNo="")
         {
             empName = empName.Trim();
-            var list = GetALDatas(depId, fromDate, toDate, auditStatus, eLevel, empName);
-            var dep = db.ei_department.Single(d => d.id == depId);            
+            var list = GetALDatas(depId, fromDate, toDate, auditStatus, eLevel, empName,sysNum,salaryNo);
+            var dep = db.ei_department.Single(d => d.id == depId);
 
             var sm = new ALSearchParam()
             {
@@ -88,8 +94,10 @@ namespace EmpInfo.Controllers
                 toDate = toDate.ToString("yyyy-MM-dd"),
                 auditStatus = auditStatus,
                 empLeve = eLevel,
-                empName = empName
-            };            
+                empName = empName,
+                salaryNo = salaryNo,
+                sysNum = sysNum
+            };
 
             ViewData["sm"] = sm;
             ViewData["list"] = list;
@@ -99,9 +107,9 @@ namespace EmpInfo.Controllers
         }
 
         [SessionTimeOutFilter]
-        public void BeginExportALExcel(int depId, DateTime fromDate, DateTime toDate, string auditStatus, int eLevel, string empName="")
+        public void BeginExportALExcel(int depId, DateTime fromDate, DateTime toDate, string auditStatus, int eLevel, string empName = "", string sysNum = "", string salaryNo = "")
         {
-            var myData = GetALDatas(depId, fromDate, toDate, auditStatus, eLevel, empName);
+            var myData = GetALDatas(depId, fromDate, toDate, auditStatus, eLevel, empName, sysNum, salaryNo);
             var dep = db.ei_department.Single(d => d.id == depId);
 
             ushort[] colWidth = new ushort[] { 10, 20, 12, 16, 16, 60, 12, 10, 18, 18,

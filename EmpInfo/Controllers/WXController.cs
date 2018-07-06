@@ -297,7 +297,7 @@ namespace EmpInfo.Controllers
         public JsonResult HasBindWx()
         {
             bool hasBind = db.vw_push_users.Where(v => v.card_number == userInfo.cardNo).Count() > 0;
-            string msg = hasBind ? "" : "必须绑定【信利e家】微信公众号之后才能进行请假申请";
+            string msg = hasBind ? "" : "必须绑定【信利e家】微信公众号之后才能进行申请";
             return Json(new SimpleResultModel() { suc = hasBind, msg = msg });
         }
 

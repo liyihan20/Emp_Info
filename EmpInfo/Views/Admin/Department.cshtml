@@ -24,58 +24,113 @@
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
 
     <script>
-        var currentNodeId;
-        $(function () {
-            resetForm();
-            GetTreeData();
+    var currentNodeId;
+    $(function () {
+        resetForm();
+        GetTreeData();
 
-            $("#beginTimePicker,#endTimePicker").datetimepicker({
-                language: 'zh-CN',
-                format: "yyyy-mm-dd",
-                autoclose: true,
-                todayBtn: true,
-                startView: 2,
-                minView: 2
-            });
-            $("#depNameBt").on("click", function () {
-                var dName = $("#depName").html();
-                if (dName == "") {
-                    toastr.error("请先选择部门");
-                    return;
-                }
-                $("#depNameTitle").html("修改部门：" + dName);
-                $("#depNameModal").modal("show");
-                $("#depNewName").val("");
-            });
+        $("#beginTimePicker,#endTimePicker").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            todayBtn: true,
+            startView: 2,
+            minView: 2
+        });
+        $("#depNameBt").on("click", function () {
+            var dName = $("#depName").html();
+            if (dName == "") {
+                toastr.error("请先选择部门");
+                return;
+            }
+            $("#depNameTitle").html("修改部门：" + dName);
+            $("#depNameModal").modal("show");
+            $("#depNewName").val("");
+        });
 
-            $("#changeDepName").on("click", function () {
-                var dNum = $("#depNum").html();
-                var dNewName = $("#depNewName").val();
-                if ($.trim(dNewName) == "") {
-                    toastr.error("部门名称不能为空");
-                    return;
-                }
-                $.post("@Url.Content("~/Admin/ChangeDepartmentName")", { depNum: dNum, newName: dNewName }, function (data) {
-                    toastr.success(data.msg);
-                    $("#depName").html(dNewName);
-                    $("#depNameModal").modal("hide");
-                    GetTreeData();
+        $("#changeDepName").on("click", function () {
+            var dNum = $("#depNum").html();
+            var dNewName = $("#depNewName").val();
+            if ($.trim(dNewName) == "") {
+                toastr.error("部门名称不能为空");
+                return;
+            }
+            $.post("@Url.Content("~/Admin/ChangeDepartmentName")", { depNum: dNum, newName: dNewName }, function (data) {
+                toastr.success(data.msg);
+                $("#depName").html(dNewName);
+                $("#depNameModal").modal("hide");
+                GetTreeData();
+            });
+        });
+
+        $("#deleteDepBt").on("click", function () {
+            var dNum = $("#depNum").html();
+            if (dNum == "") {
+                toastr.error("请先选择部门");
+                return;
+            }
+            openConfirmDialog("确认要删除此部门吗？", function () {
+                $.post("@Url.Content("~/Admin/DeleteDepartment")", { depNum: dNum }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        resetForm();
+
+                        GetTreeData();
+                    } else {
+                        toastr.error(data.msg);
+                    }
                 });
             });
+        });
 
-            $("#deleteDepBt").on("click", function () {
-                var dNum = $("#depNum").html();
-                if (dNum == "") {
-                    toastr.error("请先选择部门");
-                    return;
-                }
-                openConfirmDialog("确认要删除此部门吗？", function () {
-                    $.post("@Url.Content("~/Admin/DeleteDepartment")", { depNum: dNum }, function (data) {
+        $("#addDepBt").on("click", function () {
+            var dNum = $("#depNum").html();
+            if (dNum == "") {
+                toastr.error("请先选择部门");
+                return;
+            }
+            $("#newDepModal").modal("show");
+            $("#newDepName").val("");
+        });
+        $("#addNewDep").on("click", function () {
+            var parentNum = $("#depNum").html();
+            var newDepName = $("#newDepName").val();
+            if ($.trim(newDepName) == "") {
+                toastr.error("部门名称不能为空");
+                return;
+            }
+            $.post("@Url.Content("~/Admin/AddDepartment")", { parentNum: parentNum, newDepName: newDepName }, function (data) {
+                toastr.success(data.msg);
+                $("#newDepModal").modal("hide");
+                GetTreeData();
+            });
+        });
+
+        $("#depStatusBt").on("click", function () {
+            var dNum = $("#depNum").html();
+            if (dNum == "") {
+                toastr.error("请先选择部门");
+                return;
+            }
+            $.post("@Url.Content("~/Admin/ToggleDepartmentForbit")", { depNum: dNum }, function (data) {
+                toastr.success(data.msg);
+                $("#depStatusBt").html($("#depStatusBt").html() == "禁用" ? "正常" : "禁用");
+                GetTreeData();
+            });
+        });
+
+        //选择管理员
+        $("#depAdminBt").on("click", function () {
+            var dNum = $("#depNum").html();
+            if (dNum == "") {
+                toastr.error("请先选择部门");
+                return;
+            }
+            openSelectUserDialog($("#depAdmin").html(), 6, function (result) {
+                $.post("@Url.Content("~/Admin/ChangeDepAdmins")", { depNum: dNum, admins: result }, function (data) {
                         if (data.suc) {
+                            $("#depAdmin").html(result);
                             toastr.success(data.msg);
-                            resetForm();
-
-                            GetTreeData();
                         } else {
                             toastr.error(data.msg);
                         }
@@ -83,53 +138,17 @@
                 });
             });
 
-            $("#addDepBt").on("click", function () {
-                var dNum = $("#depNum").html();
-                if (dNum == "") {
-                    toastr.error("请先选择部门");
-                    return;
-                }
-                $("#newDepModal").modal("show");
-                $("#newDepName").val("");
-            });
-            $("#addNewDep").on("click", function () {
-                var parentNum = $("#depNum").html();
-                var newDepName = $("#newDepName").val();
-                if ($.trim(newDepName) == "") {
-                    toastr.error("部门名称不能为空");
-                    return;
-                }
-                $.post("@Url.Content("~/Admin/AddDepartment")", { parentNum: parentNum, newDepName: newDepName }, function (data) {
-                    toastr.success(data.msg);
-                    $("#newDepModal").modal("hide");
-                    GetTreeData();
-                });
-            });
-
-            $("#depStatusBt").on("click", function () {
-                var dNum = $("#depNum").html();
-                if (dNum == "") {
-                    toastr.error("请先选择部门");
-                    return;
-                }
-                $.post("@Url.Content("~/Admin/ToggleDepartmentForbit")", { depNum: dNum }, function (data) {
-                    toastr.success(data.msg);
-                    $("#depStatusBt").html($("#depStatusBt").html() == "禁用" ? "正常" : "禁用");
-                    GetTreeData();
-                });
-            });
-
             //选择管理员
-            $("#depAdminBt").on("click", function () {
+            $("#depReporterBt").on("click", function () {
                 var dNum = $("#depNum").html();
                 if (dNum == "") {
                     toastr.error("请先选择部门");
                     return;
                 }
-                openSelectUserDialog($("#depAdmin").html(), 6, function (result) {
-                    $.post("@Url.Content("~/Admin/ChangeDepAdmins")", { depNum: dNum, admins: result }, function (data) {
+                openSelectUserDialog($("#depReporter").html(), 6, function (result) {
+                    $.post("@Url.Content("~/Admin/ChangeDepReporters")", { depNum: dNum, reporters: result }, function (data) {
                         if (data.suc) {
-                            $("#depAdmin").html(result);
+                            $("#depReporter").html(result);
                             toastr.success(data.msg);
                         } else {
                             toastr.error(data.msg);
@@ -147,226 +166,227 @@
                     return;
                 }
                 $.post("@Url.Content("~/Admin/ToggleAuditNode")", { depNum: dNum }, function (data) {
+                if (data.suc) {
+                    if ($("#depAuditNode").is(":checked")) {
+                        $("#depAuditPanel").show();
+                    } else {
+                        $("#depAuditPanel").hide();
+                    }
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+        });
+
+        //修改节点名称
+        $("#depAuditNodeName").on("change", function () {
+            var dNum = $("#depNum").html();
+            if (dNum == "") {
+                toastr.error("请先选择部门");
+                event.preventDefault();
+                return;
+            }
+            $.post("@Url.Content("~/Admin/AlterAuditNodeName")", { depNum: dNum, nodeName: $("#depAuditNodeName").val() }, function (data) {
+                if (!data.suc) {
+                    toastr.error(data.msg);
+                }
+            });
+        });
+
+        //是否会签
+        $("#depAuditCounterSign").on("click", function () {
+            var dNum = $("#depNum").html();
+            if (dNum == "") {
+                toastr.error("请先选择部门");
+                event.preventDefault();
+                return;
+            }
+            $.post("@Url.Content("~/Admin/ToggleAuditCounterSign")", { depNum: dNum }, function (data) {
+                if (!data.suc) {
+                    toastr.error(data.msg);
+                }
+            });
+        });
+
+        //增加审核人
+        var depAuditorId = 0;
+        $("#auditorAddBt").on("click", function () {
+            if ($("#depAuditNodeName").val() == "") {
+                toastr.error("请先输入节点名称后再添加审核人");
+                return;
+            }
+            depAuditorId = 0;
+            $("#newDepAuditor").val("");
+            $("#newDepAuditorModal").modal("show");
+        });
+
+        //修改审核人
+        $("#dep_audit_users").on("click", ".editAuditorBt", function () {
+            var thisTr = $(this).parents("tr");
+            depAuditorId = $(thisTr.find("input[type='hidden']")[0]).val();
+            var auditorNum = $(thisTr.find(".auditorNum")[0]).html();
+            var auditorName = $(thisTr.find(".auditorName")[0]).html();
+            var bTime = $(thisTr.find(".bTime")[0]).html();
+            var eTime = $(thisTr.find(".eTime")[0]).html();
+            $("#newDepAuditorModal").modal("show");
+            $("#newDepAuditor").val(auditorName + "(" + auditorNum + ")");
+            $("#beginTime").val(bTime);
+            $("#endTime").val(eTime);
+        });
+
+        //删除审核人
+        $("#dep_audit_users").on("click", ".removeAuditorBt", function () {
+            var thisTr = $(this).parents("tr");
+            depAuditorId = $(thisTr.find("input[type='hidden']")[0]).val();
+            openConfirmDialog("确认要删除此审核人吗？", function () {
+                $.post("@Url.Content("~/Admin/RemoveDepAuditor")", { depAuditorId: depAuditorId }, function (data) {
                     if (data.suc) {
-                        if ($("#depAuditNode").is(":checked")) {
-                            $("#depAuditPanel").show();                            
-                        } else {
-                            $("#depAuditPanel").hide();
-                        }
+                        toastr.success("审核人删除成功");
+                        loadDepAuditors();
+                    } else {
+                        toastr.error("审核人删除失败");
+                    }
+                });
+            });
+        });
+
+        //选择审核人
+        $("#newDepAuditor").on("click", function () {
+            openSelectUserDialog($("#newDepAuditor").val(), 1, function (result) {
+                $("#newDepAuditor").val(result);
+            });
+        });
+
+        //增加、修改审核人
+        $("#addNewDepAuditor").on("click", function () {
+            var dNum = $("#depNum").html();
+            if (dNum == "") {
+                toastr.error("请先选择部门");
+                event.preventDefault();
+                return;
+            }
+
+            var auditor = $("#newDepAuditor").val();
+            var btime = $("#beginTime").val();
+            var etime = $("#endTime").val();
+            if (auditor == "") {
+                toastr.error("审核人不能为空");
+                return;
+            }
+            if (btime == "") {
+                toastr.error("生效日期不能为空");
+                return;
+            }
+            if (etime == "") {
+                toastr.error("失效日期不能为空");
+                return;
+            }
+            $.post("@Url.Content("~/Admin/SaveDepAuditor")",
+                { depNum: dNum, depAuditorId: depAuditorId, auditor: auditor, bTime: btime, eTime: etime },
+                function (data) {
+                    if (data.suc) {
+                        $("#newDepAuditorModal").modal("hide");
+                        loadDepAuditors(); //刷新审核人表格
+                        toastr.success(depAuditorId == 0 ? "新增成功" : "修改成功");
                     } else {
                         toastr.error(data.msg);
                     }
                 });
-            });
-
-            //修改节点名称
-            $("#depAuditNodeName").on("change", function () {
-                var dNum = $("#depNum").html();
-                if (dNum == "") {
-                    toastr.error("请先选择部门");
-                    event.preventDefault();
-                    return;
-                }
-                $.post("@Url.Content("~/Admin/AlterAuditNodeName")", { depNum: dNum, nodeName: $("#depAuditNodeName").val() }, function (data) {
-                    if (!data.suc) {
-                        toastr.error(data.msg);
-                    }
-                });
-            });
-
-            //是否会签
-            $("#depAuditCounterSign").on("click", function () {
-                var dNum = $("#depNum").html();
-                if (dNum == "") {
-                    toastr.error("请先选择部门");
-                    event.preventDefault();
-                    return;
-                }
-                $.post("@Url.Content("~/Admin/ToggleAuditCounterSign")", { depNum: dNum }, function (data) {
-                    if (!data.suc) {
-                        toastr.error(data.msg);
-                    }
-                });
-            });
-
-            //增加审核人
-            var depAuditorId = 0;
-            $("#auditorAddBt").on("click", function () {
-                if ($("#depAuditNodeName").val() == "") {
-                    toastr.error("请先输入节点名称后再添加审核人");
-                    return;
-                }
-                depAuditorId = 0;
-                $("#newDepAuditor").val("");
-                $("#newDepAuditorModal").modal("show");
-            });
-
-            //修改审核人
-            $("#dep_audit_users").on("click", ".editAuditorBt", function () {
-                var thisTr = $(this).parents("tr");                
-                depAuditorId = $(thisTr.find("input[type='hidden']")[0]).val();
-                var auditorNum = $(thisTr.find(".auditorNum")[0]).html();
-                var auditorName = $(thisTr.find(".auditorName")[0]).html();
-                var bTime = $(thisTr.find(".bTime")[0]).html();
-                var eTime = $(thisTr.find(".eTime")[0]).html();
-                $("#newDepAuditorModal").modal("show");
-                $("#newDepAuditor").val(auditorName + "(" + auditorNum + ")");
-                $("#beginTime").val(bTime);
-                $("#endTime").val(eTime);
-            });
-
-            //删除审核人
-            $("#dep_audit_users").on("click", ".removeAuditorBt", function () {
-                var thisTr = $(this).parents("tr");
-                depAuditorId = $(thisTr.find("input[type='hidden']")[0]).val();
-                openConfirmDialog("确认要删除此审核人吗？", function () {
-                    $.post("@Url.Content("~/Admin/RemoveDepAuditor")", { depAuditorId: depAuditorId }, function (data) {
-                        if (data.suc) {
-                            toastr.success("审核人删除成功");
-                            loadDepAuditors();
-                        } else {
-                            toastr.error("审核人删除失败");                            
-                        }
-                    });
-                });
-            });
-
-            //选择审核人
-            $("#newDepAuditor").on("click", function () {
-                openSelectUserDialog($("#newDepAuditor").val(), 1, function (result) {
-                    $("#newDepAuditor").val(result);
-                });
-            });
-
-            //增加、修改审核人
-            $("#addNewDepAuditor").on("click", function () {
-                var dNum = $("#depNum").html();
-                if (dNum == "") {
-                    toastr.error("请先选择部门");
-                    event.preventDefault();
-                    return;
-                }
-
-                var auditor = $("#newDepAuditor").val();
-                var btime = $("#beginTime").val();
-                var etime = $("#endTime").val();
-                if (auditor == "") {
-                    toastr.error("审核人不能为空");
-                    return;
-                }
-                if (btime == "") {
-                    toastr.error("生效日期不能为空");
-                    return;
-                }
-                if (etime == "") {
-                    toastr.error("失效日期不能为空");
-                    return;
-                }
-                $.post("@Url.Content("~/Admin/SaveDepAuditor")",
-                    { depNum: dNum, depAuditorId: depAuditorId, auditor: auditor, bTime: btime, eTime: etime },
-                    function (data) {
-                        if (data.suc) {
-                            $("#newDepAuditorModal").modal("hide");
-                            loadDepAuditors(); //刷新审核人表格
-                            toastr.success(depAuditorId == 0 ? "新增成功" : "修改成功");
-                        } else {
-                            toastr.error(data.msg);
-                        }
-                    });
-            });            
-
         });
 
-        function GetTreeData() {
-            $.post("@Url.Content("~/Admin/GetDepartmentTree")", {}, function (data) {
-                $("#depTree").treeview({
-                    data: data,
-                    expandIcon: "fa fa-folder-o",
-                    collapseIcon: "fa fa-folder-open-o",
-                    emptyIcon: "fa fa-home",
-                    onNodeSelected: function (event, node) {
-                        resetForm();
-                        $("#depStatus").html("<i class='fa fa-spinner fa-pulse fa-fw'></i>");                                               
+    });
 
-                        currentNodeId = node.nodeId;
-                        var num = node.tags[0];
-                        $.post("@Url.Content("~/Admin/GetDepartmentInfo")", { depNum: num }, function (result) {
-                            $("#depNum").html(num);
-                            $("#depName").html(node.text);
-                            $("#depAdmin").html(result.admin);
-                            $("#depAuditor").html(result.auditor);
-                            $("#depCreator").html(result.creator);
-                            $("#depCreateTime").html(result.createTime);
-                            $("#depStatus").html(result.status);
-                            if (result.status == "正常") {
-                                $("#depStatusBt").html("禁用");
-                            } else {
-                                $("#depStatusBt").html("启用");
-                            }
-                            if (result.isAuditNode) {
-                                $("#depAuditNode").prop("checked", true);
-                                $("#depAuditPanel").show();
-                                $("#depAuditNodeName").val(result.auditNodeName);
-                                if (result.auditNodeCounterSign) {
-                                    $("#depAuditCounterSign").prop("checked", true);
-                                }                                
-                            } else {
-                                $("#depAuditNode").prop("checked", false);
-                                $("#depAuditPanel").hide();
-                            }
-                            loadDepAuditors();//刷新审核人列表
-                        });
-                    }
-                });
-                if (currentNodeId) {
-                    $("#depTree").treeview("selectNode", [currentNodeId]);
-                }
-            });
-        }
+    function GetTreeData() {
+        $.post("@Url.Content("~/Admin/GetDepartmentTree")", {}, function (data) {
+            $("#depTree").treeview({
+                data: data,
+                expandIcon: "fa fa-folder-o",
+                collapseIcon: "fa fa-folder-open-o",
+                emptyIcon: "fa fa-home",
+                onNodeSelected: function (event, node) {
+                    resetForm();
+                    $("#depStatus").html("<i class='fa fa-spinner fa-pulse fa-fw'></i>");
 
-        function resetForm() {
-            currentNodeId = undefined;
-            $("#depAdmin").html("");
-            $("#depCreator").html("");
-            $("#depCreateTime").html("");
-            $("#depNum").html("");
-            $("#depName").html("");
-            $("#depStatus").html("");
-            $("#depAuditNode").prop("checked", false);
-            $("#depAuditPanel").hide();
-            $("#depAuditNodeName").val("");
-            $("#depAuditCounterSign").prop("checked", false);            
-        }
-
-        function loadDepAuditors() {
-            var dNum = $("#depNum").html();
-            if (dNum == "") {
-                return;
-            }
-            $("#dep_audit_users").empty();
-            $.post("@Url.Content("~/Admin/LoadDepAuditors")", { depNum: dNum }, function (data) {
-                if (data.suc) {
-                    $("#dep_audit_users").empty(); //清理多一次，解决很快点击两个部门，会显示这两个部门的审核人的bug
-                    var list = data.list;
-                    for (var i = 0; i < list.length; i++) {
-                        var tbContent = "<tr";
-                        if (list[i].isExpire) {
-                            //过期的加上删除线
-                            tbContent += " style='text-decoration:line-through;text-decoration-color:#d9534f'";
+                    currentNodeId = node.nodeId;
+                    var num = node.tags[0];
+                    $.post("@Url.Content("~/Admin/GetDepartmentInfo")", { depNum: num }, function (result) {
+                        $("#depNum").html(num);
+                        $("#depName").html(node.text);
+                        $("#depAdmin").html(result.admin);
+                        $("#depReporter").html(result.reporter);
+                        $("#depAuditor").html(result.auditor);
+                        $("#depCreator").html(result.creator);
+                        $("#depCreateTime").html(result.createTime);
+                        $("#depStatus").html(result.status);
+                        if (result.status == "正常") {
+                            $("#depStatusBt").html("禁用");
+                        } else {
+                            $("#depStatusBt").html("启用");
                         }
-                        tbContent += ">";
-                        tbContent += "<td><span class='auditorNum'>" + list[i].auditorNum + "</span><input type='hidden' value='" + list[i].id + "' /></td>";
-                        tbContent += "<td><span class='auditorName'>" + list[i].auditorName + "</span></td>";
-                        tbContent += "<td><span class='bTime'>" + list[i].bTime + "</span></td>";
-                        tbContent += "<td><span class='eTime'>" + list[i].eTime + "</span></td>";
-                        tbContent += "<td><button type='button' class='btn btn-default btn-xs editAuditorBt' title='修改'><i class='fa fa-pencil text-danger'></i></button>";
-                        tbContent += "&nbsp;<button type='button' class='btn btn-default btn-xs removeAuditorBt' title='删除'><i class='fa fa-remove text-danger'></i></td>";
-                        tbContent += "</tr>";
-                        $("#dep_audit_users").append(tbContent);
-                    }
+                        if (result.isAuditNode) {
+                            $("#depAuditNode").prop("checked", true);
+                            $("#depAuditPanel").show();
+                            $("#depAuditNodeName").val(result.auditNodeName);
+                            if (result.auditNodeCounterSign) {
+                                $("#depAuditCounterSign").prop("checked", true);
+                            }
+                        } else {
+                            $("#depAuditNode").prop("checked", false);
+                            $("#depAuditPanel").hide();
+                        }
+                        loadDepAuditors();//刷新审核人列表
+                    });
                 }
             });
+            if (currentNodeId) {
+                $("#depTree").treeview("selectNode", [currentNodeId]);
+            }
+        });
+    }
+
+    function resetForm() {
+        currentNodeId = undefined;
+        $("#depAdmin").html("");
+        $("#depCreator").html("");
+        $("#depCreateTime").html("");
+        $("#depNum").html("");
+        $("#depName").html("");
+        $("#depStatus").html("");
+        $("#depAuditNode").prop("checked", false);
+        $("#depAuditPanel").hide();
+        $("#depAuditNodeName").val("");
+        $("#depAuditCounterSign").prop("checked", false);
+    }
+
+    function loadDepAuditors() {
+        var dNum = $("#depNum").html();
+        if (dNum == "") {
+            return;
         }
+        $("#dep_audit_users").empty();
+        $.post("@Url.Content("~/Admin/LoadDepAuditors")", { depNum: dNum }, function (data) {
+            if (data.suc) {
+                $("#dep_audit_users").empty(); //清理多一次，解决很快点击两个部门，会显示这两个部门的审核人的bug
+                var list = data.list;
+                for (var i = 0; i < list.length; i++) {
+                    var tbContent = "<tr";
+                    if (list[i].isExpire) {
+                        //过期的加上删除线
+                        tbContent += " style='text-decoration:line-through;text-decoration-color:#d9534f'";
+                    }
+                    tbContent += ">";
+                    tbContent += "<td><span class='auditorNum'>" + list[i].auditorNum + "</span><input type='hidden' value='" + list[i].id + "' /></td>";
+                    tbContent += "<td><span class='auditorName'>" + list[i].auditorName + "</span></td>";
+                    tbContent += "<td><span class='bTime'>" + list[i].bTime + "</span></td>";
+                    tbContent += "<td><span class='eTime'>" + list[i].eTime + "</span></td>";
+                    tbContent += "<td><button type='button' class='btn btn-default btn-xs editAuditorBt' title='修改'><i class='fa fa-pencil text-danger'></i></button>";
+                    tbContent += "&nbsp;<button type='button' class='btn btn-default btn-xs removeAuditorBt' title='删除'><i class='fa fa-remove text-danger'></i></td>";
+                    tbContent += "</tr>";
+                    $("#dep_audit_users").append(tbContent);
+                }
+            }
+        });
+    }
 
     </script>
 
@@ -420,6 +440,13 @@
                     </span>
                     <span id="depAdmin"></span>
                     <button type="button" id="depAdminBt" class="btn btn-default pull-right btn-sm">修改</button>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        统计员：
+                    </span>
+                    <span id="depReporter"></span>
+                    <button type="button" id="depReporterBt" class="btn btn-default pull-right btn-sm">修改</button>
                 </div>
                 <div class="b-div">
                     <span class="b-label">

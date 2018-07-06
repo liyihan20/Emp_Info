@@ -80,28 +80,35 @@
             $('#fromDatePicker1').datetimepicker('setEndDate', e.date);
         });
 
-        $("input.check1").iCheck({
-            checkboxClass: 'icheckbox_square-blue',
-        });
-        $("input.check2").iCheck({
-            checkboxClass: 'icheckbox_square-green',
-        });
+        //$("input.check1").iCheck({
+        //    checkboxClass: 'icheckbox_square-blue',
+        //});
+        //$("input.check2").iCheck({
+        //    checkboxClass: 'icheckbox_square-green',
+        //});
 
-        $("input.check1").on("ifChecked", function () {
-            var sysNo = $(this).attr("data-sn");
-            checkFlag(sysNo, 1, true);
-        });
-        $("input.check1").on("ifUnchecked", function () {
-            var sysNo = $(this).attr("data-sn");
-            checkFlag(sysNo, 1, false);
-        });
-        $("input.check2").on("ifChecked", function () {
-            var sysNo = $(this).attr("data-sn");
-            checkFlag(sysNo, 2, true);
-        });
-        $("input.check2").on("ifUnchecked", function () {
-            var sysNo = $(this).attr("data-sn");
-            checkFlag(sysNo, 2, false);
+        //$("input.check1").on("ifChecked", function () {
+        //    var sysNo = $(this).attr("data-sn");
+        //    checkFlag(sysNo, 1, true);
+        //});
+        //$("input.check1").on("ifUnchecked", function () {
+        //    var sysNo = $(this).attr("data-sn");
+        //    checkFlag(sysNo, 1, false);
+        //});
+        //$("input.check2").on("ifChecked", function () {
+        //    var sysNo = $(this).attr("data-sn");
+        //    checkFlag(sysNo, 2, true);
+        //});
+        //$("input.check2").on("ifUnchecked", function () {
+        //    var sysNo = $(this).attr("data-sn");
+        //    checkFlag(sysNo, 2, false);
+        //});
+
+        $("input.check1,input.check2").on("change", function () {
+            var isChecked = $(this).is(":checked");
+            var sysNo = sysNo = $(this).attr("data-sn");
+            var which = $(this).hasClass("check1");
+            checkFlag(sysNo, which ? "1" : "2", isChecked);            
         });
 
         $("#alReportBt").on("click", function () {
@@ -200,7 +207,10 @@
             + "&toDate=" + td
             + "&auditStatus=" + escape($("#auditStatus").val())
             + "&eLevel=" + $("#eLevel").val()
-            + "&empName=" + escape($("#empName").val());
+            + "&empName=" + escape($("#empName").val())
+            + "&sysNum=" + escape($("#sysNum").val())
+            + "&salaryNo=" + escape($("#salaryNo").val())
+        ;
     }
 
         function checkFlag(sysNo, which, checked) {
@@ -259,7 +269,6 @@
                         <input class="form-control" type="text" id="to_date" name="to_date" placeholder="请输入结束日期" readonly value="@sm.toDate">
                     </div>
                 </td>
-
             </tr>
             <tr>
                 <td class="tdText">
@@ -290,6 +299,21 @@
                 </td>
                 <td><input type="text" class="form-control" id="empName" value="@sm.empName" /> </td>
             </tr>
+            <tr>
+                <td class="tdText">
+                    流水编号：
+                </td>
+                <td>
+                    <input type="text" class="form-control" id="sysNum" value="@sm.sysNum" style="margin-top:6px;"/>
+                </td>
+                <td class="tdText">
+                    工资条码：
+                </td>
+                <td>
+                    <input type="text" class="form-control" id="salaryNo" value="@sm.salaryNo" />
+                </td>
+                <td></td><td></td>
+            </tr>
         </table>
         <div class="btn-group btn-group-justified" role="group">
             <div class="btn-group" role="group">
@@ -300,7 +324,7 @@
             </div>
         </div>
         @if (list != null) {
-            if (list.Count() > 0) {                 
+            if (list.Count() > 0) {
                 <table style="margin-top:18px;width:100%;" class="table table-condensed table-hover">
                     <tr>
                         <th style="width:5%;" class="text-center">
@@ -371,16 +395,16 @@
                         </td>
                         <td>
                             @if (l.check1 == true) {
-                                <input type="checkbox" class="check1" data-sn="@l.sys_no" checked/> 
+                                <input type="checkbox" class="check1" data-sn="@l.sys_no" checked style="zoom:120%;" /> 
                             }
                             else {
-                                <input type="checkbox" class="check1" data-sn="@l.sys_no" />
+                                <input type="checkbox" class="check1" data-sn="@l.sys_no" style="zoom:120%;" />
                             }
                             @if (l.check2 == true) {
-                                <input type="checkbox" class="check2" data-sn="@l.sys_no" checked/>
+                                <input type="checkbox" class="check2" data-sn="@l.sys_no" checked style="zoom:120%;"/>
                             }
                             else {
-                                <input type="checkbox" class="check2" data-sn="@l.sys_no" />
+                                <input type="checkbox" class="check2" data-sn="@l.sys_no" style="zoom:120%;" />
                             }
                             
                         </td>

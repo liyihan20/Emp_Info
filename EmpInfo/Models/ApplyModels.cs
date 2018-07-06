@@ -68,6 +68,13 @@ namespace EmpInfo.Models
         public bool? isPass { get; set; }
         public string opinion { get; set; }
     }
-        
 
+    public class ALRecordModel
+    {
+        public string sysNo { get; set; }
+        public string applyTime { get; set; }
+        public string leaveType { get; set; }
+        public string leaveDays { get; set; }
+        public string leaveDateSpan { get; set; }
+    }
 }

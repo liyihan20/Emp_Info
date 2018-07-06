@@ -10,16 +10,10 @@
 namespace EmpInfo.Models
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class flow_applyEntryQueue
+    public partial class GenTrulyDeliveryBill_Result
     {
-        public int id { get; set; }
-        public string sys_no { get; set; }
-        public Nullable<int> step { get; set; }
-        public string step_name { get; set; }
-        public string auditors { get; set; }
-        public Nullable<bool> countersign { get; set; }
-        public Nullable<int> flow_template_entry_id { get; set; }
+        public string msg { get; set; }
+        public Nullable<int> suc { get; set; }
     }
 }

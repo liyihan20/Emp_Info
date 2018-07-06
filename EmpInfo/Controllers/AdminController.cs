@@ -15,6 +15,8 @@ namespace EmpInfo.Controllers
     public class AdminController : BaseController
     {
         int pageNumber = 30;
+        string[] speciaDepNodeName = new string[] { "AH审批", "行政审批" };
+        string[] speciaDepNumber = new string[] { "1","2","101", "106" };
         
         [AuthorityFilter]
         public ActionResult AdminIndex()
@@ -517,15 +519,16 @@ namespace EmpInfo.Controllers
         public JsonResult GetDepartmentTree()
         {
             var list = new List<Department>();
+            var deps = db.ei_department.Where(d => d.FIsDeleted == null || d.FIsDeleted == false).ToList();
             foreach (var d in db.ei_department.Where(d => d.FNumber.Length == 1).ToList()) {
-                list.Add(GetDepartment(d.FNumber));
+                list.Add(GetDepartment(deps,d.FNumber));
             }
             return Json(list);
         }
 
-        private Department GetDepartment(string rootNumber, bool isAdmin = false)
+        private Department GetDepartment(List<ei_department> deps, string rootNumber, bool isAdmin = false)
         {
-            var rootDep = db.ei_department.Single(e => e.FNumber == rootNumber);
+            var rootDep = deps.Single(e => e.FNumber == rootNumber);
             var theNodeIsAdmin = isAdmin; //是否管理员节点
             Department dep = new Department();
             dep.text = rootDep.FName;
@@ -543,10 +546,10 @@ namespace EmpInfo.Controllers
             else if (theNodeIsAdmin) {
                 dep.color = "#5cb85c"; //有权限管理显示绿色
             }
-            foreach (var child in db.ei_department
-                .Where(e => e.FParent == rootNumber && (e.FIsDeleted == null || e.FIsDeleted == false))
+            foreach (var child in deps
+                .Where(e => e.FParent == rootNumber)
                 .OrderBy(e => e.FNumber).ToList()) {
-                dep.nodes.Add(GetDepartment(child.FNumber, theNodeIsAdmin)); //递归获取子节点
+                dep.nodes.Add(GetDepartment(deps, child.FNumber, theNodeIsAdmin)); //递归获取子节点
             }
             if (dep.nodes.Count() == 0) {
                 dep.nodes = null; //没有子节点
@@ -563,6 +566,7 @@ namespace EmpInfo.Controllers
             {
                 status = dep.FIsForbit == true ? "禁用" : "正常",
                 admin = GetUserNameAndCardByCardNum(dep.FAdmin),
+                reporter=GetUserNameAndCardByCardNum(dep.FReporter),
                 creator = GetUserNameAndCardByCardNum(dep.FCreator),
                 createTime = ((DateTime)dep.FCreateDate).ToString("yyyy-MM-dd HH:mm"),
                 isAuditNode = dep.FIsAuditNode,
@@ -599,6 +603,8 @@ namespace EmpInfo.Controllers
         [SessionTimeOutJsonFilter]
         public JsonResult AddDepartment(string parentNum, string newDepName)
         {
+            
+
             var eldest = db.ei_department.Where(e => e.FParent == parentNum).OrderByDescending(e => e.FNumber).ToList();
             string childIndex = "01";
             if (eldest.Count() > 0) {
@@ -655,6 +661,18 @@ namespace EmpInfo.Controllers
         }
 
         [SessionTimeOutJsonFilter]
+        public JsonResult ChangeDepReporters(string depNum, string reporters)
+        {
+            var dep = db.ei_department.Single(e => e.FNumber == depNum);
+            dep.FReporter = GetUserCardByNameAndCardNum(reporters);
+
+            db.SaveChanges();
+
+            WriteEventLog("部门管理", depNum + "变更统计员：" + reporters);
+            return Json(new SimpleResultModel() { suc = true, msg = "统计员更新成功" });
+        }
+
+        [SessionTimeOutJsonFilter]
         public JsonResult ToggleAuditNode(string depNum)
         {
             var dep = db.ei_department.Single(e => e.FNumber == depNum);
@@ -667,6 +685,9 @@ namespace EmpInfo.Controllers
         [SessionTimeOutJsonFilter]
         public JsonResult AlterAuditNodeName(string depNum, string nodeName)
         {
+            if (!speciaDepNumber.Contains(depNum) && speciaDepNodeName.Contains(nodeName)) {
+                return Json(new SimpleResultModel() { suc = false, msg = "【" + nodeName + "】是系统保留关键字，请修改为其他名称" });
+            }
             var dep = db.ei_department.Single(e => e.FNumber == depNum);
             var depNodes = dep.ei_departmentAuditNode.ToList();
             ei_departmentAuditNode depNode;

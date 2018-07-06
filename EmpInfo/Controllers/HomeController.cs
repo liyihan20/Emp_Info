@@ -553,7 +553,7 @@ namespace EmpInfo.Controllers
             string autStr = string.Join(",", auts);
             ViewData["autStr"] = autStr;
 
-            ViewData["isDepAdmin"] = db.ei_department.Where(d => d.FAdmin.Contains(userInfo.cardNo)).Count() > 0;
+            ViewData["isDepReporter"] = db.ei_department.Where(d => d.FReporter.Contains(userInfo.cardNo)).Count() > 0;
 
             return View();
         }

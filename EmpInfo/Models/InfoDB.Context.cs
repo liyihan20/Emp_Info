@@ -70,7 +70,6 @@ namespace EmpInfo.Models
         public DbSet<ei_leaveDayExceedPushLog> ei_leaveDayExceedPushLog { get; set; }
         public DbSet<vw_leaving_days> vw_leaving_days { get; set; }
         public DbSet<vw_askLeaveReport> vw_askLeaveReport { get; set; }
-        public DbSet<flow_applyEntryQueue> flow_applyEntryQueue { get; set; }
         public DbSet<ei_stockAdminApply> ei_stockAdminApply { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
@@ -307,6 +306,79 @@ namespace EmpInfo.Models
                 new ObjectParameter("accountName", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetK3StockAuditor_Result>("GetK3StockAuditor", accountNameParameter);
+        }
+    
+        public virtual ObjectResult<GenTrulyDeliveryBill_Result> GenTrulyDeliveryBill(string account, string orderNumber, string sRNumber)
+        {
+            var accountParameter = account != null ?
+                new ObjectParameter("account", account) :
+                new ObjectParameter("account", typeof(string));
+    
+            var orderNumberParameter = orderNumber != null ?
+                new ObjectParameter("orderNumber", orderNumber) :
+                new ObjectParameter("orderNumber", typeof(string));
+    
+            var sRNumberParameter = sRNumber != null ?
+                new ObjectParameter("SRNumber", sRNumber) :
+                new ObjectParameter("SRNumber", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GenTrulyDeliveryBill_Result>("GenTrulyDeliveryBill", accountParameter, orderNumberParameter, sRNumberParameter);
+        }
+    
+        public virtual ObjectResult<GetOutStockBillsForAudit1_Result> GetOutStockBillsForAudit1(string account, Nullable<System.DateTime> fd, Nullable<System.DateTime> td)
+        {
+            var accountParameter = account != null ?
+                new ObjectParameter("account", account) :
+                new ObjectParameter("account", typeof(string));
+    
+            var fdParameter = fd.HasValue ?
+                new ObjectParameter("fd", fd) :
+                new ObjectParameter("fd", typeof(System.DateTime));
+    
+            var tdParameter = td.HasValue ?
+                new ObjectParameter("td", td) :
+                new ObjectParameter("td", typeof(System.DateTime));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetOutStockBillsForAudit1_Result>("GetOutStockBillsForAudit1", accountParameter, fdParameter, tdParameter);
+        }
+    
+        public virtual ObjectResult<StockbillAudit1_Result> StockbillAudit1(string account, Nullable<int> interid, string name)
+        {
+            var accountParameter = account != null ?
+                new ObjectParameter("account", account) :
+                new ObjectParameter("account", typeof(string));
+    
+            var interidParameter = interid.HasValue ?
+                new ObjectParameter("interid", interid) :
+                new ObjectParameter("interid", typeof(int));
+    
+            var nameParameter = name != null ?
+                new ObjectParameter("name", name) :
+                new ObjectParameter("name", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<StockbillAudit1_Result>("StockbillAudit1", accountParameter, interidParameter, nameParameter);
+        }
+    
+        public virtual int AddUser(string card_number, string accountset)
+        {
+            var card_numberParameter = card_number != null ?
+                new ObjectParameter("card_number", card_number) :
+                new ObjectParameter("card_number", typeof(string));
+    
+            var accountsetParameter = accountset != null ?
+                new ObjectParameter("accountset", accountset) :
+                new ObjectParameter("accountset", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("AddUser", card_numberParameter, accountsetParameter);
+        }
+    
+        public virtual ObjectResult<Nullable<decimal>> GetVacationDaysLeftProc(string empNo)
+        {
+            var empNoParameter = empNo != null ?
+                new ObjectParameter("empNo", empNo) :
+                new ObjectParameter("empNo", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<decimal>>("GetVacationDaysLeftProc", empNoParameter);
         }
     }
 }

@@ -23,5 +23,6 @@ namespace EmpInfo.Models
         public Nullable<int> work_days { get; set; }
         public Nullable<decimal> work_hours { get; set; }
         public Nullable<System.DateTime> apply_time { get; set; }
+        public string sys_no { get; set; }
     }
 }
