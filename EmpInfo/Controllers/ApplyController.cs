@@ -17,6 +17,7 @@ namespace EmpInfo.Controllers
         const string DORM_REPAIR_BILL_TYPE = "DP";
         const string ASK_LEAVE_BILL_TYPE = "AL";
         const string STOCK_ADMIN_BILL_TYPE = "SA";
+        const string UNNORMAL_CH_BILL_TYPE = "UC";
 
         #region 宿舍维修申请 DP
 
@@ -383,20 +384,7 @@ namespace EmpInfo.Controllers
         
         #endregion
 
-        #region 请假申请 AL
-
-        //[SessionTimeOutFilter]
-        //public ActionResult AskLeaveIndex()
-        //{
-        //    FlowSvrSoapClient client = new FlowSvrSoapClient();
-        //    int myDealingApplyCount = client.GetMyDealingApplyCount(userInfo.cardNo, new ArrayOfString() { ASK_LEAVE_BILL_TYPE });
-
-        //    ViewData["dealingCount"] = myDealingApplyCount;
-
-        //    WriteEventLog("请假申请", "打开主界面");
-        //    return View();
-        //}
-        
+        #region 请假申请 AL  
 
         [SessionTimeOutFilter]
         public ActionResult BeginApplyAL()
@@ -468,8 +456,9 @@ namespace EmpInfo.Controllers
                     return Json(new SimpleResultModel() { suc = false, msg = "流程审核人中存在已离职的员工，请联系部门管理员处理" });
                 }
                 al.auditor_queues = JsonConvert.SerializeObject(queueList);
-            }
+            }          
             
+
             if (al.to_date == null || al.from_date == null) {
                 return Json(new SimpleResultModel() { suc = false, msg = "请假日期不合法" });
             }
@@ -477,69 +466,39 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = "请检查请假期间" });
             }
 
+            if (al.leave_type.Equals("年假") && ((DateTime)al.to_date).Year != ((DateTime)al.from_date).Year) {
+                return Json(new SimpleResultModel() { suc = false, msg = "不能跨年度休年假，请分开请假" });
+            }
+            //return Json(new SimpleResultModel() { suc = true, msg = "测试ok" });
             FlowSvrSoapClient client = new FlowSvrSoapClient();
             var result = client.StartWorkFlow(JsonConvert.SerializeObject(al), ASK_LEAVE_BILL_TYPE, userInfo.cardNo, al.sys_no, al.leave_type, ((DateTime)al.from_date).ToString("yyyy-MM-dd HH:mm") + "~" + ((DateTime)al.to_date).ToString("yyyy-MM-dd HH:mm"));
             if (result.suc) {
-                db.ei_askLeave.Add(al);
+                try {
+                    db.ei_askLeave.Add(al);
 
-                //将部门保存到用户表
-                var user = db.ei_users.Single(e => e.card_number == al.applier_num);
-                user.dep_long_name = al.dep_long_name;
-                user.dep_no = al.dep_no;
+                    //将部门保存到用户表
+                    var user = db.ei_users.Single(e => e.card_number == al.applier_num);
+                    user.dep_long_name = al.dep_long_name;
+                    user.dep_no = al.dep_no;
 
-                db.SaveChanges();
+                    db.SaveChanges();
+                }
+                catch(Exception ex) {
+                    //将生成的流程表记录删除
+                    client.DeleteApplyForFailure(al.sys_no);
+                    return Json(new SimpleResultModel() { suc = false, msg = "申请提交失败，原因：" + ex.Message });
+                }
 
-                //ALEmail(al, result);
+                ALEmail(al, result);
                 return Json(new SimpleResultModel() { suc = true, msg = "申请编号是：" + al.sys_no });
             }
             else {
-                //将生成的流程表记录删除
-                client.DeleteApplyForFailure(al.sys_no);
+                
                 return Json(new SimpleResultModel() { suc = false, msg = "原因是：" + result.msg });
             }         
             //return Json(new SimpleResultModel() { suc = false, msg = "test"});
         }
-
-        ////我申请的
-        //[SessionTimeOutFilter]
-        //public ActionResult GetMyApplyALList()
-        //{
-        //    DateTime lastYear = DateTime.Now.AddYears(-1);
-        //    FlowSvrSoapClient flow = new FlowSvrSoapClient();
-        //    List<FlowMyAppliesModel> list = flow.GetMyApplyList(userInfo.cardNo, lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), "", new ArrayOfString() { ASK_LEAVE_BILL_TYPE }, "", "", 10, 100).ToList();
-        //    ViewData["list"] = list;
-
-        //    WriteEventLog("请假申请单", "打开我申请的界面");
-        //    return View();
-        //}
-
-        ////我的待办
-        //[SessionTimeOutFilter]
-        //public ActionResult GetMyAuditingALList()
-        //{
-        //    FlowSvrSoapClient flow = new FlowSvrSoapClient();
-        //    var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { ASK_LEAVE_BILL_TYPE }, 100).ToList();
-        //    list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
-        //    ViewData["list"] = list;
-        //    WriteEventLog("请假申请单", "打开我的代办界面");
-        //    return View();
-        //}
-
-        ////我的已办
-        //[SessionTimeOutFilter]
-        //public ActionResult GetMyAuditedALList()
-        //{
-        //    DateTime lastYear = DateTime.Now.AddYears(-1);
-        //    FlowSvrSoapClient flow = new FlowSvrSoapClient();
-        //    var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), new ArrayOfInt() { 1, -1 }, new ArrayOfInt() { 10 }, new ArrayOfString() { ASK_LEAVE_BILL_TYPE }, 300).ToList();
-        //    list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
-
-        //    ViewData["list"] = list;
-        //    WriteEventLog("请假申请单", "打开我的已办界面");
-        //    return View();
-        //}
-
-        //撤销申请
+        
         [SessionTimeOutJsonFilter]
         
         public JsonResult AbortALApply(string sysNo, string reason = "")
@@ -550,24 +509,24 @@ namespace EmpInfo.Controllers
             if (flow.ApplyHasBeenAudited(sysNo)) {
                 var auditStatus = flow.GetApplyResult(sysNo);
                 if (auditStatus.Contains("审批中")) {
-                    return Json(new SimpleResultModel() { suc = false, msg = "流程正在审批中，不能撤销，请联系当前处理人NG" },JsonRequestBehavior.AllowGet);
+                    return Json(new SimpleResultModel() { suc = false, msg = "流程正在审批中，不能撤销，请联系当前处理人NG" });
                 }
                 else if (auditStatus.Contains("撤销")) {
-                    return Json(new SimpleResultModel() { suc = false, msg = "流程已经撤销，不能再次操作" }, JsonRequestBehavior.AllowGet);
+                    return Json(new SimpleResultModel() { suc = false, msg = "流程已经撤销，不能再次操作" });
                 }
                 else if (auditStatus.Contains("拒绝")) {
-                    return Json(new SimpleResultModel() { suc = false, msg = "流程已被拒绝，不需要再撤销" }, JsonRequestBehavior.AllowGet);
+                    return Json(new SimpleResultModel() { suc = false, msg = "流程已被拒绝，不需要再撤销" });
                 }
                 else if (auditStatus.Contains("通过")) {
                     if (db.ei_askLeave.Where(a => a.sys_no == sysNo && a.from_date < DateTime.Now).Count() > 0) {
-                        return Json(new SimpleResultModel() { suc = false, msg = "当前请假时间已生效，不能撤销" }, JsonRequestBehavior.AllowGet);
+                        return Json(new SimpleResultModel() { suc = false, msg = "当前请假时间已生效，不能撤销" });
                     }
                     else {
                         result = flow.AbortAfterFinish(sysNo, reason);
                     }
                 }
                 else {
-                    return Json(new SimpleResultModel() { suc = false, msg = "不能撤销，当前状态是：" + auditStatus }, JsonRequestBehavior.AllowGet);
+                    return Json(new SimpleResultModel() { suc = false, msg = "不能撤销，当前状态是：" + auditStatus });
                 }
             }
             else {
@@ -578,7 +537,7 @@ namespace EmpInfo.Controllers
             WriteEventLog("请假申请单", "撤销、中止流程：" + sysNo);
 
             ALEmail(db.ei_askLeave.Single(a => a.sys_no == sysNo), result);
-            return Json(new SimpleResultModel() { suc = result.suc, msg = result.msg }, JsonRequestBehavior.AllowGet);
+            return Json(new SimpleResultModel() { suc = result.suc, msg = result.msg });
         }
 
         //查看申请
@@ -678,6 +637,10 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = "请检查请假期间和请假天数是否对应" });
             }
 
+            if (al.leave_type.Equals("年假") && ((DateTime)al.to_date).Year != ((DateTime)al.from_date).Year) {
+                return Json(new SimpleResultModel() { suc = false, msg = "不能跨年度休年假，请分开请假" });
+            }
+
             if (!string.IsNullOrEmpty(al.agent_man)) {
                 if (string.IsNullOrEmpty(GetUserEmailByCardNum(al.agent_man))) {
                     return Json(new SimpleResultModel() { suc = false, msg = "代理人邮箱没有设置" });
@@ -688,7 +651,7 @@ namespace EmpInfo.Controllers
                     return Json(new SimpleResultModel() { suc = false, msg = "知会人（" + GetUserNameAndCardByCardNum(im) + "）邮箱没有设置" });
                 }
             }
-
+            var c = al.is_continue;
             FlowSvrSoapClient client = new FlowSvrSoapClient();
             var result = client.GetFlowQueue(JsonConvert.SerializeObject(al));
             List<flow_applyEntryQueue> queue = null;
@@ -732,7 +695,7 @@ namespace EmpInfo.Controllers
                     content += string.Format("<div><a href='http://192.168.90.100/Emp/Apply/CheckALApply?sysNo={0}'>内网用户点击此链接</a></div>", al.sys_no);
                     content += string.Format("<div><a href='http://emp.truly.com.cn/Emp/Apply/CheckALApply?sysNo={0}'>外网用户点击此链接</a></div></div>",al.sys_no);
 
-                    var pushUsers = db.vw_push_users.Where(u => u.card_number == al.applier_num).ToList();
+                    var pushUsers = db.vw_push_users.Where(u => u.card_number == al.applier_num && u.wx_push_flow_info == true).ToList();
                     if (pushUsers.Count() > 0) {
                         var pushUser = pushUsers.First();
                         wx_pushMsg pm = new wx_pushMsg();
@@ -765,7 +728,7 @@ namespace EmpInfo.Controllers
 
                     //微信推送
                     foreach (var ad in model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
-                        var pushUsers=db.vw_push_users.Where(u=>u.card_number==ad).ToList();
+                        var pushUsers = db.vw_push_users.Where(u => u.card_number == ad && u.wx_push_flow_info == true).ToList();
                         if(pushUsers.Count()==0){
                             continue;
                         }
@@ -875,7 +838,7 @@ namespace EmpInfo.Controllers
         //查看最近1年内的申请记录
         [SessionTimeOutJsonFilter]
         public JsonResult GetLeaveRecordsInOneYear(string applierNameAndCard)
-        {
+        {            
             DateTime aYearAgo = DateTime.Now.AddYears(-1);
             string applierNumber = GetUserCardByNameAndCardNum(applierNameAndCard);
 
@@ -919,18 +882,7 @@ namespace EmpInfo.Controllers
         #endregion
 
         #region 仓管权限申请 SA
-
-        //[SessionTimeOutFilter]
-        //public ActionResult StockAdminIndex()
-        //{
-        //    FlowSvrSoapClient client = new FlowSvrSoapClient();
-        //    int myDealingApplyCount = client.GetMyDealingApplyCount(userInfo.cardNo, new ArrayOfString() { STOCK_ADMIN_BILL_TYPE });
-
-        //    ViewData["dealingCount"] = myDealingApplyCount;
-
-        //    WriteEventLog("仓管权限申请", "打开主界面");
-        //    return View();
-        //}
+                
 
         [SessionTimeOutFilter]
         public ActionResult BeginApplySA()
@@ -993,45 +945,6 @@ namespace EmpInfo.Controllers
             }
             //return Json(new SimpleResultModel() { suc = false, msg = "test"});
         }
-
-        ////我申请的
-        //[SessionTimeOutFilter]
-        //public ActionResult GetMyApplySAList()
-        //{
-        //    DateTime lastYear = DateTime.Now.AddYears(-1);
-        //    FlowSvrSoapClient flow = new FlowSvrSoapClient();
-        //    List<FlowMyAppliesModel> list = flow.GetMyApplyList(userInfo.cardNo, lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), "", new ArrayOfString() { STOCK_ADMIN_BILL_TYPE }, "", "", 10, 100).ToList();
-        //    ViewData["list"] = list;
-
-        //    WriteEventLog("仓管权限申请", "打开我申请的界面");
-        //    return View();
-        //}
-
-        ////我的待办
-        //[SessionTimeOutFilter]
-        //public ActionResult GetMyAuditingSAList()
-        //{
-        //    FlowSvrSoapClient flow = new FlowSvrSoapClient();
-        //    var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { STOCK_ADMIN_BILL_TYPE }, 100).ToList();
-        //    list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
-        //    ViewData["list"] = list;
-        //    WriteEventLog("仓管权限申请", "打开我的代办界面");
-        //    return View();
-        //}
-
-        ////我的已办
-        //[SessionTimeOutFilter]
-        //public ActionResult GetMyAuditedSAList()
-        //{
-        //    DateTime lastYear = DateTime.Now.AddYears(-1);
-        //    FlowSvrSoapClient flow = new FlowSvrSoapClient();
-        //    var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), new ArrayOfInt() { 1, -1 }, new ArrayOfInt() { 10 }, new ArrayOfString() { STOCK_ADMIN_BILL_TYPE }, 100).ToList();
-        //    list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
-
-        //    ViewData["list"] = list;
-        //    WriteEventLog("仓管权限申请", "打开我的已办界面");
-        //    return View();
-        //}
                 
 
         //查看申请
@@ -1044,8 +957,10 @@ namespace EmpInfo.Controllers
 
             var sas = db.ei_stockAdminApply.Where(s => s.sys_no == sysNo).ToList();
             if (sas.Count() < 1) {
-                ViewBag.tip = "此申请流水号不存在";
-                return View("Error");
+                MyUtils.ClearCookie(this.Response, this.Session);
+                return View("Close");
+                //ViewBag.tip = "此申请流水号不存在";
+                //return View("Error");
             }
 
             var auditStatus = new FlowSvrSoapClient().GetApplyResult(sysNo);
@@ -1126,7 +1041,7 @@ namespace EmpInfo.Controllers
                     content += string.Format("<div><a href='http://192.168.90.100/Emp/Apply/CheckSAApply?sysNo={0}'>内网用户点击此链接</a></div>", sa.sys_no);
                     content += string.Format("<div><a href='http://emp.truly.com.cn/Emp/Apply/CheckSAApply?sysNo={0}'>外网用户点击此链接</a></div></div>", sa.sys_no);
 
-                    var pushUsers = db.vw_push_users.Where(u => u.card_number == sa.applier_num).ToList();
+                    var pushUsers = db.vw_push_users.Where(u => u.card_number == sa.applier_num && u.wx_push_flow_info == true).ToList();
                     if (pushUsers.Count() > 0) {
                         var pushUser = pushUsers.First();
                         wx_pushMsg pm = new wx_pushMsg();
@@ -1159,20 +1074,20 @@ namespace EmpInfo.Controllers
 
                     //微信推送
                     foreach (var ad in model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
-                        var pushUsers = db.vw_push_users.Where(u => u.card_number == ad).ToList();
+                        var pushUsers = db.vw_push_users.Where(u => u.card_number == ad && u.wx_push_flow_info == true).ToList();
                         if (pushUsers.Count() == 0) {
                             continue;
                         }
                         var pushUser = pushUsers.First();
                         wx_pushMsg pm = new wx_pushMsg();
                         pm.FCardNumber = ad;
-                        pm.FFirst = "你有一张待审批事项："+sa.sys_no;
+                        pm.FFirst = "你有一张待审批事项：" + sa.sys_no;
                         pm.FHasSend = false;
                         pm.FInTime = DateTime.Now;
                         pm.FkeyWord1 = "仓库管理权限申请流程";
                         pm.FKeyWord2 = sa.applier_name;
                         pm.FKeyWord3 = ((DateTime)sa.apply_time).ToString("yyyy-MM-dd HH:mm:ss");
-                        pm.FKeyWord4 = sa.k3_account_name+":"+sa.k3_stock_name;
+                        pm.FKeyWord4 = sa.k3_account_name + ":" + sa.k3_stock_name;
                         pm.FKeyWord5 = result.stepName;
                         pm.FOpenId = pushUser.wx_openid;
                         pm.FPushType = "待审2";
@@ -1191,30 +1106,318 @@ namespace EmpInfo.Controllers
 
         #endregion
 
+        #region 非正常时间出货 UC
+
+        [SessionTimeOutFilter]
+        public ActionResult BeginApplyUC()
+        {
+            //申请时间必须在8时至19时之间
+            var hour = DateTime.Now.Hour;
+            if (hour < 8 || hour >= 19) {
+                ViewBag.tip = "非正常时间出货的申请时间必须在8时到19时之间，当前时间不能申请";
+                return View("Error");
+            }
+
+            var list = db.flow_auditorRelation.Where(a => a.bill_type == UNNORMAL_CH_BILL_TYPE).ToList();
+            ViewData["marketList"] = list.Where(l => l.relate_name == "市场部总经理").Select(l => l.relate_text).Distinct().ToList();
+            ViewData["busDepList"] = list.Where(l => l.relate_name == "事业部长").Select(l => l.relate_text).Distinct().ToList();
+            ViewData["accountingList"] = list.Where(l => l.relate_name == "会计部主管").Select(l => l.relate_text).Distinct().ToList();
+
+            ViewData["sysNum"] = GetNextSysNum("UC",2);
+            return View();
+        }
+
+        [SessionTimeOutJsonFilter]
+        public ActionResult SaveApplyUC(FormCollection fc)
+        {
+            var uc = new ei_ucApply();
+            MyUtils.SetFieldValueToModel(fc, uc);
+            List<ei_ucApplyEntry> entrys = JsonConvert.DeserializeObject<List<ei_ucApplyEntry>>(fc.Get("entrys"));
+            
+            if (string.IsNullOrEmpty(uc.market_name)) {
+                return Json(new SimpleResultModel() { suc = false, msg = "请选择市场部！" });
+            }
+
+            if (string.IsNullOrEmpty(uc.customer_name)) {
+                return Json(new SimpleResultModel() { suc = false, msg = "请录入正确的客户编码！" });
+            }
+
+            if (string.IsNullOrEmpty(uc.company)) {
+                return Json(new SimpleResultModel() { suc = false, msg = "请选择出货公司！" });
+            }
+
+            if (string.IsNullOrEmpty(uc.bus_dep)) {
+                return Json(new SimpleResultModel() { suc = false, msg = "请选择生产事业部！" });
+            }
+
+            if (string.IsNullOrEmpty(uc.delivery_company)) {
+                return Json(new SimpleResultModel() { suc = false, msg = "请填写货运公司！" });
+            }
+
+            if (entrys.Count() < 1) {
+                return Json(new SimpleResultModel() { suc = false, msg = "出货明细必须至少一条！" });
+            }
+
+            if (uc.arrive_time == null) {
+                return Json(new SimpleResultModel() { suc = false, msg = "到达日期不合法" });
+            }
+
+            DateTime today = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd 19:00:00"));
+            DateTime tomorrow = today.AddDays(1);
+
+            if ((uc.arrive_time >= today && uc.arrive_time <= today.AddHours(3)) || (uc.arrive_time >= tomorrow && uc.arrive_time <= tomorrow.AddHours(3))) {
+                uc.applier_name = userInfo.name;
+                uc.applier_num = userInfo.cardNo;
+                uc.apply_time = DateTime.Now;
+
+                FlowSvrSoapClient client = new FlowSvrSoapClient();
+                var result = client.StartWorkFlow(JsonConvert.SerializeObject(uc), UNNORMAL_CH_BILL_TYPE, userInfo.cardNo, uc.sys_no, uc.customer_name, ((DateTime)uc.arrive_time).ToString("yyyy-MM-dd HH:mm"));
+                if (result.suc) {
+                    try {
+                        db.ei_ucApply.Add(uc);
+                        foreach (var e in entrys) {
+                            e.ei_ucApply = uc;
+                            db.ei_ucApplyEntry.Add(e);
+                        }
+                        db.SaveChanges();
+                    }
+                    catch(Exception ex) {
+                        //将生成的流程表记录删除
+                        client.DeleteApplyForFailure(uc.sys_no);
+                        return Json(new SimpleResultModel() { suc = false, msg = "申请提交失败，原因："+ ex.Message});
+                    }
+
+                    UCEmail(uc, result);
+
+                    WriteEventLog("非正常出货申请", "提交申请：" + uc.sys_no);
+                    return Json(new SimpleResultModel() { suc = true, msg = "申请编号是：" + uc.sys_no });
+                }
+                else {                    
+                    return Json(new SimpleResultModel() { suc = false, msg = "原因是：" + result.msg });
+                }         
+            }
+            else {
+                return Json(new SimpleResultModel() { suc = false, msg = "到达时间不在今明19时至22时范围内" });
+            }            
+        }
+
+        //查看申请
+        [SessionTimeOutFilter]
+        public ActionResult CheckUCApply(string sysNo, string param)
+        {
+            if (string.IsNullOrEmpty(sysNo) & !string.IsNullOrEmpty(param)) {
+                sysNo = param;
+            }
+            var uc = db.ei_ucApply.Single(u => u.sys_no == sysNo);
+
+            ViewData["uc"] = uc;
+            ViewData["entrys"] = uc.ei_ucApplyEntry.ToList();
+            ViewData["auditStatus"] = new FlowSvrSoapClient().GetApplyResult(sysNo);
+            if (uc.has_attachment == true) {
+                ViewData["attachments"] = MyUtils.GetAttachmentInfo(sysNo);
+            }
+
+            WriteEventLog("非正常出货", "查看申请单：" + sysNo);
+            return View();
+        }
+
+        //开始审核申请
+        [SessionTimeOutFilter]
+        public ActionResult BeginAuditUCApply(string sysNo, int? step, string param)
+        {
+            if (string.IsNullOrEmpty(sysNo) && !string.IsNullOrEmpty(param)) {
+                sysNo = param.Split(';')[0];
+                step = int.Parse(param.Split(';')[1]);
+            }
+            WriteEventLog("非正常出货", "进入审批" + sysNo + ";step:" + step);
+
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            var result = flow.ApplyHasAudit(sysNo, (int)step, userInfo.cardNo);
+            if (!result.suc) {
+                ViewBag.tip = result.msg;
+                return View("Error");
+            }
+            
+            BeginAuditModel bam = new BeginAuditModel()
+            {
+                sysNum = sysNo,
+                step = (int)step,
+                stepName = result.stepName,
+                isPass = result.isPass,
+                opinion = result.opinion
+            };
+            ViewData["bam"] = bam;
+            return View();
+        }
+
+        //处理审核申请
+        [SessionTimeOutJsonFilter]
+        public JsonResult HandleUCApply(string sysNo, int step, bool isPass, string opinion)
+        {
+            var uc = db.ei_ucApply.Single(a => a.sys_no == sysNo);
+            
+            var setting=new JsonSerializerSettings();
+            setting.ReferenceLoopHandling=ReferenceLoopHandling.Ignore;
+            string formJson = JsonConvert.SerializeObject(uc, setting);
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            var result = flow.BeginAudit(sysNo, step, userInfo.cardNo, isPass, opinion, formJson);
+            if (result.suc) {
+                //发送通知到下一级审核人
+                UCEmail(uc, result);
+            }
+            WriteEventLog("非正常时间出货申请", "处理申请单:" + sysNo + ";step:" + step + ";isPass:" + isPass);
+            return Json(new SimpleResultModel() { suc = result.suc, msg = result.msg });
+        }
+
+        private void UCEmail(ei_ucApply uc, FlowResultModel model)
+        {
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            var result = flow.GetCurrentStep(uc.sys_no);                       
+
+            string subject = "", emailAddrs = "", content = "", names = "", ccEmails = "";            
+            //处理成功才发送邮件
+            if (model.suc) {
+                if (model.msg.Contains("完成") || model.msg.Contains("NG")) {
+                    bool isSuc = true;
+                    if (model.msg.Contains("NG")) {
+                        isSuc = false;
+                    }
+                    
+                    //流程正常结束
+                    subject = "非正常时间出货申请单已" + (isSuc ? "批准" : "拒绝");
+                    emailAddrs = GetUserEmailByCardNum(uc.applier_num);
+                    names = uc.applier_name;
+                    content = "<div>" + names + ",你好：</div>";
+                    content += "<div style='margin-left:30px;'>你申请的单号为【" + uc.sys_no + "】的非正常时间出货申请单已被" + (isSuc ? "批准" : "拒绝") + ",客户是：" + uc.customer_name + "规格型号是：" + uc.ei_ucApplyEntry.First().moduel + "等" + uc.ei_ucApplyEntry.Count() + "个" + "，请知悉。</div>";
+                    content += "<div style='clear:both'><br/>单击以下链接可查看此申请单详情。</div>";
+                    content += string.Format("<div><a href='http://192.168.90.100/Emp/Apply/CheckUCApply?sysNo={0}'>内网用户点击此链接</a></div>", uc.sys_no);
+                    content += string.Format("<div><a href='http://emp.truly.com.cn/Emp/Apply/CheckUCApply?sysNo={0}'>外网用户点击此链接</a></div></div>", uc.sys_no);
+
+                    var pushUsers = db.vw_push_users.Where(u => u.card_number == uc.applier_num && u.wx_push_flow_info == true).ToList();
+                    if (isSuc) {
+                        //通知知会人
+                        pushUsers.AddRange(
+                            (from u in db.ei_ucNotifyUsers
+                             join v in db.vw_push_users on u.card_number equals v.card_number
+                             where v.wx_push_flow_info == true && (u.company == "所有" || u.company == uc.company)
+                             select v).ToList()
+                        );
+                        ccEmails = string.Join(",", (
+                            from u in db.ei_ucNotifyUsers
+                            join us in db.ei_users on u.card_number equals us.card_number
+                            where u.company == "所有" || u.company == uc.company
+                            select us.email
+                            ).ToArray()
+                         );
+                    }
+
+                    foreach (var pushUser in pushUsers) {
+                        wx_pushMsg pm = new wx_pushMsg();
+                        pm.FCardNumber = pushUser.card_number;
+                        pm.FFirst = "你有一张申请单已审批完成";
+                        pm.FHasSend = false;
+                        pm.FInTime = DateTime.Now;
+                        pm.FkeyWord1 = "非正常时间出货申请流程";
+                        pm.FKeyWord2 = uc.sys_no;
+                        pm.FKeyWord3 = isSuc ? "审批通过" : "审批不通过";
+                        pm.FKeyWord4 = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+                        pm.FOpenId = pushUser.wx_openid;
+                        pm.FPushType = "办结";
+                        pm.FRemark = "点击可查看详情";
+                        pm.FUrl = string.Format("http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}&controllerName=Apply&actionName=CheckUCApply&param={2}", pushUser.card_number, MyUtils.getMD5(pushUser.card_number), uc.sys_no);
+                        db.wx_pushMsg.Add(pm);                        
+                    }
+                    db.SaveChanges();
+                }
+                else if (!string.IsNullOrEmpty(model.nextAuditors)) {
+                    //流转到下一环节
+                    subject = "你有一张待审批的非正常时间出货申请单" + (model.msg.Contains("撤销") ? "(撤销)" : "");
+                    emailAddrs = GetUserEmailByCardNum(model.nextAuditors);
+                    names = GetUserNameByCardNum(model.nextAuditors);
+                    content = "<div>" + names + ",你好：</div>";
+                    content += "<div style='margin-left:30px;'>你有一张待处理的单号为【" + uc.sys_no + "】的非正常时间出货申请单，请尽快登陆系统处理。</div>";
+                    content += "<div style='clear:both'><br/>单击以下链接可进入系统审核这张单据。</div>";
+                    content += string.Format("<div><a href='http://192.168.90.100/Emp/Apply/BeginAuditUCApply?sysNo={0}&step={1}'>内网用户点击此链接</a></div>", uc.sys_no, result.step);
+                    content += string.Format("<div><a href='http://emp.truly.com.cn/Emp/Apply/BeginAuditUCApply?sysNo={0}&step={1}'>外网用户点击此链接</a></div></div>", uc.sys_no, result.step);
+
+                    //微信推送
+                    foreach (var ad in model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
+                        var pushUsers = db.vw_push_users.Where(u => u.card_number == ad && u.wx_push_flow_info == true).ToList();
+                        if (pushUsers.Count() == 0) {
+                            continue;
+                        }
+                        var pushUser = pushUsers.First();
+                        wx_pushMsg pm = new wx_pushMsg();
+                        pm.FCardNumber = ad;
+                        pm.FFirst = "你有一张待审批事项：" + uc.sys_no;
+                        pm.FHasSend = false;
+                        pm.FInTime = DateTime.Now;
+                        pm.FkeyWord1 = "非正常时间出货申请流程";
+                        pm.FKeyWord2 = uc.applier_name;
+                        pm.FKeyWord3 = ((DateTime)uc.apply_time).ToString("yyyy-MM-dd HH:mm:ss");
+                        pm.FKeyWord4 = uc.customer_name + ":" + uc.ei_ucApplyEntry.First().moduel + "等";
+                        pm.FKeyWord5 = result.stepName;
+                        pm.FOpenId = pushUser.wx_openid;
+                        pm.FPushType = "待审2";
+                        pm.FRemark = "点击可进入审批此申请";
+                        pm.FUrl = string.Format("http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}&controllerName=Apply&actionName=BeginAuditUCApply&param={2}", ad, MyUtils.getMD5(ad), uc.sys_no + ";" + result.step);
+                        db.wx_pushMsg.Add(pm);
+                    }
+                    db.SaveChanges();
+                }
+
+            }
+            WriteEventLog("非正常时间出货申请", uc.sys_no + ">发送通知邮件，地址：" + emailAddrs + ";content:" + content);
+
+            MyEmail.SendEmail(subject, emailAddrs, content, ccEmails);
+        }
+
+        #endregion
+
         #region 所有流程共享方法 除了宿舍维修流程
 
+        //单据类别名称
+        private string GetBillName(string billType)
+        {
+            switch (billType) {
+                case "AL":
+                    return "请假申请单";
+                case "BT":
+                    return "出差申请单";
+                case "SA":
+                    return "仓管权限申请";
+                case "UC":
+                    return "非正常时间出货申请";
+                default:
+                    return "";
+            }
+        }
+
         // 主界面
-        public ActionResult ApplyIndex(string billType,string billName)
+        [SessionTimeOutFilter]
+        public ActionResult ApplyIndex(string billType)
         {
             FlowSvrSoapClient client = new FlowSvrSoapClient();
             int myDealingApplyCount = client.GetMyDealingApplyCount(userInfo.cardNo, new ArrayOfString() { billType });
 
             ViewData["dealingCount"] = myDealingApplyCount;
             ViewData["billType"] = billType;
-            ViewData["billName"] = billName;
+            ViewData["billName"] = GetBillName(billType);
 
-            WriteEventLog(billName, "打开主界面");
+            WriteEventLog(billType, "打开主界面");
 
             return View();
         }
 
         //开始申请
+        [SessionTimeOutFilter]
         public ActionResult BeginApply(string billType)
         {
             return RedirectToAction("BeginApply" + billType);
         }
 
         //我申请的
+        [SessionTimeOutFilter]
         public ActionResult GetMyApplyList(string billType)
         {
             DateTime lastYear = DateTime.Now.AddYears(-1);
@@ -1228,6 +1431,7 @@ namespace EmpInfo.Controllers
         }
 
         //查看申请详情
+        [SessionTimeOutFilter]
         public ActionResult CheckApply(string sysNo)
         {
             string billType = sysNo.Substring(0, 2);
@@ -1235,19 +1439,22 @@ namespace EmpInfo.Controllers
             return RedirectToAction(actionName, new { sysNo = sysNo });
         }
 
-        //我的代办
+        //我的待办
+        [SessionTimeOutFilter]
         public ActionResult GetMyAuditingList(string billType)
         {
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 10 }, new ArrayOfString() { billType }, 100).ToList();
+            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { billType }, 100).ToList();
             list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
             ViewData["list"] = list;
-            WriteEventLog(billType, "打开我的代办界面");
+            ViewData["billType"] = billType;
+            WriteEventLog(billType, "打开我的待办界面");
 
             return View();
-        }
+        }        
 
         //开始审批
+        [SessionTimeOutFilter]
         public ActionResult BeginAuditApply(string sysNo, int? step)
         {
             string billType = sysNo.Substring(0, 2);
@@ -1256,26 +1463,48 @@ namespace EmpInfo.Controllers
         }
 
         //我的已办
+        [SessionTimeOutFilter]
         public ActionResult GetMyAuditedList(string billType)
         {
-            DateTime lastYear = DateTime.Now.AddYears(-1);
-            FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), new ArrayOfInt() { 1, -1 }, new ArrayOfInt() { 10 }, new ArrayOfString() { billType }, 300).ToList();
-            list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
+            return RedirectToAction("CheckMyAuditedList", new { billType = billType, fromDate = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"), toDate = DateTime.Now.ToString("yyyy-MM-dd") });
+        }
 
+        //查询我的已办
+        [SessionTimeOutJsonFilter]
+        public ActionResult CheckMyAuditedList(string billType, string fromDate, string toDate, string sysNo = "", string cardNo = "")
+        {
+            DateTime fromDateDt, toDateDt;
+            if (!DateTime.TryParse(fromDate, out fromDateDt)) {
+                fromDateDt = DateTime.Now.AddMonths(-1);                
+            }
+            if (!DateTime.TryParse(toDate, out toDateDt)) {
+                toDateDt = DateTime.Now;
+            }
+
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            var list = flow.GetAuditList(userInfo.cardNo, sysNo, cardNo, "", "", fromDateDt.ToShortDateString(), toDateDt.ToShortDateString(), new ArrayOfInt() { 1, -1 }, new ArrayOfInt() { 10 }, new ArrayOfString() { billType }, 300).ToList();
+            list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
+            
             ViewData["list"] = list;
+            ViewData["billType"] = billType;
+            ViewData["fromDate"] = fromDate;
+            ViewData["toDate"] = toDate;
+            ViewData["sysNo"] = sysNo;
+            ViewData["cardNo"] = cardNo;
+
             WriteEventLog(billType, "打开我的已办界面");
-            return View();
+            return View("GetMyAuditedList");
         }
 
         //撤销申请
         [SessionTimeOutJsonFilter]
-        public ActionResult AbortApply(string sysNo, string reason = "")
+        public JsonResult AbortApply(string sysNo, string reason = "")
         {
             string billType = sysNo.Substring(0, 2);
 
             if ("AL".Equals(billType)) {
-                return RedirectToAction("AbortALApply", new { sysNo = sysNo, reason = reason });
+                //return RedirectToAction("AbortALApply", new { sysNo = sysNo, reason = reason });
+                return AbortALApply(sysNo, reason);
             }
 
             FlowSvrSoapClient flow = new FlowSvrSoapClient();

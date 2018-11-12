@@ -1,5 +1,6 @@
 ﻿@{
     List<EmpInfo.FlowSvr.FlowAuditListModel> list = (List<EmpInfo.FlowSvr.FlowAuditListModel>)ViewData["list"];
+    string billType = (string)ViewData["billType"];
 }
 @section CSS{
     
@@ -38,6 +39,13 @@
             }
         });
 
+        $(function () {
+            $("#exportExcelBt").on("click", function () {
+                toastr.info("请稍等，不要重复点击，正在导出......");
+                window.location.href = "@Url.Content("~/Report/BeginExportALAuditingExcel")";
+            });
+        })
+
     </script>
 }
 <div class="panel panel-success" id="applyDiv">
@@ -54,7 +62,10 @@
         
         <h4 class="text-danger"><i>可以查看到最多100条待办记录:</i> </h4>
         <hr />
-        
+        @if (billType.Equals("AL")) { 
+            <button class="btn btn-default pull-right" id="exportExcelBt"><i class="fa fa-file-excel-o"></i> 导出到excel</button>
+            <div class="clearfix"></div>
+        }
         <table data-toggle="table" id="tb">
             <thead>
                 <tr>

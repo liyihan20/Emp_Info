@@ -44,7 +44,7 @@
             $(this).removeClass("list-group-item-danger");
         });
 
-        $(".list-group-item").on("click", function () {
+        $(".list-content").on("click", function () {
             var self = this;
             var h = {};
             h.stDate = $(self).find(".stDate").html();
@@ -124,8 +124,59 @@
 
         });
 
-        $("#account").val("@spm.account");
+        //反审核
+        $("#rejectLink").on("click", function () {
+            $.post("@Url.Content("~/K3/GetStockBillForReject")", { account: $("#account").val() }, function (data) {
+                if (data.suc) {
+
+                    if(data.list.length==0){
+                        toastr.info("查询不到24小时内已一审未二审的销售出库单");
+                        return;
+                    }
+
+                    var html = "<table style='width:100%;'><thead><tr><td style='width:40%;'>销售单号</td><td style='width:40%;'>一审时间</td><td style='width:20%;'>反审</td></tr></thead>";
+                    html += "<tbody>";
+
+                    var l = data.list;
+                    for (var i = 0; i < l.length; i++) {
+                        html += "<tr>";
+                        html += "<td>" + l[i].billNo + "</td>";
+                        html += "<td>" + l[i].checkDate1 + "</td>";
+                        html += "<td><button class='btn btn-default btn-xs' onclick='reject(" + l[i].interId + ")'><i class='fa fa-reply'></i> </button></td>"
+                    }
+
+                    html += "</tbody></table>";
+                    openMessageDialog(html, "可反审列表");
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
         });
+
+        $("#excelBt").on("click", function () {
+            if ($("#account").val() == "电子") {
+                toastr.error("电子不支持导出出库审核记录");
+                return;
+            }
+            window.location.href = "@Url.Content("~/Report/ExportSRFlowRecord?account=")" + $("#account").val() + "&fromDate=" + $("#from_date").val() + "&toDate=" + $("#to_date").val();
+        });
+
+
+        $("#account").val("@spm.account");
+
+    });
+
+    function reject(id) {
+        $.post("@Url.Content("~/K3/BeginAuditStockBill")", { account: $("#account").val(), interid: id,isReject:true }, function (data) {
+            if (data.suc) {
+                toastr.success("反审核成功！");
+                $("#MessageModal").modal("hide");
+            } else {
+                toastr.error("反审核失败，原因：" + data.msg);
+            }
+        });
+    }
+
     </script>
 }
 
@@ -139,7 +190,10 @@
         </ol>
     </div>
     <div class="panel-body">
-        <i class="text-danger"> <i class="fa fa-info-circle"></i> 选择帐套/开始查询日期/结束查询日期之后，可查询未一审的销售出库单:</i>
+        <i class="text-danger"> <i class="fa fa-info-circle"></i> 
+        选择帐套/开始查询日期/结束查询日期之后，可查询未一审的销售出库单:
+        <span style="cursor:pointer;" id="rejectLink"> 【反审核】</span>
+        </i>
         <div class="row" style="margin:6px 0;">
             <div class="col-xs-12 col-md-4">
                 <select class="form-control" id="account" name="account" style="margin:6px 0;">
@@ -162,8 +216,9 @@
             </div>
         </div>
         
-        <button class="btn btn-primary btn-block" id="searchBt"><i class="fa fa-search"></i> 开始搜索</button>
-
+        <button class="btn btn-primary btn-block" id="searchBt"><i class="fa fa-search"></i> 搜索K3销售出库单</button>        
+        <button class="btn btn-success btn-block" id="excelBt"><i class="fa fa-file-excel-o"></i> 导出出货系统审批记录</button>
+        
     </div>
     
     <ul class="list-group">
@@ -171,7 +226,7 @@
             if (list.Count() > 0) { 
                 int idx=1;
                 foreach (var l in list) { 
-                    <li class="list-group-item" style="cursor:pointer;">
+                    <li class="list-group-item list-content" style="cursor:pointer;">
                         <span class="text-danger" style="display:inline-block;width:30px;">[@(idx++)]</span> &nbsp;
                         <i class="fa fa-clock-o"></i> <span class="stDate">@l.stDate</span> &nbsp;&nbsp; 
                         <span class="stNumber" style="display:inline-block;width:140px;">@l.stNumber</span>
@@ -189,11 +244,12 @@
                     <p class="text-center text-warning">-------- 查询不到符合条件的销售出库单 --------</p>
                 </li>
             }
-        }
+        }        
     </ul>
 
 </div>
 
 @section Modal {
     @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_MessageDialog")
 }

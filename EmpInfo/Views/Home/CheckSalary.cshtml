@@ -1,6 +1,6 @@
 ﻿@using EmpInfo.Models;
 @{
-    GetSalaryInfo_Result info = ((List<GetSalaryInfo_Result>)ViewData["info"]).First();
+    GetSalaryInfo_new_Result info = ((List<GetSalaryInfo_new_Result>)ViewData["info"]).First();
     List<string> months = (List<string>)ViewData["months"];    
 }
 
@@ -92,7 +92,7 @@
     <div class="panel-body">
         <div class="row">
             <div class="col-xs-5 col-md-3 text-success">账号：<strong>@ViewData["salaryNo"]</strong></div>
-            <div class="col-xs-7 col-md-3 text-success">基本工资：<strong>@info.basicSalary.ToString("N1")</strong></div>
+            <div class="col-xs-7 col-md-3 text-success">基本工资：<strong>@(((decimal)info.basicSalary).ToString("N1"))</strong></div>
             <div class="col-xs-5 col-md-3 text-success">类别：<strong>@info.salaryType</strong> </div>
             <div class="col-xs-7 col-md-3 text-success">最近发放月份：<strong>@info.lastSalaryDate</strong></div>
         </div>

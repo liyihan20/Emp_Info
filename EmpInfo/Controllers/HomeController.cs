@@ -58,17 +58,19 @@ namespace EmpInfo.Controllers
         public ActionResult GetEmpPortrait(string card_no)
         {
             if (string.IsNullOrEmpty(card_no)) card_no = userInfo.cardNo;
-            var user = db.ei_users.Single(u => u.card_number == card_no);
-            byte[] portrait = user.short_portrait;
-            string picUrl;
+            var user = db.ei_users.Where(u => u.card_number == card_no).FirstOrDefault();
+            byte[] portrait = user == null ? null : user.short_portrait;
             if (portrait == null) {
                 //无照片的，先看看人事系统有没有 2017-9-5
+                string picUrl;
                 var emp = db.GetHREmpInfo(card_no).ToList();
                 if (emp.Count() > 0) {
                     if (emp.First().zp != null) {
-                        user.short_portrait = MyUtils.MakeThumbnail(MyUtils.BytesToImage(emp.First().zp));
-                        db.SaveChanges();
-                        portrait = user.short_portrait;
+                        portrait = MyUtils.MakeThumbnail(MyUtils.BytesToImage(emp.First().zp));
+                        if (user != null) {
+                            user.short_portrait = portrait;
+                            db.SaveChanges();
+                        }
                     }
                     else {
                         picUrl = Server.MapPath("~/Content/images/") + (user.sex.Equals("男") ? "user_man.png" : "user_woman.png");
@@ -464,40 +466,43 @@ namespace EmpInfo.Controllers
         [SessionTimeOutFilter]
         public ActionResult CheckSalary()
         {
-            int salaryNo = 0;
-            try {
-                salaryNo = int.Parse(userInfoDetail.salaryNo);
-            }
-            catch {
-                ViewBag.tip = "你的工资账号不存在";
-                return View("Error");
-            }
-            ViewData["salaryNo"] = salaryNo;
-            var info = db.GetSalaryInfo(salaryNo).ToList();
-            ViewData["months"] = db.GetSalaryMonths(salaryNo).ToList();
-            ViewData["info"] = info;
-            WriteEventLog("工资查询", "进入工资查询页面:" + info.First().basicSalary);
-            return View();
+            //2018-10-11起，不再提供查询工资服务
+            ViewBag.tip = "接上级通知，不再提供工资查询服务";
+            return View("Error");
+
+            //string salaryNo = userInfoDetail.salaryNo;
+            //if(string.IsNullOrEmpty(salaryNo))
+            //{
+            //    ViewBag.tip = "你的工资账号不存在";
+            //    return View("Error");
+            //}
+
+            //ViewData["salaryNo"] = salaryNo;
+            //var info = db.GetSalaryInfo_new(salaryNo).ToList();
+            //ViewData["months"] = db.GetSalaryMonths(salaryNo).ToList();
+            //ViewData["info"] = info;
+            //WriteEventLog("工资查询", "进入工资查询页面");
+            //return View();
         }
 
         public JsonResult CheckSalarySummary(string yearMonth)
-        {
-            int salaryNo = int.Parse(userInfoDetail.salaryNo);
+        {            
             DateTime firstDay = DateTime.Parse(yearMonth + "-01");
             DateTime lastDay = firstDay.AddMonths(1);
+            yearMonth = yearMonth.Replace("-", "");
 
             WriteEventLog("工资查询", "查询工资月度摘要:"+yearMonth);
-            return Json(db.GetSalarySummary(salaryNo, firstDay, lastDay).ToList().First());
+            return Json(db.GetSalarySummary(userInfoDetail.salaryNo, firstDay, lastDay,yearMonth).ToList().First());
         }
 
         public JsonResult CheckSalaryDetail(string yearMonth)
-        {
-            int salaryNo=int.Parse(userInfoDetail.salaryNo);
+        {            
             DateTime firstDay = DateTime.Parse(yearMonth + "-01");
             DateTime lastDay = firstDay.AddMonths(1);
+            yearMonth = yearMonth.Replace("-", "");
 
             WriteEventLog("工资查询", "查询工资月度明细:" + yearMonth);
-            var result = db.GetSalaryAllDetail(salaryNo, firstDay, lastDay).ToList();
+            var result = db.GetSalaryAllDetail(userInfoDetail.salaryNo, firstDay, lastDay,yearMonth).ToList();
             if (result.Count() == 0) {
                 return Json(new { suc = false, msg = "查询不到此月份的工资数据" });
             }
@@ -512,8 +517,8 @@ namespace EmpInfo.Controllers
                 ViewBag.tip = "参数出错";
                 return View("Error");
             }
-            ViewData["yearMonth"] = dt.ToString("yyyy-MM");
-            
+            ViewData["yearMonth"] = dt.ToString("yyyy-MM");                       
+
             return View();
         }
 

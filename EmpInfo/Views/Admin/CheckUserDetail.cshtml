@@ -18,12 +18,12 @@
 
             $("#activeBtn").click(function () {
                 var st = $("#status").html();
-                if (st == "禁用" && $("#depName").html() == "") {
+                if (st == "禁用" && "@user.dep_name" == "" && "@user.card_number".indexOf("GN")<0) {
                     toastr.error("此员工已离职，不能解禁");
                     return;
                 }
                 $.post("@Url.Content("~/Admin/activeUser")", { id: "@user.id" }, function (data) {
-                    if (data.suc) {                        
+                    if (data.suc) {
                         st = st == "正常" ? "禁用" : "正常";
                         $("#status").html(st);
                         toastr.success(data.msg);
@@ -52,20 +52,21 @@
             <img id="people_img" title="头像" class="img-thumbnail center-block" style="background-color:#fff;border:1px solid #ddd;width:100px;height:120px;" alt="people image" src="@Url.Content("~/Home/GetEmpPortrait?card_no="+user.card_number)" />
         </div>
     </div>
+    @{
+        string[] texts = new string[] { "姓名", "厂牌", "性别", "部门", "长部门", "身份证", "条形码",
+            "银行卡号", "邮箱地址", "手机长号", "手机短号", "注册日期", "最后登陆日期" 
+        };
+        string[] values = new string[]{
+            user.name,user.card_number,user.sex,user.short_dep_name,user.dep_name,user.id_number,user.salary_no,
+            user.bank_no,user.email,user.phone,user.short_phone,
+            ((DateTime)user.create_date).ToShortDateString(),user.last_login_date==null?"":(((DateTime)user.last_login_date).ToShortDateString())
+        };
+    }
     <ul class="list-group">
         <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>状态：</span><span class="pull-right" id="status" style="color:red">@(user.forbit_flag==true?"禁用":"正常")</span></li>
-        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>姓名：</span><span class="pull-right">@user.name</span></li>
-        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>厂牌：</span><span class="pull-right">@user.card_number</span></li>
-        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>性别：</span><span class="pull-right">@user.sex</span></li>
-        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>部门：</span><span class="pull-right" id="depName">@user.short_dep_name</span></li>
-        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>长部门：</span><span class="pull-right">@user.dep_name</span></li>
-        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>身份证：</span><span class="pull-right">@user.id_number</span></li>
-        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>条形码：</span><span class="pull-right">@user.salary_no</span></li>
-        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>邮箱地址：</span><span class="pull-right">@user.email</span></li>
-        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>手机长号：</span><span class="pull-right">@user.phone</span></li>
-        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>手机短号：</span><span class="pull-right">@user.short_phone</span></li>
-        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>注册日期：</span><span class="pull-right">@(((DateTime)user.create_date).ToShortDateString())</span></li>
-        <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>最后登陆日期：</span><span class="pull-right">@(user.last_login_date==null?"":(((DateTime)user.last_login_date).ToShortDateString()))</span></li>
+        @for (var i = 0; i < texts.Length; i++) {
+            <li class="list-group-item text-primary"><span class="glyphicon glyphicon-triangle-right"></span> <span>@texts[i]：</span><span class="pull-right">@values[i]</span></li>
+        }
     </ul>
     <div class="btn-group btn-group-justified" role="group" aria-label="操作按钮">
         <div class="btn-group" role="group">

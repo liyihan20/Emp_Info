@@ -43,7 +43,7 @@ namespace EmpInfo.Controllers
             var result = (from u in db.vw_ei_simple_users
                           where (u.card_number.Contains(queryString)
                           || u.name.Contains(queryString))
-                          && u.short_dep_name != null
+                          && (u.short_dep_name != null || u.card_number.StartsWith("GN"))
                           select new
                           {
                               cardNumber = u.card_number,
@@ -105,5 +105,18 @@ namespace EmpInfo.Controllers
             return Json(list);
         }
         
+        //获取k3的客户名称，通过客户编码
+        public JsonResult GetK3CustomerName(string customerNumber)
+        {
+            var list = db.GetK3CustomerNameByNum(customerNumber).ToList();
+            if (list.Count() < 1) {
+                return Json(new SimpleResultModel() { suc = false, msg = "客户不存在，请确认客户编码是否正确" });
+            }
+            else {
+                return Json(new SimpleResultModel() { suc = true, extra = list.First() });
+            }
+
+        }
+
     }
 }

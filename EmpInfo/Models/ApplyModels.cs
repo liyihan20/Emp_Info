@@ -27,6 +27,7 @@ namespace EmpInfo.Models
             this.leaveReason = al.leave_reason;
             this.leaveTimeZone = ((DateTime)al.from_date).ToString("yyyy-MM-dd HH:mm") + " ~ " + ((DateTime)al.to_date).ToString("yyyy-MM-dd HH:mm");
             this.totalLeaveDays = "共 " + al.work_days + " 天 " + al.work_hours + " 小时";
+            this.isContinue = al.is_continue ? "是" : "否";
             this.hasAttachment = al.has_attachment ?? false;
         }
         public string auditStatus { get; set; }
@@ -40,6 +41,7 @@ namespace EmpInfo.Models
         public string leaveReason { get; set; }
         public string leaveTimeZone { get; set; }
         public string totalLeaveDays { get; set; }
+        public string isContinue { get; set; }
         public string agentMan { get; set; }
         public string informMan { get; set; }
         public bool hasAttachment { get; set; }

@@ -126,7 +126,7 @@ namespace EmpInfo.Controllers
                             customerNumber = r.customerNumber,
                             saleStyle = r.saleType,
                             srNumber = r.saleReqNo
-                        }).Distinct(new stBillComparer()).ToList();
+                        }).Distinct(new stBillComparer()).OrderBy(r => r.stId).ToList();
             list.ForEach(l =>
             {
                 var entry = from r in result
@@ -170,15 +170,15 @@ namespace EmpInfo.Controllers
 
         //开始一审k3销售出库单
         [SessionTimeOutJsonFilter]
-        public JsonResult BeginAuditStockBill(string account, int interid)
+        public JsonResult BeginAuditStockBill(string account, int interid,bool isReject = false)
         {
             try {
-                var result = db.StockbillAudit1(account, interid, userInfo.name).First();
-                WriteEventLog("出库单一审", "一审:"+interid + (result.suc == true ? "成功" : "失败") + ";msg" + result.msg);
+                var result = db.StockbillAudit1(account, interid, userInfo.name, isReject).First();
+                WriteEventLog("出库单一审", (isReject?"反":"") + "一审:"+interid + (result.suc == true ? "成功" : "失败") + ";msg" + result.msg);
                 return Json(new SimpleResultModel() { suc = (bool)result.suc, msg = result.msg });
             }
             catch (Exception ex) {
-                WriteEventLog("出库单一审", "一审失败：" + interid + ex.Message);
+                WriteEventLog("出库单一审", (isReject ? "反" : "") + "一审失败：" + interid + ex.Message);
                 return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
             }
         }
@@ -198,6 +198,19 @@ namespace EmpInfo.Controllers
             }
         }
 
+        //获取本人24小时内的已审核销售出库单
+        [SessionTimeOutJsonFilter]
+        public JsonResult GetStockBillForReject(string account)
+        {
+            try {
+                var list = db.GetOutStockBillsForAudit1To2(account, userInfo.name).ToList();
+                return Json(new { suc = true, list = list });
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+        }
+        
         #endregion
 
     }

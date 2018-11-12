@@ -5,63 +5,71 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="31485ad8413145feadb8e14bbd6e0c54" Name="Diagram1" ShowGrid="false" >
-        <EntityTypeShape EntityType="ICAuditModel.ei_users" Width="1.5" PointX="5.75" PointY="2.125" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_event_log" Width="1.5" PointX="0.75" PointY="7.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.vw_ei_users" Width="1.5" PointX="5.75" PointY="8.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_authority" Width="2" PointX="5.25" PointY="7.125" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_groupAuthority" Width="2" PointX="8" PointY="5.125" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_groups" Width="2" PointX="5.25" PointY="4.125" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_groupUser" Width="2" PointX="8" PointY="2.125" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_users" Width="1.5" PointX="5.375" PointY="1.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_event_log" Width="1.5" PointX="5.375" PointY="5.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_ei_users" Width="1.5" PointX="10.75" PointY="2" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_authority" Width="1.5" PointX="5.375" PointY="3.625" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_groupAuthority" Width="1.5" PointX="8.125" PointY="3.625" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_groups" Width="1.5" PointX="8.125" PointY="2.625" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_groupUser" Width="1.5" PointX="8.125" PointY="1.5" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_groupAuthority_ei_authority" />
         <AssociationConnector Association="ICAuditModel.FK_ei_groupAuthority_ei_groups" />
         <AssociationConnector Association="ICAuditModel.FK_ei_groupUser_ei_groups" />
         <AssociationConnector Association="ICAuditModel.FK_ei_groupUser_ei_users" />
-        <EntityTypeShape EntityType="ICAuditModel.dn_dishes" Width="1.5" PointX="2.875" PointY="2.125" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.dn_order" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.dn_orderEntry" Width="1.5" PointX="0.625" PointY="2" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.dn_dishes" Width="1.5" PointX="2.875" PointY="1.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.dn_order" Width="1.5" PointX="0.5" PointY="0.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.dn_orderEntry" Width="1.5" PointX="0.5" PointY="1.375" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_dn_orderEntry_dn_dishes" />
         <AssociationConnector Association="ICAuditModel.FK_dn_orderEntry_dn_order" />
-        <EntityTypeShape EntityType="ICAuditModel.dn_desks" Width="1.5" PointX="7.75" PointY="8.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.dn_shoppingCar" Width="1.5" PointX="3" PointY="0.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.dn_desks" Width="1.5" PointX="0.5" PointY="3.875" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.dn_shoppingCar" Width="1.5" PointX="2.875" PointY="0.5" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_dn_shoppingCar_dn_dishes" />
         <AssociationConnector Association="ICAuditModel.FK_dn_shoppingCar_dn_order" />
-        <EntityTypeShape EntityType="ICAuditModel.all_maxNum" Width="1.5" PointX="5.75" PointY="10.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.dn_discountInfo" Width="1.5" PointX="7.75" PointY="6.5" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.dn_discountInfoUsers" Width="1.5" PointX="10" PointY="6.5" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.dn_points" Width="1.5" PointX="9.75" PointY="8.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.dn_pointsForDish" Width="1.5" PointX="2.875" PointY="4.25" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.dn_pointsRecord" Width="1.5" PointX="7.75" PointY="10.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.all_maxNum" Width="1.5" PointX="5.375" PointY="6.25" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.dn_discountInfo" Width="1.5" PointX="0.5" PointY="3.125" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.dn_discountInfoUsers" Width="1.5" PointX="2.875" PointY="3.125" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.dn_points" Width="1.5" PointX="2.875" PointY="3.875" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.dn_pointsForDish" Width="1.5" PointX="2.875" PointY="2.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.dn_pointsRecord" Width="1.5" PointX="0.5" PointY="6" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_dn_discountInfoUsers_dn_discountInfo" />
         <AssociationConnector Association="ICAuditModel.FK_dn_pointsForDish_dn_dishes" />
-        <EntityTypeShape EntityType="ICAuditModel.dn_birthdayMealLog" Width="1.5" PointX="9.75" PointY="10.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_specialUsers" Width="1.5" PointX="10.75" PointY="1.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.dn_items" Width="1.5" PointX="10.75" PointY="3.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.dn_Restaurent" Width="1.5" PointX="0.75" PointY="12.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_resVisitLog" Width="1.5" PointX="2.75" PointY="12.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.vw_ei_simple_users" Width="1.5" PointX="4.75" PointY="12.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_deliveryInfo" Width="1.5" PointX="8" PointY="3.25" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.dn_birthdayMealLog" Width="1.5" PointX="2.875" PointY="6" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_specialUsers" Width="1.5" PointX="8.125" PointY="0.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.dn_items" Width="1.5" PointX="0.5" PointY="2.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.dn_Restaurent" Width="1.5" PointX="0.5" PointY="6.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_resVisitLog" Width="1.5" PointX="2.875" PointY="6.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_ei_simple_users" Width="1.5" PointX="10.75" PointY="2.875" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_deliveryInfo" Width="1.5" PointX="5.375" PointY="2.625" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_deliveryInfo_ei_users" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_pushMsg" Width="1.5" PointX="0.75" PointY="9.5" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_emp_portrait" Width="1.5" PointX="6.75" PointY="12.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_PushResponse" Width="1.5" PointX="3" PointY="8.625" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_pushMsg" Width="1.5" PointX="0.5" PointY="5.25" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_emp_portrait" Width="1.5" PointX="8.125" PointY="6.25" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_PushResponse" Width="1.5" PointX="2.875" PointY="5.25" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_PushResponse_ei_pushMsg" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_k3RestLog" Width="1.5" PointX="11.75" PointY="8.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_dormRepair" Width="1.5" PointX="8.75" PointY="12.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.vw_getAllhrEmp" Width="1.5" PointX="11.75" PointY="10.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_department" Width="1.5" PointX="0.75" PointY="5.5" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_departmentAuditUser" Width="1.5" PointX="5.25" PointY="5.5" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_empLevel" Width="1.5" PointX="11.375" PointY="11.75" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_askLeave" Width="1.5" PointX="0.75" PointY="4.25" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.vw_push_users" Width="1.5" PointX="10.5" PointY="4.625" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_users_android" Width="1.5" PointX="8" PointY="1.125" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_departmentAuditNode" Width="1.5" PointX="3.125" PointY="5.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_k3RestLog" Width="1.5" PointX="0.5" PointY="9.625" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_dormRepair" Width="1.5" PointX="4.125" PointY="9.625" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_getAllhrEmp" Width="1.5" PointX="12.625" PointY="1.25" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_department" Width="1.5" PointX="5.375" PointY="4.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_departmentAuditUser" Width="1.5" PointX="8.125" PointY="5.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_empLevel" Width="1.5" PointX="4.125" PointY="8.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_askLeave" Width="1.5" PointX="0.5" PointY="8.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_push_users" Width="1.5" PointX="12.625" PointY="0.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_users_android" Width="1.5" PointX="5.375" PointY="0.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_departmentAuditNode" Width="1.5" PointX="8.125" PointY="4.5" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_departmentAuditNode_ei_department" />
         <AssociationConnector Association="ICAuditModel.FK_ei_departmentAuditUser_ei_departmentAuditNode" />
-        <EntityTypeShape EntityType="ICAuditModel.wx_pushMsg" Width="1.5" PointX="10.75" PointY="0.625" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_leaveDayExceedPushLog" Width="1.5" PointX="13.375" PointY="0.75" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.vw_leaving_days" Width="1.5" PointX="0.75" PointY="13.75" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.vw_askLeaveReport" Width="1.5" PointX="13.375" PointY="2.75" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_stockAdminApply" Width="1.5" PointX="5.375" PointY="13.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.wx_pushMsg" Width="1.5" PointX="10.75" PointY="0.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_leaveDayExceedPushLog" Width="1.5" PointX="2.25" PointY="8.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_leaving_days" Width="1.5" PointX="12.625" PointY="2" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_stockAdminApply" Width="1.5" PointX="2.375" PointY="9.625" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.flow_auditorRelation" Width="1.5" PointX="5.375" PointY="7" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_ucApply" Width="1.5" PointX="0.5" PointY="10.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_ucApplyEntry" Width="1.5" PointX="2.375" PointY="10.5" IsExpanded="false" />
+        <AssociationConnector Association="ICAuditModel.FK_ei_ucApplyEntry_ei_ucApply" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_UCReport" Width="1.5" PointX="12.625" PointY="2.875" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_ucNotifyUsers" Width="1.5" PointX="4.125" PointY="10.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_askLeaveReport" Width="1.5" PointX="10.75" PointY="1.25" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_ALModifyLog" Width="1.5" PointX="6" PointY="8.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_assistantEmps" Width="1.5" PointX="10.75" PointY="3.75" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

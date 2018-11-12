@@ -157,7 +157,11 @@
 
         //工资查询入口
         $("#SalaryImg,#SalaryBt").click(function () {
-            $.post("@Url.Content("~/Home/ValidateEmail")", {}, function (data) {
+            //2018-10-11 不再提供查询服务
+            toastr.info("接上级通知，不再提供工资查询服务");
+            return;
+
+            @*$.post("@Url.Content("~/Home/ValidateEmail")", {}, function (data) {
                 if (!data.suc) {
                     toastr.error(data.msg);
                 } else {
@@ -175,7 +179,7 @@
                         }
                     });
                 }
-            });
+            });*@
         });
 
         //K3重置密码
@@ -274,16 +278,6 @@
     @if (!auditorComing) { 
     <div class="col-xs-6 col-sm-4">
         <div class="thumbnail">
-            <a href="#" id="SalaryImg"><img src="@Url.Content("~/Content/images/salary.png")" alt="salary"></a>
-            <div class="caption">
-                <h3>个人工资</h3>
-                @*<p>可以查询本人的工资概况和最近半年内的发放明细记录</p>
-                <p><button class="btn btn-primary btn-block" id="SalaryBt">进入查询</button></p>*@
-            </div>
-        </div>
-    </div>
-    <div class="col-xs-6 col-sm-4">
-        <div class="thumbnail">
             <a href="#" id="mealImg"><img src="@Url.Content("~/Content/images/meal.png")" alt="meal"></a>
             <div class="caption">
                 <h3>饭卡消费</h3>
@@ -355,7 +349,19 @@
             </div>
         </div>
     }
+    <div class="col-xs-6 col-sm-4">
+        <div class="thumbnail">
+            <a href="#" id="SalaryImg"><img src="@Url.Content("~/Content/images/salary.png")" alt="salary"></a>
+            <div class="caption">
+                <h3>个人工资</h3>
+                @*<p>可以查询本人的工资概况和最近半年内的发放明细记录</p>
+                    <p><button class="btn btn-primary btn-block" id="SalaryBt">进入查询</button></p>*@
+            </div>
+        </div>
+    </div>
     }
+    
+    
 </div>
 
 @Html.Partial("_ResSelDialog")

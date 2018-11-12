@@ -12,6 +12,7 @@ using Gma.QrCodeNet.Encoding;
 using Gma.QrCodeNet.Encoding.Windows.Render;
 using System.Configuration;
 using System.Collections.Generic;
+using System.Web;
 
 
 namespace EmpInfo.Util
@@ -546,18 +547,26 @@ namespace EmpInfo.Util
             var folder = GetAttachmentFolder(sysNo);
 
             DirectoryInfo di = new DirectoryInfo(folder);
-            foreach (FileInfo fi in di.GetFiles()) {
-                if (fi.Name.Contains(".db")) {
-                    continue; //将目录自动生成的thumb.db文件过滤掉
+            if (di.Exists) {
+                foreach (FileInfo fi in di.GetFiles()) {
+                    if (fi.Name.EndsWith(".db")) {
+                        continue; //将目录自动生成的thumb.db文件过滤掉
+                    }
+                    list.Add(new AttachmentModel()
+                    {
+                        fileName = fi.Name,
+                        fileSize = fi.Length / 1024 + " K"
+                    });
                 }
-                list.Add(new AttachmentModel()
-                {
-                    fileName = fi.Name,                    
-                    fileSize = fi.Length / 1024 + " K"
-                });
             }
-
             return list;
+        }
+
+        public static void ClearCookie(HttpResponseBase response,HttpSessionStateBase session){
+            var cookie = new HttpCookie(ConfigurationManager.AppSettings["cookieName"]);
+            cookie.Expires = DateTime.Now.AddDays(-1);
+            response.AppendCookie(cookie);
+            session.Clear();
         }
 
     }

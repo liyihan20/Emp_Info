@@ -28,7 +28,7 @@ namespace EmpInfo.Controllers
                 return _db;
             }
         }
-
+        
         protected CanteenEntities canteenDb
         {
             get
@@ -204,6 +204,7 @@ namespace EmpInfo.Controllers
         //设置cookie
         protected void setcookie(ei_users user,int days)
         {
+            Session.Clear(); //必须清空session，否则如果没有点退出按钮，会导致下一登录用户还是前一用户
             var cookie = new HttpCookie(ConfigurationManager.AppSettings["cookieName"]);
             cookie.Expires = DateTime.Now.AddDays(days);
             cookie.Values.Add("userid", user.id.ToString());

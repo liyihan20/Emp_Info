@@ -25,4 +25,12 @@ namespace EmpInfo.Models
         public string salaryNo { get; set; }
     }
 
+    public class AssistantEmpModel
+    {
+        public string cardNumber { get; set; }
+        public string empName { get; set; }
+        public string empType { get; set; }
+        public string depName { get; set; }
+    }
+
 }

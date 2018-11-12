@@ -1,0 +1,120 @@
+﻿@using EmpInfo.Models;
+@{
+    List<vw_UCReport> list=(List<vw_UCReport>)ViewData["list"];
+    var h = list.First();
+    int numPerPage = 20;
+    int pageNum = (int)Math.Ceiling((decimal)list.Count() / numPerPage);
+}
+
+@section CSS{
+    <style type="text/css" media="print">
+        .noPrint{
+            display:none;
+        }
+        .pageNext {
+            page-break-after: always;
+        }        
+    </style>
+    <style type="text/css">
+        #reportTb tr td{
+            text-align:center;
+            border:1px solid;
+            padding:2px;
+        }
+    </style>
+}
+
+<div class="text-center noPrint" style="margin-bottom:8px;">
+    <button type="button" class="btn btn-default btn-sm" onclick="javascript: window.print();"><i class="fa fa-print"></i> 开始打印</button>
+</div>
+@for (var p = 1; p <= pageNum; p++) {
+    <div><img src="@Url.Content("~/Content/images/Truly.gif")" /></div>
+    <div style="text-align:right;padding-right:8px;font-size:10px;">申请单号：@h.sys_no</div>
+    <table style="width:100%;" id="reportTb">
+        <tr>
+            <td colspan="4">
+                <div style="font-size:22px;font-weight:bold;padding:6px 2px;">非正常时间出货申请</div>                
+            </td>
+        </tr>
+        <tr>
+            <td style="width:20%;">市场部:</td>
+            <td style="width:30%;">@h.market_name</td>
+            <td style="width:20%;">客户全称:</td>
+            <td style="width:30%;">@h.customer_name</td>
+        </tr>
+        <tr>
+            <td>出货公司:</td>
+            <td>@h.company</td>
+            <td>生产事业部:</td>
+            <td>@h.bus_dep</td>
+        </tr>
+        <tr>
+            <td colspan="2">预计实物及数据到达物流中心时间:</td>
+            <td colspan="2">@(((DateTime)h.arrive_time).ToString("yyyy-MM-dd HH:mm"))</td>
+        </tr>        
+
+        <tr>
+            @*<td style="font-weight:bold;">订单单号</td>*@
+            <td style="font-weight:bold;" colspan="3">规格型号</td>
+            <td style="font-weight:bold;">数量</td>
+        </tr>
+
+        @for (int i = (p - 1) * numPerPage; i < p * numPerPage; i++) {
+            if (i < list.Count()) {
+                <tr>
+                    @*<td>@list[i].num</td>*@
+                    <td colspan="3">@list[i].moduel</td>
+                    <td>@(((decimal)list[i].qty).ToString("###,###.####"))</td>
+                </tr>
+            }
+        }
+        <tr>
+            <td>货运公司:</td>
+            <td colspan="3" style="text-align:left;">@h.delivery_company <br/> &nbsp;</td>
+        </tr>
+        <tr>
+            <td>申请原因:</td>
+            <td colspan="3" style="text-align:left;">@h.reason</td>
+        </tr> 
+        <tr>
+            <td>申请人:</td>
+            <td style="font-weight:bold;">@h.applier_name</td>
+            <td>市场部总经理:</td>
+            <td style="font-weight:bold;">@h.market_manager</td>
+        </tr>
+        <tr>
+            <td>事业部部长:</td>
+            <td style="font-weight:bold;">@h.bus_minister</td>
+            <td>市场管理部:</td>
+            <td style="font-weight:bold;">@h.market_administration</td>
+        </tr>
+        <tr>
+            <td>仓运管理部:</td>
+            <td style="font-weight:bold;">@h.stock_administration</td>
+            <td>会计部主管:</td>
+            <td style="font-weight:bold;">@h.accounting_minister</td>
+        </tr>
+        <tr>
+            <td>行政部总经理:</td>
+            <td style="font-weight:bold;">@h.administration_manager</td>
+            <td></td><td></td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <div style="text-align:left;font-size:12px;">
+                    备注:
+                    <div style="margin-left:24px">
+                        <div>1. 以上只允许提前一个工作日及当天上班时间提出申请。</div>
+                        <div>2. 申请人根据以上已审批申请，通知对应部门的执行人员配合执行。</div>
+                        <div>3. 出货及放行必须在以上申请的客户、型号、数量的范围内，超出部分不给于配合。</div>
+                        <div>4. 门卫凭以上审批申请及系统放行条，给予配合放行出厂，而无需夜间放行申请。</div>
+                        <div>5. 如货物无法在22:00前出到物流中心，此申请无效。</div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    if (p < pageNum) {
+        <div class="pageNext"></div>
+    }
+}   

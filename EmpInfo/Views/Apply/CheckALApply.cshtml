@@ -77,15 +77,15 @@
         });
 </script>
 }
-<div class="row">
-    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12">
+<div class="row" style="margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
         <div class="panel panel-danger">
             <div class="panel-heading">
                 <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
                     <li><span class="glyphicon glyphicon-hand-right"></span></li>
                     <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
                     <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-                    <li><a href="@string.Concat(Url.Content("~/Apply/ApplyIndex?billType=AL&billName="),Uri.EscapeDataString("请假申请单"))">请假申请单</a></li>
+                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=AL")">请假申请单</a></li>
                     <li class="active">查看详情</li>
                 </ol>
             </div>
@@ -145,6 +145,10 @@
                     <tr>
                         <th>请假天数</th>
                         <td>@al.totalLeaveDays</td>
+                    </tr>
+                    <tr>
+                        <th>延假</th>
+                        <td>@al.isContinue</td>
                     </tr>
                     <tr>
                         <th>请假事由</th>

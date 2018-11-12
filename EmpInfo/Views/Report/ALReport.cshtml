@@ -108,23 +108,54 @@
             var isChecked = $(this).is(":checked");
             var sysNo = sysNo = $(this).attr("data-sn");
             var which = $(this).hasClass("check1");
-            checkFlag(sysNo, which ? "1" : "2", isChecked);            
+            checkFlag(sysNo, which ? "1" : "2", isChecked);
         });
 
         $("#alReportBt").on("click", function () {
+            $(this).button("loading");
+            $("#alCheckBt").addClass("disabled");
             exportDatas("BeginExportALExcel");
+            
+            window.setTimeout(function () {
+                $("#alReportBt").button("reset");
+                $("#alCheckBt").removeClass("disabled");
+            }, 15 * 1000);
+
         });
 
         $("#alCheckBt").on("click", function () {
-            exportDatas("CheckALDatas");
+            $(this).button("loading");
+            $("#alReportBt").addClass("disabled");
+            exportDatas("CheckALDatas",1);
+        });
+
+        //下一页按钮
+        $("#nextLink").click(function () {
+            var currentP = parseInt($("#currentPage").html());
+            var totalP = parseInt($("#totalPage").html());
+            if (currentP == totalP) return;
+            exportDatas("CheckALDatas",++currentP);
+        });
+
+        //上一页按钮
+        $("#previousLink").click(function () {
+            var currentP = parseInt($("#currentPage").html());
+            if (currentP == 1) return;
+            exportDatas("CheckALDatas", --currentP);
         });
 
         $(".dateSpan, .dayTime").on("click", function () {            
             var tr = $(this).parents("tr")[0];
             var ds = $($(tr).find(".dateSpan")).html();
             var dt = $($(tr).find(".dayTime")).html();
-            
-            var sysNo = $($(tr).prev("tr").find(".sysNo")).html();
+
+            var status = $($(tr).prev("tr").find(".status")).html();
+            if (status != "已通过") {
+                toastr.error("只有已通过的请假条才能修改时间");
+                return;
+            }
+
+            var sysNo = $($(tr).prev("tr").find(".sysNo")).html();            
             var fDate = $.trim(ds.split("~")[0]);
             var tDate = $.trim(ds.split("~")[1]);
 
@@ -184,7 +215,7 @@
         $("#eLevel").val("@sm.empLeve");
     });
 
-    function exportDatas(method) {
+    function exportDatas(method,page) {
         var depId = $("#depId").val();
         var fd = $("#from_date").val();
         var td = $("#to_date").val();
@@ -210,7 +241,10 @@
             + "&empName=" + escape($("#empName").val())
             + "&sysNum=" + escape($("#sysNum").val())
             + "&salaryNo=" + escape($("#salaryNo").val())
+            + (page ? "&currentPage=" + page : "")
         ;
+        
+
     }
 
         function checkFlag(sysNo, which, checked) {
@@ -317,10 +351,10 @@
         </table>
         <div class="btn-group btn-group-justified" role="group">
             <div class="btn-group" role="group">
-                <button class="btn btn-primary" id="alCheckBt"><i class="fa fa-search"></i> 搜索</button>
+                <button class="btn btn-primary" id="alCheckBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
             </div>
             <div class="btn-group" role="group">
-                <button class="btn btn-success" id="alReportBt"><i class="fa fa-file-excel-o"></i> 导出报表</button>
+                <button class="btn btn-success" id="alReportBt" data-loading-text="导出中..."><i class="fa fa-file-excel-o"></i> 导出报表</button>
             </div>
         </div>
         @if (list != null) {
@@ -353,7 +387,7 @@
                         </th>
                     </tr>
                     @{
-                        int ln = 0;
+                        int ln = ((int)ViewData["currentPage"] - 1) * 100;
                         string trClass = "";                        
                     }
                     @foreach (var l in list) {
@@ -376,7 +410,7 @@
                             @(++ln)
                         </td>
                         <td>
-                            @(((DateTime)l.apply_time).ToString("MM-dd HH:mm")) / @l.status
+                            @(((DateTime)l.apply_time).ToString("MM-dd HH:mm")) / <span class="status">@l.status</span>
                         </td>
                         <td>
                             <span class="sysNo">@l.sys_no</span> 
@@ -426,6 +460,13 @@
                     </tr>      
                     }      
                 </table>
+                <nav>
+                    <ul class="pager">
+                        <li><a href="#" id="previousLink">&larr; 上一页</a></li>
+                        <li>第<span id="currentPage">@ViewData["currentPage"]</span>页，共<span id="totalPage">@ViewData["totalPage"]</span>页</li>
+                        <li><a href="#" id="nextLink">下一页 &rarr;</a></li>
+                    </ul>
+                </nav>
             }
             else {
                 <p class="text-center text-warning" style="margin-top:20px;">查询不到符合条件的请假记录</p>

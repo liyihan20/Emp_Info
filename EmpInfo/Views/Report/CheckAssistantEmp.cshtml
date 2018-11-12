@@ -1,0 +1,47 @@
+﻿@using EmpInfo.Models;
+@{
+    vw_assistantEmps emp = (vw_assistantEmps)ViewData["emp"];
+}
+
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Admin/AdminIndex")">管理员工具栏</a></li>
+            <li><a href="@Url.Content("~/Report/AssistantEmps")">基干/辅助员工查询</a></li>
+            <li class="active">查看明细</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="center-block">
+            <img id="people_img" title="头像" class="img-thumbnail center-block" style="background-color:#fff;border:1px solid #ddd;width:100px;height:120px;" alt="people image" src="@Url.Content("~/Home/GetEmpPortrait?card_no="+emp.emp_no1)" />
+        </div>
+    </div>
+    @{
+        string[] texts = new string[] { "姓名", "厂牌", "类型", "部门", "条形码", "工资类型", "生效时间", "任命时间", "职务", "职级", "组别", "备注" };
+        string[] values = new string[] { emp.emp_name,emp.emp_no1,emp.emp_type,emp.dept_name,emp.emp_no,emp.pay_type,emp.sx_date.ToString("yyyy-MM-dd"),
+            emp.rm_date,emp.emp_zw,emp.emp_zj,emp.work_name,emp.rem };
+    }
+    <ul class="list-group">
+        @for (var i = 0; i < texts.Length; i++) { 
+        <li class="list-group-item text-primary">
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:85px;">
+                        <i class="fa fa-angle-right"></i> @texts[i]：
+                    </td>
+                    <td style="text-align:right;">
+                        @values[i]
+                    </td>
+                </tr>
+            </table>            
+        </li>
+        }
+        <li class="list-group-item text-primary">
+            <div><i class="fa fa-angle-right"></i> 工作职责：</div>
+            <div>@emp.gz_fw</div>
+        </li>
+    </ul>
+</div>

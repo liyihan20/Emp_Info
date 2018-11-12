@@ -40,5 +40,7 @@ namespace EmpInfo.Models
         public string level_name { get; set; }
         public Nullable<bool> check1 { get; set; }
         public Nullable<bool> check2 { get; set; }
+        public string agent_man_name { get; set; }
+        public string inform_man_name { get; set; }
     }
 }

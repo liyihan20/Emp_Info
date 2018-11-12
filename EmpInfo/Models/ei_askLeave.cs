@@ -36,5 +36,6 @@ namespace EmpInfo.Models
         public string auditor_queues { get; set; }
         public Nullable<bool> check1 { get; set; }
         public Nullable<bool> check2 { get; set; }
+        public bool is_continue { get; set; }
     }
 }

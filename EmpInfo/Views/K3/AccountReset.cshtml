@@ -173,6 +173,16 @@
                         }
                     </div>
                 }
+                @if (accs.Where(a => a.number.Contains("XY")).Count() > 0) {
+                    <div class="text-success" style="margin-top:16px;"><i class="fa fa-flag"></i> 信元 </div>
+                    <div class="row">
+                        @foreach (var acc in accs.Where(a => a.number.Contains("XY"))) {
+                            <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
+                                <input type="radio" name="k3Account" value="@acc.name" /> <span class="accountName"> @acc.number | @acc.name </span>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
         </div>
         <h4 style="margin-bottom:12px;" class="text-danger"><i class="fa fa-question-circle"></i> 请输入对应账套的K3登陆名:</h4>

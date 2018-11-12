@@ -17,9 +17,9 @@ namespace EmpInfo.Models
         public Nullable<decimal> monthly_work_days { get; set; }
         public Nullable<decimal> counter_days { get; set; }
         public Nullable<decimal> off_duty_days { get; set; }
-        public Nullable<decimal> late_days { get; set; }
-        public Nullable<decimal> run_away_days { get; set; }
-        public Nullable<decimal> allowance { get; set; }
+        public decimal late_days { get; set; }
+        public decimal run_away_days { get; set; }
+        public decimal allowance { get; set; }
         public Nullable<decimal> work_value { get; set; }
         public Nullable<decimal> other_salary { get; set; }
         public Nullable<decimal> cut_money { get; set; }

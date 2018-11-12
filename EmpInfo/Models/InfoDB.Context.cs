@@ -69,8 +69,15 @@ namespace EmpInfo.Models
         public DbSet<wx_pushMsg> wx_pushMsg { get; set; }
         public DbSet<ei_leaveDayExceedPushLog> ei_leaveDayExceedPushLog { get; set; }
         public DbSet<vw_leaving_days> vw_leaving_days { get; set; }
-        public DbSet<vw_askLeaveReport> vw_askLeaveReport { get; set; }
         public DbSet<ei_stockAdminApply> ei_stockAdminApply { get; set; }
+        public DbSet<flow_auditorRelation> flow_auditorRelation { get; set; }
+        public DbSet<ei_ucApply> ei_ucApply { get; set; }
+        public DbSet<ei_ucApplyEntry> ei_ucApplyEntry { get; set; }
+        public DbSet<vw_UCReport> vw_UCReport { get; set; }
+        public DbSet<ei_ucNotifyUsers> ei_ucNotifyUsers { get; set; }
+        public DbSet<vw_askLeaveReport> vw_askLeaveReport { get; set; }
+        public DbSet<ei_ALModifyLog> ei_ALModifyLog { get; set; }
+        public DbSet<vw_assistantEmps> vw_assistantEmps { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {
@@ -160,58 +167,6 @@ namespace EmpInfo.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("InsertIntoYFEmp", emailParameter, mobilephoneParameter, shortphoneParameter, usernameParameter, cardnoParameter);
         }
     
-        public virtual ObjectResult<GetSalaryDetail_Result> GetSalaryDetail(Nullable<int> salary_no, Nullable<System.DateTime> begin_date, Nullable<System.DateTime> end_date)
-        {
-            var salary_noParameter = salary_no.HasValue ?
-                new ObjectParameter("salary_no", salary_no) :
-                new ObjectParameter("salary_no", typeof(int));
-    
-            var begin_dateParameter = begin_date.HasValue ?
-                new ObjectParameter("begin_date", begin_date) :
-                new ObjectParameter("begin_date", typeof(System.DateTime));
-    
-            var end_dateParameter = end_date.HasValue ?
-                new ObjectParameter("end_date", end_date) :
-                new ObjectParameter("end_date", typeof(System.DateTime));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSalaryDetail_Result>("GetSalaryDetail", salary_noParameter, begin_dateParameter, end_dateParameter);
-        }
-    
-        public virtual ObjectResult<GetSalaryInfo_Result> GetSalaryInfo(Nullable<int> salary_no)
-        {
-            var salary_noParameter = salary_no.HasValue ?
-                new ObjectParameter("salary_no", salary_no) :
-                new ObjectParameter("salary_no", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSalaryInfo_Result>("GetSalaryInfo", salary_noParameter);
-        }
-    
-        public virtual ObjectResult<GetSalarySummary_Result> GetSalarySummary(Nullable<int> salary_no, Nullable<System.DateTime> begin_date, Nullable<System.DateTime> end_date)
-        {
-            var salary_noParameter = salary_no.HasValue ?
-                new ObjectParameter("salary_no", salary_no) :
-                new ObjectParameter("salary_no", typeof(int));
-    
-            var begin_dateParameter = begin_date.HasValue ?
-                new ObjectParameter("begin_date", begin_date) :
-                new ObjectParameter("begin_date", typeof(System.DateTime));
-    
-            var end_dateParameter = end_date.HasValue ?
-                new ObjectParameter("end_date", end_date) :
-                new ObjectParameter("end_date", typeof(System.DateTime));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSalarySummary_Result>("GetSalarySummary", salary_noParameter, begin_dateParameter, end_dateParameter);
-        }
-    
-        public virtual ObjectResult<string> GetSalaryMonths(Nullable<int> salary_no)
-        {
-            var salary_noParameter = salary_no.HasValue ?
-                new ObjectParameter("salary_no", salary_no) :
-                new ObjectParameter("salary_no", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("GetSalaryMonths", salary_noParameter);
-        }
-    
         public virtual ObjectResult<string> BindK3Emp(string k3_username, string card_number, string k3_account)
         {
             var k3_usernameParameter = k3_username != null ?
@@ -266,23 +221,6 @@ namespace EmpInfo.Models
                 new ObjectParameter("dormNumber", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetDormRoomMate_Result>("GetDormRoomMate", dormNumberParameter);
-        }
-    
-        public virtual ObjectResult<GetSalaryAllDetail_Result> GetSalaryAllDetail(Nullable<int> salary_no, Nullable<System.DateTime> begin_date, Nullable<System.DateTime> end_date)
-        {
-            var salary_noParameter = salary_no.HasValue ?
-                new ObjectParameter("salary_no", salary_no) :
-                new ObjectParameter("salary_no", typeof(int));
-    
-            var begin_dateParameter = begin_date.HasValue ?
-                new ObjectParameter("begin_date", begin_date) :
-                new ObjectParameter("begin_date", typeof(System.DateTime));
-    
-            var end_dateParameter = end_date.HasValue ?
-                new ObjectParameter("end_date", end_date) :
-                new ObjectParameter("end_date", typeof(System.DateTime));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSalaryAllDetail_Result>("GetSalaryAllDetail", salary_noParameter, begin_dateParameter, end_dateParameter);
         }
     
         public virtual ObjectResult<string> GetSalaryBankCard(string salary_no)
@@ -342,7 +280,7 @@ namespace EmpInfo.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetOutStockBillsForAudit1_Result>("GetOutStockBillsForAudit1", accountParameter, fdParameter, tdParameter);
         }
     
-        public virtual ObjectResult<StockbillAudit1_Result> StockbillAudit1(string account, Nullable<int> interid, string name)
+        public virtual ObjectResult<StockbillAudit1_Result> StockbillAudit1(string account, Nullable<int> interid, string name, Nullable<bool> reject)
         {
             var accountParameter = account != null ?
                 new ObjectParameter("account", account) :
@@ -356,7 +294,11 @@ namespace EmpInfo.Models
                 new ObjectParameter("name", name) :
                 new ObjectParameter("name", typeof(string));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<StockbillAudit1_Result>("StockbillAudit1", accountParameter, interidParameter, nameParameter);
+            var rejectParameter = reject.HasValue ?
+                new ObjectParameter("reject", reject) :
+                new ObjectParameter("reject", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<StockbillAudit1_Result>("StockbillAudit1", accountParameter, interidParameter, nameParameter, rejectParameter);
         }
     
         public virtual int AddUser(string card_number, string accountset)
@@ -379,6 +321,105 @@ namespace EmpInfo.Models
                 new ObjectParameter("empNo", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<decimal>>("GetVacationDaysLeftProc", empNoParameter);
+        }
+    
+        public virtual ObjectResult<string> GetK3CustomerNameByNum(string customer_number)
+        {
+            var customer_numberParameter = customer_number != null ?
+                new ObjectParameter("customer_number", customer_number) :
+                new ObjectParameter("customer_number", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("GetK3CustomerNameByNum", customer_numberParameter);
+        }
+    
+        public virtual ObjectResult<GetOutStockBillsForAudit1To2_Result> GetOutStockBillsForAudit1To2(string account, string name)
+        {
+            var accountParameter = account != null ?
+                new ObjectParameter("account", account) :
+                new ObjectParameter("account", typeof(string));
+    
+            var nameParameter = name != null ?
+                new ObjectParameter("name", name) :
+                new ObjectParameter("name", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetOutStockBillsForAudit1To2_Result>("GetOutStockBillsForAudit1To2", accountParameter, nameParameter);
+        }
+    
+        public virtual ObjectResult<GetSalaryInfo_new_Result> GetSalaryInfo_new(string salary_no)
+        {
+            var salary_noParameter = salary_no != null ?
+                new ObjectParameter("salary_no", salary_no) :
+                new ObjectParameter("salary_no", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSalaryInfo_new_Result>("GetSalaryInfo_new", salary_noParameter);
+        }
+    
+        public virtual ObjectResult<string> GetSalaryMonths(string salary_no)
+        {
+            var salary_noParameter = salary_no != null ?
+                new ObjectParameter("salary_no", salary_no) :
+                new ObjectParameter("salary_no", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("GetSalaryMonths", salary_noParameter);
+        }
+    
+        public virtual ObjectResult<GetSalarySummary_Result> GetSalarySummary(string salary_no, Nullable<System.DateTime> begin_date, Nullable<System.DateTime> end_date, string month_no)
+        {
+            var salary_noParameter = salary_no != null ?
+                new ObjectParameter("salary_no", salary_no) :
+                new ObjectParameter("salary_no", typeof(string));
+    
+            var begin_dateParameter = begin_date.HasValue ?
+                new ObjectParameter("begin_date", begin_date) :
+                new ObjectParameter("begin_date", typeof(System.DateTime));
+    
+            var end_dateParameter = end_date.HasValue ?
+                new ObjectParameter("end_date", end_date) :
+                new ObjectParameter("end_date", typeof(System.DateTime));
+    
+            var month_noParameter = month_no != null ?
+                new ObjectParameter("month_no", month_no) :
+                new ObjectParameter("month_no", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSalarySummary_Result>("GetSalarySummary", salary_noParameter, begin_dateParameter, end_dateParameter, month_noParameter);
+        }
+    
+        public virtual ObjectResult<GetSalaryAllDetail_Result> GetSalaryAllDetail(string salary_no, Nullable<System.DateTime> begin_date, Nullable<System.DateTime> end_date, string month_no)
+        {
+            var salary_noParameter = salary_no != null ?
+                new ObjectParameter("salary_no", salary_no) :
+                new ObjectParameter("salary_no", typeof(string));
+    
+            var begin_dateParameter = begin_date.HasValue ?
+                new ObjectParameter("begin_date", begin_date) :
+                new ObjectParameter("begin_date", typeof(System.DateTime));
+    
+            var end_dateParameter = end_date.HasValue ?
+                new ObjectParameter("end_date", end_date) :
+                new ObjectParameter("end_date", typeof(System.DateTime));
+    
+            var month_noParameter = month_no != null ?
+                new ObjectParameter("month_no", month_no) :
+                new ObjectParameter("month_no", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSalaryAllDetail_Result>("GetSalaryAllDetail", salary_noParameter, begin_dateParameter, end_dateParameter, month_noParameter);
+        }
+    
+        public virtual ObjectResult<GetSRFlowRecord_Result> GetSRFlowRecord(string account, Nullable<System.DateTime> beginDate, Nullable<System.DateTime> endDate)
+        {
+            var accountParameter = account != null ?
+                new ObjectParameter("account", account) :
+                new ObjectParameter("account", typeof(string));
+    
+            var beginDateParameter = beginDate.HasValue ?
+                new ObjectParameter("beginDate", beginDate) :
+                new ObjectParameter("beginDate", typeof(System.DateTime));
+    
+            var endDateParameter = endDate.HasValue ?
+                new ObjectParameter("endDate", endDate) :
+                new ObjectParameter("endDate", typeof(System.DateTime));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSRFlowRecord_Result>("GetSRFlowRecord", accountParameter, beginDateParameter, endDateParameter);
         }
     }
 }

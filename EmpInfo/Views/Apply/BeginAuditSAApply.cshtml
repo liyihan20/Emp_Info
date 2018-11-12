@@ -2,9 +2,6 @@
 @{
     BeginAuditModel bam = (BeginAuditModel)ViewData["bam"];
 }
-@section CSS{
-    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
-}
 @section Scripts {
     <script>
         $(function () {
@@ -30,7 +27,7 @@
                 }, function (data) {
                     if (data.suc) {
                         toastr.success(data.msg);
-                        setTimeout(function () { window.location.href = "@Url.Content("~/Apply/GetMyAuditingSAList")"; }, 2000);
+                        setTimeout(function () { window.location.href = "@Url.Content("~/Apply/GetMyAuditingList?billType=SA")"; }, 2000);
                     } else {
                         toastr.error(data.msg);
                         $("#opinion").val(data.msg);

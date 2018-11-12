@@ -160,10 +160,11 @@ namespace EmpInfo.Controllers
 
         public ActionResult LogOut()
         {
-            var cookie = new HttpCookie(ConfigurationManager.AppSettings["cookieName"]);
-            cookie.Expires = DateTime.Now.AddDays(-1);
-            Response.AppendCookie(cookie);
-            Session.Clear();
+            //var cookie = new HttpCookie(ConfigurationManager.AppSettings["cookieName"]);
+            //cookie.Expires = DateTime.Now.AddDays(-1);
+            //Response.AppendCookie(cookie);
+            //Session.Clear();
+            MyUtils.ClearCookie(this.Response, this.Session);
             return RedirectToAction("Login");
         }
 

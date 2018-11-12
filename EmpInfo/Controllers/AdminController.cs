@@ -596,7 +596,7 @@ namespace EmpInfo.Controllers
             dep.FIsDeleted = true;
             db.SaveChanges();
 
-            WriteEventLog("部门管理", "删除部门："+depNum);
+            WriteEventLog("部门管理", "删除部门：" + depNum);
             return Json(new SimpleResultModel() { suc = true, msg = "部门删除成功" });
         }
 

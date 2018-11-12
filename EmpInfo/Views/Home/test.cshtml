@@ -1,28 +1,649 @@
-﻿
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>信利员工信息查询系统</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/toastr.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/skins/square/blue.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/fontawesome/fontcss/font-awesome.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/login.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/particles.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/animate.min.css")" />
+
+    <style type="text/css">
+        body, div, p, h1, h2, h3, h4, h5, h6, legend, input, button, a, label, span {
+            font-family: 'Microsoft YaHei','Courier New',Arial;
+        }
+    </style>
+
+
+    <script src="@Url.Content("~/Scripts/jquery-1.11.3.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/toastr.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/icheck.js")"></script>
+    <script src="@Url.Content("~/Scripts/placeholders.js")"></script>
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="@Url.Content("~/Scripts/html5shiv.min.js")"></script>
+      <script src="@Url.Content("~/Scripts/respond.min.js")"></script>
+    <![endif]-->
+
     <script>
-        function getId() {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-                console.log("enumerateDevices() not supported.");
-                return;
+        document.onkeydown = function (event) {
+            var e = event || window.event || arguments.callee.caller.arguments[0];
+            if (e && e.keyCode == 13) { // enter 键
+                if ($("#password").val() == "") {
+                    $("#password").focus();
+                } else if ($("#validateCode").val() == "") {
+                    $("#validateCode").focus();
+                } else {
+                    $("#btn_submit").click();
+                }
             }
-
-            // List cameras and microphones.
-
-            navigator.mediaDevices.enumerateDevices()
-            .then(function (devices) {
-                devices.forEach(function (device) {
-                    $("#xs").append("<div>"+device.kind + ": " + device.label +
-                                " id = " + device.deviceId +"</div>");
-                    console.log(device.kind + ": " + device.label +
-                                " id = " + device.deviceId);
+        };
+        var currentStep = 0;
+        var cardNumber = "";
+        $(function () {
+            $("#rememberMe").iCheck({
+                checkboxClass: 'icheckbox_square-blue',
+                //radioClass: 'iradio_square-blue'
+            });
+            $("#validateImage").click(function () {
+                $(this).attr("src", "@Url.Content("~/Account/getImage")" + "?" + Math.random());
+            });
+            $("#validateImage").click();
+            $("#btn_submit").click(function () {
+                var rememberDay = 1;
+                if ($("#rememberMe:checked").length == 1) {
+                    rememberDay = 30;
+                }
+                $(this).button('loading');
+                $.post("@Url.Content("~/Account/Login")", {
+                    username: $("#userName").val(),
+                    password: $("#password").val(),
+                    code: $("#validateCode").val(),
+                    rememberDay: rememberDay,
+                    userPlatform: navigator.platform,
+                    userAgent:navigator.userAgent
+                }, function (res) {
+                    $("#btn_submit").button('reset');
+                    if (!res.suc) {
+                        showMsg(res.msg);
+                    } else {
+                        if (res.msg == "ResetPassword") {
+                            showMsg("系统检测到你的密码过于简单，请设置成复杂密码");
+                            //弹出密码设置窗口
+                            $("#passwordModal").modal("show");
+                        } else {
+                            var urlParam = window.location.search;
+                            //排除掉微信自动添加的?from=wx
+                            if (urlParam.length > 0 & urlParam.indexOf("from=wx")<0) {
+                                var url = unescape(urlParam.substr(urlParam.indexOf("=") + 1));
+                                window.location.href = "@Url.Content("~/")" + url;
+                            } else {
+                                window.location.href = "@Url.Content("~/Home/index")";
+                            }
+                        }
+                    }
                 });
-            })
-            .catch(function (err) {
-                $("#xs").append("<div>" + err.name + ": " + err.message + "</div>");
-                console.log(err.name + ": " + err.message);
+            });
+
+            //注册链接的点击事件
+            $("#registerLink").click(function () {
+                currentStep = 0;
+                gotoNextStep();
+                $("#registerModal").modal();
+            });
+            //下一步按钮点击事件，主要处理用户信息的验证
+            $("#nextStepBut").click(function () {
+                if (currentStep == 1) {
+                    cardNumber = $("#cardNumber").val();
+                    if (cardNumber.length < 6) {
+                        toastr.error("请输入合法的厂牌编码");
+                        return;
+                    }
+                    $.post("@Url.Content("~/Account/ValidateCardNumber")", { card_no: cardNumber }, function (data) {
+                        if (data.suc) {
+                            gotoNextStep();
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                } else if (currentStep == 2) {
+                    var idNumber = $("#idNumber").val();
+                    var name = $("#registerName").val();
+                    if (idNumber.length != 6) {
+                        toastr.error("请输入最后6位身份证号码");
+                        return;
+                    }
+                    if (name == "") {
+                        toastr.error("请输入姓名");
+                        return;
+                    }
+                    $.post("@Url.Content("~/Account/ValidateIDNumber")", { card_no: cardNumber, id_number: idNumber, name: name }, function (data) {
+                        if (data.suc) {
+                            if (data.phone == "") {
+                                $("#phoneNumber").attr("placeholder", "手机号码不存在");
+                                $("#phoneNumber").attr("readonly", "readonly");
+                            } else {
+                                $("#phoneNumberSuffix").html(data.phone);
+                            }
+                            if (data.email == "") {
+                                $("#emailAddress").attr("placeholder", "email地址没有登记,不能验证");
+                                $("#emailCode").attr("readonly", "readonly");
+                                $("#sendEmailCodeBt").attr("disabled", "disabled");
+                            } else {
+                                $("#emailAddress").val(data.email);
+                            }
+                            gotoNextStep();
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                } else if (currentStep == 3) {
+                    var phoneNumber = $("#phoneNumber").val();
+                    var emailCode = $("#emailCode").val();
+                    if (phoneNumber == "" && emailCode == "") {
+                        toastr.error("手机号码与邮箱验证必须至少输入一项才可以验证通过。如果两者都没有在人事系统登记或信息有变动，请联系人事部更新或补全信息");
+                        return;
+                    }
+                    $.post("@Url.Content("~/Account/ValidatePhoneAndEmail")", { card_no: cardNumber, phone_number: phoneNumber, email_code: emailCode }, function (data) {
+                        if (data.suc) {
+                            $("#idNumber").val(data.id_number);
+                            gotoNextStep();
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                } else if (currentStep == 4) {
+                    var registerpassword = $("#registerpassword").val();
+                    var registerpassword2 = $("#registerpassword2").val();
+                    if (registerpassword.length < 6) {
+                        toastr.error("密码长度必须不少于6个字符");
+                        return;
+                    }
+                    if (registerpassword != registerpassword2) {
+                        toastr.error("确认密码与密码不一致");
+                        return;
+                    }
+                    $.post("@Url.Content("~/Account/FinishRegister")", { card_no: cardNumber, password: registerpassword }, function (data) {
+                        if (data.suc) {
+                            $("#registerModal").modal("hide");
+                            $("#userName").val(cardNumber);
+                            toastr.success(data.msg);
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                }
+            });
+
+            //注册发送邮箱验证码按钮事件
+            $("#sendEmailCodeBt").click(function () {
+                var self = this;
+                if ($("#emailAddress").val() == "") {
+                    toastr.error("邮箱地址不存在");
+                    return;
+                }
+                SendEmailCode(this, $("#emailAddress").val(), $("#registerName").val());
+            });
+
+            //修改密码
+            $("#passwordResetBtn").click(function () {
+                var newPass = $("#newPassword").val();
+                var confirmPass = $("#confirmNewPassword").val();
+                if (newPass.length < 6) {
+                    showMsg("新密码的长度至少为6位");
+                    return;
+                }
+                if (newPass != confirmPass) {
+                    showMsg("新密码和确认新密码不一致，修改失败");
+                    return;
+                }
+                $.post("@Url.Content("~/Account/ResetPassword")", { card_no: $("#userName").val(), newPass: $("#newPassword").val() }, function (data) {
+                    if (data.suc) {
+                        $("#passwordModal").modal("hide");
+                    }
+                    showMsg(data.msg);
+                });
+            });
+
+            //忘记密码
+            $("#forgetPassword").click(function () {
+                var cardNo = $("#userName").val();
+                if (cardNo == "") {
+                    toastr.error("请先输入厂牌号");
+                    return;
+                }
+                @*$.post("@Url.Content("~/Account/UserHasEmail")", { card_no: cardNo }, function (data) {
+                    if (data.suc) {
+                        $("#r_email_addr").val(data.extra);*@
+                        $("#ResetActiveModal").modal("show");
+                        toastr.info("请先验证用户信息");
+                //    } else {
+                //        toastr.error(data.msg);
+                //    }
+                //})
+            });
+
+            //忘记密码发送邮箱验证码
+            $("#resetSendCodeBtn").click(function () {
+                SendEmailCode(this, $("#r_email_addr").val(), $("#userName").val());
+            });
+
+            //忘记密码信息验证
+            $("#resetActiveBtn").click(function () {
+                var opType = $("#op_type").val();
+                var idNumber = $("#r_id_number").val();
+                //var emailCode = $("#r_email_code").val();
+                var bankCardNumber=$("#r_bank_number").val();
+
+                if (idNumber == "") {
+                    toastr.error("请输入完整身份证号");
+                    $("#r_id_number").focus();
+                    return;
+                }
+
+                if(bankCardNumber==""){
+                    toastr.error("请输入发放工资的银行卡号");
+                    $("#r_bank_number").focus();
+                    return;
+                }
+
+                //if (emailCode == "") {
+                //    toastr.error("请输入邮箱验证码");
+                //    $("#r_email_code").focus();
+                //    return;
+                //}
+
+                $.post("@Url.Content("~/Account/ResetValidate")", {
+                    card_no: $("#userName").val(),
+                    //email_code: emailCode,
+                    idNumber: idNumber,
+                    opType: opType,
+                    bankCardNumber: bankCardNumber
+                }, function (data) {
+                    if (data.suc) {
+                        $("#ResetActiveModal").modal("hide");
+                        toastr.success(data.msg);
+                        if ("1" == data.extra) {
+                            //弹出密码设置窗口
+                            $("#passwordModal").modal("show");
+                        }
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+        });
+        //登陆错误显示信息
+        function showMsg(msg) {
+            $("#password").val("");
+            $("#validateCode").val("");
+            $("#validateImage").click();
+            toastr.error(msg);
+        }
+        //下一步界面的变化事件
+        function gotoNextStep() {
+            currentStep++;
+            if (currentStep <= 3) {
+                hideAllStep();
+                showAStep(currentStep);
+                $("#nextStepText").html("下一步");
+            } else {
+                //最后一步，显示所有，并修改按钮字样为完成注册
+                showAllStep();
+                $("#nextStepText").html("完成注册");
+            }
+            showRegisterTip(currentStep);
+        }
+        function hideAllStep() {
+            for (var i = 1; i <= 4; i++) {
+                $("#step" + i).hide();
+            }
+        }
+        function showAStep(st) {
+            $("#step" + st).fadeIn(500);
+        }
+        function showAllStep() {
+            for (var i = 1; i <= 4; i++) {
+                $("#step" + i).fadeIn(500);
+            }
+            //将验证码div去掉
+            $("#emailCodeDiv").remove();
+        }
+        //注册提示信息
+        function showRegisterTip(st) {
+            var tip = "";
+            switch (st) {
+                case 1:
+                    tip = "第1步（共4步），请输入厂牌编码";
+                    break;
+                case 2:
+                    tip = "第2步（共4步），请输入你的姓名和身份证号码后6位";
+                    break;
+                case 3:
+                    tip = "第3步（共4步），验证在人事系统中登记的手机号码或邮箱，其中一项通过即可";
+                    break;
+                case 4:
+                    tip = "第4步（共4步），确认以下信息，并录入登录密码（至少6位字符）";
+                    break;
+                default:
+                    tip = "正在处理中......";
+            }
+            $("#registertip").html(tip);
+        }
+        
+        //发送邮箱验证码
+        function SendEmailCode(bt, email_addr, user_name) {
+            $(bt).button('loading');
+            $.post("@Url.Content("~/Account/SendValidateEmail")", { name: user_name, email: email_addr },
+            function (data) {
+                if (data.suc) {
+                    toastr.success(data.msg);
+                    var blockTime = 60;
+                    var inter_id = self.setInterval(function () {
+                        $(bt).html(--blockTime);
+                        $(bt).attr("disabled", "disabled");
+                        if (blockTime < 1) {
+                            clearInterval(inter_id);
+                            $(bt).button("reset");
+                        }
+                    }, 1000);
+                } else {
+                    toastr.error(data.msg);
+                }
             });
         }
-        getId();
     </script>
 
-<div id="xs"></div>
+</head>
+<body>
+
+    <div id="particles-js">
+        
+        <div class="panel panel-primary" id="div_signin" style="max-width:420px;margin:60px auto 0 auto;position:absolute;left:0;right:0;opacity:0.9;">
+            <div class="panel-heading" id="signin_title">
+                <h3 class="panel-title"><span class="fa fa-delicious" aria-hidden="true"></span>
+                <span>信利员工信息查询平台</span>
+                </h3>
+            </div>
+            <div class="panel-body" id="sigin_body">
+                <div class="form-signin" id="form_signin">                    
+                    <label for="userName" class="sr-only">用户名</label>
+                    <div class="input-group">
+                        <div class="input-group-addon"><span class="glyphicon glyphicon-user"></span></div>
+                        <input type="text" id="userName" name="userName" class="form-control" placeholder="请输入厂牌" autocomplete="off" required autofocus />
+                    </div>
+                    <label for="password" class="sr-only">密码</label>
+                    <div class="input-group">
+                        <div class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></div>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="请输入密码" required />
+                        <div class="input-group-addon" style="background-color:white;font-size:12px;padding-left:6px;padding-right:7px;width:100px;">
+                            <a href="#" id="forgetPassword">禁用/忘记密码?</a>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-addon"><span class="glyphicon glyphicon-knight"></span></div>
+                        <label for="validateCode" class="sr-only">验证码</label>
+                        <input type="text" id="validateCode" name="validateCode" class="form-control" placeholder="请输入验证码" autocomplete="off" required />
+                        <div class="input-group-addon" style="background-color:white;width:100px;">
+                            <img title="点击刷新图片" alt="click to reflesh picture" id="validateImage" style="cursor:pointer;" src="@Url.Content("~/Account/getImage")" />
+                        </div>
+                    </div>
+                    <div style="margin:5px 0 0 40px;">
+                        <input type="checkbox" name="rememberMe" id="rememberMe" /><span class="text-info small"> 30日免登陆，请勿在共用设备勾选此项</span>
+                    </div>                                   
+                    <button class="btn btn-primary btn-lg btn-block" style="margin-top:5px;" id="btn_submit" data-loading-text="登陆中...">
+                        <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> 登 陆
+                    </button>
+                    <p style="margin-top:5px;">
+                        <div class="text-center">
+                            没有用户？<a href="#" class="text-info" id="registerLink">点此进入注册</a>
+                            &nbsp;&nbsp;
+                            操作指引：<a href="@Url.Content("~/Content/doc/员工信息查询操作指引V1.0.pdf")" class="text-info">点此查看下载</a>
+                        </div>
+                    </p>
+                    <p class="text-info small">
+                        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                        此系统支持安卓、苹果手机或平板自带浏览器以及Chrome、IE10+桌面浏览器；登陆或操作如有问题可联系系统管理员：李逸焊（3006；liyihan.ic@truly.com.cn)
+                    </p>
+                    <p class="text-info small">
+                        <i class="fa fa-android"></i> 安卓APP版本：<a href="@ViewData["appUrl"]" target="_blank">点此下载</a><span class="text-danger"> (已停止更新)</span>
+                    </p>
+                    <p class="text-danger small">
+                        <i class="fa fa-info-circle"></i> 关注并绑定[信利e家]微信公众号后，可在微信端免密登陆此系统
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+        @*注册对话框*@
+    <div class="modal fade" id="registerModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="exampleModalLabel">用户注册</h4>
+                </div>
+                <div class="modal-body">
+                    @*当前注册步骤*@
+                    <input type="hidden" id="currentStep" />
+                    <div class="text-info" style="margin-bottom:10px;">
+                        <span class="glyphicon glyphicon-info-sign"></span>
+                        <span id="registertip"></span>
+                    </div>
+                    <form>
+                        <div id="step1">
+                            <div class="form-group">
+                                <label for="cardNumber" class="sr-only">厂牌编码:</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-credit-card"></span>
+                                    </span>
+                                    <input type="text" class="form-control" id="cardNumber" placeholder="在此处输入你的厂牌编码" autofocus />
+                                </div>
+                            </div>
+                        </div>
+                        <div id="step2">
+                            <div class="form-group">
+                                <label for="registerName" class="sr-only">姓名：</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-user"></span>
+                                    </span>
+                                    <input type="text" class="form-control" id="registerName" placeholder="在此处输入你的姓名" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="idNumber" class="sr-only">身份证号码:</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-modal-window"></span>
+                                    </span>
+                                    <input type="text" class="form-control" id="idNumber" maxlength="6" placeholder="在此处输入你的身份证号码后6位" />
+                                </div>
+                            </div>
+                        </div>
+                        <div id="step3">
+                            <div class="form-group">
+                                <label for="phoneNumber" class="sr-only">手机号码：</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-phone"></span>
+                                        <span id="phoneNumberSuffix"></span>
+                                    </span>
+                                    <input type="text" class="form-control" id="phoneNumber" maxlength="4" placeholder="在此处输入你的手机号码后4位" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="emailAddress" class="sr-only">邮箱地址：</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-envelope"></span>
+                                    </span>
+                                    <input type="text" class="form-control" id="emailAddress" readonly />
+                                </div>
+                            </div>
+                            <div class="form-group" id="emailCodeDiv">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-pawn"></span>
+                                    </span>
+                                    <input type="text" class="form-control" id="emailCode" placeholder="在此处输入邮箱中的验证码">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" id="sendEmailCodeBt" data-loading-text="邮件发送中...">发送验证码</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="step4">
+                            <div class="form-group">
+                                <label for="registerpassword" class="sr-only">密码</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></div>
+                                    <input type="password" id="registerpassword" class="form-control" placeholder="请输入密码" required />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="registerpassword2" class="sr-only">确认密码</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></div>
+                                    <input type="password" id="registerpassword2" class="form-control" placeholder="请再次确认密码" required />
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button id="nextStepBut" type="button" class="btn btn-success">
+                        <span class="glyphicon glyphicon-step-forward"></span>
+                        <span id="nextStepText">下一步</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*设置复杂密码对话框*@
+    <div class="modal fade" id="passwordModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">设置复杂密码</h4>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="form-group">
+                            <label for="registerpassword" class="sr-only">新密码</label>
+                            <div class="input-group">
+                                <div class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></div>
+                                <input type="password" id="newPassword" class="form-control" placeholder="请输入新密码" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerpassword2" class="sr-only">确认新密码</label>
+                            <div class="input-group">
+                                <div class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></div>
+                                <input type="password" id="confirmNewPassword" class="form-control" placeholder="请再次确认密码" required />
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-warning"><i class="fa fa-warning"></i> 说明:从2016-10-20号开始实行密码复杂化，密码至少为6位，且必须包含英文字母、数字。如:abc123 </p>
+
+                </div>
+                <div class="modal-footer">
+                    <button id="passwordResetBtn" type="button" class="btn btn-success">
+                        <i class="fa fa-check"></i> 确认修改
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*重置密码与解禁对话框*@
+    <div class="modal fade" id="ResetActiveModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="ResetActiveModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">解禁 & 重置密码</h4>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="form-group">
+                            <label for="op_type" class="sr-only">操作类型</label>
+                            <div class="input-group">
+                                <div class="input-group-addon"><span class="fa fa-question-circle"></span></div>
+                                <select class="form-control" id="op_type" required>
+                                    <option value="active_reset">解禁 & 重置密码</option>
+                                    <option value="active">只解禁</option>
+                                    <option value="reset">只重置密码</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="r_id_number" class="sr-only">身份证号</label>
+                            <div class="input-group">
+                                <div class="input-group-addon"><span class="fa fa-credit-card"></span></div>
+                                <input type="text" id="r_id_number" class="form-control" placeholder="请输入完整身份证号" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="r_id_number" class="sr-only">工资银行卡号</label>
+                            <div class="input-group">
+                                <div class="input-group-addon"><span class="fa fa-bank"></span></div>
+                                <input type="text" id="r_bank_number" class="form-control" placeholder="请输入发放工资的银行卡号" required />
+                            </div>
+                        </div>
+                        @*<div class="form-group">
+                            <label for="r_email_addr" class="sr-only">邮箱地址：</label>
+                            <div class="input-group">
+                                <div class="input-group-addon"><span class="fa fa-envelope"></span></div>
+                                <input type="text" class="form-control" id="r_email_addr" readonly />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon"><span class="glyphicon glyphicon-pawn"></span></div>
+                                <input type="text" class="form-control" id="r_email_code" placeholder="在此处输入邮箱中的验证码">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" id="resetSendCodeBtn" data-loading-text="邮件发送中...">发送验证码</button>
+                                </span>
+                            </div>
+                        </div>*@
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="resetActiveBtn" type="button" class="btn btn-success">
+                        <i class="fa fa-check"></i> 确认
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="@Url.Content("~/Scripts/particles.js")"></script>
+    <script>
+        particlesJS.load('particles-js', '@Url.Content("~/Scripts/particles.json")', function () {            
+            $("#div_signin").addClass("animated zoomInDown");
+        });
+    </script>
+</body>
+</html>

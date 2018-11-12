@@ -109,61 +109,21 @@
             if (!validateForm()) {
                 return;
             }
-
-            $("#hasAttachment").val($("#al_file_list").children().length > 0);
-            $(this).button("loading");
-            var formParam = $("#alForm").serialize();
-            $.ajax({
-                type: 'post',
-                url: '@Url.Content("~/Apply/GetALFlowQueue")',
-                data: formParam,
-                cache: false,
-                dataType: 'json',
-                success: function (data) {
-                    if (data.suc) {
-                        var q = data.list;
-                        queue = q;
-                        var div = "";
-                        var canSelectAuditor = false;
-                        var depNo = $("#eDepNum").val();
-                        if (depNo.indexOf("212") == 0 || depNo.indexOf("21501") == 0 || depNo.indexOf("10112") == 0) {
-                            canSelectAuditor = true;
-                        }
-                        for (var i = 0; i < q.length; i++) {
-                            div += "<div>" + q[i].step + ".";
-                            div += "【" + q[i].step_name + "】 <span class='auditors'>" + q[i].auditors + "</span>";
-                            if (q[i].auditors.indexOf(";") >= 0 && q[i].countersign != true && canSelectAuditor) {
-                                div += " <span class='changeAuditor text-primary' data-idx= '" + i + "' style='cursor:pointer;'>修改审核人</span>"
-                            }
-                            div += "</div>";
-                        }
-                        openConfirmDialog(div, function () {
-                            $("#apply_bt").button("loading");
-                            $.ajax({
-                                type: 'post',
-                                url: '@Url.Content("~/Apply/SaveApplyAL")',
-                                data: formParam + "&auditor_queues=" + JSON.stringify(queue),
-                                cache: false,
-                                dataType: 'json',
-                                success: function (data) {
-                                    $("#apply_bt").button("reset");
-                                    if (data.suc) {
-                                        toastr.success("提交成功:" + data.msg);
-                                        setTimeout(function () { window.location.href = "@string.Concat(Url.Content("~/Apply/ApplyIndex?billType=AL&billName="),Uri.EscapeDataString("请假申请单"))"; }, 2000);
-                                    } else {
-                                        toastr.error("提交失败：" + data.msg);
-                                        $("#apply_bt").button("reset");
-                                    }
-
-                                }
-                            });
-                        }, "审批流程预览", "返回修改", "确认提交");
-                    } else {
-                        toastr.error(data.msg);
-                    }
-                    $("#apply_bt").button("reset");
+            var beginDateNum = Date.parse($("#beginTime").val().replace(/-/g, "/"));
+            if (isNaN(beginDateNum)) {
+                toastr.error("[开始时间]不合日期规则");
+                return;
+            } else {
+                if (new Date(beginDateNum).getMonth() != new Date().getMonth()) {
+                    //如果开始请假日期不是本月，需要用户再确认 2018-08-08
+                    openConfirmDialog("请假开始日期不是本月份，是否确认要继续提交？", function () {
+                        setTimeout(function () { BeginApply(); }, 500);
+                    });
+                } else {
+                    BeginApply();
                 }
-            });
+            }
+            
         });
 
         //选择审批人员
@@ -226,8 +186,8 @@
             toastr.error("[小时]必须填写大于0的数字");
             return false;
         }
-        if (hours > 24) {
-            toastr.error("[小时]必须少于24小时")
+        if (parseFloat(hours) >= 24) {
+            toastr.error("[小时]必须少于24小时");
         }
         if ($($("input[name='leave_type']:checked")[0]).val() == "年假") {
             if (hours % 4 != 0) {
@@ -252,6 +212,7 @@
             return false;
         }
         return true;
+        
     }
 
     function showDepName() {
@@ -263,6 +224,64 @@
         }
         openMessageDialog("<div>名称：<span class='text-danger'>" + name + "</span></div><div>编码：<span class='text-danger'>" + no + "</span></div>", "当前所选部门信息");
     }
+
+    function BeginApply() {
+        $("#hasAttachment").val($("#al_file_list").children().length > 0);
+        $(this).button("loading");
+        var formParam = $("#alForm").serialize();
+        $.ajax({
+            type: 'post',
+            url: '@Url.Content("~/Apply/GetALFlowQueue")',
+            data: formParam,
+            cache: false,
+            dataType: 'json',
+            success: function (data) {
+                if (data.suc) {
+                    var q = data.list;
+                    queue = q;
+                    var div = "";
+                    var canSelectAuditor = false;
+                    var depNo = $("#eDepNum").val();
+                    if (depNo.indexOf("212") == 0 || depNo.indexOf("21501") == 0 || depNo.indexOf("10112") == 0) {
+                        canSelectAuditor = true;
+                    }
+                    for (var i = 0; i < q.length; i++) {
+                        div += "<div>" + q[i].step + ".";
+                        div += "【" + q[i].step_name + "】 <span class='auditors'>" + q[i].auditors + "</span>";
+                        if (q[i].auditors.indexOf(";") >= 0 && q[i].countersign != true && canSelectAuditor) {
+                            div += " <span class='changeAuditor text-primary' data-idx= '" + i + "' style='cursor:pointer;'>修改审核人</span>"
+                        }
+                        div += "</div>";
+                    }
+                    openConfirmDialog(div, function () {
+                        $("#apply_bt").button("loading");
+                        $.ajax({
+                            type: 'post',
+                            url: '@Url.Content("~/Apply/SaveApplyAL")',
+                            data: formParam + "&auditor_queues=" + JSON.stringify(queue),
+                            cache: false,
+                            dataType: 'json',
+                            success: function (data) {
+                                $("#apply_bt").button("reset");
+                                if (data.suc) {
+                                    toastr.success("提交成功:" + data.msg);
+                                    setTimeout(function () { window.location.href = "@Url.Content("~/Apply/ApplyIndex?billType=AL")"; }, 2000);
+                                } else {
+                                    toastr.error("提交失败：" + data.msg);
+                                    $("#apply_bt").button("reset");
+                                }
+
+                            }
+                        });
+                    }, "审批流程预览", "返回修改", "确认提交");
+                } else {
+                    toastr.error(data.msg);
+                }
+                $("#apply_bt").button("reset");
+            }
+        });
+    }
+
 </script>
 
     <script>
@@ -320,6 +339,9 @@
             //上传队列出错提示
             uploader.on("error", function (type) {
                 switch (type) {
+                    case "Q_TYPE_DENIED":
+                        toastr.error("图片格式不正确");
+                        break;
                     case "F_EXCEED_SIZE":
                         toastr.error("单个文件大小必须少于10M");
                         break;
@@ -373,7 +395,7 @@
                     <li><span class="glyphicon glyphicon-hand-right"></span></li>
                     <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
                     <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-                    <li><a href="@string.Concat(Url.Content("~/Apply/ApplyIndex?billType=AL&billName="),Uri.EscapeDataString("请假申请单"))">请假申请单</a></li>
+                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=AL")">请假申请单</a></li>
                     <li class="active">开始申请</li>
                 </ol>
             </div>
@@ -454,27 +476,28 @@
                         <div style="display:inline-block;width:70%;vertical-align:top;">
                             <div class="input-group date" id="beginTimePicker">
                                 <span class="input-group-addon">从 </span>
-                                <input class="form-control" type="text" id="beginTime" name="from_date" />
-                                <span class="input-group-addon"><span class="fa fa-calendar"></span> </span>
+                                <input class="form-control" type="text" id="beginTime" name="from_date" autocomplete="off"/>
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
                             </div>
                             <div class="input-group date" id="endTimePicker">
                                 <span class="input-group-addon">到 </span>
-                                <input class="form-control" type="text" id="endTime" name="to_date" />
-                                <span class="input-group-addon"><span class="fa fa-calendar"></span> </span>
+                                <input class="form-control" type="text" id="endTime" name="to_date" autocomplete="off"/>
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
                             </div>
-                            <div style="display:inline-block;width:50%;">                       
+                            <div style="display:inline-block;width:52%;">                       
                                 <div class="input-group">
                                     <span class="input-group-addon">共</span>
                                     <input class="form-control" type="text" id="days" name="work_days" style="padding-left:4px;padding-right:4px;" />
                                     <span class="input-group-addon">天</span>
                                 </div>
                             </div>
-                            <div style="display:inline-block;width:48%;margin-left:-5px;">                       
+                            <div style="display:inline-block;width:46%;margin-left:-5px;">                       
                                 <div class="input-group">
                                     <input class="form-control" type="text" id="hours" name="work_hours" style="padding-left:4px;padding-right:4px;" />
                                     <span class="input-group-addon">小时</span>
                                 </div>
                             </div>
+                            <div><input type="checkbox" name="is_continue" value="true" /> 延假（如紧接上一次请假，请务必勾选) </div>
                         </div>
                         <p class="small text-danger"><i class="fa fa-info-circle"></i> 例如：请假1天就是1天0小时；请假1天半写1天4小时</p>
                     </div>

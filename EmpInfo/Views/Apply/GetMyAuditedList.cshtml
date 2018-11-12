@@ -2,6 +2,7 @@
     List<EmpInfo.FlowSvr.FlowAuditListModel> list = (List<EmpInfo.FlowSvr.FlowAuditListModel>)ViewData["list"];
 }
 @section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <style type="text/css">
         #auditDiv .subTitle {
             font-size: small;
@@ -9,6 +10,61 @@
             color: gray;
         }
     </style>
+}
+@section Scripts {
+    @*加入以下js，使IE8支持datetimepicker组件*@
+    <script>
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function (elt /*, from*/) {
+                var len = this.length >>> 0;
+
+                var from = Number(arguments[1]) || 0;
+                from = (from < 0)
+                     ? Math.ceil(from)
+                     : Math.floor(from);
+                if (from < 0)
+                    from += len;
+
+                for (; from < len; from++) {
+                    if (from in this &&
+                        this[from] === elt)
+                        return from;
+                }
+                return -1;
+            };
+        }
+    </script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script>
+        $(function () {
+            $(".form_date").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd",
+                autoclose: true,
+                todayBtn: true,
+                startView: 2,
+                minView: 2
+            });
+            //设置日期联动，结束日期不能大于起始日期
+            $("#fromDatePicker1").on("changeDate", function (e) {
+                $('#toDatePicker1').datetimepicker('setStartDate', e.date);
+            });
+            $("#toDatePicker1").on("changeDate", function (e) {
+                $('#fromDatePicker1').datetimepicker('setEndDate', e.date);
+            });
+
+            $("#checkBt").on("click", function () {
+                window.location.href = "@Url.Content("~/Apply/CheckMyAuditedList?")"
+                + "billType=" + "@ViewData["billType"]" + "&"
+                + "fromDate=" + $("#from_date").val() + "&"
+                + "toDate=" + $("#to_date").val() + "&"
+                + "sysNo=" + $("#sysNo").val() + "&"
+                + "cardNo=" + $("#cardNo").val();
+            });
+
+        });
+    </script>
 }
 
 <div class="panel panel-success" id="auditDiv">
@@ -22,12 +78,40 @@
     </div>
     <div class="panel-body">
 
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
+                            <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                            <input class="form-control" type="text" id="from_date" name="from_date" placeholder="申请起始日期" readonly value="@ViewData["fromDate"]">
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
+                            <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                            <input class="form-control" type="text" id="to_date" name="to_date" placeholder="申请结束日期" readonly value="@ViewData["toDate"]">
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-6">
+                        <input type="text" class="form-control" placeholder="此处可输入申请流水号" id="sysNo"  value="@ViewData["sysNo"]"/>
+                    </div>
+                    <div class="col-xs-12 col-sm-6">
+                        <input type="text" class="form-control" placeholder="此处可输入申请人厂牌" id="cardNo"  value="@ViewData["cardNo"]"/>
+                    </div>
+                </div>
+                <div style="margin-top:8px;">
+                    <button class="btn btn-block btn-success" id="checkBt"><i class="fa fa-check"></i> 开始查询</button>
+                </div>
+            </div>
+        </div>
+
         @if (list.Count() == 0) {
             <p class="text-center text-warning">暂没有我的已办记录</p>
         }
         else {
-            <h4 class="text-danger"><i>可以查看到最近一年内的已办记录:</i> </h4>
-            <hr />
+            <div class="text-danger"><i>以下是符合筛选条件的已办记录:</i> </div>
+            <hr style="margin:4px;" />
 
             <table class="table table-hover">
                 <thead>
