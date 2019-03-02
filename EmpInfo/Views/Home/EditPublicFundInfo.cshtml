@@ -1,0 +1,215 @@
+﻿@using EmpInfo.Models;
+@{
+    ei_public_fund fund = ViewData["info"] as ei_public_fund;
+    List<public_fund_item> items = ViewData["items"] as List<public_fund_item>;
+}
+@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 80px;
+            color:deepskyblue;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+
+            .b-div input, .b-div select {
+                display: inline;
+                width: 70%;
+            }
+    </style>
+}
+@section Scripts{
+    @if (fund != null) {
+        <script>
+            $(function () {
+                $("select[name='empSex']").val('@fund.性别');
+                $("select[name='job']").val('@(fund.职业??"")');
+                $("select[name='jobTitle']").val('@(fund.职称??"")');
+                $("select[name='jobContent']").val('@(fund.职务??"")');
+
+                @if (items.Where(i => i.type == "婚姻状况" && i.code == fund.婚姻状况).Count() > 0) {
+                    <text> $("select[name='mariageStatus']").val('@fund.婚姻状况'); </text>
+                }
+                @if (items.Where(i => i.type == "学历" && i.code == fund.学历).Count() > 0) {
+                    <text> $("select[name='educationLevel']").val('@(fund.学历??"")'); </text>
+                }
+                $("#submitBtn").on("click", function (e) {
+                    e.preventDefault();
+                    var isBreak = false;
+                    $("#fundForm input,#fundForm select").each(function (idx, ele) {
+                        if ($(ele).attr("required") && $.trim($(ele).val()) == "") {
+                            var lable = $(ele).prev("span").html().split('<')[0];
+                            toastr.error("[" + lable + "]不能为空值");
+                            $(ele).focus();
+                            isBreak = true;
+                            return false;
+                        }
+                    });
+                    if (isBreak) {
+                        return;
+                    }
+                    var telephone = $("input[name='telephone']").val();
+                    if (telephone.length != 11 || isNaN(telephone)) {
+                        toastr.error("[手机号码]的长度必须为11位数字");
+                        return;
+                    }
+
+                    var postcode = $("input[name='postcode']").val();
+                    if (postcode.length != 6 || isNaN(postcode)) {
+                        toastr.error("[邮政编码]的长度必须为6位数字");
+                        return;
+                    }
+
+                    $.ajax({
+                        type: 'post',
+                        url: 'SavePublicFundInfo',
+                        data: $("#fundForm").serialize(),
+                        cache: false,
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.suc) {
+                                toastr.success(data.msg);
+                            } else {
+                                toastr.error(data.msg);
+                            }
+                        }
+                    });
+
+
+                });
+
+            });
+        </script>
+    }
+}
+@if (fund == null) {
+    <h2 class="text-danger">系统查询不到您的公积金账户，如有问题，请联系行政部。</h2>
+}
+else {
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                <li class="active">公积金信息</li>
+            </ol>
+        </div>
+        <div class="panel-body">
+            <h4 class="text-danger"><i class="fa fa-info-circle"></i> 请完善以下个人公积金基本信息：</h4>
+            <form id="fundForm">
+                <div class="row">
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">姓名:</span>
+                            <input type="text" class="form-control" name="empName" value="@fund.姓名" disabled />
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">姓名全拼<span class="text-danger">*</span>:</span>
+                            <input type="text" class="form-control" name="empNamePY" value="@fund.姓名全拼" placeholder="请输入姓名的拼音全拼" required />
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">性别<span class="text-danger">*</span>:</span>
+                            <select class="form-control" name="empSex" required>
+                                <option value="1">男</option>
+                                <option value="2">女</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">固定电话:</span>
+                            <input type="text" class="form-control" name="phone" value="@fund.固定电话号码" placeholder="请输入座机号码" />
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">手机号码<span class="text-danger">*</span>:</span>
+                            <input type="number" class="form-control" name="telephone" value="@(fund.手机号码.Length==11?fund.手机号码:"")" placeholder="请输入11位手机号码" required />
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">婚姻状况<span class="text-danger">*</span>:</span>
+                            <select class="form-control" name="mariageStatus" required>
+                                <option value="" selected disabled>请在下拉列表中选择</option>
+                                @foreach (var m in items.Where(i => i.type == "婚姻状况")) {
+                                    <option value="@m.code">@m.text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">职业<span class="text-danger">*</span>:</span>
+                            <select class="form-control" name="job" required>
+                                <option value="" selected disabled>请在下拉列表中选择</option>
+                                @foreach (var m in items.Where(i => i.type == "职业")) {
+                                    <option value="@m.code">@m.text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">职称<span class="text-danger">*</span>:</span>
+                            <select class="form-control" name="jobTitle" required>
+                                <option value="" selected disabled>请在下拉列表中选择</option>
+                                @foreach (var m in items.Where(i => i.type == "职称")) {
+                                    <option value="@m.code">@m.text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">职务<span class="text-danger">*</span>:</span>
+                            <select class="form-control" name="jobContent" required>
+                                <option value="" selected disabled>请在下拉列表中选择</option>
+                                @foreach (var m in items.Where(i => i.type == "职务")) {
+                                    <option value="@m.code">@m.text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">学历<span class="text-danger">*</span>:</span>
+                            <select class="form-control" name="educationLevel" required>
+                                <option value="" selected disabled>请在下拉列表中选择</option>
+                                @foreach (var m in items.Where(i => i.type == "学历")) {
+                                    <option value="@m.code">@m.text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">邮政编码<span class="text-danger">*</span>:</span>
+                            <input type="number" class="form-control" name="postcode" value="@fund.邮政编码" placeholder="请输入6位邮政编码" required />
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">家庭住址<span class="text-danger">*</span>:</span>
+                            <input type="text" class="form-control" name="familyAddr" value="@fund.家庭住址" placeholder="请输入家庭住址" required />
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">家庭月收入:</span>
+                            <input type="number" class="form-control" name="familyIncome" value="@fund.家庭月收入" placeholder="请输入家庭月收入" />
+                        </div>
+                    </div>
+                </div>
+                <button class="form-control btn btn-info btn-block" style="margin-top:8px;" id="submitBtn"><i class="fa fa-save"></i> 保存公积金信息</button>
+            </form>
+        </div>
+    </div>
+}

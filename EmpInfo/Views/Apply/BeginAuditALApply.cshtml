@@ -17,8 +17,8 @@
             $("#opinionOpt").on("change", function () {
                 $("#opinion").val($("#opinionOpt").val());
             });
-            $("#opinionOpt").val("同意！");
-            $("#opinionOpt").trigger("change");
+            //$("#opinionOpt").val("同意！");
+            //$("#opinionOpt").trigger("change");
         });
         function audit(isPass) {
             openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此申请吗？", function () {

@@ -37,26 +37,35 @@
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
     <script>
-        $(function () {
-            $(".form_date").datetimepicker({
-                language: 'zh-CN',
-                format: "yyyy-mm-dd",
-                autoclose: true,
-                todayBtn: true,
-                startView: 2,
-                minView: 2
-            });
-            //设置日期联动，结束日期不能大于起始日期
-            $("#fromDatePicker1").on("changeDate", function (e) {
-                $('#toDatePicker1').datetimepicker('setStartDate', e.date);
-            });
-            $("#toDatePicker1").on("changeDate", function (e) {
-                $('#fromDatePicker1').datetimepicker('setEndDate', e.date);
+    $(function () {
+        $(".form_date").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            todayBtn: true,
+            startView: 2,
+            minView: 2
+        });
+        //设置日期联动，结束日期不能大于起始日期
+        $("#fromDatePicker1").on("changeDate", function (e) {
+            $('#toDatePicker1').datetimepicker('setStartDate', e.date);
+        });
+        $("#toDatePicker1").on("changeDate", function (e) {
+            $('#fromDatePicker1').datetimepicker('setEndDate', e.date);
+        });
+
+        $("#checkBt").on("click", function () {
+            window.location.href = "@Url.Content("~/Apply/CheckMyAuditedList?")"
+            + "billType=" + "@ViewData["billType"]" + "&"
+                + "fromDate=" + $("#from_date").val() + "&"
+                + "toDate=" + $("#to_date").val() + "&"
+                + "sysNo=" + $("#sysNo").val() + "&"
+                + "cardNo=" + $("#cardNo").val();
             });
 
-            $("#checkBt").on("click", function () {
-                window.location.href = "@Url.Content("~/Apply/CheckMyAuditedList?")"
-                + "billType=" + "@ViewData["billType"]" + "&"
+            $("#exportExcelBt").on("click", function () {
+                toastr.info("请稍等，不要重复点击，正在导出......");
+                window.location.href = "@Url.Content("~/Report/BeginExportALAuditedExcel?")"
                 + "fromDate=" + $("#from_date").val() + "&"
                 + "toDate=" + $("#to_date").val() + "&"
                 + "sysNo=" + $("#sysNo").val() + "&"
@@ -111,8 +120,12 @@
         }
         else {
             <div class="text-danger"><i>以下是符合筛选条件的已办记录:</i> </div>
+            
             <hr style="margin:4px;" />
-
+            if ((string)ViewData["billType"]== "AL") {
+                <button class="btn btn-default pull-right" id="exportExcelBt"><i class="fa fa-file-excel-o"></i> 导出到excel</button>
+                <div class="clearfix"></div>
+            }
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -133,6 +146,21 @@
                     }
                 </tbody>
             </table>
+            @*if ((string)ViewData["billType"] == "AL") {
+                var group = (from l in list
+                             where l.finalResult == "成功"
+                             group l by l.title into g
+                             select new
+                             {
+                                 title = g.Key,
+                                 count = g.Count()
+                             }).ToList();
+                string groupInfo = "";
+                foreach (var g in group) {
+                    groupInfo += g.title + "：" + g.count + "例； ";
+                }
+                <div class="text-success" style="padding-left:8px;font-size:16px;">汇总信息： @groupInfo</div>
+            }*@
         }
 
     </div>

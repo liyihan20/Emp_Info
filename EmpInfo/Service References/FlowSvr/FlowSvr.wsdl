@@ -319,6 +319,7 @@
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="formJson" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="billType" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -403,31 +404,19 @@
         </s:complexType>
       </s:element>
       <s:element name="TestGetAuditQueue">
-        <s:complexType />
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="depNo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
       </s:element>
       <s:element name="TestGetAuditQueueResponse">
         <s:complexType>
           <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="TestGetAuditQueueResult" type="tns:ArrayOfFlow_applyEntryQueue" />
+            <s:element minOccurs="0" maxOccurs="1" name="TestGetAuditQueueResult" type="tns:FlowResultModel" />
           </s:sequence>
         </s:complexType>
       </s:element>
-      <s:complexType name="ArrayOfFlow_applyEntryQueue">
-        <s:sequence>
-          <s:element minOccurs="0" maxOccurs="unbounded" name="flow_applyEntryQueue" nillable="true" type="tns:flow_applyEntryQueue" />
-        </s:sequence>
-      </s:complexType>
-      <s:complexType name="flow_applyEntryQueue">
-        <s:sequence>
-          <s:element minOccurs="1" maxOccurs="1" name="id" type="s:int" />
-          <s:element minOccurs="0" maxOccurs="1" name="sys_no" type="s:string" />
-          <s:element minOccurs="1" maxOccurs="1" name="step" nillable="true" type="s:int" />
-          <s:element minOccurs="0" maxOccurs="1" name="step_name" type="s:string" />
-          <s:element minOccurs="0" maxOccurs="1" name="auditors" type="s:string" />
-          <s:element minOccurs="1" maxOccurs="1" name="countersign" nillable="true" type="s:boolean" />
-          <s:element minOccurs="1" maxOccurs="1" name="flow_template_entry_id" nillable="true" type="s:int" />
-        </s:sequence>
-      </s:complexType>
     </s:schema>
   </wsdl:types>
   <wsdl:message name="StartWorkFlowSoapIn">

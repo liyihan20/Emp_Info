@@ -1,0 +1,366 @@
+﻿@using EmpInfo.Models;
+@{    
+    List<vw_crReport> list = (List<vw_crReport>)ViewData["list"];
+    CRSearchParam p = ViewData["sm"] as CRSearchParam;
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <style type="text/css">
+        .tdText {
+            text-align: right;
+            font-style: italic;
+            padding-right: 10px;
+        }
+
+        .b-label {
+            display: inline-block;
+            width: 80px;
+            vertical-align: top;
+            color: gray;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+
+        .dateSpan, .dayTime {
+            cursor: pointer;
+        }
+    </style>
+}
+@section Scripts {
+    @*加入以下js，使IE8支持datetimepicker组件*@
+    <script>
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function (elt /*, from*/) {
+                var len = this.length >>> 0;
+
+                var from = Number(arguments[1]) || 0;
+                from = (from < 0)
+                     ? Math.ceil(from)
+                     : Math.floor(from);
+                if (from < 0)
+                    from += len;
+
+                for (; from < len; from++) {
+                    if (from in this &&
+                        this[from] === elt)
+                        return from;
+                }
+                return -1;
+            };
+        }
+    </script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script>
+        var currentTr;
+    $(function () {
+        //选择部门
+        $("#depName").on("click", function () {
+            openSelectDepDialog(1, function (selectedDep) {
+                console.log(selectedDep);
+                $("#depName").val(selectedDep.depLongName);
+                $("#depId").val(selectedDep.depId);
+            });
+        });
+        $(".form_date").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            todayBtn: true,
+            startView: 2,
+            minView: 2
+        });
+        //设置日期联动，结束日期不能大于起始日期
+        $("#fromDatePicker1").on("changeDate", function (e) {
+            $('#toDatePicker1').datetimepicker('setStartDate', e.date);
+        });
+        $("#toDatePicker1").on("changeDate", function (e) {
+            $('#fromDatePicker1').datetimepicker('setEndDate', e.date);
+        });
+
+
+        $("input.check1,input.check2").on("change", function () {
+            var isChecked = $(this).is(":checked");
+            var sysNo = sysNo = $(this).attr("data-sn");
+            var which = $(this).hasClass("check1");
+            checkFlag(sysNo, which ? "1" : "2", isChecked);
+        });
+
+        $("#alReportBt").on("click", function () {
+            $(this).button("loading");
+            $("#alCheckBt").addClass("disabled");
+            exportDatas("BeginExportCRExcel");
+
+            window.setTimeout(function () {
+                $("#alReportBt").button("reset");
+                $("#alCheckBt").removeClass("disabled");
+            }, 15 * 1000);
+
+        });
+
+        $("#alCheckBt").on("click", function () {            
+            exportDatas("CheckCRDatas",1);
+        });
+
+        //下一页按钮
+        $("#nextLink").click(function () {
+            var currentP = parseInt($("#currentPage").html());
+            var totalP = parseInt($("#totalPage").html());
+            if (currentP == totalP) return;
+            exportDatas("CheckCRDatas",++currentP);
+        });
+
+        //上一页按钮
+        $("#previousLink").click(function () {
+            var currentP = parseInt($("#currentPage").html());
+            if (currentP == 1) return;
+            exportDatas("CheckCRDatas", --currentP);
+        });
+
+        $("#auditStatus").val("@p.auditStatus");
+
+    });
+
+    function exportDatas(method,page) {
+        var depId = $("#depId").val();
+        var fd = $("#from_date").val();
+        var td = $("#to_date").val();
+
+        if (depId == "") {
+            toastr.error("请先选择部门");            
+            return;
+        }
+        if (fd == "") {
+            toastr.error("请先选择起始日期");            
+            return;
+        }
+        if (td == "") {
+            toastr.error("请先选择结束日期");            
+            return;
+        }
+        window.location.href = "@Url.Content("~/Report/")" + method
+            + "?depId=" + depId
+            + "&fromDate=" + fd
+            + "&toDate=" + td
+            + "&auditStatus=" + escape($("#auditStatus").val())            
+            + "&empName=" + escape($("#empName").val())            
+            + "&salaryNo=" + escape($("#salaryNo").val())
+            + (page ? "&currentPage=" + page : "")
+        ;
+
+
+    }
+
+    function checkFlag(sysNo, which, checked) {
+        $.post("@Url.Content("~/Report/SetCRFlag")", {
+            sysNo: sysNo,
+            which: which,
+            isChecked: checked
+        }, function (data) {
+            if (!data.suc) {
+                toastr.error(data.msg);
+            }
+        });
+    }
+        
+    </script>
+
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Home/EleProcess")">电子公司专用流程</a></li>
+            <li class="active">考勤补记报表</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <i class="text-danger"> <i class="fa fa-info-circle"></i> 输入查询条件之后，可查询或导出excel报表:</i>
+        <table style="width:100%;margin-bottom:12px;">
+            <tr>
+                <td style="width:10%;" class="tdText">
+                    职员部门：
+                </td>
+                <td style="width:30%;">
+                    <input type="text" class="form-control" id="depName" style="margin-top:6px;" value="@p.depName" />
+                    <input type="hidden" id="depId" value="@p.depId"/>
+                </td>
+                <td style="width:10%;" class="tdText">
+                    起始日期：
+                </td>
+                <td style="width:20%;">
+                    <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" id="from_date" name="from_date" placeholder="请输入起始日期" readonly value="@p.fromDate">
+                    </div>
+                </td>
+                <td style="width:10%;" class="tdText">
+                    结束日期：
+                </td>
+                <td style="width:20%;">
+                    <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" id="to_date" name="to_date" placeholder="请输入结束日期" readonly value="@p.toDate">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="tdText">
+                    流程状态：
+                </td>
+                <td>
+                    <select class="form-control" id="auditStatus" name="auditStatus">
+                        <option value="所有">所有</option>
+                        <option value="已通过">已通过</option>
+                        <option value="已拒绝">已拒绝</option>
+                        <option value="审批中">审批中</option>
+                        <option value="已撤销">已撤销</option>
+                    </select>
+                </td>
+                <td class="tdText">
+                    职员姓名：
+                </td>
+                <td><input type="text" class="form-control" id="empName" value="@p.empName"/> </td>
+                <td class="tdText">
+                    工资条码：
+                </td>
+                <td>
+                    <input type="text" class="form-control" id="salaryNo" value="@p.salaryNo" />
+                </td>
+            </tr>            
+        </table>
+        <div class="btn-group btn-group-justified" role="group">
+            <div class="btn-group" role="group">
+                <button class="btn btn-primary" id="alCheckBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
+            </div>
+            <div class="btn-group" role="group">
+                <button class="btn btn-success" id="alReportBt" data-loading-text="导出中..."><i class="fa fa-file-excel-o"></i> 导出报表</button>
+            </div>
+        </div>
+        @if (list != null) {
+            if (list.Count() > 0) {
+                <div style="margin-top:18px;"><i class="text-danger"> <i class="fa fa-info-circle"></i> 排序规则：申请日期升序</i></div>
+                <table style="width:100%;" class="table table-condensed table-hover">
+                    <tr>
+                        <th style="width:5%;" class="text-center">
+                            行号
+                        </th>
+                        <th style="width:18%;">
+                            申请时间/状态
+                        </th>
+                        <th style="width:12%;">
+                            流水号
+                        </th>
+                        <th style="width:15%;">
+                            申请人
+                        </th>
+                        <th style="width:8%;">
+                            条形码
+                        </th>
+                        <th style="width:23%;">
+                            漏刷日期/原因
+                        </th>
+                        <th style="width:12%;">
+                            漏刷时间
+                        </th>
+                        <th style="width:7%;">
+                            标识
+                        </th>
+                    </tr>
+                    @{
+                int ln = ((int)ViewData["currentPage"] - 1) * 100;
+                string trClass = "";
+                    }
+                    @foreach (var l in list) {
+                        switch (l.status) {
+                            case "已通过":
+                                trClass = "success";
+                                break;
+                            case "已拒绝":
+                                trClass = "danger";
+                                break;
+                            case "已撤销":
+                                trClass = "warning";
+                                break;
+                            default:
+                                trClass = "";
+                                break;
+                        }
+                        <tr class="@trClass">
+                            <td class="text-center">
+                                @(++ln)
+                            </td>
+                            <td>
+                                @(((DateTime)l.apply_time).ToString("MM-dd HH:mm")) / <span class="status">@l.status</span>
+                            </td>
+                            <td>
+                                <span class="sysNo">@l.sys_no</span>
+                            </td>
+                            <td>
+                                @string.Concat(l.applier_name, "(", l.applier_num, ")")
+                            </td>
+                            <td>
+                                @l.salary_no
+                            </td>
+                            <td>
+                                @(((DateTime)l.forgot_date).ToString("yyyy-MM-dd"))
+                            </td>
+                            <td>
+                                @l.forgot_time
+                            </td>
+                            <td>
+                                @if (l.check1 == true) {
+                                    <input type="checkbox" class="check1" data-sn="@l.sys_no" checked style="zoom:120%;" />
+                                }
+                                else {
+                                    <input type="checkbox" class="check1" data-sn="@l.sys_no" style="zoom:120%;" />
+                                }
+                                @if (l.check2 == true) {
+                                    <input type="checkbox" class="check2" data-sn="@l.sys_no" checked style="zoom:120%;" />
+                                }
+                                else {
+                                    <input type="checkbox" class="check2" data-sn="@l.sys_no" style="zoom:120%;" />
+                                }
+
+                            </td>
+                        </tr>
+                        <tr class="@trClass">
+                            <td style="border-top-width:0;"></td>
+                            <td colspan="4" style="border-top-width:0;">
+                                @l.dep_long_name
+                            </td>
+                            <td style="border-top-width:0;">
+                                @l.reason
+                            </td>
+                            <td style="border-top-width:0;">
+                                <span> </span>
+                            </td>
+                            <td style="border-top-width:0;">
+                                <a target="_blank" href="@string.Concat(Url.Content("~/Apply/CheckCRApply?sysNo="),l.sys_no)">详情</a>
+                            </td>
+                        </tr>
+                    }
+                </table>
+                <nav>
+                    <ul class="pager">
+                        <li><a href="#" id="previousLink">&larr; 上一页</a></li>
+                        <li>第<span id="currentPage">@ViewData["currentPage"]</span>页，共<span id="totalPage">@ViewData["totalPage"]</span>页</li>
+                        <li><a href="#" id="nextLink">下一页 &rarr;</a></li>
+                    </ul>
+                </nav>
+            }
+            else {
+                <p class="text-center text-warning" style="margin-top:20px;">查询不到符合条件的记录</p>
+            }
+        }
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_SelectDep")
+}

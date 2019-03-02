@@ -496,7 +496,7 @@ namespace EmpInfo.Controllers
         }
 
         public JsonResult CheckSalaryDetail(string yearMonth)
-        {            
+        {
             DateTime firstDay = DateTime.Parse(yearMonth + "-01");
             DateTime lastDay = firstDay.AddMonths(1);
             yearMonth = yearMonth.Replace("-", "");
@@ -509,6 +509,7 @@ namespace EmpInfo.Controllers
             return Json(new { suc = true, result = result });
         }
 
+        [SessionTimeOutFilter]
         public ActionResult CheckMonthSalary(string param)
         {
             int salaryNo = int.Parse(userInfoDetail.salaryNo);
@@ -517,12 +518,51 @@ namespace EmpInfo.Controllers
                 ViewBag.tip = "参数出错";
                 return View("Error");
             }
-            ViewData["yearMonth"] = dt.ToString("yyyy-MM");                       
+            ViewData["yearMonth"] = dt.ToString("yyyy-MM");
 
             return View();
         }
 
         #endregion
+
+        #region 公积金信息维护
+
+        public ActionResult EditPublicFundInfo()
+        {
+            ViewData["info"] = db.ei_public_fund.Where(e => e.证件号码 == userInfoDetail.idNumber).FirstOrDefault();
+            ViewData["items"] = db.public_fund_item.ToList();
+            return View();
+        }
+
+        public JsonResult SavePublicFundInfo(PublicFundModel m)
+        {
+            var info = db.ei_public_fund.Where(e => e.证件号码 == userInfoDetail.idNumber).FirstOrDefault();
+            info.手机号码 = m.telephone;
+            info.固定电话号码 = m.phone;
+            info.婚姻状况 = m.mariageStatus;
+            info.家庭月收入 = m.familyIncome;
+            info.家庭住址 = m.familyAddr;
+            info.性别 = m.empSex;
+            info.姓名全拼 = m.empNamePY;
+            info.学历 = m.educationLevel;
+            info.邮政编码 = m.postcode;
+            info.职称 = m.jobTitle;
+            info.职务 = m.jobContent;
+            info.职业 = m.job;
+
+            try {
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new { suc = false, msg = ex.Message });
+            }
+
+            WriteEventLog("个人公积金信息", "保存成功");
+            return Json(new { suc = true, msg = "保存成功！" });
+        }
+
+        #endregion
+
 
         public ActionResult test()
         {
@@ -560,6 +600,13 @@ namespace EmpInfo.Controllers
 
             ViewData["isDepReporter"] = db.ei_department.Where(d => d.FReporter.Contains(userInfo.cardNo)).Count() > 0;
 
+            return View();
+        }
+
+        [SessionTimeOutFilter]
+        public ActionResult EleProcess()
+        {
+            ViewData["isDepReporter"] = db.ei_department.Where(d => d.FReporter.Contains(userInfo.cardNo)).Count() > 0;
             return View();
         }
 

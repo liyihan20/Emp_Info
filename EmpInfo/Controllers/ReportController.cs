@@ -17,6 +17,8 @@ namespace EmpInfo.Controllers
     public class ReportController : BaseController
     {
 
+        #region 请假流程报表
+
         [SessionTimeOutFilter]
         public ActionResult ALReport()
         {
@@ -72,9 +74,10 @@ namespace EmpInfo.Controllers
             
             
             var myData = from v in db.vw_askLeaveReport
-                         join dl in db.ei_department.Where(d => d.FNumber.StartsWith(dep.FNumber)) on v.dep_no equals dl.FNumber
+                         //join dl in db.ei_department.Where(d => d.FNumber.StartsWith(dep.FNumber)) on v.dep_no equals dl.FNumber
                          where
-                         v.from_date <= toDate && v.to_date >= fromDate
+                         v.dep_no.StartsWith(dep.FNumber)
+                         && v.from_date <= toDate && v.to_date >= fromDate
                          && (auditStatus == "所有" || v.status == auditStatus)
                          && (eLevel == -1 || v.emp_level == eLevel)
                          select v;
@@ -101,7 +104,8 @@ namespace EmpInfo.Controllers
             int totalRecord = datas.Count();
             var totalPage = Math.Ceiling((totalRecord * 1.0) / pageSize);
 
-            var list = datas.OrderBy(m => m.from_date).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            //排序由请假日期改为申请日期
+            var list = datas.OrderBy(m => m.apply_time).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
             var dep = db.ei_department.Single(d => d.id == depId);
 
             var sm = new ALSearchParam()
@@ -129,7 +133,8 @@ namespace EmpInfo.Controllers
         [SessionTimeOutFilter]
         public void BeginExportALExcel(int depId, DateTime fromDate, DateTime toDate, string auditStatus, int eLevel, string empName = "", string sysNum = "", string salaryNo = "")
         {
-            var myData = GetALDatas(depId, fromDate, toDate, auditStatus, eLevel, empName, sysNum, salaryNo).OrderBy(m => m.from_date).ToList();
+            //排序改为按照提交日期，2018-11-27;2019-01-02,本来是在数据库排序，改为在服务器内存中排序，大大提高了查询速度，并解决了死锁问题。
+            var myData = GetALDatas(depId, fromDate, toDate, auditStatus, eLevel, empName, sysNum, salaryNo).ToList().OrderBy(m => m.apply_time).ToList();
             var dep = db.ei_department.Single(d => d.id == depId);
 
             ushort[] colWidth = new ushort[] { 10, 20, 12, 16, 16, 60, 12, 10, 18, 18,
@@ -194,7 +199,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, string.IsNullOrEmpty(d.agent_man)?"":(d.agent_man_name + "(" + d.agent_man + ")"));
                 cells.Add(rowIndex, ++colIndex, string.IsNullOrEmpty(d.inform_man) ? "" : (d.inform_man_name + "(" + d.inform_man + ")"));
                 cells.Add(rowIndex, ++colIndex, d.sys_no);
-                cells.Add(rowIndex, ++colIndex, GetUserNameAndCardByCardNum(d.current_auditors));
+                cells.Add(rowIndex, ++colIndex, d.current_auditors);
                 cells.Add(rowIndex, ++colIndex, d.check1 == true ? "Y" : "");
                 cells.Add(rowIndex, ++colIndex, d.check2 == true ? "Y" : "");
                 cells.Add(rowIndex, ++colIndex, string.Format("http://emp.truly.com.cn/Emp/Apply/CheckALApply?sysNo={0}", d.sys_no));
@@ -292,6 +297,77 @@ namespace EmpInfo.Controllers
             xls.Send();
         }
 
+        [SessionTimeOutFilter]
+        public void BeginExportALAuditedExcel(string fromDate, string toDate, string sysNo = "", string cardNo = "")
+        {
+            DateTime fromDateDt, toDateDt;
+            if (!DateTime.TryParse(fromDate, out fromDateDt)) {
+                fromDateDt = DateTime.Now.AddMonths(-1);
+            }
+            if (!DateTime.TryParse(toDate, out toDateDt)) {
+                toDateDt = DateTime.Now;
+            }
+
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            var myData = new List<FlowAuditListModel>();
+            
+            myData = flow.GetAuditList(userInfo.cardNo, sysNo, cardNo, "", "", fromDateDt.ToShortDateString(), toDateDt.ToShortDateString(), new ArrayOfInt() { 1, -1 }, new ArrayOfInt() { 10 }, new ArrayOfString() { "AL" }, 300).ToList();
+            myData.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
+            
+            WriteEventLog("已办Excel", "导出请假已办记录");
+
+            ushort[] colWidth = new ushort[] { 20, 16, 40, 12, 18, 16 };
+
+            string[] colName = new string[] { "申请人", "申请时间", "请假时间", "类型", "流水号", "审批结果" };
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "请假已办列表";
+            Worksheet sheet = xls.Workbook.Worksheets.Add("已办数据列表");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in myData) {
+                colIndex = 1;
+
+                //"申请人", "申请时间", "请假时间", "类型", "流水号", "审批结果"
+                cells.Add(++rowIndex, colIndex, d.applier);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.applyTime).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.subTitle);
+                cells.Add(rowIndex, ++colIndex, d.title);
+                cells.Add(rowIndex, ++colIndex, d.sysNo);
+                cells.Add(rowIndex, ++colIndex, d.auditResult);                
+            }
+
+            xls.Send();
+        }
+
         [SessionTimeOutJsonFilter]
         public JsonResult SetALFlag(string sysNo,int which,bool isChecked){
 
@@ -366,6 +442,10 @@ namespace EmpInfo.Controllers
 
         }
 
+        #endregion
+
+        #region 夜间出货
+
         [SessionTimeOutFilter]
         public ActionResult PrintUC(string sysNo)
         {
@@ -379,6 +459,8 @@ namespace EmpInfo.Controllers
             WriteEventLog("非正常时间出货", "打印申请单：" + sysNo);
             return View();
         }
+
+        #endregion
 
         #region 辅助、基干人员查询
 
@@ -498,6 +580,545 @@ namespace EmpInfo.Controllers
 
         #endregion
 
+        #region 电子调休流程
+
+        [SessionTimeOutFilter]
+        public ActionResult SVReport()
+        {
+            var sm = new SVSearchParam();
+            var cookie = Request.Cookies["svReport"];
+            if (cookie == null) {
+                sm = new SVSearchParam()
+                {
+                    vFromDate = DateTime.Now.ToString("yyyy-MM-01"),
+                    vToDate = DateTime.Now.ToString("yyyy-MM-dd"),
+                    dFromDate = DateTime.Now.ToString("yyyy-MM-01"),
+                    dToDate = DateTime.Now.ToString("yyyy-MM-dd"),
+                    auditStatus = "所有"
+                };                
+            }
+            else {
+                sm = JsonConvert.DeserializeObject<SVSearchParam>(cookie.Values.Get("sm"));
+                sm.auditStatus = MyUtils.DecodeToUTF8(sm.auditStatus);
+                sm.empName = MyUtils.DecodeToUTF8(sm.empName);
+                sm.depName = MyUtils.DecodeToUTF8(sm.depName);
+                sm.salaryNo = string.IsNullOrEmpty(sm.salaryNo) ? "" : MyUtils.DecodeToUTF8(sm.salaryNo);
+                sm.sysNum = string.IsNullOrEmpty(sm.sysNum) ? "" : MyUtils.DecodeToUTF8(sm.sysNum);
+            }
+            
+            ViewData["sm"] = sm;
+            return View();
+        }
+
+        private IQueryable<vw_svReport> GetSVDatas(int depId, DateTime vFromDate, DateTime vToDate,DateTime dFromDate,DateTime dToDate, string auditStatus, string empName = "", string salaryNo = "")
+        {
+            var dep = db.ei_department.Single(d => d.id == depId);
+            empName = empName.Trim();
+            salaryNo = salaryNo.Trim();
+
+            //保存到cookie
+            var sm = new SVSearchParam()
+            {
+                depId = depId.ToString(),
+                depName = MyUtils.EncodeToUTF8(GetDepLongNameByNum(dep.FNumber)),
+                vFromDate = vFromDate.ToString("yyyy-MM-dd"),
+                vToDate = vToDate.ToString("yyyy-MM-dd"),
+                dFromDate = dFromDate.ToString("yyyy-MM-dd"),
+                dToDate = dToDate.ToString("yyyy-MM-dd"),
+                auditStatus = MyUtils.EncodeToUTF8(auditStatus),
+                empName = MyUtils.EncodeToUTF8(empName),
+                salaryNo = MyUtils.EncodeToUTF8(salaryNo)
+            };
+            var cookie = new HttpCookie("svReport");
+            cookie.Values.Add("sm", JsonConvert.SerializeObject(sm));
+            cookie.Expires = DateTime.Now.AddDays(7);
+            Response.AppendCookie(cookie);
+
+            vToDate = vToDate.AddDays(1);
+            dToDate = dToDate.AddDays(1);
+
+            var myData = from v in db.vw_svReport
+                         //join dl in db.ei_department.Where(d => d.FNumber.StartsWith(dep.FNumber)) on v.dep_no equals dl.FNumber
+                         where
+                         v.dep_no.StartsWith(dep.FNumber)
+                         && v.vacation_date_from <= vToDate && v.vacation_date_to >= vFromDate
+                         && v.duty_date_from <= dToDate && v.duty_date_to >= dFromDate
+                         && (auditStatus == "所有" || v.status == auditStatus)
+                         select v;
+
+            if (!string.IsNullOrEmpty(empName)) {
+                myData = myData.Where(m => m.applier_name == empName);
+            }            
+            if (!string.IsNullOrEmpty(salaryNo)) {
+                myData = myData.Where(m => m.salary_no == salaryNo);
+            }
+
+            WriteEventLog("调休报表", "开始查询");
+            return myData;
+        }
+
+        [SessionTimeOutFilter]
+        public ActionResult CheckSVDatas(int depId, DateTime vFromDate, DateTime vToDate, DateTime dFromDate, DateTime dToDate, string auditStatus, string empName = "", string salaryNo = "", int currentPage = 1)
+        {
+            int pageSize = 100;
+            var datas = GetSVDatas(depId, vFromDate, vToDate,dFromDate,dToDate, auditStatus, empName, salaryNo);
+            int totalRecord = datas.Count();
+            var totalPage = Math.Ceiling((totalRecord * 1.0) / pageSize);
+            
+            var list = datas.OrderBy(m => m.apply_time).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            var dep = db.ei_department.Single(d => d.id == depId);
+
+            var sm = new SVSearchParam()
+            {
+                depId = depId.ToString(),
+                depName = GetDepLongNameByNum(dep.FNumber),
+                vFromDate = vFromDate.ToString("yyyy-MM-dd"),
+                vToDate = vToDate.ToString("yyyy-MM-dd"),
+                dFromDate = dFromDate.ToString("yyyy-MM-dd"),
+                dToDate = dToDate.ToString("yyyy-MM-dd"),
+                auditStatus = auditStatus,
+                empName = empName,
+                salaryNo = salaryNo
+            };
+
+            ViewData["sm"] = sm;
+            ViewData["list"] = list;
+            ViewData["currentPage"] = currentPage;
+            ViewData["totalPage"] = totalPage;
+
+            return View("SVReport");
+        }
+
+        [SessionTimeOutFilter]
+        public void BeginExportSVExcel(int depId, DateTime vFromDate, DateTime vToDate, DateTime dFromDate, DateTime dToDate, string auditStatus, string empName = "", string salaryNo = "")
+        {
+            var myData = GetSVDatas(depId, vFromDate, vToDate, dFromDate, dToDate, auditStatus, empName, salaryNo).OrderBy(m => m.apply_time).ToList();
+            var dep = db.ei_department.Single(d => d.id == depId);
+
+            ushort[] colWidth = new ushort[] { 10, 20, 12, 16, 60, 18, 18,
+                                               18, 18, 24, 20, 24, 10, 10 };
+
+            string[] colName = new string[] { "状态", "申请人", "条形码", "申请时间", "部门",  "值班开始日期", "值班结束日期", 
+                                              "调休开始日期", "调休结束日期", "原因", "流水号","当前审核人","标志1","标志2" };
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = dep.FName + "调休信息";
+            Worksheet sheet = xls.Workbook.Worksheets.Add("调休数据列表");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in myData) {
+                colIndex = 1;
+
+                //"状态", "申请人", "条形码", "申请时间", "部门",  "值班开始日期", "值班结束日期"
+                //"调休开始日期", "调休结束日期", "原因", "流水号","当前审核人","标志1","标志2"
+                cells.Add(++rowIndex, colIndex, d.status);
+                cells.Add(rowIndex, ++colIndex, d.applier_name + "(" + d.applier_num + ")");
+                cells.Add(rowIndex, ++colIndex, d.salary_no);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.dep_long_name);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.duty_date_from).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.duty_date_to).ToString("yyyy-MM-dd HH:mm"));
+
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.vacation_date_from).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.vacation_date_to).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.reason);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, GetUserNameAndCardByCardNum(d.current_auditors));
+                cells.Add(rowIndex, ++colIndex, d.check1 == true ? "Y" : "");
+                cells.Add(rowIndex, ++colIndex, d.check2 == true ? "Y" : "");
+            }
+            xls.Send();
+        }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult SetSVFlag(string sysNo, int which, bool isChecked)
+        {
+
+            var al = db.ei_SVApply.Single(a => a.sys_no == sysNo);
+            if (which == 1) {
+                al.check1 = isChecked;
+            }
+            else if (which == 2) {
+                al.check2 = isChecked;
+            }
+            else {
+                return Json(new SimpleResultModel() { suc = false, msg = "参数错误" });
+            }
+            try {
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+
+            WriteEventLog("调休报表:" + sysNo, "设置标志：" + which + ":" + isChecked);
+            return Json(new SimpleResultModel() { suc = true });
+        }
+
+        #endregion
+
+        #region 电子漏刷卡流程
+
+        [SessionTimeOutFilter]
+        public ActionResult CRReport()
+        {
+            var sm = new CRSearchParam();
+            var cookie = Request.Cookies["crReport"];
+            if (cookie == null) {
+                sm = new CRSearchParam()
+                {
+                    fromDate = DateTime.Now.ToString("yyyy-MM-01"),
+                    toDate = DateTime.Now.ToString("yyyy-MM-dd"),
+                    auditStatus = "所有"
+                };
+            }
+            else {
+                sm = JsonConvert.DeserializeObject<CRSearchParam>(cookie.Values.Get("sm"));
+                sm.auditStatus = MyUtils.DecodeToUTF8(sm.auditStatus);
+                sm.empName = MyUtils.DecodeToUTF8(sm.empName);
+                sm.depName = MyUtils.DecodeToUTF8(sm.depName);
+                sm.salaryNo = string.IsNullOrEmpty(sm.salaryNo) ? "" : MyUtils.DecodeToUTF8(sm.salaryNo);
+                sm.sysNum = string.IsNullOrEmpty(sm.sysNum) ? "" : MyUtils.DecodeToUTF8(sm.sysNum);
+            }
+            
+            ViewData["sm"] = sm;
+            return View();
+        }
+
+        private IQueryable<vw_crReport> GetCRDatas(int depId, DateTime fromDate, DateTime toDate, string auditStatus, string empName = "", string salaryNo = "")
+        {
+            var dep = db.ei_department.Single(d => d.id == depId);
+            empName = empName.Trim();
+            salaryNo = salaryNo.Trim();
+
+            //保存到cookie
+            var sm = new CRSearchParam()
+            {
+                depId = depId.ToString(),
+                depName = MyUtils.EncodeToUTF8(GetDepLongNameByNum(dep.FNumber)),
+                fromDate = fromDate.ToString("yyyy-MM-dd"),
+                toDate = toDate.ToString("yyyy-MM-dd"),
+                auditStatus = MyUtils.EncodeToUTF8(auditStatus),
+                empName = MyUtils.EncodeToUTF8(empName),
+                salaryNo = MyUtils.EncodeToUTF8(salaryNo)
+            };
+            var cookie = new HttpCookie("crReport");
+            cookie.Values.Add("sm", JsonConvert.SerializeObject(sm));
+            cookie.Expires = DateTime.Now.AddDays(7);
+            Response.AppendCookie(cookie);
+
+            toDate = toDate.AddDays(1);
+
+            var myData = from v in db.vw_crReport
+                         //join dl in db.ei_department.Where(d => d.FNumber.StartsWith(dep.FNumber)) on v.dep_no equals dl.FNumber
+                         where
+                         v.dep_no.StartsWith(dep.FNumber)
+                         && v.forgot_date <= toDate && v.forgot_date >= fromDate
+                         && (auditStatus == "所有" || v.status == auditStatus)
+                         select v;
+
+            if (!string.IsNullOrEmpty(empName)) {
+                myData = myData.Where(m => m.applier_name == empName);
+            }
+            if (!string.IsNullOrEmpty(salaryNo)) {
+                myData = myData.Where(m => m.salary_no == salaryNo);
+            }
+
+            WriteEventLog("漏刷卡报表", "开始查询");
+            return myData;
+        }
+
+        [SessionTimeOutFilter]
+        public ActionResult CheckCRDatas(int depId, DateTime fromDate, DateTime toDate, string auditStatus, string empName = "", string salaryNo = "", int currentPage = 1)
+        {
+            int pageSize = 100;
+            var datas = GetCRDatas(depId, fromDate, toDate, auditStatus, empName, salaryNo);
+            int totalRecord = datas.Count();
+            var totalPage = Math.Ceiling((totalRecord * 1.0) / pageSize);
+
+            var list = datas.OrderBy(m => m.apply_time).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            var dep = db.ei_department.Single(d => d.id == depId);
+
+            var sm = new CRSearchParam()
+            {
+                depId = depId.ToString(),
+                depName = GetDepLongNameByNum(dep.FNumber),
+                fromDate = fromDate.ToString("yyyy-MM-dd"),
+                toDate = toDate.ToString("yyyy-MM-dd"),
+                auditStatus = auditStatus,
+                empName = empName,
+                salaryNo = salaryNo
+            };
+
+            ViewData["sm"] = sm;
+            ViewData["list"] = list;
+            ViewData["currentPage"] = currentPage;
+            ViewData["totalPage"] = totalPage;
+
+            return View("CRReport");
+        }
+
+        [SessionTimeOutFilter]
+        public void BeginExportCRExcel(int depId, DateTime fromDate, DateTime toDate, string auditStatus, string empName = "", string salaryNo = "")
+        {
+            var myData = GetCRDatas(depId, fromDate, toDate, auditStatus, empName, salaryNo).OrderBy(m => m.apply_time).ToList();
+            var dep = db.ei_department.Single(d => d.id == depId);
+
+            ushort[] colWidth = new ushort[] { 10, 20, 12, 16, 60, 12, 18,
+                                               14, 24, 20, 24,10,10 };
+
+            string[] colName = new string[] { "状态", "申请人", "条形码", "申请时间", "部门",  "漏刷日期", "漏刷时间", 
+                                              "原因", "备注", "流水号","当前审核人","标志1","标志2" };
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = dep.FName + "考勤补记信息";
+            Worksheet sheet = xls.Workbook.Worksheets.Add("考勤补记数据列表");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in myData) {
+                colIndex = 1;
+
+                //"状态", "申请人", "条形码", "申请时间", "部门",  "漏刷日期", "漏刷时间", 
+                //"原因", "备注", "流水号","当前审核人","标志1","标志2"
+                cells.Add(++rowIndex, colIndex, d.status);
+                cells.Add(rowIndex, ++colIndex, d.applier_name + "(" + d.applier_num + ")");
+                cells.Add(rowIndex, ++colIndex, d.salary_no);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.dep_long_name);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.forgot_date).ToString("yyyy-MM-dd"));
+                cells.Add(rowIndex, ++colIndex, d.forgot_time);
+
+                cells.Add(rowIndex, ++colIndex, d.reason);
+                cells.Add(rowIndex, ++colIndex, d.comment);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, GetUserNameAndCardByCardNum(d.current_auditors));
+                cells.Add(rowIndex, ++colIndex, d.check1 == true ? "Y" : "");
+                cells.Add(rowIndex, ++colIndex, d.check2 == true ? "Y" : "");
+            }
+            xls.Send();
+        }
+
+        [SessionTimeOutJsonFilter]
+        public JsonResult SetCRFlag(string sysNo, int which, bool isChecked)
+        {
+
+            var al = db.ei_CRApply.Single(a => a.sys_no == sysNo);
+            if (which == 1) {
+                al.check1 = isChecked;
+            }
+            else if (which == 2) {
+                al.check2 = isChecked;
+            }
+            else {
+                return Json(new SimpleResultModel() { suc = false, msg = "参数错误" });
+            }
+            try {
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+
+            WriteEventLog("漏刷卡报表:" + sysNo, "设置标志：" + which + ":" + isChecked);
+            return Json(new SimpleResultModel() { suc = true });
+        }
+
+        #endregion
+
+        #region
+
+        [SessionTimeOutFilter]
+        public ActionResult EPReport()
+        {
+            return View();
+        }
+
+        [SessionTimeOutJsonFilter]
+        public IQueryable<vw_epReport> GetEPDatas(DateTime fromDate, DateTime toDate, string applyStatus,string propertyNumber="",string busDepName="",string sysNo="")
+        {
+            toDate = toDate.AddDays(1);
+            var data = from v in db.vw_epReport
+                       where v.report_time >= fromDate
+                       && v.report_time <= toDate
+                       && v.property_number.Contains(propertyNumber)
+                       && v.bus_dep_name.Contains(busDepName)
+                       && v.sys_no.Contains(sysNo)
+                       && (applyStatus == "所有"
+                       || v.apply_status == applyStatus
+                       )
+                       orderby v.report_time
+                       select v;
+            return data;
+        }
+        
+        [SessionTimeOutFilter]
+        public ActionResult CheckEPDatas(DateTime fromDate, DateTime toDate, string applyStatus, string propertyNumber = "", string busDepName = "", string sysNo = "", int currentPage = 1)
+        {
+            int pageSize = 100;
+            var datas = GetEPDatas(fromDate, toDate, applyStatus,propertyNumber,busDepName,sysNo);
+            int totalRecord = datas.Count();
+            var totalPage = Math.Ceiling((totalRecord * 1.0) / pageSize);
+
+            var list = datas.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+            ViewData["list"] = list;
+            ViewData["currentPage"] = currentPage;
+            ViewData["totalPage"] = totalPage;
+
+            return View("EPReport");
+        }
+
+        public void BeginExportEPExcel(DateTime fromDate, DateTime toDate, string applyStatus, string propertyNumber = "", string busDepName = "", string sysNo = "")
+        {
+            var myData = GetEPDatas(fromDate, toDate, applyStatus, propertyNumber, busDepName, sysNo).ToList();
+            ushort[] colWidth = new ushort[] { 12, 16, 12, 12, 18, 12, 18, 24,
+                                               16, 16, 16, 16, 16, 16, 16,
+                                               16, 16, 16, 16, 16, 16, 16,
+                                               16, 16, 16, 16, 16, 16, 16,
+                                               16 };
+
+            string[] colName = new string[] { "状态", "申请流水号", "报修时间", "报修人", "联系电话", "事业部", "车间名称", "车间位置", 
+                                              "设备名称", "设备型号", "资产编号","设备供应商","生产主管","设备经理","紧急处理级别",
+                                              "故障现象", "接单时间","接单人","处理完成时间","维修人员","故障原因类别","故障原因",
+                                              "处理方法","更换配件","修理结果","其他维修人员","评价时间","评价生产主管","评价打分",
+                                              "评价内容" };
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "设备故障报修信息";
+            Worksheet sheet = xls.Workbook.Worksheets.Add("数据列表");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in myData) {
+                colIndex = 1;
+
+                //"状态", "申请流水号", "报修时间", "报修人", "联系电话", "事业部", "车间名称", "车间位置", 
+                //"设备名称", "设备型号", "资产编号","设备供应商","生产主管","设备经理","紧急处理级别",
+                //"故障现象", "接单时间","接单人","处理完成时间","维修人员","故障原因类别","故障原因",
+                //"处理方法","更换配件","修理结果","其他维修人员","评价时间","评价生产主管","评价打分",
+                //"评价内容"
+                cells.Add(++rowIndex, colIndex, d.apply_status);                
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.report_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.applier_name);
+                cells.Add(rowIndex, ++colIndex, d.applier_phone);
+                cells.Add(rowIndex, ++colIndex, d.bus_dep_name);
+                cells.Add(rowIndex, ++colIndex, d.produce_dep_name);
+                cells.Add(rowIndex, ++colIndex, d.produce_dep_addr);
+
+                cells.Add(rowIndex, ++colIndex, d.equitment_name);
+                cells.Add(rowIndex, ++colIndex, d.equitment_modual);
+                cells.Add(rowIndex, ++colIndex, d.property_number);
+                cells.Add(rowIndex, ++colIndex, d.equitment_supplier);
+                cells.Add(rowIndex, ++colIndex, d.produce_dep_charger_name);
+                cells.Add(rowIndex, ++colIndex, d.equitment_dep_charger_name);
+                cells.Add(rowIndex, ++colIndex, d.emergency_level);
+
+                cells.Add(rowIndex, ++colIndex, d.faulty_situation);
+                cells.Add(rowIndex, ++colIndex, d.accept_time==null?"":((DateTime)d.accept_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.accept_user_name);
+                cells.Add(rowIndex, ++colIndex, d.confirm_time == null ? "" : ((DateTime)d.confirm_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.confirm_user_name);
+                cells.Add(rowIndex, ++colIndex, d.faulty_type);
+                cells.Add(rowIndex, ++colIndex, d.faulty_reason);
+
+                cells.Add(rowIndex, ++colIndex, d.repair_method);
+                cells.Add(rowIndex, ++colIndex, d.exchange_parts);
+                cells.Add(rowIndex, ++colIndex, d.repair_result);
+                cells.Add(rowIndex, ++colIndex, d.other_repairers);
+                cells.Add(rowIndex, ++colIndex, d.evaluation_time == null ? "" : ((DateTime)d.evaluation_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.produce_dep_charger_name);
+                cells.Add(rowIndex, ++colIndex, d.evaluation_score);
+
+                cells.Add(rowIndex, ++colIndex, d.evaluation_content);
+            }
+            xls.Send();
+        }
+
+        #endregion
 
     }
 }

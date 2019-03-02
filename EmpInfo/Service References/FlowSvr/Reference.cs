@@ -798,150 +798,6 @@ namespace EmpInfo.FlowSvr {
         }
     }
     
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.CollectionDataContractAttribute(Name="ArrayOfFlow_applyEntryQueue", Namespace="http://ic.truly.com.cn/", ItemName="flow_applyEntryQueue")]
-    [System.SerializableAttribute()]
-    public class ArrayOfFlow_applyEntryQueue : System.Collections.Generic.List<EmpInfo.FlowSvr.flow_applyEntryQueue> {
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="flow_applyEntryQueue", Namespace="http://ic.truly.com.cn/")]
-    [System.SerializableAttribute()]
-    public partial class flow_applyEntryQueue : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        private int idField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string sys_noField;
-        
-        private System.Nullable<int> stepField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string step_nameField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string auditorsField;
-        
-        private System.Nullable<bool> countersignField;
-        
-        private System.Nullable<int> flow_template_entry_idField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public int id {
-            get {
-                return this.idField;
-            }
-            set {
-                if ((this.idField.Equals(value) != true)) {
-                    this.idField = value;
-                    this.RaisePropertyChanged("id");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public string sys_no {
-            get {
-                return this.sys_noField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.sys_noField, value) != true)) {
-                    this.sys_noField = value;
-                    this.RaisePropertyChanged("sys_no");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
-        public System.Nullable<int> step {
-            get {
-                return this.stepField;
-            }
-            set {
-                if ((this.stepField.Equals(value) != true)) {
-                    this.stepField = value;
-                    this.RaisePropertyChanged("step");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
-        public string step_name {
-            get {
-                return this.step_nameField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.step_nameField, value) != true)) {
-                    this.step_nameField = value;
-                    this.RaisePropertyChanged("step_name");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
-        public string auditors {
-            get {
-                return this.auditorsField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.auditorsField, value) != true)) {
-                    this.auditorsField = value;
-                    this.RaisePropertyChanged("auditors");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=5)]
-        public System.Nullable<bool> countersign {
-            get {
-                return this.countersignField;
-            }
-            set {
-                if ((this.countersignField.Equals(value) != true)) {
-                    this.countersignField = value;
-                    this.RaisePropertyChanged("countersign");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=6)]
-        public System.Nullable<int> flow_template_entry_id {
-            get {
-                return this.flow_template_entry_idField;
-            }
-            set {
-                if ((this.flow_template_entry_idField.Equals(value) != true)) {
-                    this.flow_template_entry_idField = value;
-                    this.RaisePropertyChanged("flow_template_entry_id");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(Namespace="http://ic.truly.com.cn/", ConfigurationName="FlowSvr.FlowSvrSoap")]
     public interface FlowSvrSoap {
@@ -1030,7 +886,7 @@ namespace EmpInfo.FlowSvr {
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestMyFlowList", ReplyAction="*")]
         EmpInfo.FlowSvr.TestMyFlowListResponse TestMyFlowList(EmpInfo.FlowSvr.TestMyFlowListRequest request);
         
-        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 TestGetAuditQueueResult 以后生成的消息协定未标记为 nillable
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 depNo 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestGetAuditQueue", ReplyAction="*")]
         EmpInfo.FlowSvr.TestGetAuditQueueResponse TestGetAuditQueue(EmpInfo.FlowSvr.TestGetAuditQueueRequest request);
     }
@@ -2142,11 +1998,15 @@ namespace EmpInfo.FlowSvr {
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string formJson;
         
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string billType;
+        
         public GetFlowQueueRequestBody() {
         }
         
-        public GetFlowQueueRequestBody(string formJson) {
+        public GetFlowQueueRequestBody(string formJson, string billType) {
             this.formJson = formJson;
+            this.billType = billType;
         }
     }
     
@@ -2595,10 +2455,17 @@ namespace EmpInfo.FlowSvr {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute()]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
     public partial class TestGetAuditQueueRequestBody {
         
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string depNo;
+        
         public TestGetAuditQueueRequestBody() {
+        }
+        
+        public TestGetAuditQueueRequestBody(string depNo) {
+            this.depNo = depNo;
         }
     }
     
@@ -2626,12 +2493,12 @@ namespace EmpInfo.FlowSvr {
     public partial class TestGetAuditQueueResponseBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public EmpInfo.FlowSvr.ArrayOfFlow_applyEntryQueue TestGetAuditQueueResult;
+        public EmpInfo.FlowSvr.FlowResultModel TestGetAuditQueueResult;
         
         public TestGetAuditQueueResponseBody() {
         }
         
-        public TestGetAuditQueueResponseBody(EmpInfo.FlowSvr.ArrayOfFlow_applyEntryQueue TestGetAuditQueueResult) {
+        public TestGetAuditQueueResponseBody(EmpInfo.FlowSvr.FlowResultModel TestGetAuditQueueResult) {
             this.TestGetAuditQueueResult = TestGetAuditQueueResult;
         }
     }
@@ -2883,10 +2750,11 @@ namespace EmpInfo.FlowSvr {
             return base.Channel.GetFlowQueue(request);
         }
         
-        public EmpInfo.FlowSvr.FlowResultModel GetFlowQueue(string formJson) {
+        public EmpInfo.FlowSvr.FlowResultModel GetFlowQueue(string formJson, string billType) {
             EmpInfo.FlowSvr.GetFlowQueueRequest inValue = new EmpInfo.FlowSvr.GetFlowQueueRequest();
             inValue.Body = new EmpInfo.FlowSvr.GetFlowQueueRequestBody();
             inValue.Body.formJson = formJson;
+            inValue.Body.billType = billType;
             EmpInfo.FlowSvr.GetFlowQueueResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).GetFlowQueue(inValue);
             return retVal.Body.GetFlowQueueResult;
         }
@@ -2972,9 +2840,10 @@ namespace EmpInfo.FlowSvr {
             return base.Channel.TestGetAuditQueue(request);
         }
         
-        public EmpInfo.FlowSvr.ArrayOfFlow_applyEntryQueue TestGetAuditQueue() {
+        public EmpInfo.FlowSvr.FlowResultModel TestGetAuditQueue(string depNo) {
             EmpInfo.FlowSvr.TestGetAuditQueueRequest inValue = new EmpInfo.FlowSvr.TestGetAuditQueueRequest();
             inValue.Body = new EmpInfo.FlowSvr.TestGetAuditQueueRequestBody();
+            inValue.Body.depNo = depNo;
             EmpInfo.FlowSvr.TestGetAuditQueueResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).TestGetAuditQueue(inValue);
             return retVal.Body.TestGetAuditQueueResult;
         }

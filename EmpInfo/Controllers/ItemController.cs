@@ -106,9 +106,9 @@ namespace EmpInfo.Controllers
         }
         
         //获取k3的客户名称，通过客户编码
-        public JsonResult GetK3CustomerName(string customerNumber)
+        public JsonResult GetK3CustomerName(string customerNumber, string company)
         {
-            var list = db.GetK3CustomerNameByNum(customerNumber).ToList();
+            var list = db.GetK3CustomerNameByNum(customerNumber, company).ToList();
             if (list.Count() < 1) {
                 return Json(new SimpleResultModel() { suc = false, msg = "客户不存在，请确认客户编码是否正确" });
             }

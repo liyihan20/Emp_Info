@@ -59,7 +59,7 @@
         string[] values = new string[]{
             user.name,user.card_number,user.sex,user.short_dep_name,user.dep_name,user.id_number,user.salary_no,
             user.bank_no,user.email,user.phone,user.short_phone,
-            ((DateTime)user.create_date).ToShortDateString(),user.last_login_date==null?"":(((DateTime)user.last_login_date).ToShortDateString())
+            ((DateTime)user.create_date).ToString("yyyy-MM-dd HH:mm"),user.last_login_date==null?"":(((DateTime)user.last_login_date).ToString("yyyy-MM-dd HH:mm"))
         };
     }
     <ul class="list-group">

@@ -1,0 +1,500 @@
+﻿@using EmpInfo.Models;
+@{
+    ei_epEqDeps eqDep = ViewData["eqDep"] as ei_epEqDeps;
+    List<PrDepUserModel> userList = ViewData["userList"] as List<PrDepUserModel>;
+    List<ei_epPrDeps> prDepList = ViewData["prDepList"] as List<ei_epPrDeps>;
+}
+@section CSS{
+    <style>
+        .badge {
+            color: #337ab7;
+            background-color: #fff;
+        }
+    </style>
+}
+@section Scripts{
+    <script>
+        $(function () {
+
+            //列表的点击激活事件
+            $("#userList,#autList").on("click", "a", function () {
+                if ($(this).hasClass("active")) {
+                    $(this).removeClass("active");
+                    $(this).find(".badge").addClass("hidden");
+                } else {
+                    $(this).addClass("active");
+                    $(this).find(".badge").removeClass("hidden");
+                }
+            });
+            //用户搜索
+            $("#searchUserText").keyup(function () {
+                if (event.keyCode == 13) {
+                    $("#searchUserBt").click();
+                }
+            });
+            $("#searchUserBt").click(function () {
+                var str = $("#searchUserText").val();
+                $("#userList a").each(function () {
+                    var name = $(this).find(".u_name").html();
+                    var no = $(this).find(".u_no").html();
+                    if (name.indexOf(str) < 0 && no.indexOf(str) < 0) {
+                        $(this).hide();
+                        if ($(this).hasClass("active")) {
+                            $(this).removeClass("active");
+                            $(this).find(".badge").addClass("hidden");
+                        }
+                    } else {
+                        $(this).show();
+                    }
+                });
+            });
+            //权限搜索
+            $("#searchAutText").keyup(function () {
+                if (event.keyCode == 13) {
+                    $("#searchAutBt").click();
+                }
+            });
+            $("#searchAutBt").click(function () {
+                var str = $("#searchAutText").val();
+                $("#autList a").each(function () {
+                    var name = $(this).find(".a_name").html();
+                    var no = $(this).find(".a_no").html();
+                    if (name.indexOf(str) < 0 && no.indexOf(str) < 0) {
+                        $(this).hide();
+                        if ($(this).hasClass("active")) {
+                            $(this).removeClass("active");
+                            $(this).find(".badge").addClass("hidden");
+                        }
+                    } else {
+                        $(this).show();
+                    }
+                });
+            });
+
+            //选择人员
+            $("#eqDepCharger,#eqDepMinister,#prDepCharger,#prDepChief,#prDepMinister").on("focus", function () {
+                var self = this;
+                openSelectUserDialog($(self).val(), 1, function (result) {
+                    $(self).val(result);
+                });
+            });
+
+            //更新组
+            $("#group_save_bt").click(function () {
+                var eqDepNum = $("#eqDepNum").val();
+                var eqDepName = $("#eqDepName").val();
+                var eqDepCharger = $("#eqDepCharger").val();
+                var eqDepMinister = $("#eqDepMinister").val();
+                var eqDepForbit=$("#eqDepForbit").val();
+                $.post("@Url.Content("~/EP/UpdateEqDep")", {
+                    id: "@eqDep.id",
+                    depNum: eqDepNum,
+                    depName: eqDepName,
+                    charger: eqDepCharger,
+                    minister: eqDepMinister,
+                    isForbit:eqDepForbit
+                }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+
+            //删除组
+            $("#group_remove_bt").click(function () {
+                openConfirmDialog("确定要删除本设备部门吗？与设备人员和生产部门的关联关系也会一并删除！", function () {
+                    $.post("@Url.Content("~/EP/RemoveEqDep")", {id:@eqDep.id},function(data){
+                        if(data.suc){
+                            window.location.href="@Url.Content("~/EP/EquitmentDeps")";
+                        }else{
+                            toastr.error("删除失败："+data.msg);
+                        }
+                    });
+                });
+            });
+
+            //禁用/激活
+            $("#group_forbit_bt").click(function(){
+                $.post("@Url.Content("~/EP/ToggleForbitStatus")", {id:@eqDep.id},function(data){
+                    if(data.suc){
+                        window.location.reload(true);
+                    }else{
+                        toastr.error("操作失败："+data.msg);
+                    }
+                });
+            });
+
+            //添加用户到组
+            $(".addUserLink").on("click",function(){
+                var role=$(this).html();
+                openSelectUserDialog("", 100, function (users) {                    
+                    $.post("@Url.Content("~/EP/AddEqUsers")", { depId: "@eqDep.id",role:role, userInfo: users }, function (data) {
+                        if (data.suc) {
+                            for(var i=0;i<data.list.length;i++){
+                                var node = "<a class='list-group-item'><div class='media'><div class='media-left media-middle'><img class='media-object' src='@Url.Content("~/Content/images/user_blue_48.png")' alt='user_blue_48'></div><div class='media-body'><h4 class='media-heading'><span class='u_name'>";
+                                node += data.list[i].name;
+                                node += "</span></h4><div><div class='u_no'>";
+                                node += data.list[i].number;
+                                node+="</div><div>";
+                                node+=data.list[i].jobPosition;
+                                node += "</div><input type='hidden' class='u_id' value='";
+                                node += data.list[i].id;
+                                node += "' /></div></div><div class='media-right'><span class='badge hidden'><i class='glyphicon glyphicon-ok'></i></span></div></div></a>";
+                                $("#userList").append(node);
+                            }
+                            toastr.success("已处理");
+                        }else{
+                            toastr.error(data.msg);
+                        }
+                    });                    
+                });
+            });
+            
+                //移除组内用户
+                $("#removeUserBt").click(function () {
+                    if ($("#userList a.active").length < 1) {
+                        toastr.error("请先选择需要移除的用户");
+                        return;
+                    }
+                    var user_ids = "";
+                    $("#userList a.active").each(function () {
+                        var user_id = $(this).find(".u_id").val();
+                        if (user_ids != "") user_ids += ",";
+                        user_ids += user_id;
+                    });
+                    $.post("@Url.Content("~/EP/RemoveUserInDep")", { depId: "@eqDep.id", userIds: user_ids }, function (data) {
+                        if (data.suc) {
+                            toastr.success(data.msg);
+                            $("#userList a.active").remove();
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                });
+
+                //添加权限到组
+            $("#addAutBt").click(function () {
+                $("#prDepForm")[0].reset();
+                $("#prId").val("0");
+                $("#groupAutModal").modal("show");
+            });
+            $("#modifyAutBt").on("click",function(){
+                if ($("#autList a.active").length != 1) {
+                    toastr.error("请先选择一个需要修改的生产部门");
+                    return;
+                }
+                var prDepId=$("#autList a.active").find(".a_id").val();
+                $.post("@Url.Content("~/EP/GetPrDep")",{id:prDepId},function(data){
+                    if(data.suc){
+                        $("#prDepForm")[0].reset();
+                        var d = data.dep;
+                        $("#prId").val(d.id);
+                        $("#prDepNo").val(d.dep_num);
+                        $("#prDepName").val(d.dep_name);
+                        $("#busDepName").val(d.bus_dep_name);
+                        $("#prDepCharger").val(d.charger_name+"("+d.charger_num+")");
+                        $("#prDepChief").val(d.chief_name==null?"":(d.chief_name+"("+d.chief_num+")"));
+                        $("#prDepMinister").val(d.minister_name==null?"":(d.minister_name+"("+d.minister_num+")"));
+                        $("#groupAutModal").modal("show");
+                    }else{
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+            $("#bt_groupAut").click(function () {
+                var prId=$("#prId").val();
+                var prDepNo= $("#prDepNo").val();
+                var prDepName=$("#prDepName").val();
+                var busDepName=$("#busDepName").val();
+                var prDepCharger=$("#prDepCharger").val();
+                var prDepChief=$("#prDepChief").val();
+                var prDepMinister=$("#prDepMinister").val();
+                $.post("@Url.Content("~/EP/SavePrDeps")", { 
+                    prId:prId,
+                    depId: "@eqDep.id",
+                    prDepNo: prDepNo,
+                    prDepName:prDepName,
+                    busDepName:busDepName,
+                    prDepCharger:prDepCharger,
+                    prDepChief:prDepChief,
+                    prDepMinister:prDepMinister
+                }, function (data) {
+                    if (data.suc) {                        
+                        toastr.success(data.msg);
+                        $("#groupAutModal").modal("hide");
+                        setTimeout(function(){window.location.reload(true);},1000);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+
+            //移除组内权限
+            $("#removeAutBt").click(function () {
+                if ($("#autList a.active").length < 1) {
+                    toastr.error("请先选择需要移除的生产部门");
+                    return;
+                }
+                openConfirmDialog("确定要删除所选生产部门吗？", function () {
+                    var pr_dep_ids = "";
+                    $("#autList a.active").each(function () {
+                        var pr_dep_id = $(this).find(".a_id").val();
+                        if (pr_dep_ids != "") pr_dep_ids += ",";
+                        pr_dep_ids += pr_dep_id;
+                    });
+                    $.post("@Url.Content("~/EP/RemovePrDeps")", { prDepIds: pr_dep_ids }, function (data) {
+                        if (data.suc) {
+                            toastr.success(data.msg);
+                            $("#autList a.active").remove();
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                });
+            });
+
+        $("#eqDepForbit").val("@(eqDep.is_forbit==true?"1":"0")");
+
+        });        
+    </script>
+}
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=EP")">设备故障报修单</a></li>
+            <li><a href="@Url.Content("~/EP/EquitmentDeps")">设备部门维护</a></li>
+            <li class="active">设备部门维护</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="form-group">
+                    <label for="eqDepNum" class="sr-only">设备部门编码:</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">设备部门编码:</div>
+                        <input type="text" class="form-control" id="eqDepNum" value="@eqDep.dep_num" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="form-group">
+                    <label for="eqDepName" class="sr-only">设备部门名称:</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">设备部门名称:</div>
+                        <input type="text" class="form-control" id="eqDepName" value="@eqDep.dep_name" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="form-group">
+                    <label for="eqDepCharger" class="sr-only">设备部门负责人:</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">设备部门负责人:</div>
+                        <input type="text" class="form-control" id="eqDepCharger" value="@(eqDep.charger_name+"("+eqDep.charger_num+")")" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="form-group">
+                    <label for="eqDepMinister" class="sr-only">设备部门分部长:</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">设备部门分部长:</div>
+                        <input type="text" class="form-control" id="eqDepMinister" value="@(eqDep.minister_name+"("+eqDep.minister_num+")")" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="form-group">
+                    <label for="eqDepForbit" class="sr-only">设备部门状态:</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">设备部门状态:</div>
+                        <select id="eqDepForbit" class="form-control">
+                            <option value="1">禁用</option>
+                            <option value="0">正常</option>
+                        </select>                        
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-4">
+                <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary" id="group_save_bt"><span class="glyphicon glyphicon-floppy-save"></span> 保存</button>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-danger" id="group_remove_bt"><span class="glyphicon glyphicon-floppy-remove"></span> 删除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <h3 class="panel-title"><span class="fa fa-user"></span> 设备人员&生产部门</h3>
+    </div>
+    <div class="panel-body">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#groupUser" aria-controls="groupUser" role="tab" data-toggle="tab">设备人员</a></li>
+            <li role="presentation"><a href="#groupAut" aria-controls="groupAut" role="tab" data-toggle="tab">生产部门</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <!-- 用户tab -->
+            <div role="tabpanel" class="tab-pane fade in active" id="groupUser">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="searchUserText" placeholder="输入姓名或厂牌搜索">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="button" id="searchUserBt"><span class="fa fa-search"></span> 搜索</button>
+                            </span>
+                        </div>
+                        <div class="btn-group pull-right" role="group" aria-label="操作按钮" style="margin-top:10px;">
+                            @*<div class="btn-group" role="group">
+                                <button class="btn btn-success" id="addUserBt">
+                                    <span class="fa fa-plus"></span>
+                                    添加人员
+                                </button>
+                            </div>*@
+                              <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  添加人员
+                                  <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                  <li><a href="#" class="addUserLink">工程师</a></li>
+                                  <li><a href="#" class="addUserLink">经理</a></li>
+                                  <li><a href="#" class="addUserLink">科长</a></li>
+                                  <li><a href="#" class="addUserLink">技术员</a></li>
+                                </ul>
+                              </div>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-danger" id="removeUserBt">
+                                    <span class="fa fa-remove"></span>
+                                    移除人员
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group" id="userList">
+                        @foreach (var u in userList) {
+                            <a class="list-group-item">
+                                <div class="media">
+                                    <div class="media-left media-middle">
+                                        <img class="media-object" src="@Url.Content("~/Content/images/user_blue_48.png")" alt="user_blue_48">
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="media-heading"><span class="u_name">@u.name</span></h4>
+                                        <div>
+                                            <div class="u_no">@u.number</div>
+                                            <div>@u.jobPosition</div>
+                                            <input type="hidden" class="u_id" value="@u.id" />
+                                        </div>
+                                    </div>
+                                    <div class='media-right'>
+                                        <span class='badge hidden'><i class='glyphicon glyphicon-ok'></i></span>
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+            <!-- 以下是生产部门tab -->
+            <div role="tabpanel" class="tab-pane fade" id="groupAut">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="searchAutText" placeholder="输入生产部门名称或编码搜索">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="button" id="searchAutBt"><span class="fa fa-search"></span> 搜索</button>
+                            </span>
+                        </div>
+                        <div class="btn-group pull-right" role="group" aria-label="操作按钮" style="margin-top:10px;">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-success" id="addAutBt">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    添加
+                                </button>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-info" id="modifyAutBt">
+                                    <span class="fa fa-pencil"></span>
+                                    修改
+                                </button>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-danger" id="removeAutBt">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    移除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group" id="autList">
+                        @foreach (var a in prDepList) {
+                            <a class="list-group-item">
+                                <div class="media">
+                                    <div class="media-left media-middle">
+                                        <img class="media-object" src="@Url.Content("~/Content/images/dep.png")" alt="athority_48">
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="media-heading"><span class="a_no">@a.dep_num</span>&nbsp;<span class="a_name">@a.dep_name</span></h4>
+                                        <div>
+                                            <div>@a.bus_dep_name</div>
+                                            <div>部门主管：@a.charger_name</div>
+                                            <div>部门直接上级：@a.chief_name</div>
+                                            <div>事业部长：@a.minister_name</div>
+                                            <input type="hidden" class="a_id" value="@a.id" />
+                                        </div>
+                                    </div>
+                                    <div class='media-right'>
+                                        <span class='badge hidden'><i class='glyphicon glyphicon-ok'></i></span>
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal{
+    <div class="modal fade" id="groupAutModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupAutModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> 添加生产部门</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="prDepForm">
+                        <input type="hidden" id="prId" value="0" />
+                        <input type="text" class="form-control" id="prDepNo" placeholder="请输入生产部门编码" />
+                        <input type="text" class="form-control" id="prDepName" placeholder="请输入生产部门名称" style="margin-top:4px;"/>
+                        <input type="text" class="form-control" id="busDepName" placeholder="请输入所属事业部名称" style="margin-top:4px;"/>
+                        <input type="text" class="form-control" id="prDepCharger" placeholder="请输入生产部门主管" style="margin-top:4px;"/>
+                        <input type="text" class="form-control" id="prDepChief" placeholder="请输入生产部门上级" style="margin-top:4px;"/>
+                        <input type="text" class="form-control" id="prDepMinister" placeholder="请输入生产部门部长" style="margin-top:4px;"/>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-reply"></i> 取消</button>
+                    <button id="bt_groupAut" type="button" class="btn btn-success"><i class="fa fa-check"></i> 确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_SelectUsers")
+}

@@ -25,6 +25,32 @@ namespace EmpInfo.Models
         public string salaryNo { get; set; }
     }
 
+    public class CRSearchParam
+    {
+        public string depId { get; set; }
+        public string depName { get; set; }
+        public string fromDate { get; set; }
+        public string toDate { get; set; }
+        public string auditStatus { get; set; }
+        public string empName { get; set; }
+        public string sysNum { get; set; }
+        public string salaryNo { get; set; }
+    }
+
+    public class SVSearchParam
+    {
+        public string depId { get; set; }
+        public string depName { get; set; }
+        public string vFromDate { get; set; }
+        public string vToDate { get; set; }
+        public string dFromDate { get; set; }
+        public string dToDate { get; set; }
+        public string auditStatus { get; set; }
+        public string empName { get; set; }
+        public string sysNum { get; set; }
+        public string salaryNo { get; set; }
+    }
+
     public class AssistantEmpModel
     {
         public string cardNumber { get; set; }

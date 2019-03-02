@@ -51,7 +51,6 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_department" Width="1.5" PointX="5.375" PointY="4.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_departmentAuditUser" Width="1.5" PointX="8.125" PointY="5.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_empLevel" Width="1.5" PointX="4.125" PointY="8.75" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_askLeave" Width="1.5" PointX="0.5" PointY="8.75" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_push_users" Width="1.5" PointX="12.625" PointY="0.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_users_android" Width="1.5" PointX="5.375" PointY="0.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_departmentAuditNode" Width="1.5" PointX="8.125" PointY="4.5" IsExpanded="false" />
@@ -70,6 +69,22 @@
         <EntityTypeShape EntityType="ICAuditModel.vw_askLeaveReport" Width="1.5" PointX="10.75" PointY="1.25" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_ALModifyLog" Width="1.5" PointX="6" PointY="8.75" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_assistantEmps" Width="1.5" PointX="10.75" PointY="3.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_CRApply" Width="1.5" PointX="0.5" PointY="11.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_SVApply" Width="1.5" PointX="2.375" PointY="11.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_crReport" Width="1.5" PointX="0.5" PointY="12.125" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_svReport" Width="1.5" PointX="2.375" PointY="12.125" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.flow_applyEntryQueue" Width="1.5" PointX="5.375" PointY="7.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_public_fund" Width="1.5" PointX="6" PointY="9.625" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.public_fund_item" Width="1.5" PointX="6" PointY="10.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_epPrDeps" Width="1.5" PointX="8.25" PointY="10.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_epEqDeps" Width="1.5" PointX="8.25" PointY="9.625" IsExpanded="false" />
+        <AssociationConnector Association="ICAuditModel.FK_ei_epPrDeps_ei_epEqDeps" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_epEqUsers" Width="1.5" PointX="8.25" PointY="8.75" IsExpanded="false" />
+        <AssociationConnector Association="ICAuditModel.FK_ei_epEqUsers_ei_epEqDeps" />
+        <AssociationConnector Association="ICAuditModel.FK_ei_epEqUsers_ei_users" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_epApply" Width="1.5" PointX="8.25" PointY="11.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_askLeave" Width="1.5" PointX="0.5" PointY="8.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_epReport" Width="1.5" PointX="6" PointY="11.5" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

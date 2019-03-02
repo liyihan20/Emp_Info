@@ -359,7 +359,8 @@
         </div>
         @if (list != null) {
             if (list.Count() > 0) {
-                <table style="margin-top:18px;width:100%;" class="table table-condensed table-hover">
+                <div style="margin-top:18px;"><i class="text-danger"> <i class="fa fa-info-circle"></i> 排序规则：申请日期升序</i></div>
+                        <table style="width:100%;" class="table table-condensed table-hover">
                     <tr>
                         <th style="width:5%;" class="text-center">
                             行号
@@ -387,7 +388,7 @@
                         </th>
                     </tr>
                     @{
-                        int ln = ((int)ViewData["currentPage"] - 1) * 100;
+                int ln = ((int)ViewData["currentPage"] - 1) * 100;
                         string trClass = "";                        
                     }
                     @foreach (var l in list) {

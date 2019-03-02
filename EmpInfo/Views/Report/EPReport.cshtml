@@ -1,0 +1,311 @@
+﻿@using EmpInfo.Models;
+@{
+    List<vw_epReport> list = (List<vw_epReport>)ViewData["list"];    
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <style type="text/css">
+        .tdText {
+            text-align: right;
+            font-style: italic;
+            padding-right: 10px;
+        }
+
+        .b-label {
+            display: inline-block;
+            width: 80px;
+            vertical-align: top;
+            color: gray;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+
+        .dateSpan, .dayTime {
+            cursor: pointer;
+        }
+    </style>
+}
+@section Scripts {
+    @*加入以下js，使IE8支持datetimepicker组件*@
+    <script>
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function (elt /*, from*/) {
+                var len = this.length >>> 0;
+
+                var from = Number(arguments[1]) || 0;
+                from = (from < 0)
+                     ? Math.ceil(from)
+                     : Math.floor(from);
+                if (from < 0)
+                    from += len;
+
+                for (; from < len; from++) {
+                    if (from in this &&
+                        this[from] === elt)
+                        return from;
+                }
+                return -1;
+            };
+        }
+    </script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script>
+        var currentTr;
+    $(function () {        
+        $(".form_date").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            todayBtn: true,
+            startView: 2,
+            minView: 2
+        });
+        //设置日期联动，结束日期不能大于起始日期
+        $("#fromDatePicker1").on("changeDate", function (e) {
+            $('#toDatePicker1').datetimepicker('setStartDate', e.date);
+        });
+        $("#toDatePicker1").on("changeDate", function (e) {
+            $('#fromDatePicker1').datetimepicker('setEndDate', e.date);
+        });        
+
+        $("#epReportBt").on("click", function () {
+            $(this).button("loading");
+            $("#epCheckBt").addClass("disabled");
+            exportDatas("BeginExportEPExcel");
+
+            window.setTimeout(function () {
+                $("#epReportBt").button("reset");
+                $("#epCheckBt").removeClass("disabled");
+            }, 15 * 1000);
+
+        });
+
+        $("#epCheckBt").on("click", function () {
+            exportDatas("CheckEPDatas",1);
+        });
+
+        //下一页按钮
+        $("#nextLink").click(function () {
+            var currentP = parseInt($("#currentPage").html());
+            var totalP = parseInt($("#totalPage").html());
+            if (currentP == totalP) return;
+            exportDatas("CheckEPDatas",++currentP);
+        });
+
+        //上一页按钮
+        $("#previousLink").click(function () {
+            var currentP = parseInt($("#currentPage").html());
+            if (currentP == 1) return;
+            exportDatas("CheckEPDatas", --currentP);
+        });        
+
+    });
+
+    function exportDatas(method,page) {
+        var depId = $("#depId").val();
+        var fd = $("#from_date").val();
+        var td = $("#to_date").val();
+
+        if (depId == "") {
+            toastr.error("请先选择部门");
+            return;
+        }
+        if (fd == "") {
+            toastr.error("请先选择起始日期");
+            return;
+        }
+        if (td == "") {
+            toastr.error("请先选择结束日期");
+            return;
+        }
+        window.location.href = "@Url.Content("~/Report/")" + method            
+            + "?fromDate=" + fd
+            + "&toDate=" + td
+            + "&applyStatus=" + escape($("#applyStatus").val())
+            + "&propertyNumber=" + escape($("#propertyNumber").val())
+            + "&busDepName=" + escape($("#busDepName").val())
+            + "&sysNo=" + escape($("#sysNo").val())
+            + (page ? "&currentPage=" + page : "")
+        ;
+
+
+    }   
+
+    </script>
+
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=EP")">设备故障报修单</a></li>
+            <li class="active">查询报表</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <i class="text-danger"> <i class="fa fa-info-circle"></i> 输入查询条件之后，可查询或导出excel报表:</i>
+        <table style="width:100%;margin-bottom:12px;">
+            <tr>
+                <td style="width:10%;" class="tdText">
+                    资产编号：
+                </td>
+                <td style="width:30%;">
+                    <input type="text" class="form-control" id="propertyNumber" style="margin-top:6px;" />
+                </td>
+                <td style="width:10%;" class="tdText">
+                    起始日期：
+                </td>
+                <td style="width:20%;">
+                    <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" id="from_date" name="from_date" placeholder="请输入报修起始日期" readonly value="@DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")">
+                    </div>
+                </td>
+                <td style="width:10%;" class="tdText">
+                    结束日期：
+                </td>
+                <td style="width:20%;">
+                    <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" id="to_date" name="to_date" placeholder="请输入报修结束日期" readonly value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="tdText">
+                    流程状态：
+                </td>
+                <td>
+                    <select class="form-control" id="applyStatus" name="applyStatus">
+                        <option value="所有">所有</option>
+                        <option value="未接单">未接单</option>
+                        <option value="维修中">维修中</option>
+                        <option value="未评价">未评价</option>
+                        <option value="已完成">已完成</option>
+                        <option value="已撤销">已撤销</option>
+                    </select>
+                </td>
+                <td class="tdText">
+                    事业部：
+                </td>
+                <td><input type="text" class="form-control" id="busDepName" /> </td>
+                <td class="tdText">
+                    流水号：
+                </td>
+                <td>
+                    <input type="text" class="form-control" id="sysNo" />
+                </td>
+            </tr>
+        </table>
+        <div class="btn-group btn-group-justified" role="group">
+            <div class="btn-group" role="group">
+                <button class="btn btn-primary" id="epCheckBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
+            </div>
+            <div class="btn-group" role="group">
+                <button class="btn btn-success" id="epReportBt" data-loading-text="导出中..."><i class="fa fa-file-excel-o"></i> 导出报表</button>
+            </div>
+        </div>
+        @if (list != null) {
+            if (list.Count() > 0) {
+                <div style="margin-top:18px;"><i class="text-danger"> <i class="fa fa-info-circle"></i> 排序规则：报修日期升序</i></div>
+                <table style="width:100%;" class="table table-condensed table-hover">
+                    <tr>
+                        <th style="width:5%;" class="text-center">
+                            行号
+                        </th>
+                        <th style="width:7%;">
+                            状态
+                        </th>
+                        <th style="width:13%;">
+                            报修时间
+                        </th>
+                        <th style="width:12%;">
+                            流水号
+                        </th>
+                        <th style="width:15%;">
+                            申请人
+                        </th>
+                        <th style="width:16%;">
+                            事业部
+                        </th>
+                        <th style="width:15%;">
+                            生产车间
+                        </th>
+                        <th style="width:12%;">
+                            资产编号
+                        </th>
+                        <th style="width:5%;">
+                            详情
+                        </th>
+                    </tr>
+                    @{
+                int ln = ((int)ViewData["currentPage"] - 1) * 100;
+                string trClass = "";
+                    }
+                    @foreach (var l in list) {
+                        switch (l.apply_status) {
+                            case "已完成":
+                                trClass = "success";
+                                break;
+                            case "已撤销":
+                                trClass = "warning";
+                                break;
+                            default:
+                                trClass = "";
+                                break;
+                        }
+                        <tr class="@trClass">
+                            <td class="text-center">
+                                @(++ln)
+                            </td>
+                            <td>
+                                @l.apply_status
+                            </td>
+                            <td>
+                                @(((DateTime)l.report_time).ToString("MM-dd HH:mm"))
+                            </td>
+                            <td>
+                                <span class="sysNo">@l.sys_no</span>
+                            </td>
+                            <td>
+                                @l.applier_name
+                            </td>
+                            <td>
+                                @l.bus_dep_name
+                            </td>
+                            <td>
+                                @l.produce_dep_name
+                            </td>
+                            <td>
+                                @l.property_number
+                            </td>
+                            <td>
+                                <a target="_blank" href="@string.Concat(Url.Content("~/Apply/CheckEPApply?sysNo="),l.sys_no)">详情</a>
+                            </td>
+                        </tr>
+                    }
+                </table>
+                <nav>
+                    <ul class="pager">
+                        <li><a href="#" id="previousLink">&larr; 上一页</a></li>
+                        <li>第<span id="currentPage">@ViewData["currentPage"]</span>页，共<span id="totalPage">@ViewData["totalPage"]</span>页</li>
+                        <li><a href="#" id="nextLink">下一页 &rarr;</a></li>
+                    </ul>
+                </nav>
+            }
+            else {
+                <p class="text-center text-warning" style="margin-top:20px;">查询不到符合条件的记录</p>
+            }
+        }
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_SelectDep")
+}

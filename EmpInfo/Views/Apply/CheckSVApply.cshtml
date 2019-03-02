@@ -1,0 +1,108 @@
+﻿@using EmpInfo.Models;
+@{
+    ei_SVApply sv = (ei_SVApply)ViewData["sv"];
+}
+@section CSS{
+    <style type="text/css">
+        #contentTb th {
+            color: gray;
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        #al_file_tb th {
+            font-size: small;
+            text-align: center;
+        }
+
+        #al_file_tb td {
+            font-size: small;
+            text-align: center;
+        }
+
+        #al_file_list i {
+            cursor: pointer;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        $(function () {
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("@Url.Content("~/Apply/CheckFlowRecord") .list-group", { sysNo: "@sv.sys_no" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+
+            });        
+        });
+    </script>
+}
+<div class="row" style="margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                    <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                    <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                    <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=SV")">调休申请单</a></li>
+                    <li class="active">查看详情</li>
+                </ol>
+            </div>
+            <div class="panel-body">                
+
+                <table style="width:100%;border-collapse:separate; border-spacing:8px;" id="contentTb">
+                    <tr>
+                        <th style="width:28%;">
+                            审核状态
+                        </th>
+                        <td style="width:72%;">
+                            <span class="pull-left" style="margin-top:5px;">@ViewData["auditStatus"]</span>
+                            <button type="button" class="btn btn-default btn-sm pull-right" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>申请流水号</th>
+                        <td>
+                            @sv.sys_no
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>申请人</th>
+                        <td>
+                            <span class="pull-left" style="margin-top:5px;">@string.Concat(sv.applier_name,"(",sv.applier_num,")")</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>申请时间</th>
+                        <td>@(((DateTime)sv.apply_time).ToString("yyyy-MM-dd HH:mm"))</td>
+                    </tr>
+                    <tr>
+                        <th>所属部门</th>
+                        <td>@sv.dep_long_name</td>
+                    </tr>
+                    <tr>
+                        <th>值班日期</th>
+                        <td>@string.Format("{0:yyyy-MM-dd HH:mm}~{1:yyyy-MM-dd HH:mm}", sv.duty_date_from, sv.duty_date_to) </td>
+                    </tr>
+                    <tr>
+                        <th>调休日期</th>
+                        <td>@string.Format("{0:yyyy-MM-dd HH:mm}~{1:yyyy-MM-dd HH:mm}", sv.vacation_date_from, sv.vacation_date_to) </td>
+                    </tr>
+                    <tr>
+                        <th>调休天数</th>
+                        <td>@sv.v_days 天</td>
+                    </tr>
+                    <tr>
+                        <th>原因</th>
+                        <td>@sv.reason</td>
+                    </tr>
+                </table>                
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

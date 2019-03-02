@@ -161,6 +161,7 @@
     <Compile Include="Controllers\AndroidAppController.cs" />
     <Compile Include="Controllers\ApplyController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\EPController.cs" />
     <Compile Include="Controllers\FileController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
@@ -249,6 +250,9 @@
     <Compile Include="Models\ei_authority.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_CRApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_deliveryInfo.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -270,6 +274,18 @@
     <Compile Include="Models\ei_emp_portrait.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_epApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_epEqDeps.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_epEqUsers.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_epPrDeps.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_event_log.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -288,6 +304,9 @@
     <Compile Include="Models\ei_leaveDayExceedPushLog.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_public_fund.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_pushMsg.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -303,6 +322,9 @@
     <Compile Include="Models\ei_stockAdminApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_SVApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_ucApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -316,6 +338,10 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_users_android.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EpModels.cs" />
+    <Compile Include="Models\flow_applyEntryQueue.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\flow_auditorRelation.cs">
@@ -397,6 +423,10 @@
     <Compile Include="Models\ljq20160323_003_Result.cs">
       <DependentUpon>Canteen.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\PublicFundModel.cs" />
+    <Compile Include="Models\public_fund_item.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ReportModels.cs" />
     <Compile Include="Models\ResModels.cs" />
     <Compile Include="Models\StockbillAudit1_Result.cs">
@@ -414,10 +444,16 @@
     <Compile Include="Models\vw_assistantEmps.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\vw_crReport.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\vw_ei_simple_users.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_ei_users.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\vw_epReport.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_getAllhrEmp.cs">
@@ -427,6 +463,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_push_users.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\vw_svReport.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_UCReport.cs">
@@ -647,6 +686,9 @@
     <Content Include="Content\images\book.png" />
     <Content Include="Content\images\box.png" />
     <Content Include="Content\images\bubble-sprite.png" />
+    <Content Include="Content\images\dep.png" />
+    <Content Include="Content\images\elepr.png" />
+    <Content Include="Content\images\ep.png" />
     <Content Include="Content\images\gear.png" />
     <Content Include="Content\images\house.png" />
     <Content Include="Content\images\leave.png" />
@@ -669,6 +711,8 @@
     <Content Include="Content\images\meal.png" />
     <Content Include="Content\images\index_bg.jpg" />
     <Content Include="Content\images\index_bg2.jpg" />
+    <Content Include="Content\images\public_fund.png" />
+    <Content Include="Content\images\rc.png" />
     <Content Include="Content\images\repair.png" />
     <Content Include="Content\images\report.png" />
     <Content Include="Content\images\res_256.png" />
@@ -676,6 +720,7 @@
     <Content Include="Content\images\salary1.png" />
     <Content Include="Content\images\statistics_48.png" />
     <Content Include="Content\images\stock.png" />
+    <Content Include="Content\images\sv.png" />
     <Content Include="Content\images\Truly.gif" />
     <Content Include="Content\images\truly_home.gif" />
     <Content Include="Content\images\uc.png" />
@@ -993,9 +1038,6 @@
     <Content Include="Service References\FlowSvr\EmpInfo.FlowSvr.HasAuditModel.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Content>
-    <Content Include="Service References\FlowSvr\EmpInfo.FlowSvr.ArrayOfFlow_applyEntryQueue.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Content>
     <None Include="Service References\FlowSvr\FlowSvr.disco" />
     <None Include="Service References\FlowSvr\configuration91.svcinfo" />
     <None Include="Service References\FlowSvr\configuration.svcinfo" />
@@ -1093,6 +1135,22 @@
     <Content Include="Views\Apply\GetMyAuditingList.bak.cshtml" />
     <Content Include="Views\Report\AssistantEmps.cshtml" />
     <Content Include="Views\Report\CheckAssistantEmp.cshtml" />
+    <Content Include="Views\Apply\BeginApplyCR.cshtml" />
+    <Content Include="Views\Apply\CheckCRApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditCRApply.cshtml" />
+    <Content Include="Views\Apply\BeginApplySV.cshtml" />
+    <Content Include="Views\Apply\CheckSVApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditSVApply.cshtml" />
+    <Content Include="Views\Home\EleProcess.cshtml" />
+    <Content Include="Views\Report\CRReport.cshtml" />
+    <Content Include="Views\Report\SVReport.cshtml" />
+    <Content Include="Views\Home\EditPublicFundInfo.cshtml" />
+    <Content Include="Views\EP\EquitmentDeps.cshtml" />
+    <Content Include="Views\EP\EqDepDetail.cshtml" />
+    <Content Include="Views\Apply\BeginApplyEP.cshtml" />
+    <Content Include="Views\Apply\CheckEPApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditEPApply.cshtml" />
+    <Content Include="Views\Report\EPReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

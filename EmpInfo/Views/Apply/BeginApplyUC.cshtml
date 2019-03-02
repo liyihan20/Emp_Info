@@ -41,15 +41,15 @@
     </style>
 }
 @section Scripts {
-    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
-    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    @*<script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>*@
     <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
 
     <script>
         var items = [];
         var changeIdx = -1;
         $(function () {
-            $("#timePicker").datetimepicker({
+            @*$("#timePicker").datetimepicker({
                 language: 'zh-CN',
                 format: "yyyy-mm-dd hh:ii",
                 autoclose: true,
@@ -59,12 +59,17 @@
                 startDate: "@DateTime.Now.ToString("yyyy-MM-dd HH:mm")",
                 endDate: "@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 22:00")",
                 hoursDisabled: [22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
-            });
+            });*@
 
-            $("#customerNumber").on("focusout",function () {
+            $("#customerNumber").on("focusout", function () {
                 var num = $(this).val();
+                var company = $("select[name='company']").val();
+                if (!company) {
+                    company = "all";
+                }
+                
                 if (num.length >= 5) {
-                    $.post("@Url.Content("~/Item/GetK3CustomerName")", { customerNumber: num }, function (data) {
+                    $.post("@Url.Content("~/Item/GetK3CustomerName")", { customerNumber: num, company: company }, function (data) {
                         var tip = "<i class='fa fa-info-circle'></i> ";
                         if (data.suc) {
                             tip += "对应客户名称：" + data.extra;
@@ -309,16 +314,6 @@
                     </div>
                     <div class="b-div">
                         <span class="b-label">
-                            客户代码:
-                        </span>
-                        <span class="b-input">
-                            <input type="text" class="form-control" id="customerNumber" name="customer_number" />
-                            <input type="hidden" id="customerName" name="customer_name" />
-                            <span id="customerNameSpan" class="text-danger small"></span>
-                        </span>
-                    </div>
-                    <div class="b-div">
-                        <span class="b-label">
                             出货公司:
                         </span>
                         <span class="b-input">
@@ -328,6 +323,16 @@
                                     <option value="@al">@al</option>
                                 }
                             </select>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            客户代码:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" id="customerNumber" name="customer_number" />
+                            <input type="hidden" id="customerName" name="customer_name" />
+                            <span id="customerNameSpan" class="text-danger small"></span>
                         </span>
                     </div>
                     <div class="b-div">
@@ -348,10 +353,14 @@
                             到达时间:
                         </span>
                         <div class="b-input">
-                            <div class="input-group date" id="timePicker">
+                            <select class="form-control" name="arrive_time">
+                                <option value="@DateTime.Now.ToString("yyyy-MM-dd 22:00")">@DateTime.Now.ToString("yyyy-MM-dd 22:00")</option>
+                                <option value="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 22:00")">@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 22:00")</option>                              
+                            </select>
+                            @*<div class="input-group date" id="timePicker">
                                 <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
                                 <input class="form-control" type="text" name="arrive_time" autocomplete="off" value="@DateTime.Now.ToString("yyyy-MM-dd 22:00")"/>                                
-                            </div>
+                            </div>*@
                             <div class="text-danger small"><i class="fa fa-info-circle"></i> 指预计实物及数据到达物流中心的时间</div>
                         </div>
                     </div>

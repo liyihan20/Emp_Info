@@ -62,7 +62,6 @@ namespace EmpInfo.Models
         public DbSet<ei_department> ei_department { get; set; }
         public DbSet<ei_departmentAuditUser> ei_departmentAuditUser { get; set; }
         public DbSet<ei_empLevel> ei_empLevel { get; set; }
-        public DbSet<ei_askLeave> ei_askLeave { get; set; }
         public DbSet<vw_push_users> vw_push_users { get; set; }
         public DbSet<ei_users_android> ei_users_android { get; set; }
         public DbSet<ei_departmentAuditNode> ei_departmentAuditNode { get; set; }
@@ -78,6 +77,19 @@ namespace EmpInfo.Models
         public DbSet<vw_askLeaveReport> vw_askLeaveReport { get; set; }
         public DbSet<ei_ALModifyLog> ei_ALModifyLog { get; set; }
         public DbSet<vw_assistantEmps> vw_assistantEmps { get; set; }
+        public DbSet<ei_CRApply> ei_CRApply { get; set; }
+        public DbSet<ei_SVApply> ei_SVApply { get; set; }
+        public DbSet<vw_crReport> vw_crReport { get; set; }
+        public DbSet<vw_svReport> vw_svReport { get; set; }
+        public DbSet<flow_applyEntryQueue> flow_applyEntryQueue { get; set; }
+        public DbSet<ei_public_fund> ei_public_fund { get; set; }
+        public DbSet<public_fund_item> public_fund_item { get; set; }
+        public DbSet<ei_epPrDeps> ei_epPrDeps { get; set; }
+        public DbSet<ei_epEqDeps> ei_epEqDeps { get; set; }
+        public DbSet<ei_epEqUsers> ei_epEqUsers { get; set; }
+        public DbSet<ei_epApply> ei_epApply { get; set; }
+        public DbSet<ei_askLeave> ei_askLeave { get; set; }
+        public DbSet<vw_epReport> vw_epReport { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {
@@ -323,15 +335,6 @@ namespace EmpInfo.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<decimal>>("GetVacationDaysLeftProc", empNoParameter);
         }
     
-        public virtual ObjectResult<string> GetK3CustomerNameByNum(string customer_number)
-        {
-            var customer_numberParameter = customer_number != null ?
-                new ObjectParameter("customer_number", customer_number) :
-                new ObjectParameter("customer_number", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("GetK3CustomerNameByNum", customer_numberParameter);
-        }
-    
         public virtual ObjectResult<GetOutStockBillsForAudit1To2_Result> GetOutStockBillsForAudit1To2(string account, string name)
         {
             var accountParameter = account != null ?
@@ -420,6 +423,19 @@ namespace EmpInfo.Models
                 new ObjectParameter("endDate", typeof(System.DateTime));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSRFlowRecord_Result>("GetSRFlowRecord", accountParameter, beginDateParameter, endDateParameter);
+        }
+    
+        public virtual ObjectResult<string> GetK3CustomerNameByNum(string customer_number, string company)
+        {
+            var customer_numberParameter = customer_number != null ?
+                new ObjectParameter("customer_number", customer_number) :
+                new ObjectParameter("customer_number", typeof(string));
+    
+            var companyParameter = company != null ?
+                new ObjectParameter("company", company) :
+                new ObjectParameter("company", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("GetK3CustomerNameByNum", customer_numberParameter, companyParameter);
         }
     }
 }

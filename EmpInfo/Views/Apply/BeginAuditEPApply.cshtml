@@ -1,0 +1,251 @@
+﻿@using EmpInfo.Models;
+@{
+    BeginAuditModel bam = (BeginAuditModel)ViewData["bam"];
+    ei_epApply ep = ViewData["ep"] as ei_epApply;
+    string faultyType = "", repairResult = "";
+    if (ep != null) {
+        faultyType = ep.faulty_type;
+        repairResult = ep.repair_result;
+    }
+}
+@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;            
+            width: 85px;
+            color: gray;            
+            vertical-align: top;
+        }
+
+        .b-input{
+            display:inline-block;
+            width:70%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+    $(function () {
+        $("#applyContent").load("@Url.Content("~/Apply/CheckEPApply?")", { sysNo: "@bam.sysNum" }, function () {
+            $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> 设备故障报修详情");
+            $("#waiting").remove();
+            $(".auditContent").css("visibility", "visible");
+        });
+
+        $("#acceptBtn").on("click", function () {
+            openConfirmDialog("确认要承接此设备故障报修申请吗？", function () {
+                $.post("@Url.Content("~/Apply/HandleEPApply")", {
+                    sysNum: "@bam.sysNum",
+                    step: "@bam.step",
+                    stepName: "@bam.stepName"
+                }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        setTimeout(function () { window.location.href = "@Url.Content("~/Apply/BeginAuditApply?sysNo=")" + "@bam.sysNum" + "&step=" + "@(bam.step+1)"; }, 1000);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+        });
+
+        $("#other_repairers,#transfer_to_other").on("focus", function () {
+            var self = this;
+            var maxSelectPeople = $(this).attr("data-pn");
+            openSelectUserDialog($(self).val(), maxSelectPeople, function (result) {
+                $(self).val(result);
+            });
+        });
+
+        $("#confirmBtn").on("click", function () {
+            openConfirmDialog("确认要处理此设备故障报修申请吗？", function () {
+                $.ajax({
+                    type: "post",
+                    url: "@Url.Content("~/Apply/HandleEPApply")",
+                    data: $("#confirmForm").serialize(),
+                    cache: false,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.suc) {
+                            toastr.success(data.msg);
+                            setTimeout(function () { window.location.href = "@Url.Content("~/Apply/CheckApply?sysNo=")" + "@bam.sysNum" }, 1000);
+                        } else {
+                            toastr.error("操作失败，原因：" + data.msg);
+                        }
+                    }
+                });
+            });
+        });
+
+        $("#evaluateBtn").on("click", function () {
+            var score = $("#evaluation_score").val();
+            var content = $("#evaluation_content").val();
+            if (score < 0) {
+                toastr.error("请先选择评价分数");
+                return;
+            }
+            
+            openConfirmDialog("确认要评价此设备故障维修服务吗？", function () {
+                $.post("@Url.Content("~/Apply/HandleEPApply")", {
+                    sysNum: "@bam.sysNum",
+                    step: "@bam.step",
+                    stepName: "@bam.stepName",
+                    evaluationScore: score,
+                    evaluationContent: content
+                }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        setTimeout(function () { window.location.href = "@Url.Content("~/Apply/CheckApply?sysNo=")" + "@bam.sysNum" }, 1000);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+        });
+
+        $("#faulty_type").val("@faultyType");
+        $("#repair_result").val("@repairResult");
+
+    });
+
+</script>
+
+}
+@*通过load获取申请单内容*@
+<div class="text-center text-danger" id="waiting"><i class="fa fa-3x fa-spinner fa-pulse"></i></div>
+<div id="applyContent"></div>
+
+<div class="row auditContent" style="visibility:hidden;margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
+    @if (bam.stepName.Contains("接单")) {
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                维修接单
+            </div>
+            <div class="panel-body">
+                <a href="#" class="btn btn-success btn-block" id="acceptBtn"><i class="fa fa-check"></i> 接单</a>
+            </div>
+        </div>
+}
+else if (bam.stepName.Contains("处理")) {
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            维修处理
+        </div>
+        <div class="panel-body">
+            <form id="confirmForm">
+                <input type="hidden" name="sysNum" value="@bam.sysNum" />
+                <input type="hidden" name="step" value="@bam.step" />
+                <input type="hidden" name="stepName" value="@bam.stepName" />
+                <div class="b-div">
+                    <span class="b-label">
+                        故障原因类别:
+                    </span>
+                    <span class="b-input">
+                        <select class="form-control" id="faulty_type" name="faulty_type">
+                            <option value="" selected disabled>----请在下拉列表中选择----</option>
+                            <option value="设备自身问题">设备自身问题</option>
+                            <option value="操作者操作不当">操作者操作不当</option>
+                            <option value="原因不明确">原因不明确</option>
+                        </select>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        故障原因:
+                    </span>
+                    <span class="b-input">
+                        <textarea class="form-control" rows="2" name="faulty_reason" spellcheck="false">@ep.faulty_reason</textarea>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        修理方法:
+                    </span>
+                    <span class="b-input">
+                        <textarea class="form-control" rows="2" name="repair_method" spellcheck="false">@ep.repair_method</textarea>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        更换配件:
+                    </span>
+                    <span class="b-input">
+                        <textarea class="form-control" rows="2" name="exchange_parts" placeholder="输入更换的配件名称和型号" spellcheck="false">@ep.exchange_parts</textarea>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        修理结果:
+                    </span>
+                    <span class="b-input">
+                        <select class="form-control" id="repair_result" name="repair_result">
+                            <option value="" selected disabled>----请在下拉列表中选择----</option>
+                            <option value="正常生产">正常生产</option>
+                            <option value="可以生产但故障未彻底排除">可以生产但故障未彻底排除</option>
+                            <option value="无法生产">无法生产</option>
+                        </select>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        其他协助修理人员:
+                    </span>
+                    <span class="b-input">
+                        <textarea class="form-control" rows="2" name="other_repairers" id="other_repairers" spellcheck="false" data-pn="10">@ep.other_repairers</textarea>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        转移给其他人员处理:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control" id="transfer_to_other" name="transfer_to_repairer" data-pn="1" />
+                    </span>
+                </div>
+            </form>
+            <a href="#" class="btn btn-success btn-block" id="confirmBtn"><i class="fa fa-check"></i> 确认处理</a>
+        </div>
+    </div>
+}
+else if (bam.stepName.Contains("评价")) {
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            服务评价
+        </div>
+        <div class="panel-body">
+            <div class="b-div">
+                <span class="b-label">
+                    评价分数:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" id="evaluation_score">
+                        <option value="-1" selected disabled>----请在下拉列表中选择----</option>
+                        <option value="2">满意</option>
+                        <option value="1">比较满意</option>
+                        <option value="0">不满意</option>
+                    </select>
+                </span>
+            </div>            
+            <div class="b-div">
+                <span class="b-label">
+                    评价内容:
+                </span>
+                <span class="b-input">
+                    <textarea class="form-control" rows="2" id="evaluation_content" spellcheck="false"></textarea>
+                </span>
+            </div>
+            <a href="#" class="btn btn-success btn-block" id="evaluateBtn"><i class="fa fa-check"></i> 提交评价</a>
+        </div>
+    </div>
+}
+        </div>
+    </div>
+    @section Modal {
+        @Html.Partial("_ConfirmDialog")
+        @Html.Partial("_SelectUsers")
+    }

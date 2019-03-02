@@ -27,5 +27,6 @@ namespace EmpInfo.Models
         public string work_name { get; set; }
         public string pay_type { get; set; }
         public string rem { get; set; }
+        public string shift { get; set; }
     }
 }

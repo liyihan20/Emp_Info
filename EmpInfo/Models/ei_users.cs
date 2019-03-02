@@ -18,6 +18,7 @@ namespace EmpInfo.Models
         {
             this.ei_groupUser = new HashSet<ei_groupUser>();
             this.ei_deliveryInfo = new HashSet<ei_deliveryInfo>();
+            this.ei_epEqUsers = new HashSet<ei_epEqUsers>();
         }
     
         public int id { get; set; }
@@ -49,5 +50,6 @@ namespace EmpInfo.Models
     
         public virtual ICollection<ei_groupUser> ei_groupUser { get; set; }
         public virtual ICollection<ei_deliveryInfo> ei_deliveryInfo { get; set; }
+        public virtual ICollection<ei_epEqUsers> ei_epEqUsers { get; set; }
     }
 }

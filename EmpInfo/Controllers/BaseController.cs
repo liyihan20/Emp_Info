@@ -326,13 +326,16 @@ namespace EmpInfo.Controllers
             if (dep.FIsDeleted == true) {
                 return "已删除部门";
             }
-            if (dep.FIsForbit == true) {
-                return "已禁用部门";
-            }
+            
             string depName = dep.FName;
             while (dep.FParent != null) {
                 dep = db.ei_department.Single(d => d.FNumber == dep.FParent);
-                depName = dep.FName + "/" + depName;
+                if (dep.FIsForbit == true) {
+                    return "已禁用部门";
+                }
+                else {
+                    depName = dep.FName + "/" + depName;
+                }
             }
 
             return depName;

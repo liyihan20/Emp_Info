@@ -63,15 +63,15 @@
                             <div class="caption">
                                 <h3>@i.sysNo</h3>
                                 <p>申请时间：@(((DateTime)i.applyTime).ToString("yyyy-MM-dd HH:mm:ss"))</p>
-                                <p>申请信息：@i.subTitle</p>
+                                <p>申请信息：@i.subTitle</p> 
                                 @{var textColor = "text-default";
                                 if (i.auditResult == "成功") { textColor = "text-success"; }
                                 if (i.auditResult == "失败") { textColor = "text-danger"; }
                                 }
                                 <p>审核结果：<b class="@textColor">@i.auditResult</b></p>
                                 <p><button class="btn btn-primary btn-block" onclick="CheckDetail('@i.sysNo')"><i class="fa fa-search"></i> 查看详情</button></p>
-                                @if (i.auditResult == "成功" && ViewData["billType"] == "AL") {
-                                    DateTime fromDate = DateTime.Parse(i.subTitle.Split(new char[] { '~' })[0].Trim());
+                                @if (i.auditResult == "成功" && (string)ViewData["billType"] == "AL") {
+                                    DateTime fromDate = DateTime.Parse(i.subTitle.Split(new char[] { '~' })[0].Trim());                                    
                                     if (DateTime.Now < fromDate) {
                                         <p><button class="btn btn-danger btn-block" onclick="AbortApplyAfterFinish('@i.sysNo')"><i class="fa fa-reply"></i> 撤销申请</button></p>
                                     }
