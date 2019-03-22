@@ -82,9 +82,11 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_epEqUsers" Width="1.5" PointX="8.25" PointY="8.75" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_epEqUsers_ei_epEqDeps" />
         <AssociationConnector Association="ICAuditModel.FK_ei_epEqUsers_ei_users" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_epApply" Width="1.5" PointX="8.25" PointY="11.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_askLeave" Width="1.5" PointX="0.5" PointY="8.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_epApply" Width="1.5" PointX="8.25" PointY="11.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_epReport" Width="1.5" PointX="6" PointY="11.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_UCExcel" Width="1.5" PointX="4.125" PointY="11.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_epBusReportChecker" Width="1.5" PointX="8.25" PointY="12.125" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

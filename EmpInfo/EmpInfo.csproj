@@ -277,6 +277,9 @@
     <Compile Include="Models\ei_epApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_epBusReportChecker.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_epEqDeps.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -340,6 +343,7 @@
     <Compile Include="Models\ei_users_android.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\EmergencyEnum.cs" />
     <Compile Include="Models\EpModels.cs" />
     <Compile Include="Models\flow_applyEntryQueue.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
@@ -466,6 +470,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_svReport.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\vw_UCExcel.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_UCReport.cs">
@@ -1151,6 +1158,7 @@
     <Content Include="Views\Apply\CheckEPApply.cshtml" />
     <Content Include="Views\Apply\BeginAuditEPApply.cshtml" />
     <Content Include="Views\Report\EPReport.cshtml" />
+    <Content Include="Views\Report\UCReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

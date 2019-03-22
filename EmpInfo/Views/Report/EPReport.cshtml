@@ -1,5 +1,6 @@
 ﻿@using EmpInfo.Models;
 @{
+    var param = ViewData["searchParam"] as EPSearchParam;
     List<vw_epReport> list = (List<vw_epReport>)ViewData["list"];    
 }
 @section CSS{
@@ -102,6 +103,8 @@
             exportDatas("CheckEPDatas", --currentP);
         });        
 
+        $("#applyStatus").val("@param.applyStatus");
+
     });
 
     function exportDatas(method,page) {
@@ -126,8 +129,8 @@
             + "&toDate=" + td
             + "&applyStatus=" + escape($("#applyStatus").val())
             + "&propertyNumber=" + escape($("#propertyNumber").val())
-            + "&busDepName=" + escape($("#busDepName").val())
-            + "&sysNo=" + escape($("#sysNo").val())
+            + "&procDepName=" + escape($("#procDepName").val())
+            + "&equitmentDepName=" + escape($("#equitmentDepName").val())
             + (page ? "&currentPage=" + page : "")
         ;
 
@@ -150,13 +153,55 @@
     </div>
     <div class="panel-body">
         <i class="text-danger"> <i class="fa fa-info-circle"></i> 输入查询条件之后，可查询或导出excel报表:</i>
-        <table style="width:100%;margin-bottom:12px;">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">资产编号：</div>
+                <input type="text" class="form-control" id="propertyNumber" value="@param.propertyNumber" />
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">起始日期：</div>
+                <div class="input-group date form_date" id="fromDatePicker1">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    <input class="form-control" type="text" id="from_date" name="from_date" placeholder="请输入报修起始日期" readonly value="@param.fromDate">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">结束日期：</div>                
+                <div class="input-group date form_date" id="toDatePicker1">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    <input class="form-control" type="text" id="to_date" name="to_date" placeholder="请输入报修结束日期" readonly value="@param.toDate">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
+                <div class="lbText">流程状态：</div>
+                    <select class="form-control" id="applyStatus" name="applyStatus">
+                        <option value="所有">所有</option>
+                        <option value="未接单">未接单</option>
+                        <option value="维修中">维修中</option>
+                        <option value="未评价">未评价</option>
+                        <option value="未打分">未打分</option>
+                        <option value="已完成">已完成</option>
+                        <option value="已撤销">已撤销</option>
+                        <option value="拒接">拒接</option>
+                        <option value="延迟处理">延迟处理</option>
+                    </select>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
+                <div class="lbText">设备支部：</div>
+                    <input type="text" class="form-control" id="equitmentDepName" value="@param.equitmentDepName" />
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
+                <div class="lbText">生产车间：</div>
+                <input type="text" class="form-control" id="procDepName" value="@param.procDepName" />
+            </div>
+        </div>
+        @*<table style="width:100%;margin-bottom:12px;">
             <tr>
                 <td style="width:10%;" class="tdText">
                     资产编号：
                 </td>
                 <td style="width:30%;">
-                    <input type="text" class="form-control" id="propertyNumber" style="margin-top:6px;" />
+                    <input type="text" class="form-control" id="propertyNumber" style="margin-top:6px;" value="@param.propertyNumber" />
                 </td>
                 <td style="width:10%;" class="tdText">
                     起始日期：
@@ -164,7 +209,7 @@
                 <td style="width:20%;">
                     <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                        <input class="form-control" type="text" id="from_date" name="from_date" placeholder="请输入报修起始日期" readonly value="@DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")">
+                        <input class="form-control" type="text" id="from_date" name="from_date" placeholder="请输入报修起始日期" readonly value="@param.fromDate">
                     </div>
                 </td>
                 <td style="width:10%;" class="tdText">
@@ -173,7 +218,7 @@
                 <td style="width:20%;">
                     <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                        <input class="form-control" type="text" id="to_date" name="to_date" placeholder="请输入报修结束日期" readonly value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                        <input class="form-control" type="text" id="to_date" name="to_date" placeholder="请输入报修结束日期" readonly value="@param.toDate">
                     </div>
                 </td>
             </tr>
@@ -187,23 +232,26 @@
                         <option value="未接单">未接单</option>
                         <option value="维修中">维修中</option>
                         <option value="未评价">未评价</option>
+                        <option value="未打分">未打分</option>
                         <option value="已完成">已完成</option>
                         <option value="已撤销">已撤销</option>
+                        <option value="拒接">拒接</option>
+                        <option value="延迟处理">延迟处理</option>
                     </select>
                 </td>
                 <td class="tdText">
-                    事业部：
-                </td>
-                <td><input type="text" class="form-control" id="busDepName" /> </td>
-                <td class="tdText">
-                    流水号：
+                    设备支部：
                 </td>
                 <td>
-                    <input type="text" class="form-control" id="sysNo" />
+                    <input type="text" class="form-control" id="equitmentDepName" value="@param.equitmentDepName" />
                 </td>
+                <td class="tdText">
+                    生产车间：
+                </td>
+                <td><input type="text" class="form-control" id="procDepName" value="@param.procDepName" /> </td>
             </tr>
-        </table>
-        <div class="btn-group btn-group-justified" role="group">
+        </table>*@
+        <div class="btn-group btn-group-justified" role="group" style="margin-top:8px;">
             <div class="btn-group" role="group">
                 <button class="btn btn-primary" id="epCheckBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
             </div>
@@ -225,20 +273,20 @@
                         <th style="width:13%;">
                             报修时间
                         </th>
-                        <th style="width:12%;">
-                            流水号
-                        </th>
                         <th style="width:15%;">
+                            设备支部
+                        </th>
+                        <th style="width:8%;">
                             申请人
                         </th>
                         <th style="width:16%;">
-                            事业部
+                            影响停产程度
                         </th>
-                        <th style="width:15%;">
+                        <th style="width:17%;">
                             生产车间
                         </th>
-                        <th style="width:12%;">
-                            资产编号
+                        <th style="width:14%;">
+                            设备名称
                         </th>
                         <th style="width:5%;">
                             详情
@@ -256,6 +304,9 @@
                             case "已撤销":
                                 trClass = "warning";
                                 break;
+                            case "拒接":
+                                trClass = "danger";
+                                break;
                             default:
                                 trClass = "";
                                 break;
@@ -271,19 +322,19 @@
                                 @(((DateTime)l.report_time).ToString("MM-dd HH:mm"))
                             </td>
                             <td>
-                                <span class="sysNo">@l.sys_no</span>
+                                @l.equitment_dep_name
                             </td>
                             <td>
                                 @l.applier_name
                             </td>
                             <td>
-                                @l.bus_dep_name
+                                @(((EmergencyEnum)l.emergency_level).ToString())
                             </td>
                             <td>
                                 @l.produce_dep_name
                             </td>
                             <td>
-                                @l.property_number
+                                @l.equitment_name
                             </td>
                             <td>
                                 <a target="_blank" href="@string.Concat(Url.Content("~/Apply/CheckEPApply?sysNo="),l.sys_no)">详情</a>

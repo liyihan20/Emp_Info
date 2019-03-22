@@ -59,4 +59,13 @@ namespace EmpInfo.Models
         public string depName { get; set; }
     }
 
+    public class EPSearchParam{
+        public string fromDate { get; set; }
+        public string toDate { get; set; }
+        public string applyStatus { get; set; }
+        public string propertyNumber { get; set; }
+        public string procDepName { get; set; }
+        public string equitmentDepName { get; set; }
+    }
+
 }

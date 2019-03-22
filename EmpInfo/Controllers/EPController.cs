@@ -62,6 +62,7 @@ namespace EmpInfo.Controllers
             var dep = new ei_epEqDeps();
             dep.dep_num = depNum;
             dep.dep_name = depName;
+            dep.is_forbit = false;
             try {
                 if (!string.IsNullOrEmpty(charger)) {
                     dep.charger_name = charger.Split(new char[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries)[0];
@@ -243,11 +244,11 @@ namespace EmpInfo.Controllers
             }
         }
 
-        public JsonResult SavePrDeps(int prId, int depId, string prDepNo, string prDepName, string busDepName, string prDepCharger, string prDepChief, string prDepMinister)
+        public JsonResult SavePrDeps(int prId, int depId, string prDepName, string busDepName, string prDepCharger, string prDepChief, string prDepMinister)
         {
-            if (string.IsNullOrEmpty(prDepNo)) {
-                return Json(new { suc = false, msg = "生产部门编码不能为空" });
-            }
+            //if (string.IsNullOrEmpty(prDepNo)) {
+            //    return Json(new { suc = false, msg = "生产部门编码不能为空" });
+            //}
             if (string.IsNullOrEmpty(prDepName)) {
                 return Json(new { suc = false, msg = "生产部门名称不能为空" });
             }
@@ -260,9 +261,10 @@ namespace EmpInfo.Controllers
 
             ei_epPrDeps dep;
             if (prId == 0) {
-                if (db.ei_epPrDeps.Where(e => e.dep_num == prDepNo).Count() > 0) {
-                    return Json(new { suc = false, msg = "此生产部门编码已存在，不能重复保存" });
-                }
+                
+                //if (db.ei_epPrDeps.Where(e => e.dep_num == prDepNo).Count() > 0) {
+                //    return Json(new { suc = false, msg = "此生产部门编码已存在，不能重复保存" });
+                //}
                 if (db.ei_epPrDeps.Where(e => e.dep_name == prDepName).Count() > 0) {
                     return Json(new { suc = false, msg = "此生产部门名称已存在，不能重复保存" });
                 }
@@ -270,6 +272,14 @@ namespace EmpInfo.Controllers
                 dep.create_date = DateTime.Now;
                 dep.creater_name = userInfo.name;
                 dep.creater_num = userInfo.cardNo;
+
+                var maxNo = db.ei_epPrDeps.OrderByDescending(e => e.id).Select(e => e.dep_num).FirstOrDefault();
+                if (maxNo == null) {
+                    dep.dep_num = "P1";
+                }
+                else {
+                    dep.dep_num = "P" + (Int32.Parse(maxNo.Substring(1)) + 1).ToString();
+                }
                 db.ei_epPrDeps.Add(dep);
             }
             else {
@@ -278,7 +288,7 @@ namespace EmpInfo.Controllers
 
             try {                
                 dep.eq_dep_id = depId;
-                dep.dep_num = prDepNo;
+                //dep.dep_num = prDepNo;
                 dep.dep_name = prDepName;
                 dep.bus_dep_name = busDepName;
                 dep.charger_name = prDepCharger.Split(new char[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries)[0];

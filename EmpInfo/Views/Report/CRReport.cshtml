@@ -23,7 +23,7 @@
             margin: 6px 0;
         }
 
-        .dateSpan, .dayTime {
+        .dateSpan,.dayTime{
             cursor: pointer;
         }
     </style>
@@ -117,6 +117,52 @@
             var currentP = parseInt($("#currentPage").html());
             if (currentP == 1) return;
             exportDatas("CheckCRDatas", --currentP);
+        });
+
+        $(".dateSpan, .dayTime").on("click", function () {
+            var tr = $(this).parents("tr")[0];
+            var ds = $($(tr).find(".dateSpan")).html();
+            var dt = $($(tr).find(".dayTime")).html();
+
+            var status = $($(tr).find(".status")).html();
+            if (status != "已通过") {
+                toastr.error("只有已通过的申请才能修改时间");
+                return;
+            }
+
+            var sysNo = $($(tr).find(".sysNo")).html();
+            var mTimes = dt.split(",");
+
+            $("#mSysNo").val(sysNo);
+            $("#mForgotDate").val(ds);
+            for (var i = 0; i < mTimes.length; i++) {
+                $("#mTime" + (i + 1)).val(mTimes[i]);
+            }           
+
+            currentTr = tr;
+
+            $("#updateModal").modal("show");
+
+        });
+
+        $("#updateBtn").on("click", function () {
+            $.post("@Url.Content("~/Report/UpdateCRDays")", {
+                sysNo: $("#mSysNo").val(),
+                forgotDate: $("#mForgotDate").val(),
+                time1: $("#mTime1").val(),
+                time2: $("#mTime2").val(),
+                time3: $("#mTime3").val(),
+                time4: $("#mTime4").val()
+            }, function (data) {
+                if (data.suc) {
+                    toastr.success(data.msg);
+                    $($(currentTr).find(".dateSpan")).html($("#mForgotDate").val());
+                    $($(currentTr).find(".dayTime")).html($("#mTime1").val() + "," + $("#mTime2").val() + "," + $("#mTime3").val() + "," + $("#mTime4").val());
+                    $("#updateModal").modal("hide");
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
         });
 
         $("#auditStatus").val("@p.auditStatus");
@@ -308,10 +354,10 @@
                                 @l.salary_no
                             </td>
                             <td>
-                                @(((DateTime)l.forgot_date).ToString("yyyy-MM-dd"))
+                                <span class="dateSpan">@(((DateTime)l.forgot_date).ToString("yyyy-MM-dd"))</span> 
                             </td>
                             <td>
-                                @l.forgot_time
+                                <span class="dayTime">@l.forgot_time</span> 
                             </td>
                             <td>
                                 @if (l.check1 == true) {
@@ -326,7 +372,6 @@
                                 else {
                                     <input type="checkbox" class="check2" data-sn="@l.sys_no" style="zoom:120%;" />
                                 }
-
                             </td>
                         </tr>
                         <tr class="@trClass">
@@ -362,5 +407,58 @@
 </div>
 
 @section Modal {
+    <div class="modal fade" id="updateModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="fa fa-question-circle"></i> 修改漏刷卡时间</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="b-div">
+                        <label class="b-label control-label">流水号:</label>
+                        <span style="display:inline-block;width:77%">
+                            <input type="text" class="form-control" id="mSysNo" readonly/>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <label class="b-label control-label">漏刷日期:</label>
+                        <span style="display:inline-block;width:77%">
+                            <input type="text" class="form-control" id="mForgotDate" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <label class="b-label control-label">时间[1]:</label>
+                        <span style="display:inline-block;width:77%">
+                            <input type="text" class="form-control" id="mTime1" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <label class="b-label control-label">时间[2]:</label>
+                        <span style="display:inline-block;width:77%">
+                            <input type="text" class="form-control" id="mTime2" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <label class="b-label control-label">时间[3]:</label>
+                        <span style="display:inline-block;width:77%">
+                            <input type="text" class="form-control" id="mTime3" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <label class="b-label control-label">时间[4]:</label>
+                        <span style="display:inline-block;width:77%">
+                            <input type="text" class="form-control" id="mTime4" />
+                        </span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button id="updateBtn" type="button" class="btn btn-success"><i class="fa fa-check"></i> 确认修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @Html.Partial("_SelectDep")
 }

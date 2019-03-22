@@ -863,6 +863,10 @@ namespace EmpInfo.FlowSvr {
         EmpInfo.FlowSvr.GetFlowQueueResponse GetFlowQueue(EmpInfo.FlowSvr.GetFlowQueueRequest request);
         
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/StepRollBack", ReplyAction="*")]
+        EmpInfo.FlowSvr.StepRollBackResponse StepRollBack(EmpInfo.FlowSvr.StepRollBackRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/AbortAfterFinish", ReplyAction="*")]
         EmpInfo.FlowSvr.AbortAfterFinishResponse AbortAfterFinish(EmpInfo.FlowSvr.AbortAfterFinishRequest request);
         
@@ -870,7 +874,7 @@ namespace EmpInfo.FlowSvr {
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestStarFlow", ReplyAction="*")]
         EmpInfo.FlowSvr.TestStarFlowResponse TestStarFlow(EmpInfo.FlowSvr.TestStarFlowRequest request);
         
-        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 TestAuditResult 以后生成的消息协定未标记为 nillable
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestAudit", ReplyAction="*")]
         EmpInfo.FlowSvr.TestAuditResponse TestAudit(EmpInfo.FlowSvr.TestAuditRequest request);
         
@@ -878,7 +882,7 @@ namespace EmpInfo.FlowSvr {
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestFlowRecord", ReplyAction="*")]
         EmpInfo.FlowSvr.TestFlowRecordResponse TestFlowRecord(EmpInfo.FlowSvr.TestFlowRecordRequest request);
         
-        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 auditor 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestFlowAuditList", ReplyAction="*")]
         EmpInfo.FlowSvr.TestFlowAuditListResponse TestFlowAuditList(EmpInfo.FlowSvr.TestFlowAuditListRequest request);
         
@@ -2048,6 +2052,78 @@ namespace EmpInfo.FlowSvr {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class StepRollBackRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="StepRollBack", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.StepRollBackRequestBody Body;
+        
+        public StepRollBackRequest() {
+        }
+        
+        public StepRollBackRequest(EmpInfo.FlowSvr.StepRollBackRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class StepRollBackRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string sysNo;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public int step;
+        
+        public StepRollBackRequestBody() {
+        }
+        
+        public StepRollBackRequestBody(string sysNo, int step) {
+            this.sysNo = sysNo;
+            this.step = step;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class StepRollBackResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="StepRollBackResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.StepRollBackResponseBody Body;
+        
+        public StepRollBackResponse() {
+        }
+        
+        public StepRollBackResponse(EmpInfo.FlowSvr.StepRollBackResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class StepRollBackResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public EmpInfo.FlowSvr.FlowResultModel StepRollBackResult;
+        
+        public StepRollBackResponseBody() {
+        }
+        
+        public StepRollBackResponseBody(EmpInfo.FlowSvr.FlowResultModel StepRollBackResult) {
+            this.StepRollBackResult = StepRollBackResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class AbortAfterFinishRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="AbortAfterFinish", Namespace="http://ic.truly.com.cn/", Order=0)]
@@ -2197,10 +2273,21 @@ namespace EmpInfo.FlowSvr {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute()]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
     public partial class TestAuditRequestBody {
         
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string sysNo;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public int step;
+        
         public TestAuditRequestBody() {
+        }
+        
+        public TestAuditRequestBody(string sysNo, int step) {
+            this.sysNo = sysNo;
+            this.step = step;
         }
     }
     
@@ -2330,13 +2417,13 @@ namespace EmpInfo.FlowSvr {
     public partial class TestFlowAuditListRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public string sysNo;
+        public string auditor;
         
         public TestFlowAuditListRequestBody() {
         }
         
-        public TestFlowAuditListRequestBody(string sysNo) {
-            this.sysNo = sysNo;
+        public TestFlowAuditListRequestBody(string auditor) {
+            this.auditor = auditor;
         }
     }
     
@@ -2760,6 +2847,20 @@ namespace EmpInfo.FlowSvr {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.FlowSvr.StepRollBackResponse EmpInfo.FlowSvr.FlowSvrSoap.StepRollBack(EmpInfo.FlowSvr.StepRollBackRequest request) {
+            return base.Channel.StepRollBack(request);
+        }
+        
+        public EmpInfo.FlowSvr.FlowResultModel StepRollBack(string sysNo, int step) {
+            EmpInfo.FlowSvr.StepRollBackRequest inValue = new EmpInfo.FlowSvr.StepRollBackRequest();
+            inValue.Body = new EmpInfo.FlowSvr.StepRollBackRequestBody();
+            inValue.Body.sysNo = sysNo;
+            inValue.Body.step = step;
+            EmpInfo.FlowSvr.StepRollBackResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).StepRollBack(inValue);
+            return retVal.Body.StepRollBackResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         EmpInfo.FlowSvr.AbortAfterFinishResponse EmpInfo.FlowSvr.FlowSvrSoap.AbortAfterFinish(EmpInfo.FlowSvr.AbortAfterFinishRequest request) {
             return base.Channel.AbortAfterFinish(request);
         }
@@ -2790,9 +2891,11 @@ namespace EmpInfo.FlowSvr {
             return base.Channel.TestAudit(request);
         }
         
-        public EmpInfo.FlowSvr.FlowResultModel TestAudit() {
+        public EmpInfo.FlowSvr.FlowResultModel TestAudit(string sysNo, int step) {
             EmpInfo.FlowSvr.TestAuditRequest inValue = new EmpInfo.FlowSvr.TestAuditRequest();
             inValue.Body = new EmpInfo.FlowSvr.TestAuditRequestBody();
+            inValue.Body.sysNo = sysNo;
+            inValue.Body.step = step;
             EmpInfo.FlowSvr.TestAuditResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).TestAudit(inValue);
             return retVal.Body.TestAuditResult;
         }
@@ -2815,10 +2918,10 @@ namespace EmpInfo.FlowSvr {
             return base.Channel.TestFlowAuditList(request);
         }
         
-        public EmpInfo.FlowSvr.FlowAuditListModel[] TestFlowAuditList(string sysNo) {
+        public EmpInfo.FlowSvr.FlowAuditListModel[] TestFlowAuditList(string auditor) {
             EmpInfo.FlowSvr.TestFlowAuditListRequest inValue = new EmpInfo.FlowSvr.TestFlowAuditListRequest();
             inValue.Body = new EmpInfo.FlowSvr.TestFlowAuditListRequestBody();
-            inValue.Body.sysNo = sysNo;
+            inValue.Body.auditor = auditor;
             EmpInfo.FlowSvr.TestFlowAuditListResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).TestFlowAuditList(inValue);
             return retVal.Body.TestFlowAuditListResult;
         }

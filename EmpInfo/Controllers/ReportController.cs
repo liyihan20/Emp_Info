@@ -460,6 +460,80 @@ namespace EmpInfo.Controllers
             return View();
         }
 
+        [SessionTimeOutFilter]
+        public ActionResult UCReport()
+        {
+            return View();
+        }
+
+        public void BeginExportUCReport(DateTime fromDate, DateTime toDate)
+        {
+            toDate = toDate.AddDays(1);
+            var result = db.vw_UCExcel.Where(u => u.apply_time > fromDate && u.apply_time <= toDate).ToList();
+
+            ushort[] colWidth = new ushort[] { 8, 16, 12, 16, 16, 24, 12,
+                                               24, 16, 24, 24, 12, 32 };
+
+            string[] colName = new string[] { "序号", "申请流水号", "申请人", "申请时间", "完成申请时间", "市场部", "出货公司",
+                                              "客户", "生产事业部", "货运公司", "出货型号", "出货数量","申请原因" };
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "夜间出货申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("夜间出货详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result) {
+                colIndex = 1;
+
+                //"序号", "申请流水号", "申请人", "申请时间", "完成申请时间", "市场部", "出货公司"
+                //"客户", "生产事业部", "货运公司", "出货型号", "出货数量","申请原因"
+                cells.Add(++rowIndex, colIndex, rowIndex - 1);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.applier_name);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.finish_date).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.market_name);
+                cells.Add(rowIndex, ++colIndex, d.company);
+
+                cells.Add(rowIndex, ++colIndex, d.customer_name);
+                cells.Add(rowIndex, ++colIndex, d.bus_dep);
+                cells.Add(rowIndex, ++colIndex, d.delivery_company);
+                cells.Add(rowIndex, ++colIndex, d.moduel);
+                cells.Add(rowIndex, ++colIndex, d.qty);
+                cells.Add(rowIndex, ++colIndex, d.reason);
+            }
+
+            xls.Send();
+        }
+
         #endregion
 
         #region 辅助、基干人员查询
@@ -782,6 +856,7 @@ namespace EmpInfo.Controllers
             WriteEventLog("调休报表:" + sysNo, "设置标志：" + which + ":" + isChecked);
             return Json(new SimpleResultModel() { suc = true });
         }
+                
 
         #endregion
 
@@ -979,39 +1054,91 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel() { suc = true });
         }
 
+        [SessionTimeOutJsonFilter]
+        public JsonResult UpdateCRDays(string sysNo, string forgotDate, string time1, string time2, string time3, string time4)
+        {
+            DateTime forgotDateDt;
+            if (!DateTime.TryParse(forgotDate, out forgotDateDt)) {
+                return Json(new SimpleResultModel() { suc = false, msg = "漏刷日期不符合日期格式" });
+            }
+            var cr = db.ei_CRApply.Single(c => c.sys_no == sysNo);
+
+            WriteEventLog("漏刷卡修改时间", string.Format("流水号【{0}】,日期【{1:yyyy-MM-dd}】,时间【2】===>日期【{3}】,时间【{4}】"
+                , sysNo
+                , cr.forgot_date, cr.time1 + "," + cr.time2 + "," + cr.time3 + "," + cr.time4
+                , forgotDate, time1 + "," + time2 + "," + time3 + "," + time4));
+
+            try {
+                cr.forgot_date = forgotDateDt;
+                cr.time1 = time1;
+                cr.time2 = time2;
+                cr.time3 = time3;
+                cr.time4 = time4;
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+            return Json(new SimpleResultModel() { suc = true, msg = "保存成功" });
+            
+        }
+
         #endregion
 
-        #region
+        #region 设备保障维修流程
 
         [SessionTimeOutFilter]
         public ActionResult EPReport()
         {
+            ViewData["searchParam"] = new EPSearchParam()
+            {
+                fromDate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"),
+                toDate = DateTime.Now.ToString("yyyy-MM-dd"),
+                applyStatus = "所有",
+                propertyNumber = "",
+                procDepName = "",
+                equitmentDepName = ""
+            };
+
             return View();
         }
 
         [SessionTimeOutJsonFilter]
-        public IQueryable<vw_epReport> GetEPDatas(DateTime fromDate, DateTime toDate, string applyStatus,string propertyNumber="",string busDepName="",string sysNo="")
+        public IQueryable<vw_epReport> GetEPDatas(DateTime fromDate, DateTime toDate, string applyStatus, string propertyNumber = "", string procDepName = "", string equitmentDepName = "")
         {
             toDate = toDate.AddDays(1);
             var data = from v in db.vw_epReport
                        where v.report_time >= fromDate
                        && v.report_time <= toDate
-                       && v.property_number.Contains(propertyNumber)
-                       && v.bus_dep_name.Contains(busDepName)
-                       && v.sys_no.Contains(sysNo)
                        && (applyStatus == "所有"
                        || v.apply_status == applyStatus
-                       )
-                       orderby v.report_time
+                       )                       
                        select v;
-            return data;
+
+            if (!string.IsNullOrEmpty(propertyNumber)) {
+                data = data.Where(d => d.property_number.Contains(propertyNumber));
+            }
+            if (!string.IsNullOrEmpty(procDepName)) {
+                data = data.Where(d => d.produce_dep_name.Contains(procDepName));
+            }
+            if (!string.IsNullOrEmpty(equitmentDepName)) {
+                data = data.Where(d => d.equitment_dep_name.Contains(equitmentDepName));
+            }
+            
+            //2019-3-22 事业部生产主管只能查询本部门的数据，结合另外一个表使用
+            var busDeps = db.ei_epBusReportChecker.Where(e => e.checker_no == userInfo.cardNo).Select(e => e.bus_dep_name).Distinct().ToList();
+            if (busDeps.Count() > 0) {
+                data = data.Where(d => busDeps.Contains(d.bus_dep_name));
+            }
+
+            return data.OrderBy(d => d.report_time);
         }
         
         [SessionTimeOutFilter]
-        public ActionResult CheckEPDatas(DateTime fromDate, DateTime toDate, string applyStatus, string propertyNumber = "", string busDepName = "", string sysNo = "", int currentPage = 1)
+        public ActionResult CheckEPDatas(DateTime fromDate, DateTime toDate, string applyStatus, string propertyNumber = "", string procDepName = "", string equitmentDepName = "", int currentPage = 1)
         {
             int pageSize = 100;
-            var datas = GetEPDatas(fromDate, toDate, applyStatus,propertyNumber,busDepName,sysNo);
+            var datas = GetEPDatas(fromDate, toDate, applyStatus, propertyNumber, procDepName, equitmentDepName);
             int totalRecord = datas.Count();
             var totalPage = Math.Ceiling((totalRecord * 1.0) / pageSize);
 
@@ -1020,24 +1147,31 @@ namespace EmpInfo.Controllers
             ViewData["list"] = list;
             ViewData["currentPage"] = currentPage;
             ViewData["totalPage"] = totalPage;
+            ViewData["searchParam"] = new EPSearchParam()
+            {
+                fromDate = fromDate.ToString("yyyy-MM-dd"),
+                toDate = toDate.ToString("yyyy-MM-dd"),
+                applyStatus = applyStatus,
+                propertyNumber = propertyNumber,
+                procDepName = procDepName,
+                equitmentDepName = equitmentDepName
+            };
 
             return View("EPReport");
         }
 
-        public void BeginExportEPExcel(DateTime fromDate, DateTime toDate, string applyStatus, string propertyNumber = "", string busDepName = "", string sysNo = "")
+        public void BeginExportEPExcel(DateTime fromDate, DateTime toDate, string applyStatus, string propertyNumber = "", string procDepName = "", string equitmentDepName = "")
         {
-            var myData = GetEPDatas(fromDate, toDate, applyStatus, propertyNumber, busDepName, sysNo).ToList();
-            ushort[] colWidth = new ushort[] { 12, 16, 12, 12, 18, 12, 18, 24,
-                                               16, 16, 16, 16, 16, 16, 16,
-                                               16, 16, 16, 16, 16, 16, 16,
-                                               16, 16, 16, 16, 16, 16, 16,
-                                               16 };
+            var myData = GetEPDatas(fromDate, toDate, applyStatus, propertyNumber, procDepName, equitmentDepName).ToList();
+            ushort[] colWidth = new ushort[] { 12, 16, 10, 10, 12, 18, 18, 12, 18, 24,
+                                               16, 16, 16, 16, 16, 16, 16, 16,
+                                               16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+                                               16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16 };
 
-            string[] colName = new string[] { "状态", "申请流水号", "报修时间", "报修人", "联系电话", "事业部", "车间名称", "车间位置", 
-                                              "设备名称", "设备型号", "资产编号","设备供应商","生产主管","设备经理","紧急处理级别",
-                                              "故障现象", "接单时间","接单人","处理完成时间","维修人员","故障原因类别","故障原因",
-                                              "处理方法","更换配件","修理结果","其他维修人员","评价时间","评价生产主管","评价打分",
-                                              "评价内容" };
+            string[] colName = new string[] { "状态", "申请流水号", "报修日期", "报修时间", "报修人", "联系电话", "设备支部", "事业部", "车间名称", "岗位位置", 
+                                              "设备名称", "设备型号", "固定资产类别", "固定资产编号","设备供应商","生产主管","设备经理","影响停产程度",
+                                              "故障现象", "接单时间","接单人", "延迟处理原因","处理登记时间","处理完成时间","维修用时(分)", "维修人员","故障原因类别","故障原因",
+                                              "处理方法","更换配件","修理结果","协助人员","评价时间","评价生产主管","评价打分","评价内容","评分时间","评分设备经理","难度分数" };                                              
 
             //設置excel文件名和sheet名
             XlsDocument xls = new XlsDocument();
@@ -1080,27 +1214,40 @@ namespace EmpInfo.Controllers
                 //"故障现象", "接单时间","接单人","处理完成时间","维修人员","故障原因类别","故障原因",
                 //"处理方法","更换配件","修理结果","其他维修人员","评价时间","评价生产主管","评价打分",
                 //"评价内容"
-                cells.Add(++rowIndex, colIndex, d.apply_status);                
+                cells.Add(++rowIndex, colIndex, d.apply_status);
                 cells.Add(rowIndex, ++colIndex, d.sys_no);
-                cells.Add(rowIndex, ++colIndex, ((DateTime)d.report_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.report_time).ToString("yyyy-MM-dd"));
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.report_time).ToString("HH:mm"));
                 cells.Add(rowIndex, ++colIndex, d.applier_name);
                 cells.Add(rowIndex, ++colIndex, d.applier_phone);
+                cells.Add(rowIndex, ++colIndex, d.equitment_dep_name);
                 cells.Add(rowIndex, ++colIndex, d.bus_dep_name);
                 cells.Add(rowIndex, ++colIndex, d.produce_dep_name);
                 cells.Add(rowIndex, ++colIndex, d.produce_dep_addr);
 
                 cells.Add(rowIndex, ++colIndex, d.equitment_name);
                 cells.Add(rowIndex, ++colIndex, d.equitment_modual);
+                cells.Add(rowIndex, ++colIndex, d.property_type);
                 cells.Add(rowIndex, ++colIndex, d.property_number);
                 cells.Add(rowIndex, ++colIndex, d.equitment_supplier);
                 cells.Add(rowIndex, ++colIndex, d.produce_dep_charger_name);
                 cells.Add(rowIndex, ++colIndex, d.equitment_dep_charger_name);
-                cells.Add(rowIndex, ++colIndex, d.emergency_level);
+                cells.Add(rowIndex, ++colIndex, ((EmergencyEnum)d.emergency_level).ToString());
 
                 cells.Add(rowIndex, ++colIndex, d.faulty_situation);
                 cells.Add(rowIndex, ++colIndex, d.accept_time==null?"":((DateTime)d.accept_time).ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, d.accept_user_name);
+                cells.Add(rowIndex, ++colIndex, d.confirm_later_reason);
+                cells.Add(rowIndex, ++colIndex, d.confirm_register_time == null ? "" : ((DateTime)d.confirm_register_time).ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, d.confirm_time == null ? "" : ((DateTime)d.confirm_time).ToString("yyyy-MM-dd HH:mm"));
+                if (d.confirm_time == null || d.confirm_register_time == null) {
+                    cells.Add(rowIndex, ++colIndex, "");
+                }
+                else {
+                    var confirmTime = DateTime.Parse(((DateTime)d.confirm_time).ToString("yyyy-MM-dd HH:mm"));
+                    var reportTime = DateTime.Parse(((DateTime)d.report_time).ToString("yyyy-MM-dd HH:mm"));
+                    cells.Add(rowIndex, ++colIndex, (confirmTime - reportTime).TotalMinutes);
+                }
                 cells.Add(rowIndex, ++colIndex, d.confirm_user_name);
                 cells.Add(rowIndex, ++colIndex, d.faulty_type);
                 cells.Add(rowIndex, ++colIndex, d.faulty_reason);
@@ -1111,9 +1258,11 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.other_repairers);
                 cells.Add(rowIndex, ++colIndex, d.evaluation_time == null ? "" : ((DateTime)d.evaluation_time).ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, d.produce_dep_charger_name);
-                cells.Add(rowIndex, ++colIndex, d.evaluation_score);
-
+                cells.Add(rowIndex, ++colIndex, d.evaluation_score == 2 ? "满意" : (d.evaluation_score == 1 ? "一般" : (d.evaluation_score == 0 ? "不满意" : "")));
                 cells.Add(rowIndex, ++colIndex, d.evaluation_content);
+                cells.Add(rowIndex, ++colIndex, d.grade_time == null ? "" : ((DateTime)d.grade_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.equitment_dep_charger_name);
+                cells.Add(rowIndex, ++colIndex, d.difficulty_score);
             }
             xls.Send();
         }

@@ -191,7 +191,7 @@
                         $("#prDepForm")[0].reset();
                         var d = data.dep;
                         $("#prId").val(d.id);
-                        $("#prDepNo").val(d.dep_num);
+                        //$("#prDepNo").val(d.dep_num);
                         $("#prDepName").val(d.dep_name);
                         $("#busDepName").val(d.bus_dep_name);
                         $("#prDepCharger").val(d.charger_name+"("+d.charger_num+")");
@@ -205,7 +205,7 @@
             });
             $("#bt_groupAut").click(function () {
                 var prId=$("#prId").val();
-                var prDepNo= $("#prDepNo").val();
+                //var prDepNo= $("#prDepNo").val();
                 var prDepName=$("#prDepName").val();
                 var busDepName=$("#busDepName").val();
                 var prDepCharger=$("#prDepCharger").val();
@@ -214,7 +214,7 @@
                 $.post("@Url.Content("~/EP/SavePrDeps")", { 
                     prId:prId,
                     depId: "@eqDep.id",
-                    prDepNo: prDepNo,
+                    //prDepNo: prDepNo,
                     prDepName:prDepName,
                     busDepName:busDepName,
                     prDepCharger:prDepCharger,
@@ -480,12 +480,12 @@
                 <div class="modal-body">
                     <form id="prDepForm">
                         <input type="hidden" id="prId" value="0" />
-                        <input type="text" class="form-control" id="prDepNo" placeholder="请输入生产部门编码" />
+                        @*<input type="text" class="form-control" id="prDepNo" placeholder="请输入生产部门编码" />*@
                         <input type="text" class="form-control" id="prDepName" placeholder="请输入生产部门名称" style="margin-top:4px;"/>
                         <input type="text" class="form-control" id="busDepName" placeholder="请输入所属事业部名称" style="margin-top:4px;"/>
                         <input type="text" class="form-control" id="prDepCharger" placeholder="请输入生产部门主管" style="margin-top:4px;"/>
-                        <input type="text" class="form-control" id="prDepChief" placeholder="请输入生产部门上级" style="margin-top:4px;"/>
-                        <input type="text" class="form-control" id="prDepMinister" placeholder="请输入生产部门部长" style="margin-top:4px;"/>
+                        <input type="text" class="form-control" id="prDepChief" placeholder="请输入部门直接上级" style="margin-top:4px;"/>
+                        <input type="text" class="form-control" id="prDepMinister" placeholder="请输入事业部长" style="margin-top:4px;"/>
                     </form>
                 </div>
                 <div class="modal-footer">

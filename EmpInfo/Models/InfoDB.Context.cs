@@ -87,9 +87,11 @@ namespace EmpInfo.Models
         public DbSet<ei_epPrDeps> ei_epPrDeps { get; set; }
         public DbSet<ei_epEqDeps> ei_epEqDeps { get; set; }
         public DbSet<ei_epEqUsers> ei_epEqUsers { get; set; }
-        public DbSet<ei_epApply> ei_epApply { get; set; }
         public DbSet<ei_askLeave> ei_askLeave { get; set; }
+        public DbSet<ei_epApply> ei_epApply { get; set; }
         public DbSet<vw_epReport> vw_epReport { get; set; }
+        public DbSet<vw_UCExcel> vw_UCExcel { get; set; }
+        public DbSet<ei_epBusReportChecker> ei_epBusReportChecker { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {

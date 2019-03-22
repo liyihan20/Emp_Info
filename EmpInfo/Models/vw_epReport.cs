@@ -43,6 +43,13 @@ namespace EmpInfo.Models
         public Nullable<System.DateTime> evaluation_time { get; set; }
         public string evaluation_content { get; set; }
         public string other_repairers { get; set; }
+        public string equitment_dep_name { get; set; }
+        public string property_type { get; set; }
+        public string confirm_later_reason { get; set; }
+        public Nullable<bool> confirm_later_flag { get; set; }
+        public Nullable<System.DateTime> confirm_register_time { get; set; }
         public string apply_status { get; set; }
+        public Nullable<int> difficulty_score { get; set; }
+        public Nullable<System.DateTime> grade_time { get; set; }
     }
 }

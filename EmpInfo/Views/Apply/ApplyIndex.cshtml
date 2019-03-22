@@ -64,5 +64,10 @@
             <a href="@Url.Content("~/Report/EPReport")" class="list-group-item"><i class="fa fa-fw fa-file-text-o"></i> 查询报表</a>
         }
         }
+        @if ("UC".Equals(billType)) {
+            if (auts.IndexOf("UCReport") >= 0) {
+                <a href="@Url.Content("~/Report/UCReport")" class="list-group-item"><i class="fa fa-fw fa-file-text-o"></i> 查询报表</a>
+            }
+        }
     </div>
 </div>

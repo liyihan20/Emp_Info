@@ -66,19 +66,27 @@
                         <td>@ep.applier_phone</td>
                     </tr>
                     <tr>
-                        <th>事业部</th>
-                        <td>@ep.bus_dep_name</td>
-                    </tr>
-                    <tr>
                         <th>车间名称</th>
                         <td>@ep.produce_dep_name</td>
                     </tr>
                     <tr>
-                        <th>资产编号</th>
+                        <th>设备支部</th>
+                        <td>@ep.equitment_dep_name</td>
+                    </tr>
+                    <tr>
+                        <th>事业部</th>
+                        <td>@ep.bus_dep_name</td>
+                    </tr>
+                    <tr>
+                        <th>固定资产类别</th>
+                        <td>@ep.property_type</td>
+                    </tr>
+                    <tr>
+                        <th>固定资产编号</th>
                         <td>@ep.property_number</td>
                     </tr>
                     <tr>
-                        <th>车间位置</th>
+                        <th>岗位位置</th>
                         <td>@ep.produce_dep_addr</td>
                     </tr>
                     <tr>
@@ -102,8 +110,8 @@
                         <td>@ep.equitment_dep_charger_name</td>
                     </tr>
                     <tr>
-                        <th>紧急处理级别</th>
-                        <td>@(ep.emergency_level==1?"特急影响现在生产":(ep.emergency_level==2?"紧急将影响正常生产":(ep.emergency_level==3?"不紧急":"")))</td>
+                        <th>影响停产程度</th>
+                        <td>@(((EmergencyEnum)ep.emergency_level).ToString())</td>
                     </tr>
                     <tr>
                         <th>故障现象</th>
@@ -130,7 +138,27 @@
                                 @ep.accept_user_name
                             </td>
                         </tr>
-                        @if (ep.confirm_time != null) {
+                        @if (ep.confirm_later_flag == true) {
+                                <tr>
+                                    <th>
+                                        延迟处理
+                                    </th>
+                                    <td>
+                                        是
+                                    </td>
+                                </tr>                                
+                            }
+                        @if (!string.IsNullOrEmpty(ep.confirm_later_reason)) {
+                            <tr>
+                                <th>
+                                    延迟处理原因
+                                </th>
+                                <td>
+                                    @ep.confirm_later_reason
+                                </td>
+                            </tr>
+                        }
+                        @if (ep.confirm_register_time != null) {
                             <tr>
                                 <th>
                                     处理完成时间
@@ -139,6 +167,16 @@
                                     @(((DateTime)ep.confirm_time).ToString("yyyy-MM-dd HH:mm"))
                                 </td>
                             </tr>
+                            if (ep.confirm_register_time != null) {
+                                <tr>
+                                    <th>
+                                        处理登记时间
+                                    </th>
+                                    <td>
+                                        @(((DateTime)ep.confirm_register_time).ToString("yyyy-MM-dd HH:mm"))
+                                    </td>
+                                </tr>
+                            }
                             <tr>
                                 <th>
                                     维修人员
@@ -189,12 +227,12 @@
                             </tr>
                             <tr>
                                 <th>
-                                    其他维修人员
+                                    协助人员
                                 </th>
                                 <td>
                                     @ep.other_repairers
                                 </td>
-                            </tr>
+                            </tr>                            
                         }
                     </table>
                     }
@@ -223,7 +261,7 @@
                                     评价打分
                                 </th>
                                 <td>
-                                    @(ep.evaluation_score == 2 ? "满意" : (ep.evaluation_score == 1 ? "较满意" : (ep.evaluation_score == 0 ? "不满意" : "")))
+                                    @(ep.evaluation_score == 2 ? "满意" : (ep.evaluation_score == 1 ? "一般" : (ep.evaluation_score == 0 ? "不满意" : "")))
                                 </td>
                             </tr>
                             <tr>
@@ -237,6 +275,35 @@
                         </table>
                     }
 
+                @if (ep.grade_time != null) {
+                        <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">维修难度评分</h4>
+                        <table style="width:100%;border-collapse:separate; border-spacing:8px;" class="contentTb">
+                            <tr>
+                                <th style="width:28%;">
+                                    评分时间
+                                </th>
+                                <td style="width:72%;">
+                                    @(((DateTime)ep.grade_time).ToString("yyyy-MM-dd HH:mm"))
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    评分设备经理
+                                </th>
+                                <td>
+                                    @ep.equitment_dep_charger_name
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    难度分数
+                                </th>
+                                <td>
+                                    @ep.difficulty_score 分
+                                </td>
+                            </tr>  
+                        </table>
+                    }
             </div>
         </div>
     </div>
