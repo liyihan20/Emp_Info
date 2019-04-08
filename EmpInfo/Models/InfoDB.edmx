@@ -1107,6 +1107,7 @@
           <Property Name="moduel" Type="varchar" MaxLength="500" />
           <Property Name="qty" Type="decimal" Precision="18" Scale="4" />
           <Property Name="reason" Type="varchar" MaxLength="1000" />
+          <Property Name="arrive_time" Type="datetime" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_UCReport”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -1724,7 +1725,8 @@ FROM [dbo].[vw_svReport] AS [vw_svReport]</DefiningQuery>
 [vw_UCExcel].[delivery_company] AS [delivery_company], 
 [vw_UCExcel].[moduel] AS [moduel], 
 [vw_UCExcel].[qty] AS [qty], 
-[vw_UCExcel].[reason] AS [reason]
+[vw_UCExcel].[reason] AS [reason], 
+[vw_UCExcel].[arrive_time] AS [arrive_time]
 FROM [dbo].[vw_UCExcel] AS [vw_UCExcel]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="vw_UCReport" EntityType="Self.vw_UCReport" store:Type="Views" store:Schema="dbo">
@@ -2067,8 +2069,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySet Name="ei_askLeave" EntityType="ICAuditModel.ei_askLeave" />
           <EntitySet Name="ei_epApply" EntityType="ICAuditModel.ei_epApply" />
           <EntitySet Name="vw_epReport" EntityType="ICAuditModel.vw_epReport" />
-          <EntitySet Name="vw_UCExcel" EntityType="ICAuditModel.vw_UCExcel" />
           <EntitySet Name="ei_epBusReportChecker" EntityType="ICAuditModel.ei_epBusReportChecker" />
+          <EntitySet Name="vw_UCExcel" EntityType="ICAuditModel.vw_UCExcel" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -3535,6 +3537,15 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="difficulty_score" Type="Int32" />
           <Property Name="grade_time" Type="DateTime" Precision="3" />
         </EntityType>
+        <EntityType Name="ei_epBusReportChecker">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="bus_dep_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="checker_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="checker_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
         <EntityType Name="vw_UCExcel">
           <Key>
             <PropertyRef Name="id" />
@@ -3554,15 +3565,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="moduel" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="qty" Type="Decimal" Precision="18" Scale="4" />
           <Property Name="reason" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
-        </EntityType>
-        <EntityType Name="ei_epBusReportChecker">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="bus_dep_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="checker_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="checker_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="arrive_time" Type="DateTime" Precision="3" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -4908,9 +4911,20 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="ei_epBusReportChecker">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_epBusReportChecker">
+              <MappingFragment StoreEntitySet="ei_epBusReportChecker">
+                <ScalarProperty Name="checker_name" ColumnName="checker_name" />
+                <ScalarProperty Name="checker_no" ColumnName="checker_no" />
+                <ScalarProperty Name="bus_dep_name" ColumnName="bus_dep_name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="vw_UCExcel">
             <EntityTypeMapping TypeName="ICAuditModel.vw_UCExcel">
               <MappingFragment StoreEntitySet="vw_UCExcel">
+                <ScalarProperty Name="arrive_time" ColumnName="arrive_time" />
                 <ScalarProperty Name="reason" ColumnName="reason" />
                 <ScalarProperty Name="qty" ColumnName="qty" />
                 <ScalarProperty Name="moduel" ColumnName="moduel" />
@@ -4924,16 +4938,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="applier_name" ColumnName="applier_name" />
                 <ScalarProperty Name="sys_no" ColumnName="sys_no" />
                 <ScalarProperty Name="entry_id" ColumnName="entry_id" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="ei_epBusReportChecker">
-            <EntityTypeMapping TypeName="ICAuditModel.ei_epBusReportChecker">
-              <MappingFragment StoreEntitySet="ei_epBusReportChecker">
-                <ScalarProperty Name="checker_name" ColumnName="checker_name" />
-                <ScalarProperty Name="checker_no" ColumnName="checker_no" />
-                <ScalarProperty Name="bus_dep_name" ColumnName="bus_dep_name" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

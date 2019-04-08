@@ -1,6 +1,7 @@
 ﻿@using EmpInfo.Models;
 @{
-    List<K3AccountModel> accs = (List<K3AccountModel>)ViewData["stockAccounts"];
+    SABeforeApplyModel m = ViewData["infoBeforeApply"] as SABeforeApplyModel;
+    var accs = m.accounts;
 }
 @section CSS{
     <style type="text/css">
@@ -20,7 +21,7 @@
         $("input[name='k3Account']").on("ifChecked", function () {
             var acc = $("input[name='k3Account']:checked").val();
             $("#stockName").empty();
-            $.post("@Url.Content("~/Apply/GetStockAndAdminByAccount")", { accName: acc }, function (data) {
+            $.post("@Url.Content("~/ApplyExtra/GetStockAndAdminByAccount")", { accName: acc }, function (data) {
                 if (data.suc) {
                     var result = data.result;
                     if (result.length < 1) {
@@ -70,13 +71,13 @@
 
             openConfirmDialog("确认要申请仓库：" + stockName + "(" + stockNum + ")的管理员权限吗？", function () {
                 $("#dealBt").button("loading");
-                $.post("@Url.Content("~/Apply/SaveApplySA")", {
-                    sysNum: "@ViewData["sysNum"]",
-                    stockNum: stockNum,
-                    stockName: stockName,
-                    auditorName: auditorName,
-                    auditorNum: auditorNum,
-                    accountName: account,
+                $.post("SaveApply", {
+                    sys_no: "@m.sysNum",
+                    k3_stock_num: stockNum,
+                    k3_stock_name: stockName,
+                    stock_auditor_name: auditorName,
+                    stock_auditor_num: auditorNum,
+                    k3_account_name: account,
                     comment: $("#comment").val()
                 }, function (data) {
                     if (data.suc) {
@@ -106,7 +107,7 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>            
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
-            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=SA")">仓管权限</a></li>
+            <li><a href="ApplyIndex?billType=SA">仓管权限申请单</a></li>
             <li class="active">开始申请</li>
         </ol>
     </div>
@@ -157,7 +158,7 @@
         <h4 style="margin-bottom:12px;" class="text-danger"><i class="fa fa-question-circle"></i> 申请流水号:</h4>
         <div class="row">
             <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
-                <input type="text" class="form-control" value="@ViewData["sysNum"]" readonly/>
+                <input type="text" class="form-control" value="@m.sysNum" readonly/>
             </div>
         </div>
         <h4 style="margin-bottom:12px;" class="text-danger"><i class="fa fa-question-circle"></i> 请选择仓库:</h4>

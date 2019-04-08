@@ -40,14 +40,14 @@
         });
         $("#flowRecordBt").on("click", function () {
             var box = $("<div></div>");
-            $(box).load("@Url.Content("~/Apply/CheckFlowRecord") .list-group", { sysNo: "@al.sysNo" }, function () {
+            $(box).load("CheckFlowRecord .list-group", { sysNo: "@al.sysNo" }, function () {
                 openMessageDialog($(box).html(), "查看流转记录");
             });
 
         });
         $("#leaveRecordBt").on("click", function () {
 
-            $.post("@Url.Content("~/Apply/GetLeaveRecordsInOneYear")", { applierNameAndCard: "@al.applierNameAndCard" }, function (data) {
+            $.post("@Url.Content("~/ApplyExtra/GetLeaveRecordsInOneYear")", { applierNameAndCard: "@al.applierNameAndCard" }, function (data) {
                     if (data.suc) {
                         var trs = data.list;
                         if (trs.length == 0) {
@@ -58,7 +58,7 @@
 
                         for (var i = 0; i < trs.length; i++) {
                             table += "<tr>";
-                            table += "<td><a href='@Url.Content("~/Apply/checkALApply?sysNo=")" + trs[i].sysNo + "' target='_blank'>" + trs[i].sysNo + "</a><br/>" + trs[i].applyTime + "</td>";
+                            table += "<td><a href='checkApply?sysNo=" + trs[i].sysNo + "' target='_blank'>" + trs[i].sysNo + "</a><br/>" + trs[i].applyTime + "</td>";
                             table += "<td>" + trs[i].leaveType + " : " + trs[i].leaveDays + "<br/>" + trs[i].leaveDateSpan + "</td>";
                             table += "</tr>";
                         }
@@ -85,22 +85,18 @@
                     <li><span class="glyphicon glyphicon-hand-right"></span></li>
                     <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
                     <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=AL")">请假申请单</a></li>
+                    <li><a href="ApplyIndex?billType=AL">请假申请单</a></li>
                     <li class="active">查看详情</li>
                 </ol>
             </div>
             <div class="panel-body">
-                @*<div style="float:right;margin-right:8px;">
-                    <button type="button" class="btn btn-default" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
-                </div>*@
-
                 <table style="width:100%;border-collapse:separate; border-spacing:8px;" id="contentTb">
                     <tr>
                         <th style="width:28%;">
                             审核状态                            
                         </th>
                         <td style="width:72%;">
-                            <span class="pull-left" style="margin-top:5px;">@al.auditStatus</span>                            
+                            <span class="pull-left" style="margin-top:5px;">@ViewData["auditStatus"]</span>                            
                             <button type="button" class="btn btn-default btn-sm pull-right" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
                             
                         </td>

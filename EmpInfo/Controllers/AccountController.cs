@@ -401,13 +401,17 @@ namespace EmpInfo.Controllers
                 if(string.IsNullOrEmpty(user.salary_no)){
                     return Json(new SimpleResultModel() { suc = false, msg = "你没有条形码，不能自行处理，请联系管理员" });
                 }
+
+                //第三方员工或新员工没有工资卡号的，不需要再验证 2019-04-08
                 var bankCards = db.GetSalaryBankCard(user.salary_no).ToList();
-                if(bankCards.Count()==0){
-                    return Json(new SimpleResultModel() { suc = false, msg = "工资卡号不存在" });
+                if (bankCards.Count() > 0) {
+                    if (bankCards.First() != null) {
+                        if (!bankCardNumber.Equals(bankCards.First())) {
+                            return Json(new SimpleResultModel() { suc = false, msg = "工资银行卡号错误，验证失败" });
+                        }
+                    }
                 }
-                if(!bankCardNumber.Equals(bankCards.First())){
-                    return Json(new SimpleResultModel() { suc = false, msg = "工资银行卡号错误，验证失败" });
-                }
+                
                 //验证成功
                 if (opType.IndexOf("active") >= 0) {
                     user.forbit_flag = false;

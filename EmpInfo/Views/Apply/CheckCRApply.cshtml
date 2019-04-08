@@ -1,6 +1,7 @@
 ﻿@using EmpInfo.Models;
 @{
-    ei_CRApply cr = (ei_CRApply)ViewData["cr"];
+    CRCheckApplyModel m = ViewData["am"] as CRCheckApplyModel;
+    ei_CRApply cr = m.cr;
 }
 @section CSS{
     <style type="text/css">
@@ -37,7 +38,7 @@
             });
             $("#flowRecordBt").on("click", function () {
                 var box = $("<div></div>");
-                $(box).load("@Url.Content("~/Apply/CheckFlowRecord") .list-group", { sysNo: "@cr.sys_no" }, function () {
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@cr.sys_no" }, function () {
                     openMessageDialog($(box).html(), "查看流转记录");
                 });
 
@@ -120,7 +121,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="al_file_list">                                    
-                                        @foreach (var file in (List<AttachmentModel>)ViewData["attachments"]) {
+                                        @foreach (var file in m.attachments) {
                                             <tr>
                                                 <td data-fd="@file.fileName">
                                                     @if (file.fileName.Length > 20) {

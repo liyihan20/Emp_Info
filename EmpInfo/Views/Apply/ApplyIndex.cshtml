@@ -1,39 +1,19 @@
-﻿@{
-    string billType = ViewData["billType"] as string;
-    string auts = (string)ViewData["autStr"];
-}
-@section CSS{
-    <style type="text/css">
-        .badge {
-            background-color: #3399CC;
-        }
-    </style>
+﻿@using EmpInfo.Models;
+@{    
+    List<ApplyMenuItemModel> menuItems = ViewData["menuItems"] as List<ApplyMenuItemModel>;
 }
 
 @section Scripts{
     <script>
-    $(function () {
-        //if (parseInt($("#dealingBadge").html()) > 0) {
-        //    $("#dealingBadge").css("visibility", "visible");
-        //}
-        @*$.post("@Url.Content("~/Apply/GetMyDealingApplyCount")", { billType: "@ViewData["billType"]" }, function (data) {
-            if (data.suc) {
-                if (data.count > 0) {
-                    $("#dealingBadge").html(data.count);
-                    $("#dealingBadge").css("visibility", "visible");
-                }
+    $(function () {        
+        $(".screen_900").on("click", function (e) {
+            e.preventDefault();
+            var w = $(document).width();                
+            if (w > 900) {
+                window.location.href = $(this).attr("href");
             } else {
-                toastr.error(data.msg);
+                toastr.error("此功能必须在大屏幕显示器操作");
             }
-        });*@
-        $("#beginApplyLink").on("click", function () {
-            $.post("@Url.Content("~/WX/HasBindWx")", {}, function (data) {
-                if (data.suc) {
-                    window.location.href = "@Url.Content("~/Apply/BeginApply?billType=")" + "@billType";
-                } else {
-                    toastr.error(data.msg);
-                }
-            });
         });
     });
     </script>
@@ -44,7 +24,9 @@
         <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
-            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            @foreach (var n in (ViewData["navigatorLinks"] as List<ApplyNavigatorModel>)){
+                <li><a href="@string.Concat(Url.Content("~/"),n.url)">@n.text</a></li>
+            }            
             <li class="active">@ViewData["billName"]</li>
         </ol>
     </div>
@@ -52,22 +34,8 @@
         <i> 点击以下列表选择相应的服务:</i>
     </div>
     <div class="list-group">
-        <a href="#" class="list-group-item" id="beginApplyLink"><span class="text-danger"><i class="fa fa-fw fa-pencil"></i> 开始申请</span></a>
-        <a href="@string.Concat(Url.Content("~/Apply/GetMyApplyList?billType="), billType)" class="list-group-item"><i class="fa fa-fw fa-th"></i> 我申请的</a>
-        <a href="@string.Concat(Url.Content("~/Apply/GetMyAuditingList?billType="), billType)" class="list-group-item"><i class="fa fa-fw fa-th-list"></i> 我的待办 <span class="badge" id="dealingBadge" style="visibility:hidden;"></span></a>
-        <a href="@string.Concat(Url.Content("~/Apply/GetMyAuditedList?billType="), billType)" class="list-group-item"><i class="fa fa-fw fa-th-large"></i> 我的已办</a>
-        @if ("EP".Equals(billType)) {
-            if (auts.IndexOf("EPReport") >= 0) {
-            <a href="@Url.Content("~/EP/EquitmentDeps")" class="list-group-item"><i class="fa fa-fw fa-gear"></i> 设备部门维护</a>
-        }
-            if (auts.IndexOf("EPReport") >= 0) {
-            <a href="@Url.Content("~/Report/EPReport")" class="list-group-item"><i class="fa fa-fw fa-file-text-o"></i> 查询报表</a>
-        }
-        }
-        @if ("UC".Equals(billType)) {
-            if (auts.IndexOf("UCReport") >= 0) {
-                <a href="@Url.Content("~/Report/UCReport")" class="list-group-item"><i class="fa fa-fw fa-file-text-o"></i> 查询报表</a>
-            }
-        }
+        @foreach (var m in menuItems) {
+            <a href="@m.url" class="list-group-item @m.linkClass"><span class="@m.colorClass"><i class="fa fa-fw @m.iconFont"></i> @m.text</span></a>
+        }        
     </div>
 </div>

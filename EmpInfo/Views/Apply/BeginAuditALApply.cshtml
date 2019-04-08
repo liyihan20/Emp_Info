@@ -9,7 +9,7 @@
     <script>
         $(function () {
 
-            $("#applyContent").load("@Url.Content("~/Apply/CheckALApply?")", { sysNo: "@bam.sysNum" }, function () {
+            $("#applyContent").load("CheckApply", { sysNo: "@bam.sysNum" }, function () {
                 $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> 请假申请单详情");
                 $("#waiting").remove();
                 $(".auditContent").css("visibility", "visible");
@@ -17,12 +17,10 @@
             $("#opinionOpt").on("change", function () {
                 $("#opinion").val($("#opinionOpt").val());
             });
-            //$("#opinionOpt").val("同意！");
-            //$("#opinionOpt").trigger("change");
         });
         function audit(isPass) {
             openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此申请吗？", function () {
-                $.post("@Url.Content("~/Apply/HandleAlApply")", {
+                $.post("HandleApply", {
                     sysNo: "@bam.sysNum",
                     step: "@bam.step",
                     isPass: isPass,
@@ -30,7 +28,7 @@
                 }, function (data) {
                     if (data.suc) {
                         toastr.success(data.msg);
-                        setTimeout(function () { window.location.href = "@Url.Content("~/Apply/GetMyAuditingList?billType=AL")"; }, 2000);
+                        setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
                     } else {
                         toastr.error(data.msg);
                     }
@@ -70,7 +68,7 @@
                         toastr.error("请先选择预约时间");
                         return;
                     }
-                    $.post("@Url.Content("~/Apply/LeaveDayExceedPush")", { sysNo: "@bam.sysNum", bookTime: bookTime }, function (data) {
+                    $.post("@Url.Content("~/ApplyExtra/LeaveDayExceedPush")", { sysNo: "@bam.sysNum", bookTime: bookTime }, function (data) {
                         if (data.suc) {
                             toastr.success("已成功发送预约面谈通知");
                             setTimeout(getSendMsgLog, 1000);
@@ -83,7 +81,7 @@
             });
 
             function getSendMsgLog() {
-                $.post("@Url.Content("~/Apply/GetLeaveDaysExceedLog")", { sysNo: "@bam.sysNum" }, function (data) {
+                $.post("@Url.Content("~/ApplyExtra/GetLeaveDaysExceedLog")", { sysNo: "@bam.sysNum" }, function (data) {
                     if (data.suc) {
                         $("#msgLog").html(data.msg);
                     } else {

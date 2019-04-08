@@ -471,10 +471,10 @@ namespace EmpInfo.Controllers
             toDate = toDate.AddDays(1);
             var result = db.vw_UCExcel.Where(u => u.apply_time > fromDate && u.apply_time <= toDate).ToList();
 
-            ushort[] colWidth = new ushort[] { 8, 16, 12, 16, 16, 24, 12,
+            ushort[] colWidth = new ushort[] { 8, 16, 12, 16, 16, 16, 24, 12,
                                                24, 16, 24, 24, 12, 32 };
 
-            string[] colName = new string[] { "序号", "申请流水号", "申请人", "申请时间", "完成申请时间", "市场部", "出货公司",
+            string[] colName = new string[] { "序号", "申请流水号", "申请人", "申请时间", "完成申请时间","到达时间", "市场部", "出货公司",
                                               "客户", "生产事业部", "货运公司", "出货型号", "出货数量","申请原因" };
 
             //設置excel文件名和sheet名
@@ -520,6 +520,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.applier_name);
                 cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, ((DateTime)d.finish_date).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.arrive_time).ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, d.market_name);
                 cells.Add(rowIndex, ++colIndex, d.company);
 

@@ -1,7 +1,8 @@
 ﻿@using EmpInfo.Models;
 @{
-    ei_ucApply uc=(ei_ucApply)ViewData["uc"];
-    List<ei_ucApplyEntry> entrys = (List<ei_ucApplyEntry>)ViewData["entrys"];    
+    UCCheckApplyModel m = ViewData["am"] as UCCheckApplyModel;
+    ei_ucApply uc = m.uc;
+    List<ei_ucApplyEntry> entrys = m.entrys;
 }
 
 @section CSS{
@@ -40,7 +41,7 @@
             });
             $("#flowRecordBt").on("click", function () {
                 var box = $("<div></div>");
-                $(box).load("@Url.Content("~/Apply/CheckFlowRecord") .list-group", { sysNo: "@uc.sys_no" }, function () {
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@uc.sys_no" }, function () {
                     openMessageDialog($(box).html(), "查看流转记录");
                 });
             });
@@ -63,7 +64,7 @@
                     <li><span class="glyphicon glyphicon-hand-right"></span></li>
                     <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
                     <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=UC")">非正常时间出货</a></li>
+                    <li><a href="ApplyIndex?billType=UC">非正常时间出货</a></li>
                     <li class="active">查看详情</li>
                 </ol>
             </div>
@@ -141,7 +142,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="al_file_list">                                    
-                                        @foreach (var file in (List<AttachmentModel>)ViewData["attachments"]) {
+                                        @foreach (var file in m.attachments) {
                                             <tr>
                                                 <td data-fd="@file.fileName">
                                                     @if (file.fileName.Length > 20) {

@@ -157,7 +157,6 @@ namespace EmpInfo.Controllers
                 throw;
             }
 
-
             return Json(new { suc = true, msg = "保存成功" });
         }
 
@@ -237,6 +236,7 @@ namespace EmpInfo.Controllers
                     db.ei_epEqUsers.Remove(depUser);
                 }
                 db.SaveChanges();
+                WriteEventLog("设备故障报修", "移出设备部人员：" + userIds + ";dep:" + depId);
                 return Json(new { suc = true,msg="成功移出选择的人员" });
             }
             catch (Exception ex) {

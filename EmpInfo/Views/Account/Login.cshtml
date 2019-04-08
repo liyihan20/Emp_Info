@@ -98,13 +98,13 @@
                     $.post("@Url.Content("~/Account/ValidateIDNumber")", { card_no: cardNumber, id_number: idNumber, name: name }, function (data) {
                         if (data.suc) {
                             if (data.phone == "") {
-                                $("#phoneNumber").attr("placeholder", "手机号码不存在");
+                                $("#phoneNumber").attr("placeholder", "手机号码在人事系统未登记,不能验证");
                                 $("#phoneNumber").attr("readonly", "readonly");
                             } else {
                                 $("#phoneNumberSuffix").html(data.phone);
                             }
                             if (data.email == "") {
-                                $("#emailAddress").attr("placeholder", "email地址没有登记,不能验证");
+                                $("#emailAddress").attr("placeholder", "email地址在人事系统未登记,不能验证");
                                 $("#emailCode").attr("readonly", "readonly");
                                 $("#sendEmailCodeBt").attr("disabled", "disabled");
                             } else {

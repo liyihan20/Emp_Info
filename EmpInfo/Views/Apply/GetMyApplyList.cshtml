@@ -1,4 +1,5 @@
-﻿@{
+﻿@using EmpInfo.Models
+@{
     List<EmpInfo.FlowSvr.FlowMyAppliesModel> list = (List<EmpInfo.FlowSvr.FlowMyAppliesModel>)ViewData["list"];
 }
     @section CSS{
@@ -17,10 +18,9 @@
         function CheckDetail(sysNo) {
             window.location.href = "CheckApply?sysNo=" + sysNo;
         }
-        function AbortApply(sysNo, reason) {
-            if (!reason) reason = "";
+        function AbortApply(sysNo) {            
             openConfirmDialog("确认要撤销此申请吗？", function () {
-                $.post("@Url.Content("~/Apply/AbortApply")", { sysNo: sysNo, reason: reason }, function (data) {
+                $.post("AbortApply", { sysNo: sysNo }, function (data) {
                     if (data.suc) {
                         toastr.success(data.msg);
                         setTimeout(function () { location.reload(true); }, 2000);
@@ -29,12 +29,7 @@
                     }
                 });
             });
-        }
-        function AbortApplyAfterFinish(sysNo) {
-            openInputDialog("请输入撤销请假申请的原因：", function (reason) {
-                AbortApply(sysNo, reason);
-            },"撤销原因输入");
-        }
+        }        
         </script>
     }
     <div class="panel panel-success" id="applyDiv">
@@ -42,7 +37,10 @@
             <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
                 <li><span class="glyphicon glyphicon-hand-right"></span></li>
                 <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
-                <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+                @foreach (var n in (ViewData["navigatorLinks"] as List<ApplyNavigatorModel>)) {
+                    <li><a href="@string.Concat(Url.Content("~/"),n.url)">@n.text</a></li>
+                } 
+                <li><a href="@string.Concat("ApplyIndex?billType=", ViewData["billType"])">@ViewData["billTypeName"]</a></li>
                 <li class="active">我申请的</li>
             </ol>
         </div>
@@ -70,17 +68,9 @@
                                 }
                                 <p>审核结果：<b class="@textColor">@i.auditResult</b></p>
                                 <p><button class="btn btn-primary btn-block" onclick="CheckDetail('@i.sysNo')"><i class="fa fa-search"></i> 查看详情</button></p>
-                                @if (i.auditResult == "成功" && (string)ViewData["billType"] == "AL") {
-                                    DateTime fromDate = DateTime.Parse(i.subTitle.Split(new char[] { '~' })[0].Trim());                                    
-                                    if (DateTime.Now < fromDate) {
-                                        <p><button class="btn btn-danger btn-block" onclick="AbortApplyAfterFinish('@i.sysNo')"><i class="fa fa-reply"></i> 撤销申请</button></p>
-                                    }
-                                }
-                                else if (i.auditResult == "审批中") {
+                                @if (i.auditResult == "审批中") {
                                     <p><button class="btn btn-danger btn-block" onclick="AbortApply('@i.sysNo')"><i class="fa fa-reply"></i> 撤销申请</button></p>
                                 }
-
-
                             </div>
                         </div>
                     </div>
@@ -90,5 +80,4 @@
     </div>
     @section modal{
         @Html.Partial("_ConfirmDialog")
-        @Html.Partial("_InputDialog")
     }

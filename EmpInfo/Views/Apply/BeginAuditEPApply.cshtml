@@ -1,7 +1,7 @@
 ﻿@using EmpInfo.Models;
 @{
     BeginAuditModel bam = (BeginAuditModel)ViewData["bam"];
-    ei_epApply ep = ViewData["ep"] as ei_epApply;
+    ei_epApply ep = (ei_epApply)bam.otherInfo;
     string faultyType = "", repairResult = "";
     if (ep != null) {
         faultyType = ep.faulty_type;
@@ -12,9 +12,9 @@
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <style type="text/css">
         .b-label {
-            display: inline-block;            
+            display: inline-block;
             width: 85px;
-            color: gray;            
+            color: gray;
             vertical-align: top;
         }
 
@@ -42,29 +42,11 @@
             minuteStep: 5,
         });
 
-        $("#applyContent").load("@Url.Content("~/Apply/CheckEPApply?")", { sysNo: "@bam.sysNum" }, function () {
+        $("#applyContent").load("CheckApply", { sysNo: "@bam.sysNum" }, function () {
             $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> 设备故障报修详情");
             $("#waiting").remove();
             $(".auditContent").css("visibility", "visible");
         });
-
-        @*$("#acceptBtn").on("click", function () {
-            openConfirmDialog("确认要承接此设备故障报修申请吗？", function () {
-                $.post("@Url.Content("~/Apply/HandleEPApply")", {
-                    sysNum: "@bam.sysNum",
-                    step: "@bam.step",
-                    stepName: "@bam.stepName"
-                }, function (data) {
-                    if (data.suc) {
-                        toastr.success(data.msg);
-                        setTimeout(function () { window.location.href = "@Url.Content("~/Apply/BeginAuditApply?sysNo=")" + "@bam.sysNum" + "&step=" + "@(bam.step+1)"; }, 1000);
-                    } else {
-                        toastr.error(data.msg);
-                    }
-                });
-            });
-        });*@
-
 
         $("#other_repairers,#transfer_to_other").on("focus", function () {
             var self = this;
@@ -73,26 +55,6 @@
                 $(self).val(result);
             });
         });
-
-        @*$("#confirmBtn").on("click", function () {
-            openConfirmDialog("确认要处理此设备故障报修申请吗？", function () {
-                $.ajax({
-                    type: "post",
-                    url: "@Url.Content("~/Apply/HandleEPApply")",
-                    data: $("#confirmForm").serialize(),
-                    cache: false,
-                    dataType: "json",
-                    success: function (data) {
-                        if (data.suc) {
-                            toastr.success(data.msg);
-                            setTimeout(function () { window.location.href = "@Url.Content("~/Apply/CheckApply?sysNo=")" + "@bam.sysNum" }, 1000);
-                        } else {
-                            toastr.error("操作失败，原因：" + data.msg);
-                        }
-                    }
-                });
-            });
-        });*@
 
         $("#evaluateBtn").on("click", function () {
             var score = $("#evaluation_score").val();
@@ -107,7 +69,7 @@
             }
 
             openConfirmDialog("确认要评价此设备故障维修服务吗？", function () {
-                $.post("@Url.Content("~/Apply/HandleEPApply")", {
+                $.post("HandleApply", {
                     sysNum: "@bam.sysNum",
                     step: "@bam.step",
                     stepName: "@bam.stepName",
@@ -116,7 +78,7 @@
                 }, function (data) {
                     if (data.suc) {
                         toastr.success(data.msg);
-                        setTimeout(function () { window.location.href = "@Url.Content("~/Apply/GetMyAuditingList?billType=EP")"; }, 1000);
+                        setTimeout(function () { window.location.href = "GetMyAuditingList?billType=EP"; }, 1000);
                     } else {
                         toastr.error(data.msg);
                     }
@@ -131,7 +93,7 @@
                 return;
             }
             openConfirmDialog("确认要对此设备故障维修打分吗？", function () {
-                $.post("@Url.Content("~/Apply/HandleEPApply")", {
+                $.post("HandleApply", {
                     sysNum: "@bam.sysNum",
                     step: "@bam.step",
                     stepName: "@bam.stepName",
@@ -139,7 +101,7 @@
                 }, function (data) {
                     if (data.suc) {
                         toastr.success(data.msg);
-                        setTimeout(function () { window.location.href = "@Url.Content("~/Apply/GetMyAuditingList?billType=EP")"; }, 1000);
+                        setTimeout(function () { window.location.href = "GetMyAuditingList?billType=EP"; }, 1000);
                     } else {
                         toastr.error(data.msg);
                     }
@@ -159,7 +121,7 @@
             return;
         }
         openConfirmDialog("确认要" + (isAccepted ? "承接" : "拒接") + "此设备故障报修申请吗？", function () {
-            $.post("@Url.Content("~/Apply/HandleEPApply")", {
+            $.post("HandleApply", {
                 sysNum: "@bam.sysNum",
                 step: "@bam.step",
                 stepName: "@bam.stepName",
@@ -169,9 +131,9 @@
                 if (data.suc) {
                     toastr.success(data.msg);
                     if (isAccepted) {
-                        setTimeout(function () { window.location.href = "@Url.Content("~/Apply/BeginAuditApply?sysNo=")" + "@bam.sysNum" + "&step=" + "@(bam.step+1)"; }, 1000);
+                        setTimeout(function () { window.location.href = "BeginAuditApply?sysNo=" + "@bam.sysNum" + "&step=" + "@(bam.step+1)"; }, 1000);
                     } else {
-                        setTimeout(function () { window.location.href = "@Url.Content("~/Apply/CheckApply?sysNo=")" + "@bam.sysNum" }, 1000);
+                        setTimeout(function () { window.location.href = "CheckApply?sysNo=" + "@bam.sysNum" }, 1000);
                     }
                 } else {
                     toastr.error(data.msg);
@@ -193,14 +155,14 @@
         openConfirmDialog("确认要" + (lateConfirm ? "延迟" : "") + "处理此设备故障报修申请吗？", function () {
             $.ajax({
                 type: "post",
-                url: "@Url.Content("~/Apply/HandleEPApply")",
+                url: "HandleApply",
                 data: $("#confirmForm").serialize(),
                 cache: false,
                 dataType: "json",
                 success: function (data) {
                     if (data.suc) {
                         toastr.success(data.msg);
-                        setTimeout(function () { window.location.href = "@Url.Content("~/Apply/CheckApply?sysNo=")" + "@bam.sysNum" }, 1000);
+                        setTimeout(function () { window.location.href = "CheckApply?sysNo=" + "@bam.sysNum" }, 1000);
                     } else {
                         toastr.error("操作失败，原因：" + data.msg);
                     }

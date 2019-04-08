@@ -1,7 +1,6 @@
-﻿@{
-    List<string> marketList = (List<string>)ViewData["marketList"];
-    List<string> busDepList = (List<string>)ViewData["busDepList"];
-    List<string> accountingList = (List<string>)ViewData["accountingList"];
+﻿@using EmpInfo.Models;
+@{
+    UCBeforeApplyModel m = ViewData["infoBeforeApply"] as UCBeforeApplyModel;    
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
@@ -41,25 +40,12 @@
     </style>
 }
 @section Scripts {
-    @*<script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
-    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>*@
     <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
 
     <script>
         var items = [];
         var changeIdx = -1;
         $(function () {
-            @*$("#timePicker").datetimepicker({
-                language: 'zh-CN',
-                format: "yyyy-mm-dd hh:ii",
-                autoclose: true,
-                startView: 2,
-                maxView: 2,
-                minuteStep: 5,
-                startDate: "@DateTime.Now.ToString("yyyy-MM-dd HH:mm")",
-                endDate: "@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 22:00")",
-                hoursDisabled: [22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
-            });*@
 
             $("#customerNumber").on("focusout", function () {
                 var num = $(this).val();
@@ -97,7 +83,7 @@
                     $("#apply_bt").button("loading");
                     $.ajax({
                         type: 'post',
-                        url: '@Url.Content("~/Apply/SaveApplyUC")',
+                        url: 'SaveApply',
                         data: $("#chForm").serialize() + "&entrys=" + JSON.stringify(items),
                         cache: false,
                         dataType: 'json',
@@ -105,7 +91,7 @@
                             $("#apply_bt").button("reset");
                             if (data.suc) {
                                 toastr.success("提交成功:" + data.msg);
-                                setTimeout(function () { window.location.href = "@Url.Content("~/Apply/ApplyIndex?billType=UC")"; }, 2000);
+                                setTimeout(function () { window.location.href = "ApplyIndex?billType=UC"; }, 2000);
                             } else {
                                 toastr.error("提交失败：" + data.msg);
                                 $("#apply_bt").button("reset");
@@ -186,7 +172,7 @@
                 pick: '#picker',
                 resize: false,
                 auto: true,
-                formData: { sysNum: '@ViewData["sysNum"]' },
+                formData: { sysNum: '@m.sysNum' },
                 fileNumLimit: maxNum,
                 fileSingleSizeLimit: maxSingleSize,
                 accept: {
@@ -254,7 +240,7 @@
                     var fileId = $(fileTD).attr("id");
                     var fileName = $(fileTD).attr("data-fd");
 
-                    $.post("@Url.Content("~/File/RemoveUploadedFile")", { sysNum: "@ViewData["sysNum"]", fileName: fileName }, function (data) {
+                    $.post("@Url.Content("~/File/RemoveUploadedFile")", { sysNum: "@m.sysNum", fileName: fileName }, function (data) {
                         if (data.suc) {
                             toastr.success("文件移除成功");
                             uploader.removeFile(fileId,true);
@@ -284,7 +270,7 @@
                     <li><span class="glyphicon glyphicon-hand-right"></span></li>
                     <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
                     <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=UC")">非正常时间出货单</a></li>
+                    <li><a href="ApplyIndex?billType=UC">非正常时间出货单</a></li>
                     <li class="active">开始申请</li>
                 </ol>
             </div>
@@ -295,8 +281,7 @@
                             申请流水号:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" id="sysNum" value="@ViewData["sysNum"]" disabled />
-                            <input type="hidden" name="sys_no" value="@ViewData["sysNum"]" />
+                            <input type="text" class="form-control" name="sys_no" id="sysNum" value="@m.sysNum" readonly />
                         </span>
                     </div>
                     <div class="b-div">
@@ -306,7 +291,7 @@
                         <span class="b-input">
                             <select class="form-control" name="market_name">
                                 <option value="">---- 下拉选择市场部 ----</option>
-                                @foreach (var ml in marketList) {                                    
+                                @foreach (var ml in m.marketList) {                                    
                                     <option value="@ml">@ml</option>
                                 }
                             </select>
@@ -319,7 +304,7 @@
                         <span class="b-input">
                             <select class="form-control" name="company">
                                 <option value="">---- 下拉选择出货公司 ----</option>
-                                @foreach (var al in accountingList) {                                    
+                                @foreach (var al in m.accountingList) {                                    
                                     <option value="@al">@al</option>
                                 }
                             </select>
@@ -342,7 +327,7 @@
                         <span class="b-input">
                             <select class="form-control" name="bus_dep">
                                 <option value="">---- 下拉选择事业部 ----</option>
-                                @foreach (var bl in busDepList) {                                    
+                                @foreach (var bl in m.busDepList) {                                    
                                     <option value="@bl">@bl</option>
                                 }
                             </select>
@@ -357,10 +342,6 @@
                                 <option value="@DateTime.Now.ToString("yyyy-MM-dd 21:00")">@DateTime.Now.ToString("yyyy-MM-dd 21:00")</option>
                                 <option value="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 21:00")">@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 21:00")</option>                              
                             </select>
-                            @*<div class="input-group date" id="timePicker">
-                                <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
-                                <input class="form-control" type="text" name="arrive_time" autocomplete="off" value="@DateTime.Now.ToString("yyyy-MM-dd 22:00")"/>                                
-                            </div>*@
                             <div class="text-danger small"><i class="fa fa-info-circle"></i> 指预计实物及数据到达物流中心的时间</div>
                         </div>
                     </div>
@@ -443,13 +424,6 @@
                 <h4 class="modal-title">新增明细</h4>
             </div>
             <div class="modal-body">
-                @*<div class="form-group">
-                    <label for="order_number" class="sr-only">单号:</label>
-                    <div class="input-group">
-                        <div class="input-group-addon">单号:</div>
-                        <input type="text" class="form-control" id="order_number" required />
-                    </div>
-                </div>*@
                 <div class="form-group">
                     <label for="item_moduel" class="sr-only">型号:</label>
                     <div class="input-group">

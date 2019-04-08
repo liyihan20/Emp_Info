@@ -1,6 +1,6 @@
 ﻿@using EmpInfo.Models;
 @{
-    ei_stockAdminApply sa = (ei_stockAdminApply)ViewData["sa"];
+    ei_stockAdminApply sa = ViewData["am"] as ei_stockAdminApply;
 }
 @section CSS{
     <style type="text/css">
@@ -31,7 +31,7 @@
         $(function () {            
             $("#flowRecordBt").on("click", function () {                
                 var box = $("<div></div>");
-                $(box).load("@Url.Content("~/Apply/CheckFlowRecord") .list-group", { sysNo: "@sa.sys_no" }, function () {
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@sa.sys_no" }, function () {
                     openMessageDialog($(box).html(), "查看流转记录");
                 });
                 
@@ -47,7 +47,7 @@
                     <li><span class="glyphicon glyphicon-hand-right"></span></li>
                     <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
                     <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=SA")">仓管权限</a></li>
+                    <li><a href="ApplyIndex?billType=SA">仓管权限</a></li>
                     <li class="active">查看详情</li>
                 </ol>
             </div>

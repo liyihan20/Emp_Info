@@ -28,5 +28,6 @@ namespace EmpInfo.Models
         public string moduel { get; set; }
         public Nullable<decimal> qty { get; set; }
         public string reason { get; set; }
+        public Nullable<System.DateTime> arrive_time { get; set; }
     }
 }

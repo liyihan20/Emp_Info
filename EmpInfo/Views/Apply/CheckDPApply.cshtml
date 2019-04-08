@@ -1,0 +1,381 @@
+﻿@using EmpInfo.Models;
+@{
+    DPCheckApplyModel m = ViewData["am"] as DPCheckApplyModel;
+    List<EmpInfo.FlowSvr.FlowRecordModels> records = m.records;
+    ei_dormRepair form = m.bill;
+
+    bool isFromDormSys = false;
+    if (ViewData["fromDormSys"] != null) {
+        isFromDormSys = true;
+    }
+    
+}
+
+@section CSS{
+    <style type="text/css">
+        .b-div {
+            margin: 10px;
+        }
+
+        .b-label {
+            display: inline-block;
+            width: 90px;
+            vertical-align: top;
+        }
+
+        .row div {
+            margin-top: 6px;
+        }
+
+        .badge {
+            background-color: #3399CC;
+        }
+    </style>
+}
+
+<div class="panel panel-success">
+    @if (!isFromDormSys) { 
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/DormGroupIndex")">后勤事务</a></li>
+            <li><a href="ApplyIndex?billType=DP">宿舍维修申请单</a></li>
+            <li class="active">查看维修单</li>
+        </ol>
+    </div>
+    }
+    <div class="panel-body">
+        @*申请环节*@
+        <div class="panel panel-success" id="firstStepDiv">
+            <div class="panel-heading">
+                <span class="fa-stack">
+                    <i class="fa fa-stack-2x fa-circle"></i>
+                    <i class="fa fa-check fa-stack-1x fa-inverse"></i>
+                </span>
+                <span style="font-size:16px;"> 提交维修申请单</span>
+            </div>
+            <div class="panel-body">
+                <div class="well well-sm text-success">
+                    <i class="fa fa-clock-o"></i>
+                    @(records.Where(r => r.stepName.Contains("提交")).First().auditors)
+                    于
+                    @(records.Where(r => r.stepName.Contains("提交")).First().auditTimes)
+                    提交成功
+                </div>
+                @if (records.Where(r => r.stepName.Contains("撤销")).Count() > 0) {
+                    <div class="well well-sm text-danger">
+                        <i class="fa fa-reply"></i> 
+                        @(records.Where(r => r.stepName.Contains("撤销")).First().auditors)
+                        于
+                        @(records.Where(r => r.stepName.Contains("撤销")).First().auditTimes)
+                        撤销/中止此维修单流程
+                    </div>
+                }
+                <div class="row">
+                    <div class="col-xs-12 col-md-4 col-sm-6">
+                        <span class="b-label">
+                            区号:
+                        </span>
+                        <span>@form.area_name</span>
+                    </div>
+                    <div class="col-xs-12 col-md-4 col-sm-6">
+                        <span class="b-label">
+                            宿舍号:
+                        </span>
+                        <span>@form.dorm_num</span>
+                    </div>
+                    <div class="col-xs-12 col-md-4 col-sm-6">
+                        <span class="b-label">
+                            维修类型:
+                        </span>
+                        <span>
+                            @form.repair_type
+                        </span>
+                    </div>
+                    @if (form.repair_type.Equals("预约维修")) {
+                        <div class="col-xs-12 col-md-4 col-sm-6">
+                            <span class="b-label">
+                                维修时间:
+                            </span>
+                            <span>
+                                @(((DateTime)form.repair_time).ToString("yyyy-MM-dd HH:mm"))
+                            </span>
+                        </div>
+                    }
+                    <div class="col-xs-12 col-md-4 col-sm-6">
+                        <span class="b-label">
+                            费用承担:
+                        </span>
+                        <span>
+                            @form.fee_share_type
+                        </span>
+                    </div>
+                    @if (form.fee_share_type.Equals("舍友分摊")) {
+                        <div class="col-xs-12 col-md-4 col-sm-6">
+                            <span class="b-label">
+                                分摊舍友:
+                            </span>
+                            <span>
+                                @form.fee_share_peple
+                            </span>
+                        </div>
+                    }
+                    <div class="col-xs-12 col-md-4 col-sm-6">
+                        <span class="b-label">
+                            联系人:
+                        </span>
+                        <span>
+                            @form.contact_name
+                        </span>
+                    </div>
+                    <div class="col-xs-12 col-md-4 col-sm-6">
+                        <span class="b-label">
+                            手机号码:
+                        </span>
+                        <span>
+                            @form.contact_phone
+                        </span>
+
+                    </div>
+                    <div class="col-xs-12 col-md-4 col-sm-6">
+                        <span class="b-label">
+                            手机短号:
+                        </span>
+                        <span>
+                            @form.contact_short_phone
+                        </span>
+
+                    </div>
+                    <div class="col-xs-12">
+                        <span class="b-label">维修内容:</span>
+                        <span>@form.repair_content</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @*舍友会签环节*@
+        @if (records.Where(r => r.stepName.Contains("舍友")).Count() > 0) {
+            var secondRecords = records.Where(r => r.stepName.Contains("舍友"));
+            bool? secondIsPass = null;
+            if (secondRecords.Where(r => r.auditResult == "失败").Count() > 0) {
+                secondIsPass = false;
+            }
+            else if (secondRecords.Where(r => r.auditResult == "审核中").Count() == 0) {
+                secondIsPass = true;
+            }
+            <div class="panel @(secondIsPass == true ? "panel-success" : secondIsPass == false ? "panel-danger" : "panel-info") ">
+                <div class="panel-heading">
+                    <span class="fa-stack">
+                        <i class="fa fa-stack-2x fa-circle"></i>
+                        <i class="fa fa-stack-1x fa-inverse @(secondIsPass == true ? "fa-check" : secondIsPass == false ? "fa-close" : "fa-question ")"></i>
+                    </span>
+                    <span style="font-size:16px;"> 舍友确认</span>
+                </div>
+                <div class="panel-body">
+                    @foreach (var suc in secondRecords.Where(r => r.auditResult == "成功")) {
+                        <div class="well well-sm text-success">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认同意维修申请
+                        </div>
+                    }
+                    @foreach (var suc in secondRecords.Where(r => r.auditResult == "失败")) {
+                        <div class="well well-sm text-danger">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认不同意维修申请，流程结束
+                        </div>
+                    }
+                    @foreach (var suc in secondRecords.Where(r => r.auditResult == "审核中")) {
+                        <div class="well well-sm text-info">
+                           <i class="fa fa-clock-o"></i> 等待 @suc.auditors 确认处理
+                        </div>
+                    }                    
+                </div>
+            </div>
+        }
+
+        @*维修接单环节*@
+        @if (records.Where(r => r.stepName.Contains("接单")).Count() > 0) {
+            var thirdRecords = records.Where(r => r.stepName.Contains("接单"));
+            bool? thirdIsPass = null;
+            if (thirdRecords.Where(r => r.auditResult == "失败").Count() > 0) {
+                thirdIsPass = false;
+            }
+            else if (thirdRecords.Where(r => r.auditResult == "审核中").Count() == 0) {
+                thirdIsPass = true;
+            }
+            <div class="panel @(thirdIsPass == true ? "panel-success" : thirdIsPass == false ? "panel-danger" : "panel-info") ">
+                <div class="panel-heading">
+                    <span class="fa-stack">
+                        <i class="fa fa-stack-2x fa-circle"></i>
+                        <i class="fa fa-stack-1x fa-inverse @(thirdIsPass == true ? "fa-check" : thirdIsPass == false ? "fa-close" : "fa-question ")"></i>
+                    </span>
+                    <span style="font-size:16px;"> 后勤受理接单</span>
+                </div>
+                <div class="panel-body">
+                    @foreach (var suc in thirdRecords.Where(r => r.auditResult == "成功")) {
+                        <div class="well well-sm text-success">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认受理此维修申请
+                        </div>
+                    }
+                    @foreach (var suc in thirdRecords.Where(r => r.auditResult == "失败")) {
+                        <div class="well well-sm text-danger">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认不受理此维修申请，流程结束
+                        </div>
+                    }
+                    @foreach (var suc in thirdRecords.Where(r => r.auditResult == "审核中")) {
+                        <div class="well well-sm text-info">
+                           <i class="fa fa-clock-o"></i> 等待 @suc.auditors 确认受理
+                        </div>
+                    }
+                    @if (thirdIsPass == true) {
+                        <div class="row">
+                            <div class="col-xs-12 col-md-4 col-sm-6">
+                                <span class="b-label">
+                                    确认维修时间:
+                                </span>
+                                <span>@(form.confirm_repair_time == null ? "" : ((DateTime)form.confirm_repair_time).ToString("yyyy-MM-dd HH:mm"))</span>
+                            </div>
+                            <div class="col-xs-12 col-md-4 col-sm-6">
+                                <span class="b-label">
+                                    维修联系人:
+                                </span>
+                                <span>@form.accepter_name</span>
+                            </div>
+                            <div class="col-xs-12 col-md-8 col-sm-12">
+                                <span class="b-label">
+                                    维修意见:
+                                </span>
+                                <span>@form.accept_comment</span>
+                            </div>
+                        </div>
+                    }                    
+                </div>
+            </div>
+        }
+
+        @*维修完成环节*@
+        @if (records.Where(r => r.stepName.Contains("完成")).Count() > 0) {
+            var forthRecords = records.Where(r => r.stepName.Contains("完成"));
+            bool? forthIsPass = null;
+            if (forthRecords.Where(r => r.auditResult == "失败").Count() > 0) {
+                forthIsPass = false;
+            }
+            else if (forthRecords.Where(r => r.auditResult == "审核中").Count() == 0) {
+                forthIsPass = true;
+            }
+            <div class="panel @(forthIsPass == true ? "panel-success" : forthIsPass == false ? "panel-danger" : "panel-info") ">
+                <div class="panel-heading">
+                    <span class="fa-stack">
+                        <i class="fa fa-stack-2x fa-circle"></i>
+                        <i class="fa fa-stack-1x fa-inverse @(forthIsPass == true ? "fa-check" : forthIsPass == false ? "fa-close" : "fa-question ")"></i>
+                    </span>
+                    <span style="font-size:16px;"> 后勤维修完成</span>
+                </div>
+                <div class="panel-body">
+                    @foreach (var suc in forthRecords.Where(r => r.auditResult == "成功")) {
+                        <div class="well well-sm text-success">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认完成此维修申请
+                        </div>
+                    }
+                    @foreach (var suc in forthRecords.Where(r => r.auditResult == "失败")) {
+                        <div class="well well-sm text-danger">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认拒绝此维修申请，流程结束
+                        </div>
+                    }
+                    @foreach (var suc in forthRecords.Where(r => r.auditResult == "审核中")) {
+                        <div class="well well-sm text-info">
+                           <i class="fa fa-clock-o"></i> 等待 @suc.auditors 确认处理
+                        </div>
+                    }
+                    @if (forthIsPass == true) {
+                        <div class="row">
+                            <div class="col-xs-12 col-md-4 col-sm-6">
+                                <span class="b-label">
+                                    维修项目:
+                                </span>
+                                <span>@form.repaire_subject</span>
+                            </div>
+                            <div class="col-xs-12 col-md-4 col-sm-6">
+                                <span class="b-label">
+                                    维修完成时间:
+                                </span>
+                                <span>@(form.finish_repair_time == null ? "" : ((DateTime)form.finish_repair_time).ToString("yyyy-MM-dd HH:mm"))</span>
+                            </div>
+                            <div class="col-xs-12 col-md-4 col-sm-6">
+                                <span class="b-label">
+                                    维修费用:
+                                </span>
+                                <span>@form.charge_fee 元</span>
+                            </div>
+                        </div>
+                    }                    
+                </div>
+            </div>
+        }
+
+        @*服务评价环节*@
+        @if (records.Where(r => r.stepName.Contains("评价")).Count() > 0) {
+            var fifthRecords = records.Where(r => r.stepName.Contains("评价"));
+            bool? fifthIsPass = null;
+            if (fifthRecords.Where(r => r.auditResult == "失败").Count() > 0) {
+                fifthIsPass = false;
+            }
+            else if (fifthRecords.Where(r => r.auditResult == "审核中").Count() == 0) {
+                fifthIsPass = true;
+            }
+            <div class="panel @(fifthIsPass == true ? "panel-success" : fifthIsPass == false ? "panel-danger" : "panel-info") ">
+                <div class="panel-heading">
+                    <span class="fa-stack">
+                        <i class="fa fa-stack-2x fa-circle"></i>
+                        <i class="fa fa-stack-1x fa-inverse @(fifthIsPass == true ? "fa-check" : fifthIsPass == false ? "fa-close" : "fa-question ")"></i>
+                    </span>
+                    <span style="font-size:16px;"> 对此次服务确认评价</span>
+                </div>
+                <div class="panel-body">
+                    @foreach (var suc in fifthRecords.Where(r => r.auditResult == "成功")) {
+                        <div class="well well-sm text-success">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认并评价了此维修申请，流程成功结束
+                        </div>
+                    }
+                    @foreach (var suc in fifthRecords.Where(r => r.auditResult == "失败")) {
+                        <div class="well well-sm text-danger">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 拒绝评价此维修申请，流程结束
+                        </div>
+                    }
+                    @foreach (var suc in fifthRecords.Where(r => r.auditResult == "审核中")) {
+                        <div class="well well-sm text-info">
+                           <i class="fa fa-clock-o"></i> 等待 @suc.auditors 对此服务进行评价
+                        </div>
+                    }
+                    @if (fifthIsPass == true) {
+                        <div class="row">
+                            <div class="col-xs-12 col-md-4 col-sm-6">
+                                <span class="b-label">
+                                    服务打分:
+                                </span>
+                                <span style="color:#fde16d;font-size:16px;">
+                                    @for (var i = 0; i < form.applier_evaluation_score; i++) {
+                                        <i class="fa fa-star"></i>
+                                    }
+                                    @for (var i = 0; i < 5 - form.applier_evaluation_score; i++) {
+                                        <i class="fa fa-star-o"></i>
+                                    }
+
+                                </span>
+                            </div>
+                            <div class="col-xs-12 col-md-8 col-sm-6">
+                                <span class="b-label">
+                                    评价意见:
+                                </span>
+                                <span>@form.applier_evaluation</span>
+                            </div>
+                        </div>
+                    }                    
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+

@@ -1,0 +1,699 @@
+﻿@using EmpInfo.Models;
+@{
+    List<EmpInfo.FlowSvr.FlowRecordModels> records = (List<EmpInfo.FlowSvr.FlowRecordModels>)ViewData["records"];
+    ei_dormRepair form = (ei_dormRepair)ViewData["formData"];
+    AuditModel auditModel = (AuditModel)ViewData["auditModel"];
+    UserInfoDetail currentUser = (UserInfoDetail)ViewData["userInfo"];
+}
+
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/star-rating.min.css")" />
+    <style type="text/css">
+        .b-div {
+            margin: 10px;
+        }
+
+        .b-label {
+            display: inline-block;
+            width: 90px;
+            vertical-align: top;
+        }
+
+        .row div {
+            margin-top: 6px;
+        }
+
+
+        .badge {
+            background-color: #3399CC;
+        }
+    </style>
+}
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Scripts/star-rating.min.js")"></script>
+    <script>
+        $(function () {
+            $("#accepterTimePicker").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd hh:ii",
+                autoclose: true,
+                maxView: 2,
+                minuteStep: 10,
+                startDate: new Date("@DateTime.Now.ToString("yyyy-MM-dd HH:mm")"),
+                endDate: new Date("@DateTime.Now.AddDays(14).ToString("yyyy-MM-dd 20:00")")
+            });
+            $("#repairFinishPicker").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd hh:ii",
+                autoclose: true,
+                maxView: 2,
+                minuteStep: 10,
+                startDate: new Date("@DateTime.Now.AddDays(-14).ToString("yyyy-MM-dd HH:mm")"),
+                endDate: new Date("@DateTime.Now.ToString("yyyy-MM-dd HH:mm")")
+            });
+            $("#rateScore").rating({
+                clearCaption: '未评分',
+                starCaptions: {
+                    1: '1分(非常不满意)',
+                    2: '2分(不满意)',
+                    3: '3分(一般)',
+                    4: '4分(满意)',
+                    5: '5分(非常满意)'
+                }
+            });
+        });
+        function secondAudit(step, isPass) {
+            openConfirmDialog("确认要 " + (isPass ? "通过" : "拒绝") + " 此维修申请吗？", function () {
+                $.post("@Url.Content("~/Apply/RoomateConfirmDP")", { sysNo: "@form.sys_no", step: step, isPass: isPass }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg + ",请等待页面跳转...");
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                    setTimeout(function () { location.reload(true); }, 1000);
+                });
+            });
+        }
+        function thirdAudit(step, isPass) {
+            openConfirmDialog("确认要 " + (isPass ? "通过" : "拒绝") + " 此维修申请吗？", function () {
+                if (isPass) {
+                    if ($("#confirmTime").val() == "") {
+                        toastr.error("请选择确认维修时间");
+                        return;
+                    }
+                    if ($("#accepter").val() == "") {
+                        toastr.error("请填写联系人");
+                        return;
+                    }
+                    if ($("#repairComment").val() == "" && $("#accepterShortPhone").val() == "") {
+                        toastr.error("手机号码和手机短号必须至少填写一项");
+                        return;
+                    }
+                } else {
+                    if ($.trim($("#repairComment").val()) == "") {
+                        toastr.error("拒绝此申请必须在维修意见文本框写明原因");
+                        return;
+                    }
+                }
+
+                $.post("@Url.Content("~/Apply/AccepterConfirmDP")",
+                    {
+                        sysNo: "@form.sys_no",
+                        step: step,
+                        isPass: isPass,
+                        accepterComment: $("#repairComment").val(),
+                        accepter: $("#accepter").val(),
+                        accepterPhone: $("#accepterPhone").val(),
+                        accepterShortPhone: $("#accepterShortPhone").val(),
+                        confirmTime: $("#confirmTime").val()
+                    },
+                    function (data) {
+                        if (data.suc) {
+                            toastr.success(data.msg + ",请等待页面跳转...");
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                        setTimeout(function () { location.reload(true); }, 1000);
+                    });
+            });
+        }
+        function fourthAudit(step, isPass) {
+            openConfirmDialog("要 " + (isPass ? "确认完成" : "拒绝") + " 此维修申请吗？", function () {
+                var repairFee = $("#repairFee").val();
+                if (isPass) {
+                    if ($("#repairFinishTime").val() == "") {
+                        toastr.error("请选择完成维修时间");
+                        return;
+                    }
+                    if ($("#repairSubject").val() == "") {
+                        toastr.error("请维修项目内容");
+                        return;
+                    }
+                    if (isNaN(repairFee)) {
+                        toastr.error("维修费用必须是数字");
+                        return;
+                    }
+                } else {
+                    return;
+                }
+
+                $.post("@Url.Content("~/Apply/RepairFinishDP")",
+                    {
+                        sysNo: "@form.sys_no",
+                        step: step,
+                        isPass: isPass,
+                        repairSubject: $("#repairSubject").val(),
+                        repairFinishTime: $("#repairFinishTime").val(),
+                        repairFee: new Number(repairFee).toFixed(1)
+                    },
+                        function (data) {
+                            if (data.suc) {
+                                toastr.success(data.msg + ",请等待页面跳转...");
+                            } else {
+                                toastr.error(data.msg);
+                            }
+                            setTimeout(function () { location.reload(true); }, 1000);
+                        });
+            });
+        }
+        function fifthAudit(step, isPass) {
+            openConfirmDialog("要 " + (isPass ? "确认评价" : "拒绝") + " 此维修申请吗？", function () {
+                var rateScore = $("#rateScore").val();
+                if (isPass) {
+                    if (rateScore == "") {
+                        toastr.error("请点击星星对服务进行评分");
+                        return;
+                    }
+                    if (isNaN(rateScore)) {
+                        toastr.error("评分必须是正整数");
+                        return;
+                    }
+                    if (rateScore < 1) {
+                        toastr.error("评分至少必须打一星");
+                        return;
+                    }
+                    if (rateScore <= 2 && $("#rateOpinion").val() == "") {
+                        toastr.error("少于二星的评分必须填写评价意见");
+                        return;
+                    }
+                } else {
+                    return;
+                }
+
+                $.post("@Url.Content("~/Apply/EvalateDP")",
+                    {
+                        sysNo: "@form.sys_no",
+                        step: step,
+                        isPass: isPass,
+                        rateScore: rateScore,
+                        rateOpinion: $("#rateOpinion").val()
+                    },
+                    function (data) {
+                        if (data.suc) {
+                            toastr.success(data.msg + ",请等待页面跳转...");
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                        setTimeout(function () { location.reload(true); }, 1000);
+                    });
+            });
+        }
+    </script>
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            @if (currentUser != null) {
+                <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                <li><a href="@Url.Content("~/Apply/DormRepairIndex")">宿舍维修申请</a></li>
+            }
+            <li class="active">
+                @if (auditModel.isAuditing) {<text>处理维修单</text>}
+                else {<text>查看维修单</text>}
+            </li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        @*申请环节*@
+        <div class="panel panel-success" id="firstStepDiv">
+            <div class="panel-heading">
+                <span class="fa-stack">
+                    <i class="fa fa-stack-2x fa-circle"></i>
+                    <i class="fa fa-check fa-stack-1x fa-inverse"></i>
+                </span>
+                <span style="font-size:16px;"> 提交维修申请单</span>
+            </div>
+            <div class="panel-body">
+                <div class="well well-sm text-success">
+                    <i class="fa fa-clock-o"></i>
+                    @(records.Where(r => r.stepName.Contains("提交")).First().auditors)
+                    于
+                    @(records.Where(r => r.stepName.Contains("提交")).First().auditTimes)
+                    提交成功
+                </div>
+                @if (records.Where(r => r.stepName.Contains("撤销")).Count() > 0) {
+                    <div class="well well-sm text-danger">
+                        <i class="fa fa-reply"></i> 
+                        @(records.Where(r => r.stepName.Contains("撤销")).First().auditors)
+                        于
+                        @(records.Where(r => r.stepName.Contains("撤销")).First().auditTimes)
+                        撤销/中止此维修单流程
+                    </div>
+                }
+                <div class="row">
+                    <div class="col-xs-12 col-md-4 col-sm-6">
+                        <span class="b-label">
+                            区号:
+                        </span>
+                        <span>@form.area_name</span>
+                    </div>
+                    <div class="col-xs-12 col-md-4 col-sm-6">
+                        <span class="b-label">
+                            宿舍号:
+                        </span>
+                        <span>@form.dorm_num</span>
+                    </div>
+                    <div class="col-xs-12 col-md-4 col-sm-6">
+                        <span class="b-label">
+                            维修类型:
+                        </span>
+                        <span>
+                            @form.repair_type
+                        </span>
+                    </div>
+                    @if (form.repair_type.Equals("预约维修")) {
+                        <div class="col-xs-12 col-md-4 col-sm-6">
+                            <span class="b-label">
+                                维修时间:
+                            </span>
+                            <span>
+                                @(((DateTime)form.repair_time).ToString("yyyy-MM-dd HH:mm"))
+                            </span>
+                        </div>
+                    }
+                    <div class="col-xs-12 col-md-4 col-sm-6">
+                        <span class="b-label">
+                            费用承担:
+                        </span>
+                        <span>
+                            @form.fee_share_type
+                        </span>
+                    </div>
+                    @if (form.fee_share_type.Equals("舍友分摊")) {
+                        <div class="col-xs-12 col-md-4 col-sm-6">
+                            <span class="b-label">
+                                分摊舍友:
+                            </span>
+                            <span>
+                                @form.fee_share_peple
+                            </span>
+                        </div>
+                    }
+                    <div class="col-xs-12 col-md-4 col-sm-6">
+                        <span class="b-label">
+                            联系人:
+                        </span>
+                        <span>
+                            @form.contact_name
+                        </span>
+                    </div>
+                    <div class="col-xs-12 col-md-4 col-sm-6">
+                        <span class="b-label">
+                            手机号码:
+                        </span>
+                        <span>
+                            @form.contact_phone
+                        </span>
+
+                    </div>
+                    <div class="col-xs-12 col-md-4 col-sm-6">
+                        <span class="b-label">
+                            手机短号:
+                        </span>
+                        <span>
+                            @form.contact_short_phone
+                        </span>
+
+                    </div>
+                    <div class="col-xs-12">
+                        <span class="b-label">维修内容:</span>
+                        <span>@form.repair_content</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @*舍友会签环节*@
+        @if (records.Where(r => r.stepName.Contains("舍友")).Count() > 0) {
+            var secondRecords = records.Where(r => r.stepName.Contains("舍友"));
+            bool? secondIsPass = null;
+            if (secondRecords.Where(r => r.auditResult == "失败").Count() > 0) {
+                secondIsPass = false;
+            }
+            else if (secondRecords.Where(r => r.auditResult == "审核中").Count() == 0) {
+                secondIsPass = true;
+            }
+            <div class="panel @(secondIsPass == true ? "panel-success" : secondIsPass == false ? "panel-danger" : "panel-info") ">
+                <div class="panel-heading">
+                    <span class="fa-stack">
+                        <i class="fa fa-stack-2x fa-circle"></i>
+                        <i class="fa fa-stack-1x fa-inverse @(secondIsPass == true ? "fa-check" : secondIsPass == false ? "fa-close" : "fa-question ")"></i>
+                    </span>
+                    <span style="font-size:16px;"> 舍友确认</span>
+                </div>
+                <div class="panel-body">
+                    @foreach (var suc in secondRecords.Where(r => r.auditResult == "成功")) {
+                        <div class="well well-sm text-success">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认同意维修申请
+                        </div>
+                    }
+                    @foreach (var suc in secondRecords.Where(r => r.auditResult == "失败")) {
+                        <div class="well well-sm text-danger">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认不同意维修申请，流程结束
+                        </div>
+                    }
+                    @foreach (var suc in secondRecords.Where(r => r.auditResult == "审核中")) {
+                        <div class="well well-sm text-info">
+                           <i class="fa fa-clock-o"></i> 等待 @suc.auditors 确认处理
+                        </div>
+                    }
+                    @if (auditModel.isAuditing && auditModel.stepName.Contains("舍友")) {
+                        <i>请点击以下按钮确认是否同意此维修申请:</i>
+                        <div class="btn-group btn-group-justified" role="group" aria-label="操作按钮" style="margin:12px 0;">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-success" onclick="secondAudit(@auditModel.step, true)">
+                                    <i class="fa fa-check"></i>
+                                    同意
+                                </button>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-danger" onclick="secondAudit(@auditModel.step,false)">
+                                    <span class="fa fa-close"></span>
+                                    不同意
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @*维修接单环节*@
+        @if (records.Where(r => r.stepName.Contains("接单")).Count() > 0) {
+            var thirdRecords = records.Where(r => r.stepName.Contains("接单"));
+            bool? thirdIsPass = null;
+            if (thirdRecords.Where(r => r.auditResult == "失败").Count() > 0) {
+                thirdIsPass = false;
+            }
+            else if (thirdRecords.Where(r => r.auditResult == "审核中").Count() == 0) {
+                thirdIsPass = true;
+            }
+            <div class="panel @(thirdIsPass == true ? "panel-success" : thirdIsPass == false ? "panel-danger" : "panel-info") ">
+                <div class="panel-heading">
+                    <span class="fa-stack">
+                        <i class="fa fa-stack-2x fa-circle"></i>
+                        <i class="fa fa-stack-1x fa-inverse @(thirdIsPass == true ? "fa-check" : thirdIsPass == false ? "fa-close" : "fa-question ")"></i>
+                    </span>
+                    <span style="font-size:16px;"> 后勤受理接单</span>
+                </div>
+                <div class="panel-body">
+                    @foreach (var suc in thirdRecords.Where(r => r.auditResult == "成功")) {
+                        <div class="well well-sm text-success">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认受理此维修申请
+                        </div>
+                    }
+                    @foreach (var suc in thirdRecords.Where(r => r.auditResult == "失败")) {
+                        <div class="well well-sm text-danger">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认不受理此维修申请，流程结束
+                        </div>
+                    }
+                    @foreach (var suc in thirdRecords.Where(r => r.auditResult == "审核中")) {
+                        <div class="well well-sm text-info">
+                           <i class="fa fa-clock-o"></i> 等待 @suc.auditors 确认受理
+                        </div>
+                    }
+                    @if (thirdIsPass == true) {
+                        <div class="row">
+                            <div class="col-xs-12 col-md-4 col-sm-6">
+                                <span class="b-label">
+                                    确认维修时间:
+                                </span>
+                                <span>@(form.confirm_repair_time == null ? "" : ((DateTime)form.confirm_repair_time).ToString("yyyy-MM-dd HH:mm"))</span>
+                            </div>
+                            <div class="col-xs-12 col-md-4 col-sm-6">
+                                <span class="b-label">
+                                    维修联系人:
+                                </span>
+                                <span>@form.accepter_name</span>
+                            </div>
+                            @*<div class="col-xs-12 col-md-4 col-sm-6">
+                                <span class="b-label">
+                                    手机号码:
+                                </span>
+                                <span>@form.accepter_phone</span>
+                            </div>
+                            <div class="col-xs-12 col-md-4 col-sm-6">
+                                <span class="b-label">
+                                    手机短号:
+                                </span>
+                                <span>@form.accepter_short_phone</span>
+                            </div>*@
+                            <div class="col-xs-12 col-md-8 col-sm-12">
+                                <span class="b-label">
+                                    维修意见:
+                                </span>
+                                <span>@form.accept_comment</span>
+                            </div>
+                        </div>
+                    }
+
+                    @if (auditModel.isAuditing && auditModel.stepName.Contains("接单")) {
+                        <i>请填写以下信息并确认是否同意受理此维修申请:</i>
+
+                        <div class="b-div">
+                            <span class="b-label">
+                                维修意见
+                            </span>
+                            <span style="display:inline-block;width:70%;">
+                                <input type="text" class="form-control" id="repairComment" />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">确认维修时间</span>
+                            <span style="display:inline;width:70%;vertical-align:top;">
+                                <span class="input-group date" style="display:inline-table;width:70%;" id="accepterTimePicker">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span> </span>
+                                    <input class="form-control" type="text" readonly id="confirmTime" value="@(DateTime.Now.AddHours(1).ToString("yyyy-MM-dd HH:mm"))">
+                                </span>
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">维修联系人</span>
+                            <span style="display:inline-block;width:70%;">
+                                <input type="text" class="form-control" id="accepter" value="@currentUser.name" />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">手机号码</span>
+                            <span style="display:inline-block;width:70%;">
+                                <input type="text" class="form-control" id="accepterPhone" value="@currentUser.phone" />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">手机短号</span>
+                            <span style="display:inline-block;width:70%;">
+                                <input type="text" class="form-control" id="accepterShortPhone" value="@currentUser.shortPhone" />
+                            </span>
+                        </div>
+
+                        <div class="btn-group btn-group-justified" role="group" aria-label="操作按钮" style="margin:12px 0;">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-success" onclick="thirdAudit(@auditModel.step, true)">
+                                    <i class="fa fa-check"></i>
+                                    同意
+                                </button>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-danger" onclick="thirdAudit(@auditModel.step,false)">
+                                    <span class="fa fa-close"></span>
+                                    不同意
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @*维修完成环节*@
+        @if (records.Where(r => r.stepName.Contains("完成")).Count() > 0) {
+            var forthRecords = records.Where(r => r.stepName.Contains("完成"));
+            bool? forthIsPass = null;
+            if (forthRecords.Where(r => r.auditResult == "失败").Count() > 0) {
+                forthIsPass = false;
+            }
+            else if (forthRecords.Where(r => r.auditResult == "审核中").Count() == 0) {
+                forthIsPass = true;
+            }
+            <div class="panel @(forthIsPass == true ? "panel-success" : forthIsPass == false ? "panel-danger" : "panel-info") ">
+                <div class="panel-heading">
+                    <span class="fa-stack">
+                        <i class="fa fa-stack-2x fa-circle"></i>
+                        <i class="fa fa-stack-1x fa-inverse @(forthIsPass == true ? "fa-check" : forthIsPass == false ? "fa-close" : "fa-question ")"></i>
+                    </span>
+                    <span style="font-size:16px;"> 后勤维修完成</span>
+                </div>
+                <div class="panel-body">
+                    @foreach (var suc in forthRecords.Where(r => r.auditResult == "成功")) {
+                        <div class="well well-sm text-success">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认完成此维修申请
+                        </div>
+                    }
+                    @foreach (var suc in forthRecords.Where(r => r.auditResult == "失败")) {
+                        <div class="well well-sm text-danger">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认拒绝此维修申请，流程结束
+                        </div>
+                    }
+                    @foreach (var suc in forthRecords.Where(r => r.auditResult == "审核中")) {
+                        <div class="well well-sm text-info">
+                           <i class="fa fa-clock-o"></i> 等待 @suc.auditors 确认处理
+                        </div>
+                    }
+                    @if (forthIsPass == true) {
+                        <div class="row">
+                            <div class="col-xs-12 col-md-4 col-sm-6">
+                                <span class="b-label">
+                                    维修项目:
+                                </span>
+                                <span>@form.repaire_subject</span>
+                            </div>
+                            <div class="col-xs-12 col-md-4 col-sm-6">
+                                <span class="b-label">
+                                    维修完成时间:
+                                </span>
+                                <span>@(form.finish_repair_time == null ? "" : ((DateTime)form.finish_repair_time).ToString("yyyy-MM-dd HH:mm"))</span>
+                            </div>
+                            <div class="col-xs-12 col-md-4 col-sm-6">
+                                <span class="b-label">
+                                    维修费用:
+                                </span>
+                                <span>@form.charge_fee 元</span>
+                            </div>
+                        </div>
+                    }
+                    @if (auditModel.isAuditing && auditModel.stepName.Contains("完成")) {
+                        <i>请填写以下信息并确认完成此维修申请:</i>
+                        <div class="b-div">
+                            <span class="b-label">
+                                维修项目内容
+                            </span>
+                            <span style="display:inline-block;width:70%;">
+                                <input type="text" class="form-control" id="repairSubject" />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">维修完成时间</span>
+                            <span style="display:inline;width:70%;vertical-align:top;">
+                                <span class="input-group date" style="display:inline-table;width:70%;" id="repairFinishPicker">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span> </span>
+                                    <input class="form-control" type="text" readonly id="repairFinishTime" value="@(DateTime.Now.ToString("yyyy-MM-dd HH:mm"))">
+                                </span>
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">维修费用</span>
+                            <span style="display:inline-block;width:70%;">
+                                <span class="input-group" style="display:inline-table;">
+                                    <input type="number" step="0.1" min="0" class="form-control" id="repairFee" />
+                                    <span class="input-group-addon">元</span>
+                                </span>
+                            </span>
+                            <p class="small text-danger"><i class="fa fa-info-circle"></i> 费用保留一位小数点，免费维修请输入0</p>
+                        </div>
+
+                        <div class="b-div">
+                            <button class="btn btn-primary btn-block" onclick="fourthAudit(@auditModel.step,true)">确认完成</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @*服务评价环节*@
+        @if (records.Where(r => r.stepName.Contains("评价")).Count() > 0) {
+            var fifthRecords = records.Where(r => r.stepName.Contains("评价"));
+            bool? fifthIsPass = null;
+            if (fifthRecords.Where(r => r.auditResult == "失败").Count() > 0) {
+                fifthIsPass = false;
+            }
+            else if (fifthRecords.Where(r => r.auditResult == "审核中").Count() == 0) {
+                fifthIsPass = true;
+            }
+            <div class="panel @(fifthIsPass == true ? "panel-success" : fifthIsPass == false ? "panel-danger" : "panel-info") ">
+                <div class="panel-heading">
+                    <span class="fa-stack">
+                        <i class="fa fa-stack-2x fa-circle"></i>
+                        <i class="fa fa-stack-1x fa-inverse @(fifthIsPass == true ? "fa-check" : fifthIsPass == false ? "fa-close" : "fa-question ")"></i>
+                    </span>
+                    <span style="font-size:16px;"> 对此次服务确认评价</span>
+                </div>
+                <div class="panel-body">
+                    @foreach (var suc in fifthRecords.Where(r => r.auditResult == "成功")) {
+                        <div class="well well-sm text-success">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 确认并评价了此维修申请，流程成功结束
+                        </div>
+                    }
+                    @foreach (var suc in fifthRecords.Where(r => r.auditResult == "失败")) {
+                        <div class="well well-sm text-danger">
+                           <i class="fa fa-clock-o"></i> @suc.auditors 于 @suc.auditTimes 拒绝评价此维修申请，流程结束
+                        </div>
+                    }
+                    @foreach (var suc in fifthRecords.Where(r => r.auditResult == "审核中")) {
+                        <div class="well well-sm text-info">
+                           <i class="fa fa-clock-o"></i> 等待 @suc.auditors 对此服务进行评价
+                        </div>
+                    }
+                    @if (fifthIsPass == true) {
+                        <div class="row">
+                            <div class="col-xs-12 col-md-4 col-sm-6">
+                                <span class="b-label">
+                                    服务打分:
+                                </span>
+                                <span style="color:#fde16d;font-size:16px;">
+                                    @for (var i = 0; i < form.applier_evaluation_score; i++) {
+                                        <i class="fa fa-star"></i>
+                                    }
+                                    @for (var i = 0; i < 5 - form.applier_evaluation_score; i++) {
+                                        <i class="fa fa-star-o"></i>
+                                    }
+
+                                </span>
+                            </div>
+                            <div class="col-xs-12 col-md-8 col-sm-6">
+                                <span class="b-label">
+                                    评价意见:
+                                </span>
+                                <span>@form.applier_evaluation</span>
+                            </div>
+                        </div>
+                    }
+                    @if (auditModel.isAuditing && auditModel.stepName.Contains("评价")) {
+                        <i>请对本次维修服务进行评价:</i>
+                        <div class="b-div">
+                            <span class="b-label">
+                                服务打分
+                            </span>
+                            <span style="display:inline-block;width:70%;">
+                                <input type="text" id="rateScore" data-min="0" data-max="5" data-step="1" data-show-clear="false" data-size="xs" />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">评价意见</span>
+                            <span style="display:inline-block;width:70%;">
+                                <input type="text" class="form-control" id="rateOpinion" />
+                            </span>
+                            <p class="small text-danger"><i class="fa fa-info-circle"></i> 如分数低于2星，必须填写评价意见</p>
+                        </div>
+
+                        <div class="b-div">
+                            <button class="btn btn-primary btn-block" onclick="fifthAudit(@auditModel.step,true)">确认评价</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+
+    </div>
+</div>
+
+@section modal{
+    @Html.Partial("_ConfirmDialog")
+}

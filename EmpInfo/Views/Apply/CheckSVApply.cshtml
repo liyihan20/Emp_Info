@@ -1,6 +1,6 @@
 ﻿@using EmpInfo.Models;
 @{
-    ei_SVApply sv = (ei_SVApply)ViewData["sv"];
+    ei_SVApply sv = ViewData["am"] as ei_SVApply;
 }
 @section CSS{
     <style type="text/css">
@@ -30,7 +30,7 @@
         $(function () {
             $("#flowRecordBt").on("click", function () {
                 var box = $("<div></div>");
-                $(box).load("@Url.Content("~/Apply/CheckFlowRecord") .list-group", { sysNo: "@sv.sys_no" }, function () {
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@sv.sys_no" }, function () {
                     openMessageDialog($(box).html(), "查看流转记录");
                 });
 
@@ -46,7 +46,7 @@
                     <li><span class="glyphicon glyphicon-hand-right"></span></li>
                     <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
                     <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=SV")">调休申请单</a></li>
+                    <li><a href="ApplyIndex?billType=SV">调休申请单</a></li>
                     <li class="active">查看详情</li>
                 </ol>
             </div>

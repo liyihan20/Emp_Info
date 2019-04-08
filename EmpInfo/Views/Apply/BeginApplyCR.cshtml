@@ -1,5 +1,7 @@
 ﻿@using EmpInfo.Models;
-
+@{
+    CRSVBeforeApplyModel m = ViewData["infoBeforeApply"] as CRSVBeforeApplyModel;
+}
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
@@ -176,7 +178,7 @@
         var formParam = $("#alForm").serialize();
         $.ajax({
             type: 'post',
-            url: '@Url.Content("~/Apply/GetCRFlowQueue")',
+            url: 'GetFlowQueue',
             data: formParam,
             cache: false,
             dataType: 'json',
@@ -196,7 +198,7 @@
                         $("#apply_bt").button("loading");
                         $.ajax({
                             type: 'post',
-                            url: '@Url.Content("~/Apply/SaveApplyCR")',
+                            url: 'SaveApply',
                             data: formParam + "&auditor_queues=" + JSON.stringify(queue),
                             cache: false,
                             dataType: 'json',
@@ -204,7 +206,7 @@
                                 $("#apply_bt").button("reset");
                                 if (data.suc) {
                                     toastr.success("提交成功:" + data.msg);
-                                    setTimeout(function () { window.location.href = "@Url.Content("~/Apply/ApplyIndex?billType=CR")"; }, 2000);
+                                    setTimeout(function () { window.location.href = "ApplyIndex?billType=CR"; }, 2000);
                                 } else {
                                     toastr.error("提交失败：" + data.msg);
                                     $("#apply_bt").button("reset");
@@ -234,7 +236,7 @@
                 pick: '#picker',
                 resize: false,
                 auto: true,
-                formData: { sysNum: '@ViewData["sysNum"]' },
+                formData: { sysNum: '@m.sysNum' },
                 fileNumLimit: maxNum,
                 fileSingleSizeLimit: maxSingleSize,
                 accept: {
@@ -302,7 +304,7 @@
                     var fileId = $(fileTD).attr("id");
                     var fileName = $(fileTD).attr("data-fd");
 
-                    $.post("@Url.Content("~/File/RemoveUploadedFile")", { sysNum: "@ViewData["sysNum"]", fileName: fileName }, function (data) {
+                    $.post("@Url.Content("~/File/RemoveUploadedFile")", { sysNum: "@m.sysNum", fileName: fileName }, function (data) {
                         if (data.suc) {
                             toastr.success("文件移除成功");
                             uploader.removeFile(fileId,true);
@@ -333,7 +335,7 @@
                     <li><span class="glyphicon glyphicon-hand-right"></span></li>
                     <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
                     <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=CR")">考勤补记申请单</a></li>
+                    <li><a href="ApplyIndex?billType=CR">考勤补记申请单</a></li>
                     <li class="active">开始申请</li>
                 </ol>
             </div>
@@ -344,8 +346,7 @@
                             <button class="btn btn-block btn-default" disabled>申请流水号</button>
                         </span>
                         <span style="display:inline-block;width:70%">
-                            <input type="text" class="form-control" id="sysNum" value="@ViewData["sysNum"]" disabled />
-                            <input type="hidden" name="sys_no" value="@ViewData["sysNum"]" />
+                            <input type="text" class="form-control" name="sys_no" id="sysNum" value="@m.sysNum" readonly />
                         </span>
                     </div>
                     <div class="b-div">
@@ -354,11 +355,11 @@
                         </span>
                         <div style="display:inline-block;width:70%">
                             <div class="input-group">
-                                <input type="text" class="form-control" id="eDepName" name="dep_long_name" value="@ViewData["depName"]" placeholder="点击此处选择部门" />
+                                <input type="text" class="form-control" id="eDepName" name="dep_long_name" value="@m.depName" placeholder="点击此处选择部门" />
                                 <span class="input-group-addon" style="cursor:pointer;" onclick="showDepName()"><i class="fa fa-info text-danger"></i></span>
                             </div>
-                            <input type="hidden" id="eDepNum" name="dep_no" value="@ViewData["depNum"]" />
-                            <input type="hidden" id="eDepId" name="dep_id" value="@ViewData["depId"]" />
+                            <input type="hidden" id="eDepNum" name="dep_no" value="@m.depNum" />
+                            <input type="hidden" id="eDepId" name="dep_id" value="@m.depId" />
                         </div>
                     </div>
                     <div class="b-div" style="vertical-align:middle;">
@@ -457,7 +458,6 @@
 </div>
 @section Modal {
     @Html.Partial("_SelectDep")
-    @Html.Partial("_SelectUsers")
     @Html.Partial("_ConfirmDialog")
     @Html.Partial("_MessageDialog")
 }

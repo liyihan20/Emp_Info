@@ -5,6 +5,7 @@ namespace EmpInfo.Util
 {
     public class MyEmail
     {
+
         public static bool SendValidateCode(string code,string emailAddress, string username)
         {
             string subject = "员工邮箱验证";
@@ -17,6 +18,7 @@ namespace EmpInfo.Util
             
         }
 
+        
         public static bool SendEmail(string subject, string emailAddrs, string content,string ccEmailAddrs="")
         {
             if (!string.IsNullOrEmpty(emailAddrs)) {

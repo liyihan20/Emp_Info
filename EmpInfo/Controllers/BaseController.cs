@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using EmpInfo.Models;
 using EmpInfo.Util;
 using System.Configuration;
+using EmpInfo.Services;
 
 namespace EmpInfo.Controllers
 {
@@ -16,6 +17,7 @@ namespace EmpInfo.Controllers
         private UserInfo _userInfo = null;  //暂存用户简要信息
         private UserInfoDetail _userInfoDetail = null;  //暂存用户详细信息
         private DinningCardStatusModel _dinningCarStatusModel = null;  //饭卡状态信息
+        protected BillSv bill;
 
         protected ICAuditEntities db
         {
@@ -339,6 +341,24 @@ namespace EmpInfo.Controllers
             }
 
             return depName;
+        }
+
+        /// <summary>
+        /// 根据单据类型设置单据空的对象实例
+        /// </summary>
+        /// <param name="billType">单据类型</param>
+        protected void SetBillByType(string billType)
+        {
+            bill = (BillSv)new BillUtils().GetBillSvInstance(billType);
+        }
+
+        /// <summary>
+        /// 根据流水号设置单据对象实例
+        /// </summary>
+        /// <param name="sysNo">流水号</param>
+        protected void SetBillBySysNo(string sysNo)
+        {
+            bill = (BillSv)new BillUtils().GetBillSvInstanceBySysNo(sysNo);
         }
 
     }

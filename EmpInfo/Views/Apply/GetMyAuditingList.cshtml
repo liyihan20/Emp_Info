@@ -1,4 +1,5 @@
-﻿@{
+﻿@using EmpInfo.Models
+@{
     List<EmpInfo.FlowSvr.FlowAuditListModel> list = (List<EmpInfo.FlowSvr.FlowAuditListModel>)ViewData["list"];
     string billType = (string)ViewData["billType"];
 }
@@ -53,7 +54,10 @@
         <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
-            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            @foreach (var n in (ViewData["navigatorLinks"] as List<ApplyNavigatorModel>)) {
+                <li><a href="@string.Concat(Url.Content("~/"),n.url)">@n.text</a></li>
+            }            
+            <li><a href="@string.Concat("ApplyIndex?billType=", ViewData["billType"])">@ViewData["billTypeName"]</a></li>
             <li class="active">我的待办</li>
         </ol>
     </div>
@@ -80,8 +84,7 @@
             <tbody>
                 @foreach (var i in list) {
                     <tr>
-                        <td>@i.sysNo @if (i.isUserAobrt) {<span class="text-danger">(申请撤销)</span>}
-                        </td>
+                        <td>@i.sysNo @if (i.isUserAobrt) {<span class="text-danger">(申请撤销)</span>}</td>
                         <td>@i.step</td>
                         <td>@i.applier</td>
                         <td>@(((DateTime)i.applyTime).ToString("yyyy-MM-dd HH:mm:ss"))</td>

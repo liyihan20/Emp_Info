@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace EmpInfo.Models
 {
@@ -67,8 +65,13 @@ namespace EmpInfo.Models
         public string sysNum { get; set; }
         public int step { get; set; }
         public string stepName { get; set; }
+        public string auditorName { get; set; }
+        public string auditorNumber { get; set; }
         public bool? isPass { get; set; }
         public string opinion { get; set; }
+        public string billType { get; set; }
+        public string billTypeName { get; set; }
+        public object otherInfo { get; set; }
     }
 
     public class ALRecordModel
@@ -79,4 +82,90 @@ namespace EmpInfo.Models
         public string leaveDays { get; set; }
         public string leaveDateSpan { get; set; }
     }
+
+    public class ApplyMenuItemModel
+    {
+        public string url { get; set; }
+        public string text { get; set; }
+        public string iconFont { get; set; }
+        public string colorClass { get; set; }
+        public string linkClass { get; set; }
+    }
+
+    public class ApplyNavigatorModel
+    {
+        public string url { get; set; }
+        public string text { get; set; }
+    }
+
+    public class ALBeforeApplyModel
+    {
+        public string sysNum { get; set; }
+        public string depName { get; set; }
+        public string depNum { get; set; }
+        public int? depId { get; set; }
+        public int? empLevel { get; set; }
+        public int times { get; set; }
+        public int days { get; set; }
+        public decimal hours { get; set; }
+        public string pLevels { get; set; }
+        public decimal? vacationDaysLeft { get; set; }
+    }
+
+    public class EPBeforeApplyModel
+    {
+        public string sysNum { get; set; }
+        public string procDepInfo { get; set; }
+        public string applierPhone { get; set; }
+    }
+
+    public class UCBeforeApplyModel
+    {
+        public string sysNum { get; set; }
+        public List<string> marketList { get; set; }
+        public List<string> busDepList { get; set; }
+        public List<string> accountingList { get; set; }
+    }
+
+    public class UCCheckApplyModel
+    {
+        public ei_ucApply uc { get; set; }
+        public List<ei_ucApplyEntry> entrys { get; set; }
+        public List<AttachmentModel> attachments { get; set; }
+    }
+
+    public class SABeforeApplyModel
+    {
+        public string sysNum { get; set; }
+        public List<K3AccountModel> accounts { get; set; }
+    }
+
+    public class SAK3StockAuditor
+    {
+        public string stockName { get; set; }
+        public string stockNum { get; set; }
+        public string auditorName { get; set; }
+        public string auditorNum { get; set; }
+    }
+
+    public class CRSVBeforeApplyModel
+    {
+        public string sysNum { get; set; }
+        public string depName { get; set; }
+        public string depNum { get; set; }
+        public int? depId { get; set; }
+    }
+
+    public class CRCheckApplyModel
+    {
+        public ei_CRApply cr { get; set; }
+        public List<AttachmentModel> attachments { get; set; }
+    }
+
+    public class DPCheckApplyModel
+    {
+        public ei_dormRepair bill { get; set; }
+        public List<FlowSvr.FlowRecordModels> records { get; set; }
+    }
+
 }

@@ -1,4 +1,7 @@
 ﻿@using EmpInfo.Models
+@{
+    EPBeforeApplyModel m = ViewData["infoBeforeApply"] as EPBeforeApplyModel;
+}
 @section CSS{
     <style type="text/css">
         .b-label {
@@ -20,7 +23,7 @@
 }
 @section Scripts {
     <script>
-        var prDepInfo = @Html.Raw(ViewData["procDepInfo"]);
+        var prDepInfo = @Html.Raw(m.procDepInfo);
     for (var i = 0; i < prDepInfo.length; i++) {
         $("select[name='produce_dep_name']").append("<option value='" + prDepInfo[i].prDepName + "'>" + prDepInfo[i].prDepName + "</option>");
     }
@@ -95,7 +98,7 @@
                     <li><span class="glyphicon glyphicon-hand-right"></span></li>
                     <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
                     <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=EP")">设备故障报修单</a></li>
+                    <li><a href="ApplyIndex?billType=EP">设备故障报修单</a></li>
                     <li class="active">开始申请</li>
                 </ol>
             </div>
@@ -106,8 +109,7 @@
                             申请流水号:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" id="sysNum" value="@ViewData["sysNum"]" disabled />
-                            <input type="hidden" name="sys_no" value="@ViewData["sysNum"]" />
+                            <input type="text" class="form-control" name="sys_no" id="sysNum" value="@m.sysNum" readonly />                            
                         </span>
                     </div>    
                     <div class="b-div">
@@ -115,7 +117,7 @@
                             联系电话:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="applier_phone" value="@ViewData["applierPhone"]" placeholder="必填项" />
+                            <input type="text" class="form-control" name="applier_phone" value="@m.applierPhone" placeholder="必填项" />
                         </span>
                     </div>
                     <div class="b-div">
