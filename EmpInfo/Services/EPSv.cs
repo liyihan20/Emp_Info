@@ -39,7 +39,7 @@ namespace EmpInfo.Services
             var info = (from p in db.ei_epPrDeps
                         join e in db.ei_epEqDeps on p.eq_dep_id equals e.id
                         join eu in db.ei_epEqUsers on e.id equals eu.eq_dep_id
-                        where e.is_forbit == false                        
+                        where e.is_forbit == false && p.is_forbit == false                   
                         select new
                         {
                             prDepNo = p.dep_num,
@@ -404,7 +404,7 @@ namespace EmpInfo.Services
 
         public object GetBeginAuditOtherInfo(string sysNo, int step)
         {
-            return bill;
+            return new EPSv(sysNo).GetBill();
         }
 
 

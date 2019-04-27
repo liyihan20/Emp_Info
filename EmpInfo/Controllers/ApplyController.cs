@@ -19,7 +19,13 @@ namespace EmpInfo.Controllers
         [SessionTimeOutFilter]
         public ActionResult ApplyIndex(string billType)
         {
-            SetBillByType(billType);
+            try {
+                SetBillByType(billType);
+            }
+            catch {
+                ViewBag.tip = "流程不存在";
+                return View("Error");
+            }
             
             ViewData["billName"] = bill.BillTypeName;
             ViewData["menuItems"] = bill.GetApplyMenuItems(userInfo);

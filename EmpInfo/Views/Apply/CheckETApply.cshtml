@@ -1,8 +1,8 @@
 ﻿@using EmpInfo.Models;
 @{
-    UCCheckApplyModel m = ViewData["am"] as UCCheckApplyModel;
-    ei_ucApply uc = m.uc;
-    List<ei_ucApplyEntry> entrys = m.entrys;
+    ETCheckApplyModel m = ViewData["am"] as ETCheckApplyModel;
+    ei_etApply et = m.et;
+    List<ei_etApplyEntry> entrys = m.entrys;    
 }
 
 @section CSS{
@@ -11,29 +11,28 @@
             color: gray;
             font-weight:normal;
             font-style:italic;
-        }        
+        }
     </style>
 }
 @section Scripts {
     <script>
-        $(function () {
-            $("#attDiv").load("../Item/PicAttachments", { sysNo: "@uc.sys_no" }, function () { });
-            
-                $("#flowRecordBt").on("click", function () {
-                    var box = $("<div></div>");
-                    $(box).load("CheckFlowRecord .list-group", { sysNo: "@uc.sys_no" }, function () {
-                        openMessageDialog($(box).html(), "查看流转记录");
-                    });
-                });
-                $("#printBt").on("click", function () {
-                    var w = $(document).width();
-                    if (w > 900) {
-                        window.location.href = "@Url.Content("~/Report/PrintUC?sysNo=")" + "@uc.sys_no";
-                    } else {
-                        toastr.error("必须在大屏幕显示器上打印");
-                    }
-                });
+    $(function () {
+        $("#attDiv").load("../Item/PicAttachments", { sysNo: "@et.sys_no" }, function () { });
+        $("#flowRecordBt").on("click", function () {
+            var box = $("<div></div>");
+            $(box).load("CheckFlowRecord .list-group", { sysNo: "@et.sys_no" }, function () {
+                openMessageDialog($(box).html(), "查看流转记录");
             });
+        });
+        $("#printBt").on("click", function () {
+            var w = $(document).width();
+            if (w > 900) {
+                window.location.href = "@Url.Content("~/Report/PrintET?sysNo=")" + "@et.sys_no";
+            } else {
+                toastr.error("必须在大屏幕显示器上打印");
+            }
+        });
+    });
 </script>
 }
 <div class="row" style="margin-left:0;margin-right:0;">
@@ -44,7 +43,7 @@
                     <li><span class="glyphicon glyphicon-hand-right"></span></li>
                     <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
                     <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-                    <li><a href="ApplyIndex?billType=UC">非正常时间出货</a></li>
+                    <li><a href="ApplyIndex?billType=ET">紧急出货运输申请</a></li>
                     <li class="active">查看详情</li>
                 </ol>
             </div>
@@ -63,7 +62,7 @@
                     <tr>
                         <th>申请流水号</th>
                         <td>
-                            <span class="pull-left" style="margin-top:5px;">@uc.sys_no</span>
+                            <span class="pull-left" style="margin-top:5px;">@et.sys_no</span>
                             @if (ViewData["auditStatus"].Equals("已通过")) { 
                                 <button type="button" class="btn btn-default btn-sm pull-right" id="printBt"><i class="fa fa-print"></i> 打印</button>
                             }
@@ -72,43 +71,95 @@
                     <tr>
                         <th>申请人</th>
                         <td>
-                            @uc.applier_name
+                            @et.applier_name
                         </td>
-                    </tr>                    
+                    </tr>
+                    <tr>
+                        <th>联系电话</th>
+                        <td>
+                            @et.applier_phone
+                        </td>
+                    </tr>           
                     <tr>
                         <th>申请时间</th>
-                        <td>@(((DateTime)uc.apply_time).ToString("yyyy-MM-dd HH:mm"))</td>
+                        <td>@(((DateTime)et.apply_time).ToString("yyyy-MM-dd HH:mm"))</td>
                     </tr>
                     <tr>
                         <th>市场部</th>
-                        <td>@uc.market_name</td>
+                        <td>@et.market_name</td>
                     </tr>
                     <tr>
                         <th>出货公司</th>
-                        <td>@uc.company</td>
+                        <td>@et.company</td>
                     </tr>
                     <tr>
                         <th>客户</th>
-                        <td>@uc.customer_name</td>
+                        <td>@et.customer_name</td>
                     </tr>
                     <tr>
                         <th>生产事业部</th>
-                        <td>@uc.bus_dep</td>
+                        <td>@et.bus_dep</td>
                     </tr>
                     <tr>
-                        <th>到达时间</th>
-                        <td>@(((DateTime)uc.arrive_time).ToString("yyyy-MM-dd HH:mm"))</td>
+                        <th>出货时间</th>
+                        <td>@(((DateTime)et.out_time).ToString("yyyy-MM-dd HH:mm"))</td>
                     </tr>
                     <tr>
-                        <th>货运公司</th>
-                        <td>@uc.delivery_company</td>
+                        <th>运输方式</th>
+                        <td>@et.transfer_style</td>
+                    </tr>
+                    <tr>
+                        <th>总毛重(KG)</th>
+                        <td>@et.gross_weight</td>
+                    </tr>
+                    <tr>
+                        <th>件数</th>
+                        <td>@et.pack_num</td>
+                    </tr>
+                    <tr>
+                        <th>包装箱尺寸</th>
+                        <td>@et.box_size</td>
+                    </tr>
+                    <tr>
+                        <th>卡板尺寸</th>
+                        <td>@et.cardboard_size</td>
+                    </tr>
+                    <tr>
+                        <th>送货地址</th>
+                        <td>@et.addr</td>
+                    </tr>
+                    <tr>
+                        <th>出货要求</th>
+                        <td>@et.demand</td>
                     </tr>
                     <tr>
                         <th>申请原因</th>
-                        <td>@uc.reason</td>
+                        <td>@et.reason</td>
                     </tr>
+                    <tr>
+                        <th>责任备注</th>
+                        <td>@et.responsibility</td>
+                    </tr>
+                    @if (et.normal_fee != null) { 
+                    <tr>
+                        <th>货运公司</th>
+                        <td>@et.dilivery_company</td>
+                    </tr>
+                    <tr>
+                        <th>正常运费</th>
+                        <td>@et.normal_fee</td>
+                    </tr>
+                    <tr>
+                        <th>申请运费</th>
+                        <td>@et.apply_fee</td>
+                    </tr>
+                    <tr>
+                        <th>运费差额</th>
+                        <td>@et.different_fee</td>
+                    </tr>
+                    }
                 </table>   
-                @if (uc.has_attachment==true) { 
+                @if (et.has_attachment == true) {
                     <div class="b-div" id="attDiv"></div>
                 }               
                 <div class="b-div">
@@ -118,14 +169,18 @@
                             <table class="table table-condensed table-hover" style="margin:10px 0;">
                                 <thead>
                                     <tr>
-                                        <th style="width:75%;">规格型号</th>
-                                        <th style="width:25%;">出库数量</th>
+                                        <th style="width:20%;">订单单号</th>
+                                        <th style="width:25%;">产品名称</th>
+                                        <th style="width:35%;">规格型号</th>
+                                        <th style="width:20%;">出货数量</th>
                                     </tr>
                                 </thead>
                                 <tbody id="al_file_list">
                                     @foreach (var e in entrys) {
                                         <tr>
-                                            <td>@e.moduel</td>
+                                            <td>@e.order_number</td>
+                                            <td>@e.item_name</td>
+                                            <td>@e.item_modual</td>
                                             <td>@(((decimal)e.qty).ToString("###,###.####"))</td>
                                         </tr>
                                     }

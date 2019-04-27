@@ -1,0 +1,137 @@
+﻿@using EmpInfo.Models;
+@{
+    List<vw_ETReport> list = (List<vw_ETReport>)ViewData["list"];
+    var h = list.First();
+    int numPerPage = 20;
+    int pageNum = (int)Math.Ceiling((decimal)list.Count() / numPerPage);
+}
+
+@section CSS{
+    <style type="text/css" media="print">
+        .noPrint {
+            display: none;
+        }
+
+        .pageNext {
+            page-break-after: always;
+        }
+    </style>
+    <style type="text/css">
+        #reportTb tr td {
+            text-align: center;
+            border: 1px solid;
+            padding: 2px;
+        }
+    </style>
+}
+
+<div class="text-center noPrint" style="margin-bottom:8px;">
+    <button type="button" class="btn btn-default btn-sm" onclick="javascript: window.print();"><i class="fa fa-print"></i> 开始打印</button>
+</div>
+@for (var p = 1; p <= pageNum; p++) {
+    <div><img src="@Url.Content("~/Content/images/Truly.gif")" /></div>
+    <div style="text-align:right;padding-right:8px;font-size:10px;">申请单号：@h.sys_no</div>
+    <table style="width:100%;" id="reportTb">
+        <tr>
+            <td colspan="4">
+                <div style="font-size:22px;font-weight:bold;padding:6px 2px;">紧急出货运输申请</div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:25%;">市场部:</td>
+            <td style="width:25%;">@h.market_name</td>
+            <td style="width:25%;">客户全称:</td>
+            <td style="width:25%;">@h.customer_name</td>
+        </tr>
+        <tr>
+            <td>出货公司:</td>
+            <td>@h.company</td>
+            <td>生产事业部:</td>
+            <td>@h.bus_dep</td>
+        </tr>
+        <tr>
+            <td>申请时间:</td>
+            <td>@(((DateTime)h.apply_time).ToString("yyyy-MM-dd HH:mm"))</td>
+            <td>出货时间:</td>
+            <td>@(((DateTime)h.out_time).ToString("yyyy-MM-dd HH:mm"))</td>
+        </tr>
+        <tr>
+            <td>总毛重(KG):</td>
+            <td>@h.gross_weight</td>
+            <td>件数:</td>
+            <td>@h.pack_num</td>
+        </tr>
+        <tr>
+            <td>运输方式:</td>
+            <td>@h.transfer_style</td>
+            <td>出货要求:</td>
+            <td>@h.demand</td>
+        </tr>
+        <tr>
+            <td>包装箱尺寸:</td>
+            <td>@h.box_size</td>
+            <td>卡板尺寸:</td>
+            <td>@h.cardboard_size</td>
+        </tr>
+        <tr>
+            <td>申请原因:</td>
+            <td>@h.reason</td>
+            <td>责任备注:</td>
+            <td>@h.responsibility</td>
+        </tr>
+        <tr>
+            <td>送货地址:</td>
+            <td colspan="3">@h.addr</td>
+        </tr>
+        <tr>
+            <td colspan="4" style="font-weight:bold;">出货明细</td>
+        </tr>
+        <tr>
+            <td style="font-weight:bold;">订单单号</td>
+            <td style="font-weight:bold;">产品名称</td>
+            <td style="font-weight:bold;">规格型号</td>
+            <td style="font-weight:bold;">出货数量</td>
+        </tr>
+
+        @for (int i = (p - 1) * numPerPage; i < p * numPerPage; i++) {
+            if (i < list.Count()) {
+                <tr>
+                    <td>@list[i].order_number</td>
+                    <td>@list[i].item_name</td>
+                    <td>@list[i].item_modual</td>
+                    <td>@(((decimal)list[i].qty).ToString("###,###.####"))</td>
+                </tr>
+            }
+        }
+        <tr>
+            <td colspan="4">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>申请人:</td>
+            <td style="font-weight:bold;">@h.applier_name</td>
+            <td>营业部负责人:</td>
+            <td style="font-weight:bold;">@h.market_auditor</td>
+        </tr>
+        <tr>
+            <td>营运物流部:</td>
+            <td style="font-weight:bold;">@h.logistics_auditor</td>
+            <td>营运部总监:</td>
+            <td style="font-weight:bold;">@h.operation_auditor</td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <div style="text-align:left;font-size:12px;">
+                    备注:
+                    <div style="margin-left:24px">
+                        <div>1. 以上只允许在出货前一个工作日的上班时间提出申请</div>
+                        <div>2. 没有[紧急出货运输申请]的货物，全部按正常运输方式安排，即：汽运和陆运</div>
+                        <div>3. 流程：申请人-营业部负责人-营运物流部填写运费信息-营运部总监-营运物流部安排</div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    if (p < pageNum) {
+        <div class="pageNext"></div>
+    }
+}   

@@ -22,13 +22,13 @@
     <script src="@Url.Content("~/Scripts/bootstrap-treeview.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
-
+    
     <script>
     var currentNodeId;
     $(function () {
         resetForm();
         GetTreeData();
-
+        
         $("#beginTimePicker,#endTimePicker").datetimepicker({
             language: 'zh-CN',
             format: "yyyy-mm-dd",
@@ -389,6 +389,20 @@
     }
 
     </script>
+    <script>
+        //随着滚动，设置框跟着滚动
+        if ($(document).width() > 900) {
+            var ofs = $("#depInfo").offset();
+            $(window).scroll(function () {
+                var sctop = $(document).scrollTop();
+                if (sctop > 60) {
+                    $("#depInfo").offset({ top: sctop, left: ofs.left });
+                } else {
+                    $("#depInfo").offset(ofs);
+                }
+            });
+        }
+    </script>
 
 }
 <div class="panel panel-default">
@@ -405,7 +419,7 @@
     <div class="col-md-6 col-xs-12">
         <div id="depTree"></div>
     </div>
-    <div class=" col-md-6 col-xs-12">
+    <div class="col-md-6 col-xs-12" id="depInfo">
         <div class="panel panel-primary">
             <div class="panel-heading">设置部门信息</div>
             <div class="panel-body">

@@ -70,7 +70,7 @@
 
             openConfirmDialog("确认要评价此设备故障维修服务吗？", function () {
                 $.post("HandleApply", {
-                    sysNum: "@bam.sysNum",
+                    sysNo: "@bam.sysNum",
                     step: "@bam.step",
                     stepName: "@bam.stepName",
                     evaluationScore: score,
@@ -94,7 +94,7 @@
             }
             openConfirmDialog("确认要对此设备故障维修打分吗？", function () {
                 $.post("HandleApply", {
-                    sysNum: "@bam.sysNum",
+                    sysNo: "@bam.sysNum",
                     step: "@bam.step",
                     stepName: "@bam.stepName",
                     difficultyScore: score
@@ -122,7 +122,7 @@
         }
         openConfirmDialog("确认要" + (isAccepted ? "承接" : "拒接") + "此设备故障报修申请吗？", function () {
             $.post("HandleApply", {
-                sysNum: "@bam.sysNum",
+                sysNo: "@bam.sysNum",
                 step: "@bam.step",
                 stepName: "@bam.stepName",
                 pass: isAccepted,
@@ -207,7 +207,7 @@
         </div>
         <div class="panel-body">
             <form id="confirmForm">
-                <input type="hidden" name="sysNum" value="@bam.sysNum" />
+                <input type="hidden" name="sysNo" value="@bam.sysNum" />
                 <input type="hidden" name="step" value="@bam.step" />
                 <input type="hidden" name="stepName" value="@bam.stepName" />
 

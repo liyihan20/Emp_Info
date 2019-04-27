@@ -405,7 +405,7 @@ namespace EmpInfo.Controllers
                 //第三方员工或新员工没有工资卡号的，不需要再验证 2019-04-08
                 var bankCards = db.GetSalaryBankCard(user.salary_no).ToList();
                 if (bankCards.Count() > 0) {
-                    if (bankCards.First() != null) {
+                    if (!string.IsNullOrEmpty(bankCards.First())) {
                         if (!bankCardNumber.Equals(bankCards.First())) {
                             return Json(new SimpleResultModel() { suc = false, msg = "工资银行卡号错误，验证失败" });
                         }

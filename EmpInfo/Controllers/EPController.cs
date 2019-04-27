@@ -272,6 +272,8 @@ namespace EmpInfo.Controllers
                 dep.create_date = DateTime.Now;
                 dep.creater_name = userInfo.name;
                 dep.creater_num = userInfo.cardNo;
+                dep.is_forbit = false;
+                
 
                 var maxNo = db.ei_epPrDeps.OrderByDescending(e => e.id).Select(e => e.dep_num).FirstOrDefault();
                 if (maxNo == null) {
@@ -284,6 +286,13 @@ namespace EmpInfo.Controllers
             }
             else {
                 dep = db.ei_epPrDeps.Single(d => d.id == prId);
+                //如果生产部门名字有变化，那么要更新未评价的那些维修申请单
+                if (!dep.dep_name.Equals(prDepName)) {
+                    var shouldUpdateDepNames = db.ei_epApply.Where(e => e.produce_dep_name == dep.dep_name && e.evaluation_time == null).ToList();
+                    foreach (var s in shouldUpdateDepNames) {
+                        s.produce_dep_name = prDepName;
+                    }
+                }
             }
 
             try {                
@@ -353,6 +362,22 @@ namespace EmpInfo.Controllers
                 }
                 db.SaveChanges();
                 return Json(new { suc = true, msg = "成功移除所选生产部门" });
+            }
+            catch (Exception ex) {
+                return Json(new { suc = false, msg = ex.Message });
+            }
+        }
+
+        public JsonResult TogglePrDepsForbit(string prDepIds)
+        {
+            try {
+                var prDepIdInt = prDepIds.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(u => Int32.Parse(u)).ToList();
+                var prDeps = db.ei_epPrDeps.Where(e => prDepIdInt.Contains(e.id));
+                foreach (var prDep in prDeps) {
+                    prDep.is_forbit = !prDep.is_forbit;
+                }
+                db.SaveChanges();
+                return Json(new { suc = true, msg = "操作成功" });
             }
             catch (Exception ex) {
                 return Json(new { suc = false, msg = ex.Message });

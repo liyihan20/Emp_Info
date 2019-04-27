@@ -87,6 +87,11 @@
         <EntityTypeShape EntityType="ICAuditModel.vw_epReport" Width="1.5" PointX="6" PointY="11.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_epBusReportChecker" Width="1.5" PointX="8.25" PointY="12.125" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_UCExcel" Width="1.5" PointX="4.125" PointY="11.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_etApplyEntry" Width="1.5" PointX="6" PointY="13" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_etApply" Width="1.5" PointX="6" PointY="12.125" IsExpanded="false" />
+        <AssociationConnector Association="ICAuditModel.FK_ei_etApplyEntry_ei_etApply" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_ETExcel" Width="1.5" PointX="0.5" PointY="12.875" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_ETReport" Width="1.5" PointX="2.375" PointY="12.875" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

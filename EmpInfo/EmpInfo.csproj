@@ -159,7 +159,6 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AndroidAppController.cs" />
-    <Compile Include="Controllers\ApplyOldController.cs" />
     <Compile Include="Controllers\ApplyExtraController.cs" />
     <Compile Include="Controllers\ApplyController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
@@ -291,6 +290,12 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_epPrDeps.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_etApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_etApplyEntry.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_event_log.cs">
@@ -464,6 +469,12 @@
     <Compile Include="Models\vw_epReport.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\vw_ETExcel.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\vw_ETReport.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\vw_getAllhrEmp.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -502,6 +513,7 @@
     <Compile Include="Services\CRSv.cs" />
     <Compile Include="Services\DPSv.cs" />
     <Compile Include="Services\EPSv.cs" />
+    <Compile Include="Services\ETSv.cs" />
     <Compile Include="Services\SASv.cs" />
     <Compile Include="Services\SVSv.cs" />
     <Compile Include="Services\UCSv.cs" />
@@ -742,6 +754,7 @@
     <Content Include="Content\images\statistics_48.png" />
     <Content Include="Content\images\stock.png" />
     <Content Include="Content\images\sv.png" />
+    <Content Include="Content\images\truck.png" />
     <Content Include="Content\images\Truly.gif" />
     <Content Include="Content\images\truly_home.gif" />
     <Content Include="Content\images\uc.png" />
@@ -1118,14 +1131,8 @@
     <Content Include="Views\AndroidApp\PushClickView.cshtml" />
     <Content Include="Views\K3\AccountReset.cshtml" />
     <None Include="Service References\FlowSvr\FlowSvr.wsdl" />
-    <Content Include="Views\ApplyOld\DormRepairIndex.cshtml" />
-    <Content Include="Views\ApplyOld\GetMyApplyDPList.cshtml" />
-    <Content Include="Views\ApplyOld\CheckAndAuditDPApply.cshtml" />
-    <Content Include="Views\ApplyOld\GetMyAuditedDPList.cshtml" />
-    <Content Include="Views\ApplyOld\GetMyAuditingDPList.cshtml" />
     <Content Include="Views\Home\DormGroupIndex.cshtml" />
     <Content Include="Views\Admin\Department.cshtml" />
-    <Content Include="Views\ApplyOld\BeginApplyAL.cshtml" />
     <Content Include="Views\Shared\_SelectUsers.cshtml" />
     <Content Include="Views\WX\WLogin.cshtml" />
     <Content Include="Views\WX\WLogOut.cshtml" />
@@ -1133,44 +1140,21 @@
     <Content Include="Views\Shared\_SelectDep.cshtml" />
     <Content Include="Views\Home\CheckMonthSalary.cshtml" />
     <Content Include="Views\Shared\_ConfirmPasswordDialog.cshtml" />
-    <Content Include="Views\ApplyOld\CheckALApply.cshtml" />
     <Content Include="Views\Home\WorkGroupIndex.cshtml" />
-    <Content Include="Views\ApplyOld\BeginAuditALApply.cshtml" />
-    <Content Include="Views\ApplyOld\CheckFlowRecord.cshtml" />
     <Content Include="Views\Shared\_InputDialog.cshtml" />
     <Content Include="Views\Shared\_SelectItems.cshtml" />
-    <Content Include="Views\ApplyOld\BeginApplySA.cshtml" />
-    <Content Include="Views\ApplyOld\CheckSAApply.cshtml" />
-    <Content Include="Views\ApplyOld\BeginAuditSAApply.cshtml" />
     <Content Include="Views\K3\StockBillAudit.cshtml" />
     <Content Include="Views\Report\ALReport.cshtml" />
-    <Content Include="Views\ApplyOld\ApplyIndex.cshtml" />
-    <Content Include="Views\ApplyOld\GetMyApplyList.cshtml" />
-    <Content Include="Views\ApplyOld\GetMyAuditingList.cshtml" />
-    <Content Include="Views\ApplyOld\GetMyAuditedList.cshtml" />
-    <Content Include="Views\ApplyOld\BeginApplyUC.cshtml" />
-    <Content Include="Views\ApplyOld\CheckUCApply.cshtml" />
-    <Content Include="Views\ApplyOld\BeginAuditUCApply.cshtml" />
     <Content Include="Views\Report\PrintUC.cshtml" />
     <Content Include="Views\Shared\Close.cshtml" />
-    <Content Include="Views\ApplyOld\GetMyAuditingList.bak.cshtml" />
     <Content Include="Views\Report\AssistantEmps.cshtml" />
     <Content Include="Views\Report\CheckAssistantEmp.cshtml" />
-    <Content Include="Views\ApplyOld\BeginApplyCR.cshtml" />
-    <Content Include="Views\ApplyOld\CheckCRApply.cshtml" />
-    <Content Include="Views\ApplyOld\BeginAuditCRApply.cshtml" />
-    <Content Include="Views\ApplyOld\BeginApplySV.cshtml" />
-    <Content Include="Views\ApplyOld\CheckSVApply.cshtml" />
-    <Content Include="Views\ApplyOld\BeginAuditSVApply.cshtml" />
     <Content Include="Views\Home\EleProcess.cshtml" />
     <Content Include="Views\Report\CRReport.cshtml" />
     <Content Include="Views\Report\SVReport.cshtml" />
     <Content Include="Views\Home\EditPublicFundInfo.cshtml" />
     <Content Include="Views\EP\EquitmentDeps.cshtml" />
     <Content Include="Views\EP\EqDepDetail.cshtml" />
-    <Content Include="Views\ApplyOld\BeginApplyEP.cshtml" />
-    <Content Include="Views\ApplyOld\CheckEPApply.cshtml" />
-    <Content Include="Views\ApplyOld\BeginAuditEPApply.cshtml" />
     <Content Include="Views\Report\EPReport.cshtml" />
     <Content Include="Views\Report\UCReport.cshtml" />
     <Content Include="Views\Apply\ApplyIndex.cshtml" />
@@ -1197,6 +1181,12 @@
     <Content Include="Views\Apply\CheckDPApply.cshtml" />
     <Content Include="Views\Apply\BeginAuditDPApply.cshtml" />
     <Content Include="Views\Apply\CheckSVApply.cshtml" />
+    <Content Include="Views\Apply\BeginApplyET.cshtml" />
+    <Content Include="Views\Apply\CheckETApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditETApply.cshtml" />
+    <Content Include="Views\Report\PrintET.cshtml" />
+    <Content Include="Views\Report\ETReport.cshtml" />
+    <Content Include="Views\Item\PicAttachments.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

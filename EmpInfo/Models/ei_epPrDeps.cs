@@ -28,6 +28,7 @@ namespace EmpInfo.Models
         public string creater_num { get; set; }
         public string creater_name { get; set; }
         public Nullable<System.DateTime> create_date { get; set; }
+        public Nullable<bool> is_forbit { get; set; }
     
         public virtual ei_epEqDeps ei_epEqDeps { get; set; }
     }

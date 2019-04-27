@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace EmpInfo.Services
 {
-    public class DPSv:BillSv,IBeginAuditOtherInfo
+    public class DPSv : BillSv, IBeginAuditOtherInfo
     {
         ei_dormRepair bill;
         public DPSv() { }
@@ -29,7 +29,7 @@ namespace EmpInfo.Services
             get { return "宿舍维修申请"; }
         }
 
-        
+
         public override string AuditViewName()
         {
             return "BeginAuditDPApply";
@@ -39,8 +39,8 @@ namespace EmpInfo.Services
         {
             return new List<ApplyNavigatorModel>(){
                 new ApplyNavigatorModel(){
-                    text="宿舍事务集合",
-                    url="Home/DormGroupIndex"
+                    text = "宿舍事务集合",
+                    url = "Home/DormGroupIndex"
                 }
             };
         }
@@ -92,7 +92,7 @@ namespace EmpInfo.Services
                 catch (Exception ex) {
                     //将生成的流程表记录删除
                     client.DeleteApplyForFailure(bill.sys_no);
-                    throw new Exception("申请提交失败，原因：" + ex.Message );
+                    throw new Exception("申请提交失败，原因：" + ex.Message);
                 }
 
                 //发送通知邮件到下一环节
@@ -127,13 +127,13 @@ namespace EmpInfo.Services
 
             FlowResultModel result = null;
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            string formJson = JsonConvert.SerializeObject(bill);
+            
 
             //处理表单信息
-            if (stepName.Contains("舍友")) {                
+            if (stepName.Contains("舍友")) {
                 //不需要处理表单信息
             }
-            else if (stepName.Contains("接单")) {                
+            else if (stepName.Contains("接单")) {
                 string accepterComment = fc.Get("accepterComment");
                 string accepter = fc.Get("accepter");
                 string confirmTime = fc.Get("confirmTime");
@@ -158,8 +158,8 @@ namespace EmpInfo.Services
 
                 if (!string.IsNullOrEmpty(repairFinishTime)) {
                     bill.finish_repair_time = DateTime.Parse(repairFinishTime);
-                    if (bill.finish_repair_time < DateTime.Now) {
-                        throw new Exception("完成维修日期不能早于当前日期");
+                    if (bill.finish_repair_time > DateTime.Now) {
+                        throw new Exception("完成维修日期不能晚于当前日期");
                     }
                 }
 
@@ -183,6 +183,7 @@ namespace EmpInfo.Services
             }
 
             //走流程
+            string formJson = JsonConvert.SerializeObject(bill);
             result = flow.BeginAudit(bill.sys_no, step, userInfo.cardNo, isPass, auditOption, formJson);
             if (result != null && result.suc) {
                 db.SaveChanges();
@@ -201,7 +202,7 @@ namespace EmpInfo.Services
                 return new SimpleResultModel() { suc = false, msg = "不能撤销，因为后勤部已接单" };
             }
 
-            var result = flow.AbortFlow(userInfo.cardNo, sysNo);            
+            var result = flow.AbortFlow(userInfo.cardNo, sysNo);
 
             return new SimpleResultModel() { suc = result.suc, msg = result.msg };
         }
@@ -218,7 +219,7 @@ namespace EmpInfo.Services
                         bill.applier_name,
                         string.Format("你申请的单号为【{0}】的{1}已{2}，请知悉。", bill.sys_no, BillTypeName, (isSuc ? "处理完成" : "被拒绝")),
                         GetUserEmailByCardNum(bill.applier_num)
-                        );                    
+                        );
                 }
                 else {
                     FlowSvrSoapClient flow = new FlowSvrSoapClient();
@@ -231,7 +232,7 @@ namespace EmpInfo.Services
                         GetUserNameByCardNum(model.nextAuditors),
                         string.Format("你有一张待处理的单号为【{0}】的{1}，请尽快登陆系统处理。", bill.sys_no, BillTypeName),
                         GetUserEmailByCardNum(model.nextAuditors)
-                        );                    
+                        );
                 }
             }
         }

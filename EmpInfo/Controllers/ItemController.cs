@@ -118,5 +118,17 @@ namespace EmpInfo.Controllers
 
         }
 
+        /// <summary>
+        /// 图片附件列表
+        /// </summary>
+        /// <param name="sysNo"></param>
+        /// <returns></returns>
+        public ActionResult PicAttachments(string sysNo)
+        {
+            ViewData["atts"] = MyUtils.GetAttachmentInfo(sysNo);
+            ViewData["sysNo"] = sysNo;
+            return View();
+        }
+
     }
 }

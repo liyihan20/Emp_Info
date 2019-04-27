@@ -596,17 +596,14 @@ namespace EmpInfo.Controllers
                         && gu.user_id == userInfo.id
                         select a.en_name).Distinct().ToArray();
             string autStr = string.Join(",", auts);
-            ViewData["autStr"] = autStr;
-
-            ViewData["isDepReporter"] = db.ei_department.Where(d => d.FReporter.Contains(userInfo.cardNo)).Count() > 0;
+            ViewData["autStr"] = autStr;            
 
             return View();
         }
 
         [SessionTimeOutFilter]
         public ActionResult EleProcess()
-        {
-            ViewData["isDepReporter"] = db.ei_department.Where(d => d.FReporter.Contains(userInfo.cardNo)).Count() > 0;
+        {            
             return View();
         }
 

@@ -1,0 +1,565 @@
+﻿@using EmpInfo.Models;
+@{
+    ETBeforeApplyModel m = ViewData["infoBeforeApply"] as ETBeforeApplyModel;    
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
+
+    <style type="text/css">
+        .b-label {
+            display: inline-block;            
+            width: 85px;
+            color: gray;            
+            vertical-align: top;
+        }
+
+        .b-input{
+            display:inline-block;
+            width:70%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+
+        #al_file_tb th {
+            font-size: small;
+            text-align: center;
+        }
+
+        #al_file_tb td {
+            font-size: small;
+            text-align: center;
+        }
+
+        #al_file_list i {
+            cursor: pointer;
+        }
+
+    </style>
+}
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+
+    <script>
+    var items = [];
+    var changeIdx = -1;
+    $(function () {
+
+        $("#datePicker").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd hh:ii",
+            autoclose: true,
+            startView: 2,
+            maxView: 2,
+            minuteStep: 5,
+            startDate: "@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 08:00")",
+            initialDate:"@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 08:00")"
+            });
+
+            $("#customerNumber").on("focusout", function () {
+                var num = $(this).val();
+                var company = $("select[name='company']").val();
+                if (!company) {
+                    company = "all";
+                }
+
+                if (num.length >= 5) {
+                    $.post("@Url.Content("~/Item/GetK3CustomerName")", { customerNumber: num, company: company }, function (data) {
+                var tip = "<i class='fa fa-info-circle'></i> ";
+                if (data.suc) {
+                    tip += "对应客户名称：" + data.extra;
+                    $("#customerName").val(data.extra);
+                } else {
+                    tip += data.msg;
+                    $("#customerName").val("");
+                }
+                $("#customerNameSpan").html(tip);
+            });
+        }
+    });
+
+    $("#apply_bt").on("click", function () {
+        if (items.length == 0) {
+            toastr.error("必须录入出货明细才能提交");
+            return;
+        }
+        if ($("#al_file_list").children().length == 0) {
+            toastr.error("必须要上传图片附件才能提交");
+            return;
+        }
+        $("#hasAttachment").val(true);
+        openConfirmDialog("确定要提交申请吗？", function () {
+            $("#apply_bt").button("loading");
+            $.ajax({
+                type: 'post',
+                url: 'SaveApply',
+                data: $("#chForm").serialize() + "&entrys=" + JSON.stringify(items),
+                cache: false,
+                dataType: 'json',
+                success: function (data) {
+                    $("#apply_bt").button("reset");
+                    if (data.suc) {
+                        toastr.success("提交成功:" + data.msg);
+                        setTimeout(function () { window.location.href = "ApplyIndex?billType=ET"; }, 2000);
+                    } else {
+                        toastr.error("提交失败：" + data.msg);
+                        $("#apply_bt").button("reset");
+                    }
+
+                }
+            });
+        });
+    });
+
+    })
+
+    function openDialog() {
+        changeIdx = -1;
+        $("#itemModal").modal("show");
+        $("#order_number").val("");
+        $("#item_name").val("");
+        $("#item_moduel").val("");
+        $("#item_qty").val("");
+    }
+
+    function addChItem() {
+        var qty = $("#item_qty").val();
+        var name = $("#item_name").val();
+        var moduel = $("#item_moduel").val();
+        var num = $("#order_number").val();
+
+        if ($.trim(qty) == "" || isNaN(qty)) {
+            toastr.error("数量必须输入数字");
+            return;
+        }
+        if ($.trim(moduel) == "") {
+            toastr.error("规格型号必须填写");
+            return;
+        }
+        if ($.trim(name) == "") {
+            toastr.error("产品名称必须填写");
+            return;
+        }
+        if ($.trim(num) == "") {
+            toastr.error("订单单号必须填写");
+            return;
+        }
+        if (changeIdx < 0) {
+            items.push({ order_number:num,item_name:name, item_modual: moduel, qty: qty });
+
+            var idx = items.length - 1;
+            var tr = "<tr id='tr" + idx + "'>";
+            tr += "<td>" + num + "</td>";
+            tr += "<td>" + name + "</td>";
+            tr += "<td>" + moduel + "</td>";
+            tr += "<td>" + qty + "</td>";
+            tr += "<td>";
+            tr += "<a href='#' title='修改' onclick='changeChItem(" + idx + ")'><i class='text-success fa fa-pencil'></i></a>";
+            tr += " | ";
+            tr += "<a href='#' title='删除' onclick='removeChItem(" + idx + ")'><i class='text-danger fa fa-times'></i></a>";
+            tr += "</td>";
+            tr += "</tr>";
+            $("#ch_tb_content").append(tr);
+        } else {
+            items[changeIdx].order_number = num;
+            items[changeIdx].item_name = name;
+            items[changeIdx].item_modual = moduel;
+            items[changeIdx].qty = qty;
+
+            $($("#tr" + changeIdx).find("td")[0]).html(num);
+            $($("#tr" + changeIdx).find("td")[1]).html(name);
+            $($("#tr" + changeIdx).find("td")[2]).html(moduel);
+            $($("#tr" + changeIdx).find("td")[3]).html(qty);
+        }
+        $("#itemModal").modal("hide");
+    }
+
+    function changeChItem(idx) {
+        changeIdx = idx;
+        $("#itemModal").modal("show");
+        $("#order_number").val(items[idx].order_number);
+        $("#item_name").val(items[idx].item_name);
+        $("#item_moduel").val(items[idx].item_modual);
+        $("#item_qty").val(items[idx].qty);
+    }
+
+    function removeChItem(idx) {
+        items.splice(idx, 1);
+        $("#tr" + idx).remove();
+    }
+    </script>
+    <script>
+        $(function () {
+
+            $("#al_file_panel").hide();
+            var maxNum = 3; //最多上传3个文件
+            var maxSingleSize = 10 * 1024 * 1024; //单个文件最多10M,会自动压缩的
+            var uploader = WebUploader.create({
+                swf: '@Url.Content("~/Content/webupload/Uploader.swf")',
+                server: '@Url.Content("~/File/BeginUpload")',
+                pick: '#picker',
+                resize: false,
+                auto: true,
+                formData: { sysNum: '@m.sysNum' },
+                fileNumLimit: maxNum,
+                fileSingleSizeLimit: maxSingleSize,
+                accept: {
+                    title: 'Images',
+                    extensions: 'gif,jpg,jpeg,bmp,png',
+                    mimeTypes: 'image/*'
+                }
+            });
+
+            uploader.on('fileQueued', function (file) {
+                var fileName = file.name;
+                if (fileName.length > 20) {
+                    var ext = fileName.substr(fileName.lastIndexOf("."));
+                    fileName = fileName.substr(0, 14) + ".." + ext;
+                }
+                $("#al_file_list").append('<tr><td id="' + file.id + '" data-fd="' + file.name + '" class="item">' +
+                    fileName +
+                '</td><td>' + (file.size / 1000).toFixed(1) + " K</td><td class='state'>上传中...</td></tr>");
+                $("#al_file_panel").show();
+            });
+
+            uploader.on('uploadSuccess', function (file, res) {
+                if (!res.suc) {
+                    $('#' + file.id).parent().find('td.state').addClass("text-danger").html("上传出错");
+                    console.log(res);
+                } else {
+                    $('#' + file.id).parent().find('td.state').addClass("text-success").html("已上传| <i class='fa fa-times-circle-o text-danger' title='移除'></i>");
+                }
+
+            });
+
+            uploader.on('uploadError', function (file) {
+                $('#' + file.id).parent().find('td.state').addClass("text-danger").html('上传出错');
+            });
+
+            uploader.on('uploadComplete', function (file) {
+                //$('#' + file.id).find('.progress').fadeOut();
+            });
+
+            //上传队列出错提示
+            uploader.on("error", function (type) {
+                switch (type) {
+                    case "Q_TYPE_DENIED":
+                        toastr.error("图片格式不正确");
+                        break;
+                    case "F_EXCEED_SIZE":
+                        toastr.error("单个文件大小必须少于10M");
+                        break;
+                    case "F_DUPLICATE":
+                        toastr.error("不能重复上传文件");
+                        break;
+                    case "Q_EXCEED_NUM_LIMIT":
+                        toastr.error("最多上传文件数量是" + maxNum + "个");
+                        break;
+                    default:
+                        console.error("上传失败：" + type);
+                        break;
+                }
+            });
+
+            //移除已上传文件
+            $("#al_file_list").on("click", "td i", function () {
+                var fileTD = $(this).parents("tr").find("td")[0];
+                openConfirmDialog("确定要移除此上传的文件吗？", function () {
+                    var fileId = $(fileTD).attr("id");
+                    var fileName = $(fileTD).attr("data-fd");
+
+                    $.post("@Url.Content("~/File/RemoveUploadedFile")", { sysNum: "@m.sysNum", fileName: fileName }, function (data) {
+                        if (data.suc) {
+                            toastr.success("文件移除成功");
+                            uploader.removeFile(fileId,true);
+                            $(fileTD).parent().fadeOut(1000, function () {
+                                $(fileTD).parent().remove();
+                                var st = uploader.getStats();
+                                if (st.successNum == st.cancelNum) {
+                                    $("#al_file_panel").fadeOut(1000);
+                                }
+                            });
+                        } else {
+                            toastr.error("移除失败：" + data.msg);
+                        }
+                    })
+                });
+
+            });
+
+        });
+    </script>
+}
+<div class="row" style="margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                    <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                    <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                    <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+                    <li><a href="ApplyIndex?billType=ET">紧急出货运输申请</a></li>
+                    <li class="active">开始申请</li>
+                </ol>
+            </div>
+            <div class="panel-body">
+                <form id="chForm">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请流水号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="sys_no" id="sysNum" value="@m.sysNum" readonly />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            市场部:
+                        </span>
+                        <span class="b-input">
+                            <select class="form-control" name="market_name">
+                                <option value="">---- 下拉选择市场部 ----</option>
+                                @foreach (var ml in m.marketList) {                                    
+                                    <option value="@ml">@ml</option>
+                                }
+                            </select>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            出货公司:
+                        </span>
+                        <span class="b-input">
+                            <select class="form-control" name="company">
+                                <option value="">---- 下拉选择出货公司 ----</option>                                                               
+                                <option value="光电">光电</option>
+                                <option value="半导体">半导体</option>
+                                <option value="电子">电子</option>
+                                <option value="仪器">仪器</option>
+                                <option value="工业">工业</option>
+                            </select>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            客户代码:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" id="customerNumber" name="customer_number" placeholder="必填" />
+                            <input type="hidden" id="customerName" name="customer_name" />
+                            <span id="customerNameSpan" class="text-danger small"></span>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            生产事业部:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="bus_dep" placeholder="必填" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            出货时间:
+                        </span>
+                        <div class="b-input">
+                            <div class="input-group date" id="datePicker">
+                                <input class="form-control" type="text" id="outTime" name="out_time" autocomplete="off" placeholder="必填" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                            </div>                            
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            运输方式:
+                        </span>
+                        <span class="b-input">
+                            <select class="form-control" name="transfer_style">
+                                <option value="">---- 下拉选择运输方式 ----</option>                                                               
+                                <option value="小车">小车</option>
+                                <option value="7座商务车">7座商务车</option>
+                                <option value="9座商务车">9座商务车</option>
+                                <option value="2.4米小货车">2.4米小货车</option>
+                                <option value="大货车">大货车</option>
+                                <option value="空运">空运</option>
+                            </select>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            总毛重(KG):
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="gross_weight" placeholder="必填" />
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            件数:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="pack_num" placeholder="必填" />
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            包装箱尺寸:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="box_size" placeholder="必填" />
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            卡板尺寸:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="cardboard_size" placeholder="必填" />
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            送货地址:
+                        </span>
+                        <div class="b-input">
+                            <textarea class="form-control" rows="2" name="addr" placeholder="必填" ></textarea>
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            出货要求:
+                        </span>
+                        <div class="b-input">
+                            <textarea class="form-control" rows="2" name="demand" placeholder="必填" ></textarea>
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请原因:
+                        </span>
+                        <div class="b-input">
+                            <textarea class="form-control" rows="2" name="reason" placeholder="必填" ></textarea>
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            责任备注:
+                        </span>
+                        <div class="b-input">
+                            <textarea class="form-control" rows="2" name="responsibility" placeholder="备注清楚责任部门和责任人比例，必填"></textarea>
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            联系电话:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="applier_phone" placeholder="必填" value="@m.applierPhone" />
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            附件
+                        </span>
+                        <div style="display:inline-block;width:70%">
+                            <div id="uploader" class="wu-example">
+                                <div id="picker"> + </div>
+                            </div>
+                            <p class="small text-danger"><i class="fa fa-info-circle"></i> 必须上传图片证明夜间出货必要性（最多可上传3张）</p>
+                        </div>
+                    
+                        <div class="panel panel-default" id="al_file_panel">
+                            <div class="panel-heading">附件信息</div>
+                            <div class="panel-body" style="padding:0 8px;">
+                                <table class="table table-condensed table-hover" id="al_file_tb" style="margin:10px 0;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:50%;">名称</th>
+                                            <th style="width:20%;">大小</th>
+                                            <th style="width:30%;">状态</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="al_file_list"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <input type="hidden" name="has_attachment" id="hasAttachment" />
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            出货明细:
+                        </span>
+                        <div class="b-input">
+                            <button class="btn btn-primary" type="button" onclick="openDialog()"> + </button>
+                        </div>
+                    </div>
+                    <table class="table table-condensed table-hover" style="margin:10px 0;">
+                        <thead>
+                            <tr>
+                                <th style="width:20%;">订单单号</th>
+                                <th style="width:20%;">产品名称</th>
+                                <th style="width:25%;">规格型号</th>
+                                <th style="width:20%;">出货数量</th>
+                                <th style="width:15%;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ch_tb_content">
+                        </tbody>
+                    </table>
+                    <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:12px;"><i class="fa fa-check-circle-o"></i> 提交申请</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal {
+@Html.Partial("_ConfirmDialog")
+<div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">新增明细</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="item_moduel" class="sr-only">订单号:</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">订单号:</div>
+                        <input type="text" class="form-control" id="order_number" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="item_moduel" class="sr-only">产品名称:</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">产品名称:</div>
+                        <input type="text" class="form-control" id="item_name" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="item_moduel" class="sr-only">规格型号:</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">规格型号:</div>
+                        <input type="text" class="form-control" id="item_moduel" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="item_qty" class="sr-only">数量:</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">数量:</div>
+                        <input type="number" class="form-control" id="item_qty" required />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 取消</button>
+                <button type="button" class="btn btn-success" onclick="addChItem()"><span class="fa fa-check-circle"></span> 确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+}

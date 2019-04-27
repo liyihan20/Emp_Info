@@ -1270,5 +1270,120 @@ namespace EmpInfo.Controllers
 
         #endregion
 
+        #region 紧急出货
+
+        [SessionTimeOutFilter]
+        public ActionResult PrintET(string sysNo)
+        {
+            var list = db.vw_ETReport.Where(v => v.sys_no == sysNo).ToList();
+            if (list.Count() < 1) {
+                ViewBag.tip = "单据不存在";
+                return View("Error");
+            }
+            ViewData["list"] = list;
+
+            WriteEventLog("紧急出货申请", "打印申请单：" + sysNo);
+            return View();
+        }
+
+        [SessionTimeOutFilter]
+        public ActionResult ETReport()
+        {
+            return View();
+        }
+
+        public void BeginExportETReport(DateTime fromDate, DateTime toDate)
+        {
+            toDate = toDate.AddDays(1);
+            var result = db.vw_ETExcel.Where(u => u.apply_time > fromDate && u.apply_time <= toDate).ToList();
+            
+            string[] colName = new string[] { "序号", "申请流水号", "申请人", "联系电话", "申请时间", "完成申请时间", "市场部", "出货公司",
+                                              "客户", "生产事业部", "出货时间", "运输方式", "总毛重(KG)","件数", "包装箱尺寸", "卡板尺寸",
+                                              "送货地址", "出货要求", "申请原因", "责任备注", "货运公司", "正常运费", "申请运费", "运费差额",
+                                              "订单单号", "产品名称", "规格型号", "出货数量" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "紧急出货运输申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("紧急出货详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result) {
+                colIndex = 1;
+
+                //"序号", "申请流水号", "申请人", "联系电话", "申请时间", "完成申请时间", "市场部", "出货公司",
+                //"客户", "生产事业部", "出货时间", "运输方式", "总毛重(KG)","件数", "包装箱尺寸", "卡板尺寸",
+                //"送货地址", "出货要求", "申请原因", "责任备注", "货运公司", "正常运费", "申请运费", "运费差额",
+                //"订单单号", "产品名称", "规格型号", "出货数量"
+                cells.Add(++rowIndex, colIndex, rowIndex - 1);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.applier_name);
+                cells.Add(rowIndex, ++colIndex, d.applier_phone);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.finish_date).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.market_name);
+                cells.Add(rowIndex, ++colIndex, d.company);
+
+                cells.Add(rowIndex, ++colIndex, d.customer_name);
+                cells.Add(rowIndex, ++colIndex, d.bus_dep);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.out_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.transfer_style);
+                cells.Add(rowIndex, ++colIndex, d.gross_weight);
+                cells.Add(rowIndex, ++colIndex, d.pack_num);
+                cells.Add(rowIndex, ++colIndex, d.box_size);
+                cells.Add(rowIndex, ++colIndex, d.cardboard_size);
+
+                cells.Add(rowIndex, ++colIndex, d.addr);
+                cells.Add(rowIndex, ++colIndex, d.demand);
+                cells.Add(rowIndex, ++colIndex, d.reason);
+                cells.Add(rowIndex, ++colIndex, d.responsibility);
+                cells.Add(rowIndex, ++colIndex, d.dilivery_company);
+                cells.Add(rowIndex, ++colIndex, d.normal_fee);
+                cells.Add(rowIndex, ++colIndex, d.apply_fee);
+                cells.Add(rowIndex, ++colIndex, d.different_fee);
+
+                cells.Add(rowIndex, ++colIndex, d.order_number);
+                cells.Add(rowIndex, ++colIndex, d.item_name);
+                cells.Add(rowIndex, ++colIndex, d.item_modual);
+                cells.Add(rowIndex, ++colIndex, d.qty);
+            }
+
+            xls.Send();
+        }
+
+        #endregion
+
     }
 }

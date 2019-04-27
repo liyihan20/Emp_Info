@@ -43,7 +43,6 @@ namespace EmpInfo.Models
         public string agentMan { get; set; }
         public string informMan { get; set; }
         public bool hasAttachment { get; set; }
-        public List<AttachmentModel> attachments { get; set; }
     }
 
     public class AttachmentModel
@@ -131,7 +130,6 @@ namespace EmpInfo.Models
     {
         public ei_ucApply uc { get; set; }
         public List<ei_ucApplyEntry> entrys { get; set; }
-        public List<AttachmentModel> attachments { get; set; }
     }
 
     public class SABeforeApplyModel
@@ -156,16 +154,23 @@ namespace EmpInfo.Models
         public int? depId { get; set; }
     }
 
-    public class CRCheckApplyModel
-    {
-        public ei_CRApply cr { get; set; }
-        public List<AttachmentModel> attachments { get; set; }
-    }
-
     public class DPCheckApplyModel
     {
         public ei_dormRepair bill { get; set; }
         public List<FlowSvr.FlowRecordModels> records { get; set; }
+    }
+
+    public class ETBeforeApplyModel
+    {
+        public string sysNum { get; set; }
+        public string applierPhone { get; set; }
+        public List<string> marketList { get; set; }        
+    }
+
+    public class ETCheckApplyModel
+    {
+        public ei_etApply et { get; set; }
+        public List<ei_etApplyEntry> entrys { get; set; }
     }
 
 }

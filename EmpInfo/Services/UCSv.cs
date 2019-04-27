@@ -32,8 +32,9 @@ namespace EmpInfo.Services
         {
             //申请时间必须在8时至19时之间
             var hour = DateTime.Now.Hour;
-            if (hour < 8 || hour >= 19) {
-                throw new Exception("非正常时间出货的申请时间必须在8时到19时之间，当前时间不能申请");
+            var minute = DateTime.Now.Minute;
+            if (hour < 8 || hour >= 17 || (hour == 16 && minute > 45)) {
+                throw new Exception("非正常时间出货的申请时间必须在8时到16时45分之间，当前时间不能申请,有问题请联系物流总仓");
             }
             if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday) {
                 throw new Exception("非正常时间出货的申请不能在周日进行申请");
@@ -130,10 +131,7 @@ namespace EmpInfo.Services
         {
             UCCheckApplyModel m = new UCCheckApplyModel();
             m.uc = bill;
-            m.entrys = bill.ei_ucApplyEntry.ToList();
-            if (bill.has_attachment == true) {
-                m.attachments = MyUtils.GetAttachmentInfo(bill.sys_no);
-            }
+            m.entrys = bill.ei_ucApplyEntry.ToList();            
             return m;
             
         }
@@ -184,7 +182,7 @@ namespace EmpInfo.Services
                         bill.sys_no,
                         BillTypeName + "已" + (isSuc ? "批准" : "被拒绝"),
                         bill.applier_name,
-                        string.Format("你申请的单号为【{0}】的{1}已{2}，请知悉。", bill.sys_no, BillTypeName, (isSuc ? "批准" : "被拒绝")),
+                        string.Format("你申请的单号为【{0}】的{1}已{2}，客户是：{3}；规格型号是：{4}等{5}个，请知悉。", bill.sys_no, BillTypeName, (isSuc ? "批准" : "被拒绝"), bill.customer_name, bill.ei_ucApplyEntry.First().moduel, bill.ei_ucApplyEntry.Count()),
                         GetUserEmailByCardNum(bill.applier_num),
                         ccEmails
                         );

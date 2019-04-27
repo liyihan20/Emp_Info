@@ -71,14 +71,14 @@
 
             $.ajax({
                 type: "post",
-                url: "@Url.Content("~/Apply/SaveApplyEP")",
+                url: "SaveApply",
                 data: $("#chForm").serialize(),
                 cache: false,
                 dataType: "json",
                 success: function (data) {
                     if (data.suc) {
                         toastr.success("提交申请成功，请等待页面跳转...");
-                        setTimeout(function () { window.location.href="@Url.Content("~/Apply/CheckApply?sysNo=")" +"@ViewData["sysNum"]" }, 1000);
+                        setTimeout(function () { window.location.href="CheckApply?sysNo=@m.sysNum" }, 1000);
                     } else {
                         toastr.error("提交申请失败，原因：" + data.msg);
                     }

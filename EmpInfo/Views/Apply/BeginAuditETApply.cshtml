@@ -1,0 +1,182 @@
+﻿@using EmpInfo.Models;
+@{
+    BeginAuditModel bam = (BeginAuditModel)ViewData["bam"];
+    
+}
+@section CSS{
+    <style type="text/css">
+    .b-label {
+        display: inline-block;
+        width: 85px;
+        color: gray;
+        vertical-align: top;
+    }
+
+    .b-input {
+        display: inline-block;
+        width: 70%;
+    }
+
+    .b-div {
+        margin: 10px 0;
+    }
+</style>
+
+}
+@section Scripts {
+    <script>
+        $(function () {
+
+            $("#applyContent").load("CheckApply", { sysNo: "@bam.sysNum" }, function () {
+                $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> @bam.billTypeName");
+                $("#waiting").remove();
+                $(".auditContent").css("visibility", "visible");
+            });
+            $("#opinionOpt").on("change", function () {
+                $("#opinion").val($("#opinionOpt").val());
+            });
+        });
+        function audit(isPass) {
+            openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此申请吗？", function () {
+                var deliveryCompany = "", normalFee = "", applyFee = "", differentFee = "";
+                if ("@bam.stepName" == "物流填写信息") {
+                    deliveryCompany = $("#dilivery_company").val();
+                    normalFee = $.trim($("#normal_fee").val());
+                    applyFee = $.trim($("#apply_fee").val());
+                    differentFee = $.trim($("#different_fee").val());
+                }
+                $.post("HandleApply", {
+                    sysNo: "@bam.sysNum",
+                    step: "@bam.step",
+                    stepName:"@bam.stepName",
+                    isPass: isPass,
+                    opinion: $("#opinion").val(),
+                    deliveryCompany: deliveryCompany,
+                    normalFee: normalFee,
+                    applyFee: applyFee,
+                    differentFee: differentFee
+                }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+        }
+    </script>
+    @if (bam.isPass != null) {
+        <script>
+            $(function () {
+                $("#opinion").prop("readonly", "readonly").prop("placeholder", "");
+                $("#opinion").val("@bam.opinion");
+            });
+        </script>
+
+    }    
+
+}
+@*通过load获取申请单内容*@
+<div class="text-center text-danger" id="waiting"><i class="fa fa-3x fa-spinner fa-pulse"></i></div>
+<div id="applyContent"></div>
+
+@*行政审批，需发送信息*@
+@if (bam.isPass == null && bam.stepName == "物流填写信息") {
+    <div class="row auditContent" style="visibility:hidden;">
+        <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="auditHead">
+                    <i class='fa fa-pencil'></i> 物流填写派车信息
+                </div>
+                <div class="panel-body">
+                    <div class="b-div">
+                        <span class="b-label">
+                            货运公司:
+                        </span>
+                        <span class="b-input">
+                            <select class="form-control" id="dilivery_company">
+                                <option value="">---- 下拉选择货运公司 ----</option>                                                               
+                                <option value="百世">百世</option>
+                                <option value="跨越">跨越</option>
+                                <option value="恒骏">恒骏</option>
+                                <option value="顺丰">顺丰</option>
+                                <option value="邮政">邮政</option>                                                             
+                                <option value="双亨">双亨</option>
+                                <option value="冠粤">冠粤</option>
+                                <option value="荣鑫">荣鑫</option>
+                                <option value="顺展">顺展</option>
+                            </select>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            正常运费:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" id="normal_fee" placeholder="必填" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请运费:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" id="apply_fee" placeholder="必填" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            运费差额:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" id="different_fee" placeholder="必填" />
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+    @*审批信息*@
+    <div class="row auditContent" style="visibility:hidden;">
+        <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="auditHead">
+                    <i class='fa fa-pencil'></i> 开始审批
+                </div>
+                <div class="panel-body">
+                    @if (bam.isPass == null) {
+                        <select class="form-control" id="opinionOpt">
+                            <option value="">--选择常用处理意见--</option>
+                            <option value="同意！">同意！</option>
+                            <option value="不同意！">不同意！</option>
+                        </select>
+                    }
+
+                    <textarea class="form-control" rows="2" id="opinion" placeholder="请在此处输入审核意见"></textarea>
+                    <div style="margin-top:12px;"></div>
+                    @if (bam.isPass == null) {
+                        <div class="btn-group btn-group-justified" role="group">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
+                            </div>
+                        </div>
+                    }
+                    else if ((bool)bam.isPass) {
+                        <button type="button" class="btn btn-block btn-success disabled">已同意此申请</button>
+                    }
+                    else {
+                        <button type="button" class="btn btn-block btn-danger disabled">已拒绝此申请</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    @section Modal {
+        @Html.Partial("_ConfirmDialog")
+    }

@@ -3,7 +3,7 @@
     List<vw_svReport> list = (List<vw_svReport>)ViewData["list"];    
 }
 @section CSS{
-    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />    
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
 }
 @section Scripts {
     @*加入以下js，使IE8支持datetimepicker组件*@
@@ -32,7 +32,7 @@
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
     <script>
         var currentTr;
-        $(function () {            
+        $(function () {
             $(".form_date").datetimepicker({
                 language: 'zh-CN',
                 format: "yyyy-mm-dd",
@@ -51,14 +51,14 @@
 
             $("#ucReportBt").on("click", function () {
                 toastr.info("数据正在导出，请稍等...");
-                window.location.href = "@Url.Content("~/Report/BeginExportUCReport?")"
+                window.location.href = "@Url.Content("~/Report/BeginExportETReport?")"
                 + "fromDate=" + $("#fromDate").val()
                 + "&toDate=" + $("#toDate").val();
                 ;
             });
 
         });
-    
+
     </script>
 
 }
@@ -69,11 +69,11 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=UC")">非正常时间出货</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=ET")">紧急出货运输申请</a></li>
             <li class="active">查询报表</li>
         </ol>
     </div>
-    <div class="panel-body">        
+    <div class="panel-body">
         <div class="row">
             <div class="col-xs-12 col-sm-6 col-md-4">
                 <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">

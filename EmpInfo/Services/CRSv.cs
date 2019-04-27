@@ -115,13 +115,8 @@ namespace EmpInfo.Services
         }
 
         public override object GetBill()
-        {
-            CRCheckApplyModel m = new CRCheckApplyModel();
-            m.cr = bill;
-            if (bill.has_attachment == true) {
-                m.attachments = MyUtils.GetAttachmentInfo(bill.sys_no);
-            }
-            return m;
+        {            
+            return bill;
         }
 
         public override SimpleResultModel HandleApply(System.Web.Mvc.FormCollection fc, UserInfo userInfo)

@@ -6,28 +6,7 @@
         }
     </style>
 }
-@section Scripts {
-<script>
-    $(function () {
-        $("#crReport").on("click", function () {
-            var w = $(document).width();
-            if (w > 900) {
-                window.location.href = "@Url.Content("~/Report/CRReport")";
-            } else {
-                toastr.error("此功能必须在大屏幕显示器操作");
-            }
-        });
-        $("#svReport").on("click", function () {
-            var w = $(document).width();
-            if (w > 900) {
-                window.location.href = "@Url.Content("~/Report/SVReport")";
-            } else {
-                toastr.error("此功能必须在大屏幕显示器操作");
-            }
-        });
-    });
-</script>
-}
+
 <div class="panel panel-danger">
     <div class="panel-heading">
         <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
@@ -51,7 +30,7 @@
                     <p class="text-center">调休申请</p>
                 </a>
             </div>
-            @if ((bool)ViewData["isDepReporter"]) { 
+            @*@if ((bool)ViewData["isDepReporter"]) { 
                 <div class="col-xs-4 col-sm-3 col-md-2">
                     <a id="crReport" href="#">
                         <img src="@Url.Content("~/Content/images/report.png")" alt="考勤补记报表" class="center-block" />
@@ -64,7 +43,7 @@
                         <p class="text-center">调休报表</p>
                     </a>
                 </div>
-            }
+            }*@
         </div>
     </div>
 </div>

@@ -342,7 +342,7 @@ namespace EmpInfo.Services
                 pm.FOpenId = u.wx_openid;
                 pm.FPushType = "待审2";
                 pm.FRemark = "点击可进入审批此申请";
-                pm.FUrl = string.Format("http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}&controllerName=Apply&actionName=BeginAuditApply&param={2}", u.card_number, MyUtils.getMD5(u.card_number), sysNo + ";" + step);
+                pm.FUrl = string.Format("http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}&controllerName=Apply&actionName=BeginAuditApply&param={2}", u.card_number, MyUtils.getMD5(u.card_number), sysNo + "%3B" + step); //%3B是分号;
                 db.wx_pushMsg.Add(pm);
             }
             db.SaveChanges();

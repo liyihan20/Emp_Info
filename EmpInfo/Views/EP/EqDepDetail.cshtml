@@ -14,237 +14,237 @@
 }
 @section Scripts{
     <script>
-        $(function () {
+    $(function () {
 
-            //列表的点击激活事件
-            $("#userList,#autList").on("click", "a", function () {
-                if ($(this).hasClass("active")) {
-                    $(this).removeClass("active");
-                    $(this).find(".badge").addClass("hidden");
+        //列表的点击激活事件
+        $("#userList,#autList").on("click", "a", function () {
+            if ($(this).hasClass("active")) {
+                $(this).removeClass("active");
+                $(this).find(".badge").addClass("hidden");
+            } else {
+                $(this).addClass("active");
+                $(this).find(".badge").removeClass("hidden");
+            }
+        });
+        //用户搜索
+        $("#searchUserText").keyup(function () {
+            if (event.keyCode == 13) {
+                $("#searchUserBt").click();
+            }
+        });
+        $("#searchUserBt").click(function () {
+            var str = $("#searchUserText").val();
+            $("#userList a").each(function () {
+                var name = $(this).find(".u_name").html();
+                var no = $(this).find(".u_no").html();
+                if (name.indexOf(str) < 0 && no.indexOf(str) < 0) {
+                    $(this).hide();
+                    if ($(this).hasClass("active")) {
+                        $(this).removeClass("active");
+                        $(this).find(".badge").addClass("hidden");
+                    }
                 } else {
-                    $(this).addClass("active");
-                    $(this).find(".badge").removeClass("hidden");
+                    $(this).show();
                 }
             });
-            //用户搜索
-            $("#searchUserText").keyup(function () {
-                if (event.keyCode == 13) {
-                    $("#searchUserBt").click();
+        });
+        //权限搜索
+        $("#searchAutText").keyup(function () {
+            if (event.keyCode == 13) {
+                $("#searchAutBt").click();
+            }
+        });
+        $("#searchAutBt").click(function () {
+            var str = $("#searchAutText").val();
+            $("#autList a").each(function () {
+                var name = $(this).find(".a_name").html();
+                var no = $(this).find(".a_no").html();
+                if (name.indexOf(str) < 0 && no.indexOf(str) < 0) {
+                    $(this).hide();
+                    if ($(this).hasClass("active")) {
+                        $(this).removeClass("active");
+                        $(this).find(".badge").addClass("hidden");
+                    }
+                } else {
+                    $(this).show();
                 }
             });
-            $("#searchUserBt").click(function () {
-                var str = $("#searchUserText").val();
-                $("#userList a").each(function () {
-                    var name = $(this).find(".u_name").html();
-                    var no = $(this).find(".u_no").html();
-                    if (name.indexOf(str) < 0 && no.indexOf(str) < 0) {
-                        $(this).hide();
-                        if ($(this).hasClass("active")) {
-                            $(this).removeClass("active");
-                            $(this).find(".badge").addClass("hidden");
-                        }
-                    } else {
-                        $(this).show();
+        });
+
+        //选择人员
+        $("#eqDepCharger,#eqDepMinister,#prDepCharger,#prDepChief,#prDepMinister").on("focus", function () {
+            var self = this;
+            openSelectUserDialog($(self).val(), 1, function (result) {
+                $(self).val(result);
+            });
+        });
+
+        //更新组
+        $("#group_save_bt").click(function () {
+            var eqDepNum = $("#eqDepNum").val();
+            var eqDepName = $("#eqDepName").val();
+            var eqDepCharger = $("#eqDepCharger").val();
+            var eqDepMinister = $("#eqDepMinister").val();
+            var eqDepForbit=$("#eqDepForbit").val();
+            $.post("@Url.Content("~/EP/UpdateEqDep")", {
+                id: "@eqDep.id",
+                depNum: eqDepNum,
+                depName: eqDepName,
+                charger: eqDepCharger,
+                minister: eqDepMinister,
+                isForbit:eqDepForbit
+            }, function (data) {
+                if (data.suc) {
+                    toastr.success(data.msg);
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+        });
+
+        //删除组
+        $("#group_remove_bt").click(function () {
+            openConfirmDialog("确定要删除本设备部门吗？与设备人员和生产部门的关联关系也会一并删除！", function () {
+                $.post("@Url.Content("~/EP/RemoveEqDep")", {id:@eqDep.id},function(data){
+                    if(data.suc){
+                        window.location.href="@Url.Content("~/EP/EquitmentDeps")";
+                    }else{
+                        toastr.error("删除失败："+data.msg);
                     }
                 });
             });
-            //权限搜索
-            $("#searchAutText").keyup(function () {
-                if (event.keyCode == 13) {
-                    $("#searchAutBt").click();
+        });
+
+        //禁用/激活
+        $("#group_forbit_bt").click(function(){
+            $.post("@Url.Content("~/EP/ToggleForbitStatus")", {id:@eqDep.id},function(data){
+                if(data.suc){
+                    window.location.reload(true);
+                }else{
+                    toastr.error("操作失败："+data.msg);
                 }
             });
-            $("#searchAutBt").click(function () {
-                var str = $("#searchAutText").val();
-                $("#autList a").each(function () {
-                    var name = $(this).find(".a_name").html();
-                    var no = $(this).find(".a_no").html();
-                    if (name.indexOf(str) < 0 && no.indexOf(str) < 0) {
-                        $(this).hide();
-                        if ($(this).hasClass("active")) {
-                            $(this).removeClass("active");
-                            $(this).find(".badge").addClass("hidden");
-                        }
-                    } else {
-                        $(this).show();
-                    }
-                });
-            });
+        });
 
-            //选择人员
-            $("#eqDepCharger,#eqDepMinister,#prDepCharger,#prDepChief,#prDepMinister").on("focus", function () {
-                var self = this;
-                openSelectUserDialog($(self).val(), 1, function (result) {
-                    $(self).val(result);
-                });
-            });
-
-            //更新组
-            $("#group_save_bt").click(function () {
-                var eqDepNum = $("#eqDepNum").val();
-                var eqDepName = $("#eqDepName").val();
-                var eqDepCharger = $("#eqDepCharger").val();
-                var eqDepMinister = $("#eqDepMinister").val();
-                var eqDepForbit=$("#eqDepForbit").val();
-                $.post("@Url.Content("~/EP/UpdateEqDep")", {
-                    id: "@eqDep.id",
-                    depNum: eqDepNum,
-                    depName: eqDepName,
-                    charger: eqDepCharger,
-                    minister: eqDepMinister,
-                    isForbit:eqDepForbit
-                }, function (data) {
+        //添加用户到组
+        $(".addUserLink").on("click",function(){
+            var role=$(this).html();
+            openSelectUserDialog("", 100, function (users) {
+                $.post("@Url.Content("~/EP/AddEqUsers")", { depId: "@eqDep.id",role:role, userInfo: users }, function (data) {
                     if (data.suc) {
-                        toastr.success(data.msg);
-                    } else {
-                        toastr.error(data.msg);
-                    }
-                });
-            });
-
-            //删除组
-            $("#group_remove_bt").click(function () {
-                openConfirmDialog("确定要删除本设备部门吗？与设备人员和生产部门的关联关系也会一并删除！", function () {
-                    $.post("@Url.Content("~/EP/RemoveEqDep")", {id:@eqDep.id},function(data){
-                        if(data.suc){
-                            window.location.href="@Url.Content("~/EP/EquitmentDeps")";
-                        }else{
-                            toastr.error("删除失败："+data.msg);
+                        for(var i=0;i<data.list.length;i++){
+                            var node = "<a class='list-group-item'><div class='media'><div class='media-left media-middle'><img class='media-object' src='@Url.Content("~/Content/images/user_blue_48.png")' alt='user_blue_48'></div><div class='media-body'><h4 class='media-heading'><span class='u_name'>";
+                            node += data.list[i].name;
+                            node += "</span></h4><div><div class='u_no'>";
+                            node += data.list[i].number;
+                            node+="</div><div>";
+                            node+=data.list[i].jobPosition;
+                            node += "</div><input type='hidden' class='u_id' value='";
+                            node += data.list[i].id;
+                            node += "' /></div></div><div class='media-right'><span class='badge hidden'><i class='glyphicon glyphicon-ok'></i></span></div></div></a>";
+                            $("#userList").append(node);
                         }
-                    });
-                });
-            });
-
-            //禁用/激活
-            $("#group_forbit_bt").click(function(){
-                $.post("@Url.Content("~/EP/ToggleForbitStatus")", {id:@eqDep.id},function(data){
-                    if(data.suc){
-                        window.location.reload(true);
-                    }else{
-                        toastr.error("操作失败："+data.msg);
-                    }
-                });
-            });
-
-            //添加用户到组
-            $(".addUserLink").on("click",function(){
-                var role=$(this).html();
-                openSelectUserDialog("", 100, function (users) {                    
-                    $.post("@Url.Content("~/EP/AddEqUsers")", { depId: "@eqDep.id",role:role, userInfo: users }, function (data) {
-                        if (data.suc) {
-                            for(var i=0;i<data.list.length;i++){
-                                var node = "<a class='list-group-item'><div class='media'><div class='media-left media-middle'><img class='media-object' src='@Url.Content("~/Content/images/user_blue_48.png")' alt='user_blue_48'></div><div class='media-body'><h4 class='media-heading'><span class='u_name'>";
-                                node += data.list[i].name;
-                                node += "</span></h4><div><div class='u_no'>";
-                                node += data.list[i].number;
-                                node+="</div><div>";
-                                node+=data.list[i].jobPosition;
-                                node += "</div><input type='hidden' class='u_id' value='";
-                                node += data.list[i].id;
-                                node += "' /></div></div><div class='media-right'><span class='badge hidden'><i class='glyphicon glyphicon-ok'></i></span></div></div></a>";
-                                $("#userList").append(node);
-                            }
-                            toastr.success("已处理");
-                        }else{
-                            toastr.error(data.msg);
-                        }
-                    });                    
-                });
-            });
-            
-                //移除组内用户
-                $("#removeUserBt").click(function () {
-                    if ($("#userList a.active").length < 1) {
-                        toastr.error("请先选择需要移除的用户");
-                        return;
-                    }
-                    var user_ids = "";
-                    $("#userList a.active").each(function () {
-                        var user_id = $(this).find(".u_id").val();
-                        if (user_ids != "") user_ids += ",";
-                        user_ids += user_id;
-                    });
-                    $.post("@Url.Content("~/EP/RemoveUserInDep")", { depId: "@eqDep.id", userIds: user_ids }, function (data) {
-                        if (data.suc) {
-                            toastr.success(data.msg);
-                            $("#userList a.active").remove();
-                        } else {
-                            toastr.error(data.msg);
-                        }
-                    });
-                });
-
-                //添加权限到组
-            $("#addAutBt").click(function () {
-                $("#prDepForm")[0].reset();
-                $("#prId").val("0");
-                $("#groupAutModal").modal("show");
-            });
-            $("#modifyAutBt").on("click",function(){
-                if ($("#autList a.active").length != 1) {
-                    toastr.error("请先选择一个需要修改的生产部门");
-                    return;
-                }
-                var prDepId=$("#autList a.active").find(".a_id").val();
-                $.post("@Url.Content("~/EP/GetPrDep")",{id:prDepId},function(data){
-                    if(data.suc){
-                        $("#prDepForm")[0].reset();
-                        var d = data.dep;
-                        $("#prId").val(d.id);
-                        //$("#prDepNo").val(d.dep_num);
-                        $("#prDepName").val(d.dep_name);
-                        $("#busDepName").val(d.bus_dep_name);
-                        $("#prDepCharger").val(d.charger_name+"("+d.charger_num+")");
-                        $("#prDepChief").val(d.chief_name==null?"":(d.chief_name+"("+d.chief_num+")"));
-                        $("#prDepMinister").val(d.minister_name==null?"":(d.minister_name+"("+d.minister_num+")"));
-                        $("#groupAutModal").modal("show");
+                        toastr.success("已处理");
                     }else{
                         toastr.error(data.msg);
                     }
                 });
             });
-            $("#bt_groupAut").click(function () {
-                var prId=$("#prId").val();
-                //var prDepNo= $("#prDepNo").val();
-                var prDepName=$("#prDepName").val();
-                var busDepName=$("#busDepName").val();
-                var prDepCharger=$("#prDepCharger").val();
-                var prDepChief=$("#prDepChief").val();
-                var prDepMinister=$("#prDepMinister").val();
-                $.post("@Url.Content("~/EP/SavePrDeps")", { 
-                    prId:prId,
-                    depId: "@eqDep.id",
-                    //prDepNo: prDepNo,
-                    prDepName:prDepName,
-                    busDepName:busDepName,
-                    prDepCharger:prDepCharger,
-                    prDepChief:prDepChief,
-                    prDepMinister:prDepMinister
-                }, function (data) {
-                    if (data.suc) {                        
-                        toastr.success(data.msg);
-                        $("#groupAutModal").modal("hide");
-                        setTimeout(function(){window.location.reload(true);},1000);
-                    } else {
-                        toastr.error(data.msg);
-                    }
-                });
-            });
+        });
 
-            //移除组内权限
-            $("#removeAutBt").click(function () {
-                if ($("#autList a.active").length < 1) {
-                    toastr.error("请先选择需要移除的生产部门");
-                    return;
+        //移除组内用户
+        $("#removeUserBt").click(function () {
+            if ($("#userList a.active").length < 1) {
+                toastr.error("请先选择需要移除的用户");
+                return;
+            }
+            var user_ids = "";
+            $("#userList a.active").each(function () {
+                var user_id = $(this).find(".u_id").val();
+                if (user_ids != "") user_ids += ",";
+                user_ids += user_id;
+            });
+            $.post("@Url.Content("~/EP/RemoveUserInDep")", { depId: "@eqDep.id", userIds: user_ids }, function (data) {
+                if (data.suc) {
+                    toastr.success(data.msg);
+                    $("#userList a.active").remove();
+                } else {
+                    toastr.error(data.msg);
                 }
-                openConfirmDialog("确定要删除所选生产部门吗？", function () {
-                    var pr_dep_ids = "";
-                    $("#autList a.active").each(function () {
-                        var pr_dep_id = $(this).find(".a_id").val();
-                        if (pr_dep_ids != "") pr_dep_ids += ",";
-                        pr_dep_ids += pr_dep_id;
-                    });
-                    $.post("@Url.Content("~/EP/RemovePrDeps")", { prDepIds: pr_dep_ids }, function (data) {
+            });
+        });
+
+        //添加权限到组
+        $("#addAutBt").click(function () {
+            $("#prDepForm")[0].reset();
+            $("#prId").val("0");
+            $("#groupAutModal").modal("show");
+        });
+        $("#modifyAutBt").on("click",function(){
+            if ($("#autList a.active").length != 1) {
+                toastr.error("请先选择一个需要修改的生产部门");
+                return;
+            }
+            var prDepId=$("#autList a.active").find(".a_id").val();
+            $.post("@Url.Content("~/EP/GetPrDep")",{id:prDepId},function(data){
+                if(data.suc){
+                    $("#prDepForm")[0].reset();
+                    var d = data.dep;
+                    $("#prId").val(d.id);
+                    //$("#prDepNo").val(d.dep_num);
+                    $("#prDepName").val(d.dep_name);
+                    $("#busDepName").val(d.bus_dep_name);
+                    $("#prDepCharger").val(d.charger_name+"("+d.charger_num+")");
+                    $("#prDepChief").val(d.chief_name==null?"":(d.chief_name+"("+d.chief_num+")"));
+                    $("#prDepMinister").val(d.minister_name==null?"":(d.minister_name+"("+d.minister_num+")"));
+                    $("#groupAutModal").modal("show");
+                }else{
+                    toastr.error(data.msg);
+                }
+            });
+        });
+        $("#bt_groupAut").click(function () {
+            var prId=$("#prId").val();
+            //var prDepNo= $("#prDepNo").val();
+            var prDepName=$("#prDepName").val();
+            var busDepName=$("#busDepName").val();
+            var prDepCharger=$("#prDepCharger").val();
+            var prDepChief=$("#prDepChief").val();
+            var prDepMinister=$("#prDepMinister").val();
+            $.post("@Url.Content("~/EP/SavePrDeps")", {
+                prId:prId,
+                depId: "@eqDep.id",
+                //prDepNo: prDepNo,
+                prDepName:prDepName,
+                busDepName:busDepName,
+                prDepCharger:prDepCharger,
+                prDepChief:prDepChief,
+                prDepMinister:prDepMinister
+            }, function (data) {
+                if (data.suc) {
+                    toastr.success(data.msg);
+                    $("#groupAutModal").modal("hide");
+                    setTimeout(function(){window.location.reload(true);},1000);
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+        });
+
+        //移除组内权限
+        $("#removeAutBt").click(function () {
+            if ($("#autList a.active").length < 1) {
+                toastr.error("请先选择需要移除的生产部门");
+                return;
+            }
+            openConfirmDialog("确定要删除所选生产部门吗？", function () {
+                var pr_dep_ids = "";
+                $("#autList a.active").each(function () {
+                    var pr_dep_id = $(this).find(".a_id").val();
+                    if (pr_dep_ids != "") pr_dep_ids += ",";
+                    pr_dep_ids += pr_dep_id;
+                });
+                $.post("@Url.Content("~/EP/RemovePrDeps")", { prDepIds: pr_dep_ids }, function (data) {
                         if (data.suc) {
                             toastr.success(data.msg);
                             $("#autList a.active").remove();
@@ -254,10 +254,33 @@
                     });
                 });
             });
+            $("#toggleAutBt").click(function () {
+                if ($("#autList a.active").length < 1) {
+                    toastr.error("请先选择生产部门");
+                    return;
+                }
+                openConfirmDialog("确定要禁用/解禁所选生产部门吗？", function () {
+                    var pr_dep_ids = "";
+                    $("#autList a.active").each(function () {
+                        var pr_dep_id = $(this).find(".a_id").val();
+                        if (pr_dep_ids != "") pr_dep_ids += ",";
+                        pr_dep_ids += pr_dep_id;
+                    });
+                    $.post("@Url.Content("~/EP/TogglePrDepsForbit")", { prDepIds: pr_dep_ids }, function (data) {
+                        if (data.suc) {
+                            toastr.success(data.msg);
+                            setTimeout(function(){window.location.reload(true);},1000);
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                });
+            });
+            
 
         $("#eqDepForbit").val("@(eqDep.is_forbit==true?"1":"0")");
 
-        });        
+    });
     </script>
 }
 <div class="panel panel-success">
@@ -342,14 +365,14 @@
     <div class="panel-body">
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#groupUser" aria-controls="groupUser" role="tab" data-toggle="tab">设备人员</a></li>
-            <li role="presentation"><a href="#groupAut" aria-controls="groupAut" role="tab" data-toggle="tab">生产部门</a></li>
+            <li role="presentation"><a href="#groupUser" aria-controls="groupUser" role="tab" data-toggle="tab">设备人员</a></li>
+            <li role="presentation" class="active"><a href="#groupAut" aria-controls="groupAut" role="tab" data-toggle="tab">生产部门</a></li>
         </ul>
 
         <!-- Tab panes -->
         <div class="tab-content">
             <!-- 用户tab -->
-            <div role="tabpanel" class="tab-pane fade in active" id="groupUser">
+            <div role="tabpanel" class="tab-pane fade" id="groupUser">
                 <div class="panel panel-default" style="margin-top:10px;">
                     <div class="panel-body">
                         <div class="input-group">
@@ -410,7 +433,7 @@
                 </div>
             </div>
             <!-- 以下是生产部门tab -->
-            <div role="tabpanel" class="tab-pane fade" id="groupAut">
+            <div role="tabpanel" class="tab-pane fade in active" id="groupAut">
                 <div class="panel panel-default" style="margin-top:10px;">
                     <div class="panel-body">
                         <div class="input-group">
@@ -432,10 +455,19 @@
                                     修改
                                 </button>
                             </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <div class="btn-group pull-right" role="group" aria-label="操作按钮2" style="margin-top:2px;">
                             <div class="btn-group" role="group">
                                 <button class="btn btn-danger" id="removeAutBt">
                                     <span class="glyphicon glyphicon-remove"></span>
                                     移除
+                                </button>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-primary" id="toggleAutBt">
+                                    <span class="fa fa-recycle"></span>
+                                    禁用/启用
                                 </button>
                             </div>
                         </div>
@@ -448,7 +480,13 @@
                                         <img class="media-object" src="@Url.Content("~/Content/images/dep.png")" alt="athority_48">
                                     </div>
                                     <div class="media-body">
-                                        <h4 class="media-heading"><span class="a_no">@a.dep_num</span>&nbsp;<span class="a_name">@a.dep_name</span></h4>
+                                        <h4 class="media-heading">
+                                            <span class="a_no">@a.dep_num</span>&nbsp;
+                                            <span class="a_name">@a.dep_name</span>
+                                            @if (a.is_forbit == true) {
+                                                <span class="text-danger">(禁用)</span>
+                                            }
+                                        </h4>
                                         <div>
                                             <div>@a.bus_dep_name</div>
                                             <div>部门主管：@a.charger_name</div>

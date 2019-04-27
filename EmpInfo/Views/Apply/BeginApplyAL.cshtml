@@ -193,7 +193,7 @@
                 toastr.error("当[请假类型]是年假时，[小时]数必须是4的整数倍");
                 return false;
             }
-            if (parseInt(days) + hours / 8.0 > parseFloat("@ViewData["vacationDaysLeft"]")) {
+            if (parseInt(days) + hours / 8.0 > parseFloat("@ba.vacationDaysLeft")) {
                 toastr.error("当前年休假天数少于请假天数，提交失败");
                 return false;
             }
@@ -294,7 +294,7 @@
                 pick: '#picker',
                 resize: false,
                 auto: true,
-                formData: { sysNum: '@ViewData["sysNum"]' },
+                formData: { sysNum: '@ba.sysNum' },
                 fileNumLimit: maxNum,
                 fileSingleSizeLimit: maxSingleSize,
                 accept: {
@@ -362,10 +362,10 @@
                     var fileId = $(fileTD).attr("id");
                     var fileName = $(fileTD).attr("data-fd");
 
-                    $.post("@Url.Content("~/File/RemoveUploadedFile")", { sysNum: "@ViewData["sysNum"]", fileName: fileName }, function (data) {
+                    $.post("@Url.Content("~/File/RemoveUploadedFile")", { sysNum: "@ba.sysNum", fileName: fileName }, function (data) {
                         if (data.suc) {
                             toastr.success("文件移除成功");
-                            uploader.removeFile(fileId,true);
+                            uploader.removeFile(fileId, true);
                             $(fileTD).parent().fadeOut(1000, function () {
                                 $(fileTD).parent().remove();
                                 var st = uploader.getStats();
@@ -376,7 +376,7 @@
                         } else {
                             toastr.error("移除失败：" + data.msg);
                         }
-                    })
+                    });
                 });
 
             });
