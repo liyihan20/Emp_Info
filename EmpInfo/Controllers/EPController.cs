@@ -244,7 +244,7 @@ namespace EmpInfo.Controllers
             }
         }
 
-        public JsonResult SavePrDeps(int prId, int depId, string prDepName, string busDepName, string prDepCharger, string prDepChief, string prDepMinister)
+        public JsonResult SavePrDeps(int prId, int depId, string prDepName, string busDepName, string prDepCharger, string prPlanManager, string prDepChief, string prDepMinister)
         {
             //if (string.IsNullOrEmpty(prDepNo)) {
             //    return Json(new { suc = false, msg = "生产部门编码不能为空" });
@@ -292,7 +292,7 @@ namespace EmpInfo.Controllers
                     foreach (var s in shouldUpdateDepNames) {
                         s.produce_dep_name = prDepName;
                     }
-                }
+                }                
             }
 
             try {                
@@ -306,9 +306,25 @@ namespace EmpInfo.Controllers
                     dep.chief_name = prDepChief.Split(new char[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries)[0];
                     dep.chief_num = prDepChief.Split(new char[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries)[1];
                 }
+                else {
+                    dep.chief_name = null;
+                    dep.chief_num = null;
+                }
                 if (!string.IsNullOrEmpty(prDepMinister)) {
                     dep.minister_name = prDepMinister.Split(new char[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries)[0];
                     dep.minister_num = prDepMinister.Split(new char[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries)[1];
+                }
+                else {
+                    dep.minister_name = null;
+                    dep.minister_num = null;
+                }
+                if (!string.IsNullOrEmpty(prPlanManager)) {
+                    dep.plan_manager_name = prPlanManager.Split(new char[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries)[0];
+                    dep.plan_manager_number = prPlanManager.Split(new char[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries)[1];
+                }
+                else {
+                    dep.plan_manager_number = null;
+                    dep.plan_manager_name = null;
                 }
                 db.SaveChanges();
                 return Json(new { suc = true, msg = "保存生产部门成功", prDepId = dep.id });
@@ -332,7 +348,9 @@ namespace EmpInfo.Controllers
                 p.chief_name,
                 p.chief_num,
                 p.minister_name,
-                p.minister_num
+                p.minister_num,
+                p.plan_manager_name,
+                p.plan_manager_number
             }).FirstOrDefault();
             if (dep == null) {
                 return Json(new SimpleResultModel() { suc = false, msg = "此生产部门不存在" });

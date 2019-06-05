@@ -10,6 +10,7 @@ using org.in2bits.MyXls;
 using Newtonsoft.Json;
 using System.Data.SqlClient;
 using EmpInfo.FlowSvr;
+using EmpInfo.Services;
 
 
 namespace EmpInfo.Controllers
@@ -202,7 +203,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.current_auditors);
                 cells.Add(rowIndex, ++colIndex, d.check1 == true ? "Y" : "");
                 cells.Add(rowIndex, ++colIndex, d.check2 == true ? "Y" : "");
-                cells.Add(rowIndex, ++colIndex, string.Format("http://emp.truly.com.cn/Emp/Apply/CheckALApply?sysNo={0}", d.sys_no));
+                cells.Add(rowIndex, ++colIndex, string.Format("http://emp.truly.com.cn/Emp/Apply/CheckApply?sysNo={0}", d.sys_no));
             }
             ++rowIndex;
             cells.Add(++rowIndex, 1, "备注：");
@@ -1267,6 +1268,200 @@ namespace EmpInfo.Controllers
             }
             xls.Send();
         }
+        
+        [SessionTimeOutFilter]
+        public ActionResult ExportAuditTimeExceedExcel()
+        {
+            return View();
+        }
+
+        public void BeginExportAuditTimeExceedExcel(DateTime fromDate, DateTime toDate)
+        {
+            string dateSpan = fromDate.ToString("yyyy-MM-dd") + " _ " + toDate.ToString("yyyy-MM-dd");
+
+            toDate = toDate.AddDays(1);
+            var epSv = new EPSv();
+            var ev = epSv.GetEvaluationTimeExceedRecord(fromDate, toDate); //服务评价超时记录
+            var gr = epSv.GetGradeTimeExceedRecord(fromDate, toDate); //评分超时记录
+
+            //服务评价超时汇总
+            var evGroup = (from e in ev
+                           group e by new { e.depName, e.name } into eg
+                           select new
+                           {
+                               eg.Key.depName,
+                               eg.Key.name,
+                               sum = eg.Sum(g => g.exceedHours),
+                               cou = eg.Count()
+                           }).ToList();
+
+            //评分超时汇总
+            var grGroup = (from g in gr
+                           group g by new { g.depName, g.name } into gg
+                           select new
+                           {
+                               gg.Key.depName,
+                               gg.Key.name,
+                               sum = gg.Sum(g => g.exceedHours),
+                               cou = gg.Count()
+                           }).ToList();
+
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "设备故障处理超时表(" + dateSpan + ")";
+
+            //汇总标题样式
+            XF titleXF = xls.NewXF();
+            titleXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            titleXF.Font.Height = 16 * 20;
+            titleXF.Font.FontName = "宋体";
+            titleXF.Font.Bold = true;
+
+            //加粗样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;            
+
+            Worksheet sheet1 = xls.Workbook.Worksheets.Add("超时汇总");
+            Cells cells = sheet1.Cells;
+
+            var colWidth = new ushort[] { 24, 12, 16, 12 };            
+
+            //设置列宽
+            ColumnInfo col;            
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet1);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet1.AddColumnInfo(col);
+                
+                col = new ColumnInfo(xls, sheet1);
+                col.ColumnIndexStart = (ushort)(i + 5);
+                col.ColumnIndexEnd = (ushort)(i + 5);
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet1.AddColumnInfo(col);
+            }
+            
+            sheet1.AddMergeArea(new MergeArea(1, 1, 1, 4));
+            sheet1.AddMergeArea(new MergeArea(1, 1, 6, 9));                        
+
+            cells.Add(1, 1, "难度评分超时汇总", titleXF);
+            cells.Add(1, 6, "服务评价超时汇总", titleXF);
+
+            
+            cells.Add(2, 1, "支部名称");
+            cells.Add(2, 2, "设备经理");
+            cells.Add(2, 3, "累计超时(小时)");
+            cells.Add(2, 4, "超时次数");
+
+            cells.Add(2, 6, "生产车间");
+            cells.Add(2, 7, "生产主管");
+            cells.Add(2, 8, "累计超时(小时)");
+            cells.Add(2, 9, "超时次数");
+
+            int rowIndex = 3;
+            int colIndex = 1;
+            foreach (var g in grGroup.OrderBy(r => r.depName)) {
+                colIndex = 1;
+                cells.Add(rowIndex, colIndex, g.depName);
+                cells.Add(rowIndex, ++colIndex, g.name);
+                cells.Add(rowIndex, ++colIndex, g.sum);
+                cells.Add(rowIndex, ++colIndex, g.cou);
+                rowIndex++;
+            }
+            cells.Add(rowIndex, 1, "合计:");
+            cells.Add(rowIndex, 3, grGroup.Sum(r => r.sum));
+            cells.Add(rowIndex, 4, grGroup.Sum(r => r.cou));
+
+            rowIndex = 3;
+            colIndex = 6;
+            foreach (var g in evGroup.OrderBy(r => r.depName)) {
+                colIndex = 6;
+                cells.Add(rowIndex, colIndex, g.depName);
+                cells.Add(rowIndex, ++colIndex, g.name);
+                cells.Add(rowIndex, ++colIndex, g.sum);
+                cells.Add(rowIndex, ++colIndex, g.cou);
+                rowIndex++;
+            }
+            cells.Add(rowIndex, 6, "合计:");
+            cells.Add(rowIndex, 8, evGroup.Sum(r => r.sum));
+            cells.Add(rowIndex, 9, evGroup.Sum(r => r.cou));
+
+            //难度评分明细
+            var colName = new string[] { "序号", "支部名称", "设备经理", "流水号", "处理开始时间", "处理结束时间", "超时小时数" };
+            colWidth = new ushort[] { 8, 24, 16, 16, 16, 16, 16 };
+            Worksheet sheet2 = xls.Workbook.Worksheets.Add("难度评分超时明细");
+            cells = sheet2.Cells;
+            rowIndex = 1;
+            colIndex = 1;
+            
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet2);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet2.AddColumnInfo(col);
+            }
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            //明细信息            
+            foreach (var g in gr) {
+                rowIndex++;
+                colIndex = 1;
+                cells.Add(rowIndex, colIndex++, rowIndex - 1);
+                cells.Add(rowIndex, colIndex++, g.depName);
+                cells.Add(rowIndex, colIndex++, g.name);
+                cells.Add(rowIndex, colIndex++, g.sysNo);
+                cells.Add(rowIndex, colIndex++, ((DateTime)g.bTime).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, colIndex++, g.eTime == null ? "---" : ((DateTime)g.eTime).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, colIndex++, g.exceedHours);
+            }
+
+            //服务评价明细
+            colName = new string[] { "序号", "生产车间", "生产主管", "流水号", "处理开始时间", "处理结束时间", "超时小时数" };
+            Worksheet sheet3 = xls.Workbook.Worksheets.Add("服务评价超时明细");
+            cells = sheet3.Cells;
+            rowIndex = 1;
+            colIndex = 1;
+
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet3);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet3.AddColumnInfo(col);
+            }
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            //明细信息            
+            foreach (var g in ev) {
+                rowIndex++;
+                colIndex = 1;
+                cells.Add(rowIndex, colIndex++, rowIndex - 1);
+                cells.Add(rowIndex, colIndex++, g.depName);
+                cells.Add(rowIndex, colIndex++, g.name);
+                cells.Add(rowIndex, colIndex++, g.sysNo);
+                cells.Add(rowIndex, colIndex++, ((DateTime)g.bTime).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, colIndex++, g.eTime == null ? "---" : ((DateTime)g.eTime).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, colIndex++, g.exceedHours);
+            }
+
+            xls.Send();            
+
+        }
+
 
         #endregion
 

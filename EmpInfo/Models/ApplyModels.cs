@@ -164,7 +164,8 @@ namespace EmpInfo.Models
     {
         public string sysNum { get; set; }
         public string applierPhone { get; set; }
-        public List<string> marketList { get; set; }        
+        public List<string> marketList { get; set; }
+        public List<string> busDepList { get; set; }
     }
 
     public class ETCheckApplyModel

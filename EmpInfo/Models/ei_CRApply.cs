@@ -33,5 +33,6 @@ namespace EmpInfo.Models
         public Nullable<bool> check1 { get; set; }
         public Nullable<bool> check2 { get; set; }
         public Nullable<bool> has_attachment { get; set; }
+        public Nullable<bool> is_direct_charge { get; set; }
     }
 }

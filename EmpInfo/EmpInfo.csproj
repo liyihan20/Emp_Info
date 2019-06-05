@@ -343,13 +343,13 @@
     <Compile Include="Models\ei_ucApplyEntry.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\ei_ucNotifyUsers.cs">
-      <DependentUpon>InfoDB.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\ei_users.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_users_android.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_vacationDays.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\EmergencyEnum.cs" />
@@ -358,6 +358,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\flow_auditorRelation.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\flow_notifyUsers.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GenTrulyDeliveryBill_Result.cs">
@@ -1187,6 +1190,7 @@
     <Content Include="Views\Report\PrintET.cshtml" />
     <Content Include="Views\Report\ETReport.cshtml" />
     <Content Include="Views\Item\PicAttachments.cshtml" />
+    <Content Include="Views\Report\ExportAuditTimeExceedExcel.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

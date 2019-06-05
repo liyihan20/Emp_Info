@@ -49,5 +49,6 @@ namespace EmpInfo.Models
         public string logistics_editor { get; set; }
         public string operation_auditor { get; set; }
         public string logistics_auditor { get; set; }
+        public string busPlanner_auditor { get; set; }
     }
 }

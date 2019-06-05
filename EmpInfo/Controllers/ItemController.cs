@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using EmpInfo.Models;
 using EmpInfo.Util;
 using EmpInfo.Filter;
+using EmpInfo.Services;
 
 namespace EmpInfo.Controllers
 {
@@ -128,6 +129,16 @@ namespace EmpInfo.Controllers
             ViewData["atts"] = MyUtils.GetAttachmentInfo(sysNo);
             ViewData["sysNo"] = sysNo;
             return View();
+        }
+
+        /// <summary>
+        /// 获取紧急出货运输申请中客户对应的地址
+        /// </summary>
+        /// <param name="customerNumber"></param>
+        /// <returns></returns>
+        public JsonResult GetETCustomerAddr(string customerNumber, string company)
+        {
+            return Json(new ETSv().getCustomerAddr(customerNumber, company));
         }
 
     }

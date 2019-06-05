@@ -65,7 +65,6 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_ucApplyEntry" Width="1.5" PointX="2.375" PointY="10.5" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_ucApplyEntry_ei_ucApply" />
         <EntityTypeShape EntityType="ICAuditModel.vw_UCReport" Width="1.5" PointX="12.625" PointY="2.875" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_ucNotifyUsers" Width="1.5" PointX="4.125" PointY="10.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_askLeaveReport" Width="1.5" PointX="10.75" PointY="1.25" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_ALModifyLog" Width="1.5" PointX="6" PointY="8.75" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_assistantEmps" Width="1.5" PointX="10.75" PointY="3.75" IsExpanded="false" />
@@ -92,6 +91,8 @@
         <AssociationConnector Association="ICAuditModel.FK_ei_etApplyEntry_ei_etApply" />
         <EntityTypeShape EntityType="ICAuditModel.vw_ETExcel" Width="1.5" PointX="0.5" PointY="12.875" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_ETReport" Width="1.5" PointX="2.375" PointY="12.875" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.flow_notifyUsers" Width="1.5" PointX="8.25" PointY="13" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_vacationDays" Width="1.5" PointX="4.125" PointY="12.125" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -232,7 +232,7 @@ namespace EmpInfo.Controllers
             if (string.IsNullOrEmpty(sysNo) && !string.IsNullOrEmpty(param)) {
                 sysNo = param.Split(';')[0];
                 step = int.Parse(param.Split(';')[1]);
-            }            
+            }
 
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
             var result = flow.ApplyHasAudit(sysNo, (int)step, userInfo.cardNo);

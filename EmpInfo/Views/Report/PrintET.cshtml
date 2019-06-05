@@ -118,14 +118,23 @@
             <td>营运部总监:</td>
             <td style="font-weight:bold;">@h.operation_auditor</td>
         </tr>
+        @if (!string.IsNullOrEmpty(h.busPlanner_auditor)) {
+            <tr>
+                <td>事业部计划经理:</td>
+                <td style="font-weight:bold;">@h.busPlanner_auditor</td>
+                <td></td>
+                <td></td>
+            </tr>
+        }
         <tr>
             <td colspan="4">
                 <div style="text-align:left;font-size:12px;">
                     备注:
                     <div style="margin-left:24px">
-                        <div>1. 以上只允许在出货前一个工作日的上班时间提出申请</div>
-                        <div>2. 没有[紧急出货运输申请]的货物，全部按正常运输方式安排，即：汽运和陆运</div>
-                        <div>3. 流程：申请人-营业部负责人-营运物流部填写运费信息-营运部总监-营运物流部安排</div>
+                        <div>1. 申请时间：周一至周五出货：出货当天17点前完成申请流程；周六至周日出货: 周六上午12点前完成申请流程</div>
+                        <div>2. 没有&lt;紧急出货运输申请&gt;的货物，全部按正常运输方式安排，即：汽运或陆运</div>
+                        <div>3. 营业申请流程：申请人-营业部负责人-计划经理确认-营运物流部填写运费信息-营运部总监审批-营运物流部安排</div>
+                        <div>4. 事业部申请流程：申请人-计划经理确认-营运物流部填写运费信息-营运部总监审批-营运物流部安排</div>
                     </div>
                 </div>
             </td>

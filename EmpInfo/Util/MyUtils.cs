@@ -486,9 +486,10 @@ namespace EmpInfo.Util
         /// <param name="obj">数据库对象</param>
         public static void SetFieldValueToModel(System.Web.Mvc.FormCollection col, object obj)
         {
+            string val = "", pType = "";
             foreach (var p in obj.GetType().GetProperties()) {
-                string val = col.Get(p.Name);//字段值
-                string pType = p.PropertyType.FullName;//数据类型
+                val = col.Get(p.Name);//字段值
+                pType = p.PropertyType.FullName;//数据类型
                 if (string.IsNullOrEmpty(val) || val.Equals("null")) continue;
                 if (pType.Contains("DateTime")) {
                     DateTime dt;

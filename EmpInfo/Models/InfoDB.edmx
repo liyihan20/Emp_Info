@@ -315,6 +315,7 @@
           <Property Name="check1" Type="bit" />
           <Property Name="check2" Type="bit" />
           <Property Name="has_attachment" Type="bit" />
+          <Property Name="is_direct_charge" Type="bit" />
         </EntityType>
         <EntityType Name="ei_deliveryInfo">
           <Key>
@@ -520,6 +521,8 @@
           <Property Name="creater_name" Type="nvarchar" MaxLength="50" />
           <Property Name="create_date" Type="datetime" />
           <Property Name="is_forbit" Type="bit" />
+          <Property Name="plan_manager_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="plan_manager_number" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ei_etApply">
           <Key>
@@ -778,15 +781,6 @@
           <Property Name="moduel" Type="varchar" MaxLength="500" />
           <Property Name="qty" Type="decimal" Precision="18" Scale="4" />
         </EntityType>
-        <EntityType Name="ei_ucNotifyUsers">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="name" Type="varchar" MaxLength="50" />
-          <Property Name="card_number" Type="varchar" MaxLength="50" />
-          <Property Name="company" Type="varchar" MaxLength="50" />
-        </EntityType>
         <EntityType Name="ei_users">
           <Key>
             <PropertyRef Name="id" />
@@ -828,6 +822,14 @@
           <Property Name="device_id" Type="varchar" MaxLength="200" />
           <Property Name="login_time" Type="datetime" />
         </EntityType>
+        <EntityType Name="ei_vacationDays">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="v_day" Type="smalldatetime" Nullable="false" />
+          <Property Name="comment" Type="nvarchar" MaxLength="50" />
+        </EntityType>
         <EntityType Name="flow_applyEntryQueue">
           <Key>
             <PropertyRef Name="id" />
@@ -849,6 +851,17 @@
           <Property Name="relate_name" Type="varchar" MaxLength="50" />
           <Property Name="relate_value" Type="varchar" MaxLength="500" />
           <Property Name="relate_text" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="flow_notifyUsers">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="bill_type" Type="char" MaxLength="2" />
+          <Property Name="card_number" Type="varchar" MaxLength="20" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" />
+          <Property Name="cond1" Type="nvarchar" MaxLength="200" />
+          <Property Name="cond2" Type="nvarchar" MaxLength="200" />
         </EntityType>
         <EntityType Name="public_fund_item">
           <Key>
@@ -1105,6 +1118,7 @@
             <PropertyRef Name="out_time" />
             <PropertyRef Name="has_attachment" />
             <PropertyRef Name="entry_id" />
+            
           </Key>
           <Property Name="id" Type="int" Nullable="false" />
           <Property Name="sys_no" Type="varchar" MaxLength="50" />
@@ -1140,7 +1154,8 @@
           <Property Name="market_auditor" Type="varchar" MaxLength="100" />
           <Property Name="logistics_editor" Type="varchar" MaxLength="100" />
           <Property Name="operation_auditor" Type="varchar" MaxLength="100" />
-          <Property Name="logistics_auditor" Type="varchar" MaxLength="100" />
+          <Property Name="logistics_auditor" Type="varchar" MaxLength="6" Nullable="false" />
+          <Property Name="busPlanner_auditor" Type="varchar" MaxLength="100" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_getAllhrEmp”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -1644,11 +1659,12 @@
           <EntitySet Name="ei_SVApply" EntityType="Self.ei_SVApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_ucApply" EntityType="Self.ei_ucApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_ucApplyEntry" EntityType="Self.ei_ucApplyEntry" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="ei_ucNotifyUsers" EntityType="Self.ei_ucNotifyUsers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_users" EntityType="Self.ei_users" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_users_android" EntityType="Self.ei_users_android" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_vacationDays" EntityType="Self.ei_vacationDays" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="flow_applyEntryQueue" EntityType="Self.flow_applyEntryQueue" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="flow_auditorRelation" EntityType="Self.flow_auditorRelation" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="flow_notifyUsers" EntityType="Self.flow_notifyUsers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="public_fund_item" EntityType="Self.public_fund_item" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="wx_pushMsg" EntityType="Self.wx_pushMsg" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="vw_askLeaveReport" EntityType="Self.vw_askLeaveReport" store:Type="Views" store:Schema="dbo">
@@ -1868,7 +1884,8 @@ FROM [dbo].[vw_ETExcel] AS [vw_ETExcel]</DefiningQuery>
 [vw_ETReport].[market_auditor] AS [market_auditor], 
 [vw_ETReport].[logistics_editor] AS [logistics_editor], 
 [vw_ETReport].[operation_auditor] AS [operation_auditor], 
-[vw_ETReport].[logistics_auditor] AS [logistics_auditor]
+[vw_ETReport].[logistics_auditor] AS [logistics_auditor], 
+[vw_ETReport].[busPlanner_auditor] AS [busPlanner_auditor]
 FROM [dbo].[vw_ETReport] AS [vw_ETReport]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="vw_getAllhrEmp" EntityType="Self.vw_getAllhrEmp" store:Type="Views" store:Schema="dbo">
@@ -2234,7 +2251,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <End Role="ei_ucApplyEntry" EntitySet="ei_ucApplyEntry" />
           </AssociationSet>
           <EntitySet Name="vw_UCReport" EntityType="ICAuditModel.vw_UCReport" />
-          <EntitySet Name="ei_ucNotifyUsers" EntityType="ICAuditModel.ei_ucNotifyUsers" />
           <EntitySet Name="vw_askLeaveReport" EntityType="ICAuditModel.vw_askLeaveReport" />
           <FunctionImport Name="GetOutStockBillsForAudit1To2" ReturnType="Collection(ICAuditModel.GetOutStockBillsForAudit1To2_Result)">
             <Parameter Name="account" Mode="In" Type="String" />
@@ -2304,6 +2320,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           </AssociationSet>
           <EntitySet Name="vw_ETExcel" EntityType="ICAuditModel.vw_ETExcel" />
           <EntitySet Name="vw_ETReport" EntityType="ICAuditModel.vw_ETReport" />
+          <EntitySet Name="flow_notifyUsers" EntityType="ICAuditModel.flow_notifyUsers" />
+          <EntitySet Name="ei_vacationDays" EntityType="ICAuditModel.ei_vacationDays" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -3266,15 +3284,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="administration_manager" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="delivery_company" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
         </EntityType>
-        <EntityType Name="ei_ucNotifyUsers">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="card_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="company" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-        </EntityType>
         <EntityType Name="vw_askLeaveReport">
           <Key>
             <PropertyRef Name="id" />
@@ -3426,6 +3435,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="check1" Type="Boolean" />
           <Property Name="check2" Type="Boolean" />
           <Property Name="has_attachment" Type="Boolean" />
+          <Property Name="is_direct_charge" Type="Boolean" />
         </EntityType>
         <EntityType Name="ei_SVApply">
           <Key>
@@ -3588,6 +3598,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="create_date" Type="DateTime" Precision="3" />
           <NavigationProperty Name="ei_epEqDeps" Relationship="ICAuditModel.FK_ei_epPrDeps_ei_epEqDeps" FromRole="ei_epPrDeps" ToRole="ei_epEqDeps" />
           <Property Name="is_forbit" Type="Boolean" />
+          <Property Name="plan_manager_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="plan_manager_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="ei_epEqDeps">
           <Key>
@@ -3940,7 +3952,27 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="market_auditor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="logistics_editor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="operation_auditor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="logistics_auditor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="logistics_auditor" Type="String" MaxLength="6" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="busPlanner_auditor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="flow_notifyUsers">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="bill_type" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="card_number" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="cond1" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="cond2" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="ei_vacationDays">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="v_day" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="comment" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -4785,16 +4817,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="ei_ucNotifyUsers">
-            <EntityTypeMapping TypeName="ICAuditModel.ei_ucNotifyUsers">
-              <MappingFragment StoreEntitySet="ei_ucNotifyUsers">
-                <ScalarProperty Name="company" ColumnName="company" />
-                <ScalarProperty Name="card_number" ColumnName="card_number" />
-                <ScalarProperty Name="name" ColumnName="name" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="vw_askLeaveReport">
             <EntityTypeMapping TypeName="ICAuditModel.vw_askLeaveReport">
               <MappingFragment StoreEntitySet="vw_askLeaveReport">
@@ -4955,6 +4977,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_CRApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_CRApply">
               <MappingFragment StoreEntitySet="ei_CRApply">
+                <ScalarProperty Name="is_direct_charge" ColumnName="is_direct_charge" />
                 <ScalarProperty Name="has_attachment" ColumnName="has_attachment" />
                 <ScalarProperty Name="check2" ColumnName="check2" />
                 <ScalarProperty Name="check1" ColumnName="check1" />
@@ -5122,6 +5145,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_epPrDeps">
             <EntityTypeMapping TypeName="ICAuditModel.ei_epPrDeps">
               <MappingFragment StoreEntitySet="ei_epPrDeps">
+                <ScalarProperty Name="plan_manager_number" ColumnName="plan_manager_number" />
+                <ScalarProperty Name="plan_manager_name" ColumnName="plan_manager_name" />
                 <ScalarProperty Name="is_forbit" ColumnName="is_forbit" />
                 <ScalarProperty Name="create_date" ColumnName="create_date" />
                 <ScalarProperty Name="creater_name" ColumnName="creater_name" />
@@ -5403,6 +5428,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="vw_ETReport">
             <EntityTypeMapping TypeName="ICAuditModel.vw_ETReport">
               <MappingFragment StoreEntitySet="vw_ETReport">
+                <ScalarProperty Name="busPlanner_auditor" ColumnName="busPlanner_auditor" />
                 <ScalarProperty Name="logistics_auditor" ColumnName="logistics_auditor" />
                 <ScalarProperty Name="operation_auditor" ColumnName="operation_auditor" />
                 <ScalarProperty Name="logistics_editor" ColumnName="logistics_editor" />
@@ -5437,6 +5463,27 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="applier_name" ColumnName="applier_name" />
                 <ScalarProperty Name="applier_num" ColumnName="applier_num" />
                 <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="flow_notifyUsers">
+            <EntityTypeMapping TypeName="ICAuditModel.flow_notifyUsers">
+              <MappingFragment StoreEntitySet="flow_notifyUsers">
+                <ScalarProperty Name="cond2" ColumnName="cond2" />
+                <ScalarProperty Name="cond1" ColumnName="cond1" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
+                <ScalarProperty Name="bill_type" ColumnName="bill_type" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_vacationDays">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_vacationDays">
+              <MappingFragment StoreEntitySet="ei_vacationDays">
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="v_day" ColumnName="v_day" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

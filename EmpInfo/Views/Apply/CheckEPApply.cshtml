@@ -167,16 +167,6 @@
                                     @(((DateTime)ep.confirm_time).ToString("yyyy-MM-dd HH:mm"))
                                 </td>
                             </tr>
-                            if (ep.confirm_register_time != null) {
-                                <tr>
-                                    <th>
-                                        处理登记时间
-                                    </th>
-                                    <td>
-                                        @(((DateTime)ep.confirm_register_time).ToString("yyyy-MM-dd HH:mm"))
-                                    </td>
-                                </tr>
-                            }
                             <tr>
                                 <th>
                                     维修人员
@@ -190,6 +180,15 @@
                                     故障原因类别
                                 </th>
                                 <td>
+                                    @if (ep.faulty_type.Contains("设备自身")) {
+                                        <i class="fa fa-circle-o"></i>
+                                    }
+                                    else if (ep.faulty_type.Contains("操作不当")) {
+                                        <i class="fa fa-circle"></i>
+                                    }
+                                    else {
+                                        <i class="fa fa-dot-circle-o"></i>
+                                    }
                                     @ep.faulty_type
                                 </td>
                             </tr>
@@ -222,6 +221,15 @@
                                     修理结果
                                 </th>
                                 <td>
+                                    @if (ep.repair_result.Contains("正常")) {
+                                        <i class="fa fa-circle-o"></i>
+                                    }
+                                    else if (ep.repair_result.Contains("无法")) {
+                                        <i class="fa fa-circle"></i>
+                                    }
+                                    else {
+                                        <i class="fa fa-dot-circle-o"></i>
+                                    }
                                     @ep.repair_result
                                 </td>
                             </tr>
@@ -232,9 +240,46 @@
                                 <td>
                                     @ep.other_repairers
                                 </td>
-                            </tr>                            
+                            </tr>
+                            <tr>
+                                <th>
+                                    登记时间
+                                </th>
+                                <td>
+                                    @(((DateTime)ep.confirm_register_time).ToString("yyyy-MM-dd HH:mm"))
+                                </td>
+                            </tr>
                         }
                     </table>
+                    }
+                    @if (ep.grade_time != null) {
+                        <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">维修难度评分</h4>
+                        <table style="width:100%;border-collapse:separate; border-spacing:8px;" class="contentTb">
+                            <tr>
+                                <th style="width:28%;">
+                                    评分时间
+                                </th>
+                                <td style="width:72%;">
+                                    @(((DateTime)ep.grade_time).ToString("yyyy-MM-dd HH:mm"))
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    评分设备经理
+                                </th>
+                                <td>
+                                    @ep.equitment_dep_charger_name
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    难度分数
+                                </th>
+                                <td>
+                                    @ep.difficulty_score 分
+                                </td>
+                            </tr>  
+                        </table>
                     }
                     
                     @if (ep.evaluation_time != null) {
@@ -274,36 +319,7 @@
                             </tr>          
                         </table>
                     }
-
-                @if (ep.grade_time != null) {
-                        <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">维修难度评分</h4>
-                        <table style="width:100%;border-collapse:separate; border-spacing:8px;" class="contentTb">
-                            <tr>
-                                <th style="width:28%;">
-                                    评分时间
-                                </th>
-                                <td style="width:72%;">
-                                    @(((DateTime)ep.grade_time).ToString("yyyy-MM-dd HH:mm"))
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    评分设备经理
-                                </th>
-                                <td>
-                                    @ep.equitment_dep_charger_name
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    难度分数
-                                </th>
-                                <td>
-                                    @ep.difficulty_score 分
-                                </td>
-                            </tr>  
-                        </table>
-                    }
+                
             </div>
         </div>
     </div>

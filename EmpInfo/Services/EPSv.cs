@@ -5,6 +5,7 @@ using EmpInfo.Util;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.Objects;
 using System.Linq;
 
 namespace EmpInfo.Services
@@ -76,7 +77,14 @@ namespace EmpInfo.Services
                     url = "../Report/EPReport"
                 });
             }
-
+            if (HasGotPower("EPTimeExceedReport", userInfo.id)) {
+                menus.Add(new ApplyMenuItemModel()
+                {
+                    text = "处理超时报表",
+                    iconFont = "fa-file-text-o",
+                    url = "../Report/ExportAuditTimeExceedExcel"
+                });
+            }
             return menus;
 
         }
@@ -183,7 +191,7 @@ namespace EmpInfo.Services
                         bill.accept_time = DateTime.Now;
                         bill.accept_user_name = userInfo.name;
                         bill.accept_user_no = userInfo.cardNo;
-                        db.SaveChanges();                        
+                        db.SaveChanges(); 
                         //接单后通知申请者
                         EPAcceptedInform();
                     }
@@ -270,19 +278,31 @@ namespace EmpInfo.Services
                     if (score == 0) {
                         EPUnsatisfyInform();
                     }
-                }                
+                }
                 return new SimpleResultModel() { suc = true, msg = result.msg };
 
             }
             else if (stepName.Contains("评分")) {
-                int score = Int32.Parse(fc.Get("difficultyScore"));
+                bool managerPass = bool.Parse(fc.Get("managerPass"));
+                MyUtils.SetFieldValueToModel(fc, bill);
 
-                bill.difficulty_score = score;
-                bill.grade_time = DateTime.Now;
+                if (managerPass) {
+                    bill.grade_time = DateTime.Now;
 
+                    if (string.IsNullOrEmpty(bill.faulty_reason)) {
+                        return new SimpleResultModel() { suc = false, msg = "【故障原因】必须填写" };
+                    }
+                    if (string.IsNullOrEmpty(bill.repair_method)) {
+                        return new SimpleResultModel() { suc = false, msg = "【修理方法】必须填写" };
+                    }
+                }
+                else {
+                    //拒接
+                    bill.difficulty_score = null;
+                }
                 string formJson = JsonConvert.SerializeObject(bill);
 
-                var result = flow.BeginAudit(bill.sys_no, step, userInfo.cardNo, true, "", formJson);
+                var result = flow.BeginAudit(bill.sys_no, step, userInfo.cardNo, managerPass, "", formJson);
                 if (result.suc) {
                     db.SaveChanges();
                     //发送通知到下一级审核人
@@ -405,6 +425,120 @@ namespace EmpInfo.Services
         public object GetBeginAuditOtherInfo(string sysNo, int step)
         {
             return new EPSv(sysNo).GetBill();
+        }
+
+        /// <summary>
+        /// 服务评价环节处理时间大于1个工作日的
+        /// </summary>
+        /// <param name="beginTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
+        public List<AuditTimeExceedModel> GetEvaluationTimeExceedRecord(DateTime beginTime, DateTime endTime)
+        {
+            //初步筛选出处理时间大于1天的记录
+            var record = (from e in db.ei_epApply
+                          where e.grade_time != null
+                          && e.report_time > beginTime
+                          && e.report_time <= endTime
+                          && EntityFunctions.DiffMinutes(e.grade_time, e.evaluation_time ?? DateTime.Now) > 24 * 60
+                          orderby e.produce_dep_name
+                          select new AuditTimeExceedModel()
+                          {
+                              sysNo = e.sys_no,
+                              depName = e.produce_dep_name,
+                              bTime = e.grade_time,
+                              eTime = e.evaluation_time,
+                              name = e.produce_dep_charger_name
+                          }).ToList();
+
+            return GetAuditTimeExceedRecordExceptVacation(record, beginTime, endTime);
+        }
+
+        /// <summary>
+        /// 难度打分处理时间大于1个工作日的
+        /// </summary>
+        /// <param name="beginTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
+        public List<AuditTimeExceedModel> GetGradeTimeExceedRecord(DateTime beginTime, DateTime endTime)
+        {
+            //初步筛选出处理时间大于1天的记录
+            var record = (from e in db.ei_epApply
+                          where e.confirm_register_time != null
+                          && e.report_time > beginTime
+                          && e.report_time <= endTime
+                          && EntityFunctions.DiffMinutes(e.confirm_register_time, e.grade_time ?? DateTime.Now) > 24 * 60
+                          orderby e.equitment_dep_name
+                          select new AuditTimeExceedModel()
+                          {
+                              sysNo = e.sys_no,
+                              depName = e.equitment_dep_name,
+                              bTime = e.confirm_register_time,
+                              eTime = e.grade_time,
+                              name = e.equitment_dep_charger_name
+                          }).ToList();
+
+            return GetAuditTimeExceedRecordExceptVacation(record,beginTime,endTime);
+        }
+
+        private List<AuditTimeExceedModel> GetAuditTimeExceedRecordExceptVacation(List<AuditTimeExceedModel> record,DateTime beginTime,DateTime endTime)
+        {
+            var result = new List<AuditTimeExceedModel>();
+            //获取此段日期内的周日和节假日
+            var vacationDays = GetSundayAndVacationInAPeriod(beginTime, endTime);
+
+            //进一步筛选，去除节假日和周日的时间，只计算工作日
+            foreach (var r in record) {
+                var bTime = (DateTime)r.bTime;
+                var eTime = r.eTime == null ? DateTime.Now : (DateTime)r.eTime; //如果是未处理的，处理完成时间按照当前时间，然后计算是否超时
+                //先处理边界问题，比如处理时段是2019-6-8 20:10~2019-6-10 12:20,6-8或者6-10是周末或节假日的情况，此情况不能简单的减去1天，而是应该减去这天剩下的时间
+                //前边界的情况，将前日期+1天
+                var dayPart = DateTime.Parse((bTime).ToShortDateString());
+                if (vacationDays.Where(v => v == dayPart).Count() > 0) {
+                    bTime = dayPart.AddDays(1);
+                }
+                //后边界的情况，将后日期的时间部分抹去
+                dayPart = DateTime.Parse((eTime).ToShortDateString());
+                if (vacationDays.Where(v => v == dayPart).Count() > 0) {
+                    eTime = dayPart;
+                }
+
+                //接着处理日期内的假期，包含几项就将前日期加几天
+                bTime = bTime.AddDays(vacationDays.Where(v => v >= bTime && v <= eTime).Count());
+
+                if (bTime > eTime) continue;
+                if ((eTime - bTime).TotalDays <= 1.0) continue;
+
+                r.exceedHours = Math.Round((eTime - bTime).TotalHours, 1) - 24; //实际超时时间
+                result.Add(r);
+
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 获取某时间段之内的节假日和周日
+        /// </summary>
+        /// <param name="beginTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
+        private List<DateTime> GetSundayAndVacationInAPeriod(DateTime beginTime, DateTime endTime)
+        {
+            var days = new List<DateTime>();
+            var vacationDays = db.ei_vacationDays.Where(v => v.v_day >= beginTime && v.v_day <= endTime).ToList();
+            while (beginTime <= endTime) {
+                if (beginTime.DayOfWeek == DayOfWeek.Sunday) {
+                    days.Add(beginTime);
+                }
+                else {
+                    if (vacationDays.Where(v => v.v_day == beginTime).Count() > 0) {
+                        days.Add(beginTime);
+                    }
+                }
+                beginTime = beginTime.AddDays(1);
+            }
+            return days;
         }
 
 

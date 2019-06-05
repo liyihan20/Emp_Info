@@ -73,7 +73,6 @@ namespace EmpInfo.Models
         public DbSet<ei_ucApply> ei_ucApply { get; set; }
         public DbSet<ei_ucApplyEntry> ei_ucApplyEntry { get; set; }
         public DbSet<vw_UCReport> vw_UCReport { get; set; }
-        public DbSet<ei_ucNotifyUsers> ei_ucNotifyUsers { get; set; }
         public DbSet<vw_askLeaveReport> vw_askLeaveReport { get; set; }
         public DbSet<ei_ALModifyLog> ei_ALModifyLog { get; set; }
         public DbSet<vw_assistantEmps> vw_assistantEmps { get; set; }
@@ -96,6 +95,8 @@ namespace EmpInfo.Models
         public DbSet<ei_etApply> ei_etApply { get; set; }
         public DbSet<vw_ETExcel> vw_ETExcel { get; set; }
         public DbSet<vw_ETReport> vw_ETReport { get; set; }
+        public DbSet<flow_notifyUsers> flow_notifyUsers { get; set; }
+        public DbSet<ei_vacationDays> ei_vacationDays { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {

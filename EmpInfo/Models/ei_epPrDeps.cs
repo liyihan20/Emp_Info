@@ -29,6 +29,8 @@ namespace EmpInfo.Models
         public string creater_name { get; set; }
         public Nullable<System.DateTime> create_date { get; set; }
         public Nullable<bool> is_forbit { get; set; }
+        public string plan_manager_name { get; set; }
+        public string plan_manager_number { get; set; }
     
         public virtual ei_epEqDeps ei_epEqDeps { get; set; }
     }

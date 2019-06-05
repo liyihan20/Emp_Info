@@ -56,64 +56,69 @@
             startView: 2,
             maxView: 2,
             minuteStep: 5,
-            startDate: "@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 08:00")",
-            initialDate:"@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 08:00")"
-            });
+            startDate: "@DateTime.Now.ToString("yyyy-MM-dd HH:mm")",
+            initialDate:"@DateTime.Now.ToString("yyyy-MM-dd HH:mm")"
+        });
 
-            $("#customerNumber").on("focusout", function () {
-                var num = $(this).val();
-                var company = $("select[name='company']").val();
-                if (!company) {
-                    company = "all";
-                }
+        $("#customerNumber").on("focusout", function () {
+            var num = $(this).val();
+            var company = $("select[name='company']").val();
+            if (!company) {
+                company = "all";
+            }
 
-                if (num.length >= 5) {
-                    $.post("@Url.Content("~/Item/GetK3CustomerName")", { customerNumber: num, company: company }, function (data) {
-                var tip = "<i class='fa fa-info-circle'></i> ";
-                if (data.suc) {
-                    tip += "对应客户名称：" + data.extra;
-                    $("#customerName").val(data.extra);
-                } else {
-                    tip += data.msg;
-                    $("#customerName").val("");
-                }
-                $("#customerNameSpan").html(tip);
-            });
-        }
-    });
-
-    $("#apply_bt").on("click", function () {
-        if (items.length == 0) {
-            toastr.error("必须录入出货明细才能提交");
-            return;
-        }
-        if ($("#al_file_list").children().length == 0) {
-            toastr.error("必须要上传图片附件才能提交");
-            return;
-        }
-        $("#hasAttachment").val(true);
-        openConfirmDialog("确定要提交申请吗？", function () {
-            $("#apply_bt").button("loading");
-            $.ajax({
-                type: 'post',
-                url: 'SaveApply',
-                data: $("#chForm").serialize() + "&entrys=" + JSON.stringify(items),
-                cache: false,
-                dataType: 'json',
-                success: function (data) {
-                    $("#apply_bt").button("reset");
+            if (num.length >= 5) {
+                $.post("@Url.Content("~/Item/GetK3CustomerName")", { customerNumber: num, company: company }, function (data) {
+                    var tip = "<i class='fa fa-info-circle'></i> ";
                     if (data.suc) {
-                        toastr.success("提交成功:" + data.msg);
-                        setTimeout(function () { window.location.href = "ApplyIndex?billType=ET"; }, 2000);
-                    } else {
-                        toastr.error("提交失败：" + data.msg);
-                        $("#apply_bt").button("reset");
-                    }
+                        tip += "对应客户名称：" + data.extra;
+                        $("#customerName").val(data.extra);
 
-                }
+                        //继续获取客户地址，如果此客户有申请过的话
+                        $.post("@Url.Content("~/Item/GetETCustomerAddr")", { customerNumber: num, company: company }, function (data) {
+                            $("#addr").val(data);
+                        });
+                        } else {
+                        tip += data.msg;
+                        $("#customerName").val("");
+                    }
+                    $("#customerNameSpan").html(tip);
+                });
+            }
+        });
+
+        $("#apply_bt").on("click", function () {
+            if (items.length == 0) {
+                toastr.error("必须录入出货明细才能提交");
+                return;
+            }
+            if ($("#al_file_list").children().length == 0) {
+                toastr.error("必须要上传图片附件才能提交");
+                return;
+            }
+            $("#hasAttachment").val(true);
+            openConfirmDialog("确定要提交申请吗？", function () {
+                $("#apply_bt").button("loading");
+                $.ajax({
+                    type: 'post',
+                    url: 'SaveApply',
+                    data: $("#chForm").serialize() + "&entrys=" + JSON.stringify(items),
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        $("#apply_bt").button("reset");
+                        if (data.suc) {
+                            toastr.success("提交成功:" + data.msg);
+                            setTimeout(function () { window.location.href = "ApplyIndex?billType=ET"; }, 2000);
+                        } else {
+                            toastr.error("提交失败：" + data.msg);
+                            $("#apply_bt").button("reset");
+                        }
+
+                    }
+                });
             });
         });
-    });
 
     })
 
@@ -320,14 +325,16 @@
                         <span class="b-label">
                             市场部:
                         </span>
-                        <span class="b-input">
+                        <div class="b-input">
                             <select class="form-control" name="market_name">
                                 <option value="">---- 下拉选择市场部 ----</option>
-                                @foreach (var ml in m.marketList) {                                    
+                                @foreach (var ml in m.marketList) {
                                     <option value="@ml">@ml</option>
                                 }
+                                <option value="其它">其它</option>
                             </select>
-                        </span>
+                            <div class="text-danger small"><i class="fa fa-warning"></i> 如果是事业部出货，此处请选择【其它】</div>
+                        </div>
                     </div>
                     <div class="b-div">
                         <span class="b-label">
@@ -358,8 +365,13 @@
                         <span class="b-label">
                             生产事业部:
                         </span>
-                        <span class="b-input">
-                            <input type="text" class="form-control" name="bus_dep" placeholder="必填" />
+                        <span class="b-input">        
+                            <select class="form-control" name="bus_dep">
+                                <option value="">---- 下拉选择生产事业部 ----</option>
+                                @foreach (var ml in m.busDepList) {                                    
+                                    <option value="@ml">@ml</option>
+                                }
+                            </select>
                         </span>
                     </div>
                     <div class="b-div">
@@ -426,7 +438,7 @@
                             送货地址:
                         </span>
                         <div class="b-input">
-                            <textarea class="form-control" rows="2" name="addr" placeholder="必填" ></textarea>
+                            <textarea class="form-control" rows="2" name="addr" id="addr" placeholder="必填" ></textarea>
                         </div>
                     </div>
                     <div class="b-div">
@@ -469,7 +481,7 @@
                             <div id="uploader" class="wu-example">
                                 <div id="picker"> + </div>
                             </div>
-                            <p class="small text-danger"><i class="fa fa-info-circle"></i> 必须上传图片证明夜间出货必要性（最多可上传3张）</p>
+                            <p class="small text-danger"><i class="fa fa-info-circle"></i> 必须上传图片证明紧急出货必要性（最多可上传3张）</p>
                         </div>
                     
                         <div class="panel panel-default" id="al_file_panel">

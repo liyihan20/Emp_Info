@@ -70,6 +70,10 @@
                         <td>@cr.dep_long_name</td>
                     </tr>
                     <tr>
+                        <th>董事/总经理办公室直管</th>
+                        <td>@(cr.is_direct_charge==true?"是":"否")</td>
+                    </tr>
+                    <tr>
                         <th>漏刷日期</th>
                         <td>@(((DateTime)cr.forgot_date).ToString("yyyy-MM-dd"))</td>
                     </tr>

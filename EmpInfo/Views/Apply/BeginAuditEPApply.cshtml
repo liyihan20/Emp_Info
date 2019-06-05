@@ -93,17 +93,41 @@
                 return;
             }
             openConfirmDialog("确认要对此设备故障维修打分吗？", function () {
-                $.post("HandleApply", {
-                    sysNo: "@bam.sysNum",
-                    step: "@bam.step",
-                    stepName: "@bam.stepName",
-                    difficultyScore: score
-                }, function (data) {
-                    if (data.suc) {
-                        toastr.success(data.msg);
-                        setTimeout(function () { window.location.href = "GetMyAuditingList?billType=EP"; }, 1000);
-                    } else {
-                        toastr.error(data.msg);
+                $("#managerPass").val(true);
+                $.ajax({
+                    type: "post",
+                    url: "HandleApply",
+                    data: $("#dScoreForm").serialize(),
+                    cache: false,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.suc) {
+                            toastr.success(data.msg);
+                            setTimeout(function () { window.location.href = "GetMyAuditingList?billType=EP" }, 1000);
+                        } else {
+                            toastr.error("操作失败，原因：" + data.msg);
+                        }
+                    }
+                });
+            });
+        });
+
+        $("#managerRejectBtn").on("click", function () {
+            openConfirmDialog("确认要拒接此设备故障维修申请单吗？", function () {
+                $("#managerPass").val(false);
+                $.ajax({
+                    type: "post",
+                    url: "HandleApply",
+                    data: $("#dScoreForm").serialize(),
+                    cache: false,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.suc) {
+                            toastr.success(data.msg);
+                            setTimeout(function () { window.location.href = "GetMyAuditingList?billType=EP" }, 1000);
+                        } else {
+                            toastr.error("操作失败，原因：" + data.msg);
+                        }
                     }
                 });
             });
@@ -302,7 +326,90 @@
             <a href="#" class="btn btn-danger btn-block" onclick="ConfirmDealing(true)"><i class="fa fa-check"></i> 延迟处理</a>
         </div>
     </div>
-}
+    }
+    else if (bam.stepName.Contains("评分") && bam.isPass == null) {
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                难度评分
+            </div>
+            <div class="panel-body">
+                <form id="dScoreForm">
+                    <input type="hidden" name="sysNo" value="@bam.sysNum" />
+                    <input type="hidden" name="step" value="@bam.step" />
+                    <input type="hidden" name="stepName" value="@bam.stepName" />
+                    <div class="text-right">
+                        <a href="#dScoreForm" class="btn btn-danger" id="managerRejectBtn"><i class="fa fa-remove"></i> 拒接</a>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            故障原因类别:
+                        </span>
+                        <span class="b-input">
+                            <select class="form-control" id="faulty_type" name="faulty_type">
+                                <option value="" selected disabled>----请在下拉列表中选择（必选）----</option>
+                                <option value="设备自身问题">设备自身问题</option>
+                                <option value="操作者操作不当">操作者操作不当</option>
+                                <option value="原因不明确">原因不明确</option>
+                            </select>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            故障原因:
+                        </span>
+                        <span class="b-input">
+                            <textarea class="form-control" rows="2" name="faulty_reason" spellcheck="false" placeholder="必填项">@ep.faulty_reason</textarea>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            修理方法:
+                        </span>
+                        <span class="b-input">
+                            <textarea class="form-control" rows="2" name="repair_method" spellcheck="false" placeholder="必填项">@ep.repair_method</textarea>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            更换配件:
+                        </span>
+                        <span class="b-input">
+                            <textarea class="form-control" rows="2" name="exchange_parts" placeholder="输入更换的配件名称和型号，如无可不填" spellcheck="false">@ep.exchange_parts</textarea>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            修理结果:
+                        </span>
+                        <span class="b-input">
+                            <select class="form-control" id="repair_result" name="repair_result">
+                                <option value="" selected disabled>----请在下拉列表中选择（必选）----</option>
+                                <option value="正常生产">正常生产</option>
+                                <option value="可以生产但故障未彻底排除">可以生产但故障未彻底排除</option>
+                                <option value="无法生产">无法生产</option>
+                            </select>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            难度分数:
+                        </span>
+                        <span class="b-input">
+                            <select class="form-control" id="difficulty_score" name="difficulty_score">
+                                <option value="-1" selected disabled>----请在下拉列表中选择（必选）----</option>
+                                <option value="5">5分</option>
+                                <option value="3">3分</option>
+                                <option value="1">1分</option>
+                            </select>
+                        </span>
+                    </div>
+                    <input type="hidden" name="managerPass" id="managerPass" />
+                </form>
+                <a href="#dScoreForm" class="btn btn-success btn-block" id="gradeBtn"><i class="fa fa-check"></i> 提交评分</a>
+                
+            </div>
+        </div>
+    }
     else if (bam.stepName.Contains("评价") && bam.isPass == null) {
     <div class="panel panel-success">
         <div class="panel-heading">
@@ -331,29 +438,6 @@
                 </span>
             </div>
             <a href="#" class="btn btn-success btn-block" id="evaluateBtn"><i class="fa fa-check"></i> 提交评价</a>
-        </div>
-    </div>
-}
-else if (bam.stepName.Contains("评分") && bam.isPass == null) {
-    <div class="panel panel-success">
-        <div class="panel-heading">
-            难度评分
-        </div>
-        <div class="panel-body">
-            <div class="b-div">
-                <span class="b-label">
-                    难度分数:
-                </span>
-                <span class="b-input">
-                    <select class="form-control" id="difficulty_score">
-                        <option value="-1" selected disabled>----请在下拉列表中选择（必选）----</option>
-                        <option value="5">5分</option>
-                        <option value="3">3分</option>
-                        <option value="1">1分</option>
-                    </select>
-                </span>
-            </div>
-            <a href="#" class="btn btn-success btn-block" id="gradeBtn"><i class="fa fa-check"></i> 提交评分</a>
         </div>
     </div>
 }

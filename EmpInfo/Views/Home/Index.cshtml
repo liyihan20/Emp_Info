@@ -232,9 +232,9 @@
             window.location.href = "@Url.Content("~/Apply/DormRepairIndex")";
         });*@
 
-        $("#codeBt").click(function () {
-            $("#codeModal").modal("show");
-        });
+        //$("#codeBt").click(function () {
+        //    $("#codeModal").modal("show");
+        //});
 
         //宿舍集合
         $("#dormGroupImg,#dormGroupBt").click(function () {
@@ -257,7 +257,7 @@
         <button class="btn btn-sm" id="logoutBt"><i class="fa fa-sign-out"></i> 登出</button>
     </div>
     }
-    <img id="people_img" title="点击修改个人信息" class="img-circle" style="background-color:#fff;border:1px solid #ddd;cursor:pointer;width:80px;height:90px;" alt="people image" src="@Url.Content("~/Home/GetEmpPortrait/")" />
+    <img id="people_img" title="点击修改个人信息" class="img-circle" style="background-color:#fff;border:1px solid #ddd;cursor:pointer;width:80px;height:90px;" alt="people image" src="@Url.Content("~/Home/GetEmpPortrait")" />
     
     <div style="margin-top:5px;">
         <h5 style="color:white">@ViewData["username"]</h5>
@@ -451,7 +451,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="codeModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="codeModelLabel" aria-hidden="true">
+    @*<div class="modal fade" id="codeModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="codeModelLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-body">
@@ -463,7 +463,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>*@
 
     @*@Html.Partial("_SelectDep")*@
     @Html.Partial("_ConfirmPasswordDialog")

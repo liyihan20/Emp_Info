@@ -51,18 +51,28 @@ namespace EmpInfo.Services
 
         public override object GetInfoBeforeApply(UserInfo userInfo, UserInfoDetail userInfoDetail)
         {
-            //申请时间必须在8时至19时之间
-            //var hour = DateTime.Now.Hour;
-            //if (hour < 8 || hour >= 19) {
-            //    throw new Exception("申请时间必须在8时到19时之间，当前时间不能申请");
-            //}
-            //if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday) {
-            //    throw new Exception("申请不能在周日进行申请");
-            //}
+            //申请时间：周一至周五出货：出货当天16:45前提交申请流程;
+            //周六至周日出货: 周六上午11：45前完成申请流程
+            var hour = DateTime.Now.Hour;
+            var minute = DateTime.Now.Minute; 
+            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday) {
+                throw new Exception("不能在周日进行申请");
+            }
+            else if (DateTime.Now.DayOfWeek == DayOfWeek.Saturday) {
+                if (hour < 8 || hour >= 12 || (hour == 11 && minute > 45)) {
+                    throw new Exception("周六申请时间必须在08:00 ~ 11:45之间，当前时间不能申请");
+                }
+            }
+            else {
+                if (hour < 8 || hour >= 17 || (hour == 16 && minute > 45)) {
+                    throw new Exception("周一至周五申请时间必须在08:00 ~ 16:45之间，当前时间不能申请");
+                }
+            }
 
             ETBeforeApplyModel m = new ETBeforeApplyModel();
             m.sysNum = GetNextSysNum(BillType, 2);
             m.marketList = db.flow_auditorRelation.Where(a => a.bill_type == BillType && a.relate_name == "市场部审批").Select(a => a.relate_text).ToList().Distinct().ToList();
+            m.busDepList = db.flow_auditorRelation.Where(a => a.bill_type == BillType && a.relate_name == "事业部计划审批").Select(a => a.relate_text).ToList().Distinct().ToList();
             m.applierPhone = userInfoDetail.phone + (string.IsNullOrEmpty(userInfoDetail.shortPhone) ? "" : ("(" + userInfoDetail.shortPhone + ")"));
             return m;
         }
@@ -170,7 +180,25 @@ namespace EmpInfo.Services
                 if (model.msg.Contains("完成") || model.msg.Contains("NG")) {
                     bool isSuc = model.msg.Contains("NG") ? false : true;
                     string ccEmails = "";
-                    List<vw_push_users> pushUsers = db.vw_push_users.Where(v => v.card_number == bill.applier_num).ToList();                    
+                    List<vw_push_users> pushUsers = db.vw_push_users.Where(v => v.card_number == bill.applier_num).ToList();
+
+                    if (isSuc) {
+                        //通知知会人
+                        pushUsers.AddRange(
+                            (from u in db.flow_notifyUsers
+                             join v in db.vw_push_users on u.card_number equals v.card_number
+                             where v.wx_push_flow_info == true
+                             && u.bill_type == BillType
+                             select v).ToList()
+                        );
+                        ccEmails = string.Join(",", (
+                            from u in db.flow_notifyUsers
+                            join us in db.ei_users on u.card_number equals us.card_number
+                            where u.bill_type == BillType
+                            select us.email
+                            ).ToArray()
+                         );
+                    }
 
                     SendEmailForCompleted(
                         bill.sys_no,
@@ -215,5 +243,12 @@ namespace EmpInfo.Services
                 }
             }
         }
+
+        public string getCustomerAddr(string customerNumber,string company)
+        {
+            var et = db.ei_etApply.Where(e => e.customer_number == customerNumber && (company == "all" || e.company == company)).OrderByDescending(e => e.id).Select(e => e.addr).FirstOrDefault();
+            return et ?? "";
+        }
+
     }
 }

@@ -12,11 +12,10 @@ namespace EmpInfo.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class ei_ucNotifyUsers
+    public partial class ei_vacationDays
     {
         public int id { get; set; }
-        public string name { get; set; }
-        public string card_number { get; set; }
-        public string company { get; set; }
+        public System.DateTime v_day { get; set; }
+        public string comment { get; set; }
     }
 }

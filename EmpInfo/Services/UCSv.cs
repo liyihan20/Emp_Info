@@ -164,15 +164,18 @@ namespace EmpInfo.Services
                     if (isSuc) {
                         //通知知会人
                         pushUsers.AddRange(
-                            (from u in db.ei_ucNotifyUsers
+                            (from u in db.flow_notifyUsers
                              join v in db.vw_push_users on u.card_number equals v.card_number
-                             where v.wx_push_flow_info == true && (u.company == "所有" || u.company == bill.company)
+                             where v.wx_push_flow_info == true
+                             && u.bill_type == BillType
+                             && (u.cond1 == "所有" || u.cond1 == bill.company)
                              select v).ToList()
                         );
                         ccEmails = string.Join(",", (
-                            from u in db.ei_ucNotifyUsers
+                            from u in db.flow_notifyUsers
                             join us in db.ei_users on u.card_number equals us.card_number
-                            where u.company == "所有" || u.company == bill.company
+                            where u.cond1 == "所有" || u.cond1 == bill.company
+                            && u.bill_type == BillType
                             select us.email
                             ).ToArray()
                          );
