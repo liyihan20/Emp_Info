@@ -259,6 +259,19 @@ namespace EmpInfo.Controllers
             return false;
         }
 
+        //当前用户拥有的所有权限，用逗号隔开
+        protected string MyPowers()
+        {
+            var auts = (from a in db.ei_authority
+                        from g in db.ei_groups
+                        from gu in g.ei_groupUser
+                        from ga in g.ei_groupAuthority
+                        where ga.authority_id == a.id
+                        && gu.user_id == userInfo.id
+                        select a.en_name).Distinct().ToArray();
+            return string.Join(",", auts);
+        }
+
         //根据厂牌获取姓名
         protected string GetUserNameByCardNum(string cardNumbers)
         {

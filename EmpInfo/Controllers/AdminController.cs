@@ -742,9 +742,9 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = "生效日期不能晚于失效日期" });
             }
             string auditorNumber = GetUserCardByNameAndCardNum(auditor);
-            if (string.IsNullOrEmpty(GetUserEmailByCardNum(auditorNumber))) {
-                return Json(new SimpleResultModel() { suc = false, msg = "此审核人没有登记邮箱，不能设置" });
-            }
+            //if (string.IsNullOrEmpty(GetUserEmailByCardNum(auditorNumber))) {
+            //    return Json(new SimpleResultModel() { suc = false, msg = "此审核人没有登记邮箱，不能设置" });
+            //}
 
             ei_departmentAuditUser depAuditor;
             

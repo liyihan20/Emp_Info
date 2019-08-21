@@ -174,4 +174,17 @@ namespace EmpInfo.Models
         public List<ei_etApplyEntry> entrys { get; set; }
     }
 
+    public class APBeforeApplyModel
+    {
+        public ei_apApply ap { get; set; }
+        public List<string> k3AccountList { get; set; }
+
+    }
+
+    public class APCheckApplyModel
+    {
+        public ei_apApply ap { get; set; }
+        public List<ei_apApplyEntry> entrys { get; set; }
+    }
+
 }

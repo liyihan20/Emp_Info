@@ -53,11 +53,11 @@
     $(function () {
 
         //每次打开主页先看邮箱是否有绑定
-        $.post("@Url.Content("~/Home/ValidateEmail")", {}, function (data) {
+        @*$.post("@Url.Content("~/Home/ValidateEmail")", {}, function (data) {
             if (!data.suc) {
                 toastr.error(data.msg, "", { timeOut: 6000 });
             }
-        });
+        });*@
 
         $('#resetPassModal').on('shown.bs.modal', function () {
             $('#old_password').focus();

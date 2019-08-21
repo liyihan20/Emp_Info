@@ -97,6 +97,13 @@ namespace EmpInfo.Models
         public DbSet<vw_ETReport> vw_ETReport { get; set; }
         public DbSet<flow_notifyUsers> flow_notifyUsers { get; set; }
         public DbSet<ei_vacationDays> ei_vacationDays { get; set; }
+        public DbSet<ei_apQtyChangeLog> ei_apQtyChangeLog { get; set; }
+        public DbSet<vw_hr_department> vw_hr_department { get; set; }
+        public DbSet<k3_database> k3_database { get; set; }
+        public DbSet<ei_apApply> ei_apApply { get; set; }
+        public DbSet<ei_apApplyEntry> ei_apApplyEntry { get; set; }
+        public DbSet<vw_APExcel> vw_APExcel { get; set; }
+        public DbSet<ei_jqApply> ei_jqApply { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {
@@ -443,6 +450,76 @@ namespace EmpInfo.Models
                 new ObjectParameter("company", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("GetK3CustomerNameByNum", customer_numberParameter, companyParameter);
+        }
+    
+        public virtual ObjectResult<GetK3Item_Result> GetK3Item(string account, string item_no)
+        {
+            var accountParameter = account != null ?
+                new ObjectParameter("account", account) :
+                new ObjectParameter("account", typeof(string));
+    
+            var item_noParameter = item_no != null ?
+                new ObjectParameter("item_no", item_no) :
+                new ObjectParameter("item_no", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetK3Item_Result>("GetK3Item", accountParameter, item_noParameter);
+        }
+    
+        public virtual ObjectResult<GetApBusAndDepNamesInK3_Result> GetApBusAndDepNamesInK3(string account)
+        {
+            var accountParameter = account != null ?
+                new ObjectParameter("account", account) :
+                new ObjectParameter("account", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetApBusAndDepNamesInK3_Result>("GetApBusAndDepNamesInK3", accountParameter);
+        }
+    
+        public virtual ObjectResult<GetAPPriceHistory_Result> GetAPPriceHistory(Nullable<int> item_id)
+        {
+            var item_idParameter = item_id.HasValue ?
+                new ObjectParameter("item_id", item_id) :
+                new ObjectParameter("item_id", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetAPPriceHistory_Result>("GetAPPriceHistory", item_idParameter);
+        }
+    
+        public virtual ObjectResult<GetItemStockQtyFromK3_Result> GetItemStockQtyFromK3(string item_no)
+        {
+            var item_noParameter = item_no != null ?
+                new ObjectParameter("item_no", item_no) :
+                new ObjectParameter("item_no", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetItemStockQtyFromK3_Result>("GetItemStockQtyFromK3", item_noParameter);
+        }
+    
+        public virtual ObjectResult<GetAPHistoryQty_Result> GetAPHistoryQty(string item_number, string bus_name, Nullable<System.DateTime> begin_date, Nullable<System.DateTime> end_date)
+        {
+            var item_numberParameter = item_number != null ?
+                new ObjectParameter("item_number", item_number) :
+                new ObjectParameter("item_number", typeof(string));
+    
+            var bus_nameParameter = bus_name != null ?
+                new ObjectParameter("bus_name", bus_name) :
+                new ObjectParameter("bus_name", typeof(string));
+    
+            var begin_dateParameter = begin_date.HasValue ?
+                new ObjectParameter("begin_date", begin_date) :
+                new ObjectParameter("begin_date", typeof(System.DateTime));
+    
+            var end_dateParameter = end_date.HasValue ?
+                new ObjectParameter("end_date", end_date) :
+                new ObjectParameter("end_date", typeof(System.DateTime));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetAPHistoryQty_Result>("GetAPHistoryQty", item_numberParameter, bus_nameParameter, begin_dateParameter, end_dateParameter);
+        }
+    
+        public virtual ObjectResult<GetHREmpInfoDetail_Result> GetHREmpInfoDetail(string card_no)
+        {
+            var card_noParameter = card_no != null ?
+                new ObjectParameter("card_no", card_no) :
+                new ObjectParameter("card_no", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetHREmpInfoDetail_Result>("GetHREmpInfoDetail", card_noParameter);
         }
     }
 }

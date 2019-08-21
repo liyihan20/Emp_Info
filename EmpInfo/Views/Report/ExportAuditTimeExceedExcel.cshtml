@@ -46,7 +46,7 @@
                 $('#fromDatePicker1').datetimepicker('setEndDate', e.date);
             });
 
-            $("#ucReportBt").on("click", function () {
+            $("#reportBt").on("click", function () {
                 toastr.info("数据正在导出，请稍等...");
                 window.location.href = "@Url.Content("~/Report/BeginExportAuditTimeExceedExcel?")"
                 + "fromDate=" + $("#fromDate").val()
@@ -85,7 +85,7 @@
                 </div>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-4">
-                <button class="btn btn-success btn-block" id="ucReportBt" data-loading-text="导出中..." style="margin:6px 0;"><i class="fa fa-file-excel-o"></i> 导出报表</button>
+                <button class="btn btn-success btn-block" id="reportBt" data-loading-text="导出中..." style="margin:6px 0;"><i class="fa fa-file-excel-o"></i> 导出报表</button>
             </div>
         </div>
     </div>

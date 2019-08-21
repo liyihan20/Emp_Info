@@ -83,6 +83,10 @@
                         <td>@sv.dep_long_name</td>
                     </tr>
                     <tr>
+                        <th>董事/总经理办公室直管</th>
+                        <td>@(sv.is_direct_charge == true ? "是" : "否")</td>
+                    </tr>
+                    <tr>
                         <th>值班日期</th>
                         <td>@string.Format("{0:yyyy-MM-dd HH:mm}~{1:yyyy-MM-dd HH:mm}", sv.duty_date_from, sv.duty_date_to) </td>
                     </tr>

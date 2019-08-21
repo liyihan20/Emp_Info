@@ -180,15 +180,18 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = "此厂牌处于特殊保护状态，要注册请与管理员联系。谢谢！" });
             }
 
-            var infos = db.GetHREmpInfo(card_no).ToList();
-            if (infos.Count() < 1)
+            var info = db.GetHREmpInfo(card_no).FirstOrDefault();
+            if (info==null)
             {
                 WriteEventLogWithoutLogin(card_no, "用户注册[第一步]:厂牌编号不存在");
                 return Json(new { suc = false, msg = "厂牌编号不存在" });
             }
-            else if (string.IsNullOrEmpty(infos.First().txm)) {
+            else if (string.IsNullOrEmpty(info.txm)) {
                 WriteEventLogWithoutLogin(card_no, "工资账号还未生效");
                 return Json(new { suc = false, msg = "用户注册[第一步]:工资账号未生效，请过几天再注册" });
+            }
+            else if (string.IsNullOrEmpty(info.email) && string.IsNullOrEmpty(info.tp)) {
+                return Json(new { suc = false, msg = "手机号码在人事系统中未登记，请联系文员或行政部处理后再注册" });
             }
             else
             {

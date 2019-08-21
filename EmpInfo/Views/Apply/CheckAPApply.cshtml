@@ -1,0 +1,287 @@
+﻿@using EmpInfo.Models;
+@using Newtonsoft.Json;
+@{
+    APCheckApplyModel m = ViewData["am"] as APCheckApplyModel;
+    JsonSerializerSettings setting = new JsonSerializerSettings();
+    setting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+
+    var h = m.ap;
+    var entryJson = JsonConvert.SerializeObject(m.entrys, setting);
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: middle;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+        $("#tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: false,
+            idField: "entry_no",
+            data:@Html.Raw(entryJson),
+            columns: [
+                {
+                    field: "entry_no",
+                    title: "行号",
+                    align:"center"
+                }, {
+                    field: "item_no",
+                    title: "物料代码"
+                }, {
+                    field: "item_name",
+                    title:"物料名称"
+                }, {
+                    field: "item_modual",
+                    title: "规格型号"
+                }, {
+                    field: "item_id",
+                    visible: false
+                }, {
+                    field: "qty",
+                    title: "数量"
+                }, {
+                    field: "real_qty",
+                    title: "实际数量",
+                    cellStyle:function(value,row,index,field){
+                        if(value != row.qty){
+                            return {css:{color:'red'}};
+                        }else{
+                            return {css:{color:'black'}};
+                        }
+                    }
+                }, {
+                    field: "unit_name",
+                    title: "单位"
+                },{
+                    field: "brand",
+                    title: "品牌"
+                }, {
+                    field: "latest_arrive_date",
+                    title: "最晚到货期",
+                    formatter:function(value,row,index,field){
+                        if (value.indexOf("T") > 0) {
+                            return value.split("T")[0];
+                        }else{
+                            return value;
+                        }
+                    }
+                }, {
+                    field: "using_speed",
+                    title:"使用频率"
+                }, {
+                    field: "order_period",
+                    title: "订购周期"
+                }, {
+                    field: "usage",
+                    title: "订购用途"
+                }
+            ]
+        });
+    </script>
+    <script>
+        $(function () {
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@h.sys_no" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+
+            });
+        });
+    </script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Home/NoPaperProcess")">无纸化流程</a></li>
+            <li><a href="ApplyIndex?billType=AP">辅料订购申请</a></li>
+            <li class="active">查看申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div>
+            <div class="b-div">
+                <span class="b-label">
+                    流转记录:
+                </span>
+                <span class="b-input">
+                    <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        审核状态:
+                    </span>
+                    <span class="b-input">
+                        @ViewData["auditStatus"]
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请流水号:
+                    </span>
+                    <span class="b-input">
+                        @h.sys_no
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请时间:
+                    </span>
+                    <span class="b-input">
+                        @(((DateTime)h.apply_time).ToString("yyyy-MM-dd HH:mm"))
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请人:
+                    </span>
+                    <span class="b-input">
+                        @h.applier_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        联系电话:
+                    </span>
+                    <span class="b-input">
+                        @h.applier_phone
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        公司:
+                    </span>
+                    <div class="b-input">
+                        @h.account
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        事业部:
+                    </span>
+                    <div class="b-input">
+                        @h.bus_name
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请部门:
+                    </span>
+                    <div class="b-input">
+                        @h.dep_name
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        备注:
+                    </span>
+                    <span class="b-input">
+                        @h.comment
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        部门主管:
+                    </span>
+                    <span class="b-input">
+                        @(string.IsNullOrEmpty(h.charger_no) ? "" : string.Format("{0}({1})", h.charger_name, h.charger_no))
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        物控:
+                    </span>
+                    <span class="b-input">
+                        @(string.IsNullOrEmpty(h.controller_no) ? "" : string.Format("{0}({1})", h.controller_name, h.controller_no))
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        部长:
+                    </span>
+                    <span class="b-input">
+                        @(string.IsNullOrEmpty(h.minister_no) ? "" : string.Format("{0}({1})", h.minister_name, h.minister_no))
+                    </span>
+                </div>
+            </div>            
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        PR单号:
+                    </span>
+                    <span class="b-input">
+                        @h.po_number
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        K3账套:
+                    </span>
+                    <span class="b-input">
+                        @h.k3_account
+                    </span>
+                </div>
+            </div>
+            
+        </div>
+
+
+        <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">订料明细</h4>
+        <table data-toggle="table" id="tb"></table>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

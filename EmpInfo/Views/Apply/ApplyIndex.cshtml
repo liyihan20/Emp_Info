@@ -5,10 +5,10 @@
 
 @section Scripts{
     <script>
-    $(function () {        
+    $(function () {
         $(".screen_900").on("click", function (e) {
             e.preventDefault();
-            var w = $(document).width();                
+            var w = $(document).width();
             if (w > 900) {
                 window.location.href = $(this).attr("href");
             } else {

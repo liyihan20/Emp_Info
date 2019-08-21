@@ -106,11 +106,18 @@
             </div>
             <div class="col-xs-4 col-sm-3 col-md-2">
                 <a href="@Url.Content("~/Home/EleProcess")">
-                    <img src="@Url.Content("~/Content/images/elepr.png")" alt="assist" class="center-block" />
+                    <img src="@Url.Content("~/Content/images/elepr.png")" alt="elepr" class="center-block" />
                     <p class="text-center">电子公司专用流程</p>
                 </a>
             </div>
-
+            @if (auts.IndexOf("NoPaper") >= 0) {
+            <div class="col-xs-4 col-sm-3 col-md-2">
+                <a href="@Url.Content("~/Home/NoPaperProcess")">
+                    <img src="@Url.Content("~/Content/images/computer.png")" alt="computer" class="center-block" />
+                    <p class="text-center">无纸化流程</p>
+                </a>
+            </div>
+            }
         </div>
     </div>
 </div>

@@ -1580,5 +1580,119 @@ namespace EmpInfo.Controllers
 
         #endregion
 
+        #region 辅料申请流程
+
+        [SessionTimeOutFilter]
+        public ActionResult APReport()
+        {
+            return View();
+        }
+
+        public JsonResult CheckAPReport(DateTime fromDate, DateTime toDate)
+        {
+            toDate = toDate.AddDays(1);
+            var result = db.vw_APExcel
+                .Where(u => u.apply_time > fromDate && u.apply_time <= toDate)
+                .Select(u => new
+                {
+                    u.sys_no,
+                    u.bus_name,
+                    u.dep_name,
+                    u.applier_name,
+                    u.apply_time,
+                    u.po_number,
+                    u.audit_result,
+                }).Distinct().OrderBy(u => u.apply_time).ToList();
+            return Json(result);
+        }
+
+        public void BeginExportAPReport(DateTime fromDate, DateTime toDate)
+        {
+            toDate = toDate.AddDays(1);
+            var result = db.vw_APExcel.Where(u => u.apply_time > fromDate && u.apply_time <= toDate).ToList();
+
+            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "公司", "事业部", "申购部门", "申请时间", "PR单号","物料代码",
+                                               "物料名称", "规格型号", "实际数量", "单位","品牌","最晚到货期","使用频率","订购周期",
+                                               "订购用途", "历史单价", "税率","供应商" };                                              
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "辅料订购申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("辅料订购详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+            var sv = new APSv();
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result) {
+                colIndex = 1;
+
+                //"申请流水号", "申请人", "公司", "事业部", "申购部门", "申请时间", "PR单号","物料代码",
+                //"物料名称", "规格型号", "实际数量", "单位","品牌","最晚到货期","使用频率","订购周期",
+                //"订购用途", "历史单价", "税率","供应商"
+                cells.Add(++rowIndex, colIndex, d.audit_result);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.applier_name);
+                cells.Add(rowIndex, ++colIndex, d.account);
+                cells.Add(rowIndex, ++colIndex, d.bus_name);
+                cells.Add(rowIndex, ++colIndex, d.dep_name);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.po_number);
+                cells.Add(rowIndex, ++colIndex, d.item_no);
+
+                cells.Add(rowIndex, ++colIndex, d.item_name);
+                cells.Add(rowIndex, ++colIndex, d.item_modual);
+                cells.Add(rowIndex, ++colIndex, d.real_qty);
+                cells.Add(rowIndex, ++colIndex, d.unit_name);
+                cells.Add(rowIndex, ++colIndex, d.brand);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.latest_arrive_date).ToString("yyyy-MM-dd"));
+                cells.Add(rowIndex, ++colIndex, d.using_speed);
+                cells.Add(rowIndex, ++colIndex, d.order_period);
+
+                cells.Add(rowIndex, ++colIndex, d.usage);
+
+                var p = sv.GetItemPriceHistory((int)d.item_id);
+                if (p != null) {
+                    cells.Add(rowIndex, ++colIndex, p.price);
+                    cells.Add(rowIndex, ++colIndex, p.tax_rate);
+                    cells.Add(rowIndex, ++colIndex, p.supplier_name);
+                }
+            }
+
+            xls.Send();
+        }
+
+        #endregion
+
     }
 }

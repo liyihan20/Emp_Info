@@ -7,7 +7,7 @@
         $(function () {
 
             $("#applyContent").load("CheckApply", { sysNo: "@bam.sysNum" }, function () {
-                $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> @bam.billType 详情");
+                $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> @bam.billTypeName 详情");
                 $("#waiting").remove();
                 $(".auditContent").css("visibility", "visible");
             });

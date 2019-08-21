@@ -1,0 +1,817 @@
+﻿@using EmpInfo.Models;
+@{
+    APBeforeApplyModel m = ViewData["infoBeforeApply"] as APBeforeApplyModel;
+    List<string> accountList = new List<string>() { "光电", "半导体" };
+    List<string> k3AccountList = m.k3AccountList;
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: middle;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+        $("#tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: false,
+            idField: "entry_no",
+            clickToSelect:true,
+            columns: [
+                {
+                    radio:true
+                }, {
+                    field: "entry_no",
+                    title: "行号"
+                }, {
+                    field: "item_no",
+                    title: "物料代码"
+                }, {
+                    field: "item_name",
+                    title:"物料名称"
+                }, {
+                    field: "item_modual",
+                    title: "规格型号"
+                }, {
+                    field: "item_id",
+                    visible: false
+                }, {
+                    field: "qty",
+                    title: "数量"
+                }, {
+                    field: "unit_name",
+                    title: "单位"
+                }, {
+                    field: "latest_arrive_date",
+                    title: "最晚到货期",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value);
+                    }
+                }, {
+                    field: "brand",
+                    title: "品牌"
+                }, {
+                    field: "using_speed",
+                    title:"使用频率"
+                }, {
+                    field: "order_period",
+                    title: "订购周期"
+                }, {
+                    field: "usage",
+                    title: "订购用途"
+                }
+            ],
+            onDblClickRow: function (row, $element, field) {
+                $("#editBt").trigger("click");
+            }
+        });
+
+        $("#qty_tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: false,
+            columns: [
+                {
+                    field: "po_date",
+                    title: "订单日期",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value);
+                    }
+                }, {
+                    field: "account",
+                    title: "账套",
+                    align: "center"
+                }, {
+                    field: "dep_name",
+                    title: "申购部门"
+                }, {
+                    field: "qty",
+                    title: "订购数量"
+                }, {
+                    field: "transit_qty",
+                    title: "在途数量"
+                }, {
+                    field: "FBillNo",
+                    title: "订单编号"
+                }
+            ]
+        });
+
+        $("#stock_tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: false,
+            columns: [
+                {
+                    field: "stock_name",
+                    title: "仓库名"
+                }, {
+                    field: "qty",
+                    title: "库存量"
+                }, {
+                    field: "batch_no",
+                    title: "批次号"
+                }, {
+                    field: "bus_name",
+                    title: "事业部"
+                }
+            ]
+        });
+
+    </script>
+
+    <script>
+    var items = [];
+    var bus_dep_names = [];
+    var qtyModalParam = {};
+    $(function () {
+
+        $(".datePicker").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            startView: 2,
+            minView: 2,
+            initialDate: "@DateTime.Now.ToString("yyyy-MM-dd")"
+        });
+
+        $("#account").on("change", function () {
+            var v = $("#account").val();
+            var busTip = "---- 下拉选择事业部 ----";
+            var depTip = "---- 下拉选择部门 ----";
+            if (v == "") return;
+
+            $.post("@Url.Content("~/Item/GetApBusAndDepNameInK3")", { account: v }, function (data) {
+                if (data.suc) {
+                    bus_dep_names = JSON.parse(data.extra);
+                    var bus_names = utils.unique(bus_dep_names.map(function (d) { return d.bus_name; }));
+                    var dep_names = bus_dep_names.map(function (d) { return d.dep_name; });
+
+                    $("#bus_name").empty().append("<option value=''>" + busTip + "</option>");
+                    $("#dep_name").empty().append("<option value=''>" + depTip + "</option>");;
+
+                    for (var i = 0; i < bus_names.length; i++) {
+                        $("#bus_name").append("<option value='" + bus_names[i] + "'" + (bus_names[i] == "@m.ap.bus_name" ? " selected" : "") + ">" + bus_names[i] + "</option>");
+                    }
+                    for (var i = 0; i < dep_names.length; i++) {
+                        $("#dep_name").append("<option value='" + dep_names[i] + "'" + (dep_names[i] == "@m.ap.dep_name" ? " selected" : "") + ">" + dep_names[i] + "</option>");
+                    }
+                } else {
+                    toastr.error("获取不到此账套的事业部信息");
+                }
+            });
+
+        });
+
+        $("#bus_name").on("change", function () {
+            var v = $("#bus_name").val();
+            var depTip = "---- 下拉选择部门 ----";
+            if (v == "") return;
+
+            var dep_names = bus_dep_names.filter(function (b) { return b.bus_name == v; }).map(function (d) { return d.dep_name; });
+            $("#dep_name").empty().append("<option value=''>" + depTip + "</option>");;
+            for (var i = 0; i < dep_names.length; i++) {
+                $("#dep_name").append("<option value='" + dep_names[i] + "'" + (dep_names[i] == "@m.ap.dep_name" ? " selected" : "") + ">" + dep_names[i] + "</option>");
+            }
+
+        });
+
+        @*$("#item_no").on("focusout", function () {
+            var item_no = $(this).val();
+            var account = $("#account").val();
+            if (account == "") return;
+
+            if (item_no.length >= 5) {
+                $.post("@Url.Content("~/Item/GetK3ItemByNo")", { account: account, itemNo: item_no }, function (data) {
+                    if (data.suc) {
+                        var item = JSON.parse(data.extra);
+                        $("#item_id").val(item.item_id);
+                        $("#item_name").val(item.item_name);
+                        $("#item_modual").val(item.item_modual);
+                        $("#unit_name").val(item.unit_name);
+                    } else {
+                        $("#item_id").val("");
+                        $("#item_name").val("");
+                        $("#item_modual").val("");
+                        $("#unit_name").val("");
+                        toastr.error("获取不到此物料代码的相关物料信息，请检查是否输入错误");
+                    }
+                });
+            } else {
+                $("#item_id").val("");
+                $("#item_name").val("");
+                $("#item_modual").val("");
+                $("#unit_name").val("");
+            }
+        });*@
+
+        $(".selectUser").on("click", function () {
+            var self = this;
+            openSelectUserDialog($(self).val(), 1, function (result) {
+                $(self).val(result);
+            });
+        });
+
+        $("#apply_bt").on("click", function () {
+            if (items.length == 0) {
+                toastr.error("必须导入订料明细后才能提交");
+                return;
+            }
+
+            var head = utils.getFormObj($("#apFm"));
+            var entrys = items.filter(function (i) { return i.isDeleted == 0; });
+            if (head.applier_phone == "") {
+                toastr.error("联系电话必须填写");
+                return;
+            }
+            if (head.account == "") {
+                toastr.error("K3账套必须选择");
+                return;
+            }
+            if (head.bus_name == "") {
+                toastr.error("事业部必须选择");
+                return;
+            }
+            if (head.dep_name == "") {
+                toastr.error("申请部门必须选择");
+                return;
+            }
+            if (head.charger_no == "") {
+                toastr.error("请选择部门主管");
+                return;
+            }
+            if (head.controller_no == "") {
+                toastr.error("请选择物控");
+                return;
+            }
+            if (head.minister_no == "") {
+                toastr.error("请选择部长");
+                return;
+            }
+
+            for (var i = 0; i < items.length; i++) {
+                if (!items[i].latest_arrive_date || items[i].latest_arrive_date == "") {
+                    toastr.error("最晚到货期不能为空，行号："+(i+1));
+                    return;
+                }
+                if (!items[i].using_speed || items[i].using_speed == "") {
+                    toastr.error("使用频率不能为空，行号：" + (i + 1));
+                    return;
+                }
+                if (!items[i].order_period || items[i].order_period == "") {
+                    toastr.error("订购周期不能为空，行号：" + (i + 1));
+                    return;
+                }
+                if (!items[i].usage || items[i].usage == "") {
+                    toastr.error("订购用途不能为空，行号：" + (i + 1));
+                    return;
+                }
+            }
+
+            openConfirmDialog("确定要提交申请吗？", function () {
+                $("#apply_bt").button("loading");
+                $.ajax({
+                    type: 'post',
+                    url: 'SaveApply',
+                    data: "sys_no=" + head.sys_no + "&head=" + JSON.stringify(head).replace(/\&/g, "%26") + "&entrys=" + JSON.stringify(entrys).replace(/\&/g, "%26"),
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        $("#apply_bt").button("reset");
+                        if (data.suc) {
+                            toastr.success("提交成功:" + data.msg);
+                            setTimeout(function () { window.location.href = "CheckApply?sysNo=" + head.sys_no; }, 2000);
+                        } else {
+                            toastr.error("提交失败：" + data.msg);
+                            $("#apply_bt").button("reset");
+                        }
+
+                    }
+                });
+            });
+        });
+
+        $("#addBt").on("click", function () {
+            var k3Account = $("#k3_account").val();
+            var poNumber = $.trim($("#po_number").val());
+            if ($("#k3_account").val() == "") {
+                toastr.error("请先选择K3账套");
+                return;
+            }
+            if (poNumber == "") {
+                toastr.error("请先输入PR单号");
+                return;
+            }
+
+            var loadedDatas = $('#tb').bootstrapTable('getData');
+            if (loadedDatas.length > 0) {
+                openConfirmDialog("表格中已存在订料明细，是否重新加载数据？", function () {
+                    loadK3PO(k3Account, poNumber);
+                });
+            } else {
+                loadK3PO(k3Account, poNumber);
+            }
+
+        });
+
+        $("#editBt").on("click", function () {
+            var rows = $('#tb').bootstrapTable('getSelections');
+            if (rows.length == 0) {
+                toastr.error("请先选择一行后再修改");
+                return;
+            }
+            utils.loadObjData($("#itemFm"), rows[0]);
+            $("#itemModal").modal("show");
+        });
+
+        $("#saveBt").on("click", function () {
+            var item = utils.getFormObj($("#itemFm"));
+            if (item.latest_arrive_date == "") {
+                toastr.error("最晚到货期不能为空");
+                return;
+            }
+            if (item.using_speed == "") {
+                toastr.error("使用频率不能为空");
+                return;
+            }
+            if (item.order_period == "") {
+                toastr.error("订购周期不能为空");
+                return;
+            }
+            if (item.usage == "") {
+                toastr.error("订购用途不能为空");
+                return;
+            }
+
+
+            if (item.entry_no == 0) {
+                //新增
+                item.entry_no = items.length + 1;
+                item.isDeleted = 0;
+                items.push(item);
+            } else {
+                //更新
+                item.isDeleted = 0;
+                items[item.entry_no - 1] = item;
+            }
+
+            loadTableItems();
+
+            $("#itemModal").modal("hide");
+        });
+
+        //$("#removeBt").on("click", function () {
+        //    var rows = $('#tb').bootstrapTable('getSelections');
+        //    if (rows.length == 0) {
+        //        toastr.error("请先选择一行后再删除");
+        //        return;
+        //    }
+        //    openConfirmDialog("确定要删除选中的行吗？", function () {
+        //        items[rows[0].entry_no - 1].isDeleted = 1;
+        //        loadTableItems();
+        //    });
+        //});
+
+        $("#checkQtyBt").on("click", function () {
+            var rows = $('#tb').bootstrapTable('getSelections');
+            if (rows.length == 0) {
+                toastr.error("请先选择一行后再查询");
+                return;
+            }
+            $('#qty_tb').bootstrapTable('load', []);
+            qtyModalParam.item_no = rows[0].item_no; @*212382*@
+            $("#qtyModal").modal("show");
+            $("#qty_item_info").html("物料名称：" + rows[0].item_name + " ；规格型号：" + rows[0].item_modual);
+        });
+
+        $("#query_qty_btn").on("click",function(){
+            qtyModalParam.begin_date=$("#begin_date").val();
+            qtyModalParam.end_date=$("#end_date").val();
+            qtyModalParam.bus_name = $("#bus_name").val();
+
+            if(qtyModalParam.begin_date=="") return;
+            if(qtyModalParam.end_date=="") return;
+            if (qtyModalParam.item_no == "") return;
+            if (qtyModalParam.bus_name == "") {
+                toastr.error("请先选择事业部");
+                return;
+            }
+
+            $.post("@Url.Content("~/Item/GetAPQtyHistory")",{
+                itemNumber: qtyModalParam.item_no,
+                busName:qtyModalParam.bus_name,
+                beginDate:qtyModalParam.begin_date,
+                endDate:qtyModalParam.end_date
+            },function(data){
+                if(data.suc){
+                    var itemQtyInfo=JSON.parse(data.extra);
+                    $('#qty_tb').bootstrapTable('load', itemQtyInfo);
+                    toastr.success("查询成功，行数：" + itemQtyInfo.length);
+                }else{
+                    toastr.error(data.msg);
+                }
+            });
+        });
+
+        $("#checkStockBt").on("click", function () {
+            var rows = $('#tb').bootstrapTable('getSelections');
+            if (rows.length == 0) {
+                toastr.error("请先选择一行后再查询");
+                return;
+            }
+            $('#stock_tb').bootstrapTable('load', []);            
+
+            $.post("@Url.Content("~/Item/GetItemStockQtyFromK3")",{
+                itemNumber: rows[0].item_no
+            },function(data){
+                if (data.suc) {
+                    var stockInfo = JSON.parse(data.extra);
+                    $('#stock_tb').bootstrapTable('load', stockInfo);
+                    $("#stock_item_info").html("物料名称：" + stockInfo[0].item_name + " ；规格型号：" + stockInfo[0].item_modual);
+                    $("#stockModal").modal("show");
+                }else{
+                    toastr.error(data.msg);
+                }
+            });
+        });
+
+        if ("@m.ap.account" != "") {
+            $("#account").val("@m.ap.account");
+            $("#account").trigger("change"); //需要手动触发change事件
+        }
+
+        function loadTableItems() {
+            console.log(items);
+            $('#tb').bootstrapTable('load', items.filter(function (i) { return i.isDeleted == 0;}));
+        }
+
+        function loadK3PO(k3Account,poNumber) {
+            $.post("@Url.Content("~/Item/GetPOInfoFromK3")", {account:k3Account,poNumber:poNumber}, function (data) {
+                if (data.suc) {
+                    items = JSON.parse(data.extra);
+                    for (var i = 0; i < items.length; i++) {
+                        items[i].entry_no = i + 1;
+                        items[i].isDeleted = 0;
+                        items[i].latest_arrive_date = utils.parseTDate(items[i].latest_arrive_date);
+                    }
+                    loadTableItems();
+                    toastr.success("成功加载K3数据");
+                } else {
+                    toastr.error(data.msg);
+                }
+            })
+        }
+
+    });
+
+</script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Home/NoPaperProcess")">无纸化流程</a></li>
+            <li><a href="ApplyIndex?billType=AP">辅料订购申请</a></li>
+            <li class="active">开始申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <form id="apFm">
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请流水号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="sys_no" id="sysNum" value="@m.ap.sys_no" readonly />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            联系电话:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="applier_phone" value="@m.ap.applier_phone" />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            公司:
+                        </span>
+                        <div class="b-input">
+                            <select class="form-control" name="account" id="account">
+                                <option value="">---- 下拉选择公司 ----</option>
+                                @foreach (var d in accountList) {                                    
+                                    <option value="@d">@d</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            事业部:
+                        </span>
+                        <div class="b-input">
+                            <select class="form-control" name="bus_name" id="bus_name">
+                                <option value="">---- 下拉选择事业部 ----</option>                                
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请部门:
+                        </span>
+                        <div class="b-input">
+                            <select class="form-control" name="dep_name" id="dep_name">
+                                <option value="">---- 下拉选择部门 ----</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            备注:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="comment" />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            部门主管:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control selectUser" name="charger_no" value="@(string.IsNullOrEmpty(m.ap.charger_no) ? "" : string.Format("{0}({1})", m.ap.charger_name, m.ap.charger_no))" />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            物控:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control selectUser" name="controller_no" value="@(string.IsNullOrEmpty(m.ap.controller_no) ? "" : string.Format("{0}({1})", m.ap.controller_name, m.ap.controller_no))" />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            部长:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control selectUser" name="minister_no" value="@(string.IsNullOrEmpty(m.ap.minister_no) ? "" : string.Format("{0}({1})", m.ap.minister_name, m.ap.minister_no))" />
+                        </span>
+                    </div>
+                </div>      
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            PR单号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="po_number" id="po_number" placeholder="输入K3中的PR单号" />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            K3账套:
+                        </span>
+                        <span class="b-input">
+                            <select class="form-control" name="k3_account" id="k3_account">
+                                <option value="">---- 选择PR单所在账套 ----</option>
+                                @foreach (var d in k3AccountList) {                                    
+                                    <option value="@d">@d</option>
+                                }
+                            </select>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="b-div">
+                <span class="b-label">
+                    订料明细:
+                </span>
+                <div class="b-input">
+                    <button class="btn btn-success btn-sm" type="button" id="addBt"> <i class="fa fa-plus"></i> 从K3导入</button>
+                    <button class="btn btn-primary btn-sm" type="button" id="editBt" title="双击数据行也可修改"> <i class="fa fa-edit"></i> 修改 </button>
+                    <button class="btn btn-info btn-sm" type="button" id="checkQtyBt"> <i class="fa fa-search"></i> 历史申请数量</button>
+                    <button class="btn btn-danger btn-sm" type="button" id="checkStockBt"> <i class="fa fa-th"></i> 查询即时库存</button>
+                </div>
+            </div>
+            <table data-toggle="table" id="tb">                
+            </table>
+            <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:12px;"><i class="fa fa-check-circle-o"></i> 提交申请</button>
+        </form>
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_SelectUsers")
+    <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">新增明细</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="itemFm">
+                        <div class="row">
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon">物料代码:</div>
+                                        <input type="text" class="form-control" id="item_no" name="item_no" readonly />
+                                        <input type="hidden" name="item_id" id="item_id" />
+                                        <input type="hidden" name="entry_no" value="0"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon">物料名称:</div>
+                                        <input type="text" class="form-control" id="item_name" name="item_name" readonly placeholder="输入物料代码后自动带出" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon">规格型号:</div>
+                                        <input type="text" class="form-control" id="item_modual" name="item_modual" readonly placeholder="输入物料代码后自动带出" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon" style="padding-left:40px;">数量:</div>
+                                        <input type="text" class="form-control" id="qty" name="qty" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon" style="padding-left:40px;">单位:</div>
+                                        <input type="text" class="form-control" id="unit_name" name="unit_name" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xs-12">
+                                
+                                <div class="form-group">   
+                                    <div class="input-group date datePicker" id="datePicker3">
+                                        <span class="input-group-addon">最晚到货期:</span>
+                                        <input class="form-control" type="text" id="latest_arrive_date" name="latest_arrive_date" autocomplete="off" readonly />
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon" style="padding-left:40px;">品牌:</div>
+                                        <input type="text" class="form-control" id="brand" name="brand" placeholder="选填" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon">使用频率:</div>
+                                        <input type="text" class="form-control" id="using_speed" name="using_speed" required placeholder="必填，例如1000张/月" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon">订购周期:</div>
+                                        <input type="text" class="form-control" id="order_period" name="order_period" required placeholder="必填，例如30天" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon">订购用途:</div>
+                                        <input type="text" class="form-control" id="usage" name="usage" required placeholder="必填" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 取消</button>
+                    <button type="button" class="btn btn-success" id="saveBt"><span class="fa fa-check-circle"></span> 确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="qtyModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">查看历史数量</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-5" style="padding-right:2px;">
+                            <div class="form-group">
+                                <div class="input-group date datePicker" id="datePicker1">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                                    <input class="form-control" type="text" id="begin_date" name="begin_date" autocomplete="off" placeholder="开始日期" readonly value="@(DateTime.Now.AddMonths(-3).ToString("yyyy-MM-01"))" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-5" style="padding-left:2px;">
+                            <div class="form-group">
+                                <div class="input-group date datePicker" id="datePicker2">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                                    <input class="form-control" type="text" id="end_date" name="end_date" autocomplete="off" placeholder="结束日期" readonly value="@(DateTime.Now.ToString("yyyy-MM-dd"))" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-2">
+                            <button type="button" class="btn btn-default btn-block" id="query_qty_btn"><i class="fa fa-search text-danger"></i> </button>
+                        </div>
+                    </div>
+                    <div class="text-danger small"><i class="fa fa-info-circle"></i> <span id="qty_item_info"></span></div>
+                    <hr style="margin-top:4px;" />
+                    <table id="qty_tb"></table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="stockModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">查看即时库存</h4>
+                </div>
+                <div class="modal-body">     
+                    <div class="text-danger small"><i class="fa fa-info-circle"></i> <span id="stock_item_info"></span></div>
+                    <hr style="margin-top:4px;" />               
+                    <table id="stock_tb"></table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

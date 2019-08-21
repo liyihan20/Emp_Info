@@ -1,0 +1,558 @@
+﻿@using EmpInfo.Models;
+@using Newtonsoft.Json;
+@{
+    BeginAuditModel bam = (BeginAuditModel)ViewData["bam"];
+    APCheckApplyModel m = (APCheckApplyModel)bam.otherInfo;
+    JsonSerializerSettings setting = new JsonSerializerSettings();
+    setting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+
+    var h = m.ap;
+    var entryJson = JsonConvert.SerializeObject(m.entrys, setting);
+
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: middle;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+
+        .op_bt {
+            cursor: pointer;
+        }
+    </style>
+
+}
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+        var qtyModalParam={item_no:"",bus_name:"@h.bus_name",begin_date:"",end_date:""};
+        $("#tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: false,
+            idField: "entry_no",
+            data:@Html.Raw(entryJson),
+            columns: [
+                {
+                    field: "entry_no",
+                    title: "行号",
+                    align:"center"
+                }, {
+                    field: "item_no",
+                    title: "物料代码"
+                }, {
+                    field: "item_name",
+                    title:"物料名称"
+                }, {
+                    field: "item_modual",
+                    title: "规格型号"
+                }, {
+                    field: "item_id",
+                    visible: false
+                }, {
+                    field: "qty",
+                    title: "数量"
+                }, {
+                    field: "real_qty",
+                    title: "实际数量",
+                    cellStyle:function(value,row,index,field){
+                        if(value != row.qty){
+                            return {css:{color:'red'}};
+                        }else{
+                            return {css:{color:'black'}};
+                        }
+                    }
+                }, {
+                    field: "unit_name",
+                    title: "单位"
+                }, {
+                    field: "brand",
+                    title: "品牌"
+                }, {
+                    field: "latest_arrive_date",
+                    title: "最晚到货期",
+                    formatter:function(value,row,index,field){
+                        return utils.parseTDate(value);
+                    }
+                }, {
+                    field: "using_speed",
+                    title:"使用频率"
+                }, {
+                    field: "order_period",
+                    title: "订购周期"
+                }, {
+                    field: "usage",
+                    title: "订购用途"
+                },{
+                    field:"oprate",
+                    title:"操作按钮",
+                    align:"center",
+                    formatter:function(value,row,index,field){
+                        var bts = [];
+                        if("@bam.stepName".indexOf("PR处理")<0){
+                            bts.push("<i class='fa fa-pencil op_bt text-success' onclick='editQty("+row.entry_no+","+row.real_qty+","+index+")' title='修改数量'></i>");
+                        }
+                        bts.push("<i class='fa fa-search op_bt text-danger' onclick='checkInfo(\""+row.item_no+"\",\""+row.item_name+"\",\""+row.item_modual.replace(/"/g,'#quot;')+"\")' title='历史记录'></i>");
+                        if("@bam.stepName" == "采购确认" || "@bam.stepName" == "总裁办审批" ){
+                            bts.push("<i class='fa fa-cny op_bt text-info' onclick='checkPrice("+row.item_id+",\""+row.item_name+"\",\""+row.item_modual.replace(/"/g,'#quot;')+"\")' title='历史价格'></i>");
+                        }
+                        bts.push("<i class='fa fa-th op_bt text-primary' onclick='checkStock("+"\""+row.item_no+"\")' title='即时库存'></i>");
+                        return bts.join(" | ");
+                    }
+                }
+            ]
+        });
+
+        $("#qty_tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: false,
+            columns: [
+                {
+                    field: "po_date",
+                    title: "订单日期",
+                    formatter:function(value,row,index,field){
+                        return utils.parseTDate(value);
+                    }
+                },{
+                    field: "account",
+                    title: "账套",
+                    align:"center"
+                }, {
+                    field: "dep_name",
+                    title: "申购部门"
+                }, {
+                    field: "qty",
+                    title:"订购数量"
+                }, {
+                    field: "transit_qty",
+                    title: "在途数量"
+                },  {
+                    field: "FBillNo",
+                    title: "订单编号"
+                }
+            ]
+        });
+
+        $("#stock_tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: false,
+            columns: [
+                {
+                    field: "stock_name",
+                    title: "仓库名"
+                }, {
+                    field: "qty",
+                    title: "库存量"
+                }, {
+                    field: "batch_no",
+                    title: "批次号"
+                }, {
+                    field: "bus_name",
+                    title: "事业部"
+                }
+            ]
+        });
+
+        function editQty(entry_no,qty,idx){
+            openInputDialog("当前数量是："+qty+"；请在下方输入需要修改的数量：",function(v){
+                if(isNaN(v)){
+                    toastr.error("输入的数量不是数字格式，保存失败");
+                    return;
+                }
+                $.post("@Url.Content("~/Item/UpdateApQty")",{sysNo:"@h.sys_no",entryNo:entry_no,qty:v},function(data){
+                    if(data.suc){
+                        toastr.success("数量修改成功");
+                        $('#tb').bootstrapTable('updateCell',{index: idx, field: 'real_qty', value: v});
+                    }else{
+                        toastr.error(data.msg);
+                    }
+                });
+
+            },"修改数量");
+        }
+
+        function checkInfo(item_no,item_name,item_modual){
+            $('#qty_tb').bootstrapTable('load',[]);
+            qtyModalParam.item_no=item_no;
+            $("#qtyModal").modal("show");
+            $("#qty_item_info").html("物料名称："+item_name+" ；规格型号："+item_modual.replace(/#quot;/g,'"'));
+        }
+
+        function checkPrice(item_id,item_name,item_modual){
+            if(item_id){
+                $.post("@Url.Content("~/Item/GetAPPriceHistory")",{itemId:item_id},function(data){
+                    if(data.suc){
+                        var history=JSON.parse(data.extra);
+                        var tb='<table style="width:100%;" cellspacing="4" cellpadding="4" class="price_tb">';
+                        tb+='<tr><td style="width:120px;"><i class="fa fa-caret-right fa-fw"></i> K3账套：</td><td>'+history.account+'</td></tr>';
+                        tb+='<tr><td><i class="fa fa-caret-right fa-fw"></i> 采购日期：</td><td>'+utils.parseTDate(history.po_date)+'</td></tr>';
+                        tb+='<tr><td><i class="fa fa-caret-right fa-fw"></i> 采购单号：</td><td>'+history.bill_no+'</td></tr>';
+                        tb+='<tr><td><i class="fa fa-caret-right fa-fw"></i> 供应商：</td><td>'+history.supplier_name+'</td></tr>';
+                        tb+='<tr><td><i class="fa fa-caret-right fa-fw"></i> 物料名称：</td><td>'+item_name+'</td></tr>';
+                        tb+='<tr><td><i class="fa fa-caret-right fa-fw"></i> 规格型号：</td><td>'+item_modual.replace(/#quot;/g,'"')+'</td></tr>';
+                        tb+='<tr><td><i class="fa fa-caret-right fa-fw"></i> 价格：</td><td>'+history.price+'</td></tr>';
+                        tb+='<tr><td><i class="fa fa-caret-right fa-fw"></i> 税率：</td><td>'+history.tax_rate+'%</td></tr>';
+                        tb+='</table>';
+                        openMessageDialog(tb,'历史价格信息');
+                        $(".price_tb tr td:odd").addClass("text-danger");
+                    } else{
+                        toastr.error(data.msg);
+                    }
+                });
+            }
+        }
+
+        function checkStock(item_number){
+            $('#stock_tb').bootstrapTable('load', []);            
+
+            $.post("@Url.Content("~/Item/GetItemStockQtyFromK3")",{
+                itemNumber: item_number
+            },function(data){
+                if (data.suc) {
+                    var stockInfo = JSON.parse(data.extra);
+                    $('#stock_tb').bootstrapTable('load', stockInfo);
+                    $("#stock_item_info").html("物料名称：" + stockInfo[0].item_name + " ；规格型号：" + stockInfo[0].item_modual);
+                    $("#stockModal").modal("show");
+                }else{
+                    toastr.error(data.msg);
+                }
+            });
+        }
+
+        $(function(){
+            $("#datePicker1,#datePicker2").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd",
+                autoclose: true,
+                startView: 2,
+                minView: 2
+            });
+
+            $("#query_qty_btn").on("click",function(){
+                qtyModalParam.begin_date=$("#begin_date").val();
+                qtyModalParam.end_date=$("#end_date").val();
+
+                if(qtyModalParam.begin_date=="") return;
+                if(qtyModalParam.end_date=="") return;
+                if(qtyModalParam.item_no=="") return;
+                
+                $.post("@Url.Content("~/Item/GetAPQtyHistory")",{
+                    itemNumber:qtyModalParam.item_no,
+                    busName:qtyModalParam.bus_name,
+                    beginDate:qtyModalParam.begin_date,
+                    endDate:qtyModalParam.end_date
+                },function(data){
+                    if(data.suc){                        
+                        var itemQtyInfo=JSON.parse(data.extra);
+                        $('#qty_tb').bootstrapTable('load', itemQtyInfo);
+                        toastr.success("查询成功，行数：" + itemQtyInfo.length);
+                    }else{
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+
+
+
+        })
+
+    </script>
+    <script>
+
+        function audit(isPass) {
+            openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此申请吗？", function () {
+                var poNumber = "";
+                if ("@bam.stepName" == "PR处理") {
+                    poNumber = $("#poNumber").val();
+                }
+                $.post("HandleApply", {
+                    sysNo: "@bam.sysNum",
+                    step: "@bam.step",
+                    stepName:"@bam.stepName",
+                    isPass: isPass,
+                    opinion: $("#opinion").val(),
+                    poNumber: poNumber
+                }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+        }
+    </script>
+    @if (bam.isPass != null) {
+        <script>
+            $(function () {
+                $("#opinion").prop("readonly", "readonly").prop("placeholder", "");
+                $("#opinion").val("@bam.opinion");
+            });
+        </script>
+    }
+
+}
+@*通过load获取申请单内容*@
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li class="active">处理辅料订购申请单</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请流水号:
+                    </span>
+                    <span class="b-input">
+                        @h.sys_no 
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请时间:
+                    </span>
+                    <span class="b-input">
+                        @(((DateTime)h.apply_time).ToString("yyyy-MM-dd HH:mm"))
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请人:
+                    </span>
+                    <span class="b-input">
+                        @h.applier_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        联系电话:
+                    </span>
+                    <span class="b-input">
+                        @h.applier_phone
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        公司:
+                    </span>
+                    <div class="b-input">
+                        @h.account
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        事业部:
+                    </span>
+                    <div class="b-input">
+                        @h.bus_name
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请部门:
+                    </span>
+                    <div class="b-input">
+                        @h.dep_name
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        备注:
+                    </span>
+                    <span class="b-input">
+                        @h.comment
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        部门主管:
+                    </span>
+                    <span class="b-input">
+                        @(string.IsNullOrEmpty(h.charger_no) ? "" : string.Format("{0}({1})", h.charger_name, h.charger_no))
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        物控:
+                    </span>
+                    <span class="b-input">
+                        @(string.IsNullOrEmpty(h.controller_no) ? "" : string.Format("{0}({1})", h.controller_name, h.controller_no))
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        部长:
+                    </span>
+                    <span class="b-input">
+                        @(string.IsNullOrEmpty(h.minister_no) ? "" : string.Format("{0}({1})", h.minister_name, h.minister_no))
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        PR单号:
+                    </span>
+                    <span class="b-input">
+                        @h.po_number
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        K3账套:
+                    </span>
+                    <span class="b-input">
+                        @h.k3_account
+                    </span>
+                </div>
+            </div>
+            
+        </div>
+
+
+        <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">订料明细</h4>
+        <table data-toggle="table" id="tb"></table>
+    </div>
+</div>
+
+@*审批信息*@
+<div class="auditContent">
+    <div class="panel panel-primary">
+        <div class="panel-heading" id="auditHead">
+            <i class='fa fa-pencil'></i> 开始审批
+        </div>
+        <div class="panel-body">            
+            <textarea class="form-control" rows="2" id="opinion" placeholder="请在此处输入审核意见" style="margin-top:6px;"></textarea>
+            <div style="margin-top:12px;"></div>
+            @if (bam.isPass == null) {
+                <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
+                    </div>
+                </div>
+            }
+            else if ((bool)bam.isPass) {
+                <button type="button" class="btn btn-block btn-success disabled">已同意此申请</button>
+            }
+            else {
+                <button type="button" class="btn btn-block btn-danger disabled">已拒绝此申请</button>
+            }
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_InputDialog")
+    @Html.Partial("_MessageDialog")
+
+    <div class="modal fade" id="qtyModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">查看历史数量</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-5" style="padding-right:2px;">
+                            <div class="form-group">
+                                <div class="input-group date" id="datePicker1">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                                    <input class="form-control" type="text" id="begin_date" name="begin_date" autocomplete="off" placeholder="开始日期" readonly value="@(DateTime.Now.AddMonths(-3).ToString("yyyy-MM-01"))" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-5" style="padding-left:2px;">
+                            <div class="form-group">
+                                <div class="input-group date" id="datePicker2">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                                    <input class="form-control" type="text" id="end_date" name="end_date" autocomplete="off" placeholder="结束日期" readonly value="@(DateTime.Now.ToString("yyyy-MM-dd"))" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-2">
+                            <button type="button" class="btn btn-default btn-block" id="query_qty_btn"><i class="fa fa-search text-danger"></i> </button>
+                        </div>
+                    </div>
+                    <div class="text-danger small"><i class="fa fa-info-circle"></i> <span id="qty_item_info"></span></div>
+                    <hr style="margin-top:4px;" />
+                    <table id="qty_tb"></table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="stockModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">查看即时库存</h4>
+                </div>
+                <div class="modal-body">     
+                    <div class="text-danger small"><i class="fa fa-info-circle"></i> <span id="stock_item_info"></span></div>
+                    <hr style="margin-top:4px;" />               
+                    <table id="stock_tb"></table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

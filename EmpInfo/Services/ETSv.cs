@@ -98,6 +98,11 @@ namespace EmpInfo.Services
             if (string.IsNullOrEmpty(bill.responsibility)) throw new Exception("责任备注不能为空");
             if (string.IsNullOrEmpty(bill.transfer_style)) throw new Exception("运输方式不能为空");
 
+            var userDep = db.vw_ei_users.Where(u => u.card_number == userInfo.cardNo).FirstOrDefault().dep_name;
+            if (userDep != null && userDep.Contains("市场部") && "其它".Equals(bill.market_name)) {
+                throw new Exception("营业员请选择正确的市场部，不能选择其它");
+            }
+
             bill.applier_name = userInfo.name;
             bill.applier_num = userInfo.cardNo;
             bill.apply_time = DateTime.Now;
@@ -119,7 +124,7 @@ namespace EmpInfo.Services
             }
             else {
                 throw new Exception("申请提交失败，原因：" + result.msg);
-            }           
+            }
 
         }
 
@@ -139,7 +144,7 @@ namespace EmpInfo.Services
             bool isPass = bool.Parse(fc.Get("isPass"));
             string opinion = fc.Get("opinion");
 
-            if (stepName.Equals("物流填写信息")) {
+            if (stepName.Equals("物流填写信息") && isPass) {
                 string deliveryCompany = fc.Get("deliveryCompany");
                 string normalFee = fc.Get("normalFee");
                 string applyFee = fc.Get("applyFee");

@@ -18,16 +18,8 @@ namespace EmpInfo.Controllers
         public ActionResult Index()
         {
             WriteEventLog("主界面", "打开主页");
-            ViewData["username"] = userInfo.name;
-            var auts = (from a in db.ei_authority
-                        from g in db.ei_groups
-                        from gu in g.ei_groupUser
-                        from ga in g.ei_groupAuthority
-                        where ga.authority_id == a.id
-                        && gu.user_id == userInfo.id
-                        select a.en_name).Distinct().ToArray();
-            string autStr = string.Join(",", auts);
-            ViewData["autStr"] = autStr;
+            ViewData["username"] = userInfo.name;            
+            ViewData["autStr"] = MyPowers();
 
             if ("06022701".Equals(userInfo.cardNo)) {
                 //审计来，吉全界面调整
@@ -587,23 +579,21 @@ namespace EmpInfo.Controllers
 
         [SessionTimeOutFilter]
         public ActionResult WorkGroupIndex()
-        {
-            var auts = (from a in db.ei_authority
-                        from g in db.ei_groups
-                        from gu in g.ei_groupUser
-                        from ga in g.ei_groupAuthority
-                        where ga.authority_id == a.id
-                        && gu.user_id == userInfo.id
-                        select a.en_name).Distinct().ToArray();
-            string autStr = string.Join(",", auts);
-            ViewData["autStr"] = autStr;            
-
+        {            
+            ViewData["autStr"] = MyPowers();
             return View();
         }
 
         [SessionTimeOutFilter]
         public ActionResult EleProcess()
         {            
+            return View();
+        }
+
+        [SessionTimeOutFilter]
+        public ActionResult NoPaperProcess()
+        {
+            ViewData["autStr"] = MyPowers();
             return View();
         }
 

@@ -7,6 +7,7 @@ using EmpInfo.Models;
 using EmpInfo.Util;
 using EmpInfo.Filter;
 using EmpInfo.Services;
+using Newtonsoft.Json;
 
 namespace EmpInfo.Controllers
 {
@@ -105,18 +106,55 @@ namespace EmpInfo.Controllers
             }
             return Json(list);
         }
-        
+
+        //人事系统的部门树
+        public JsonResult GetHRDepartmentTree()
+        {
+            var list = new List<Department>();
+            var deps = db.vw_hr_department.ToList();
+            foreach (var d in db.vw_hr_department.Where(h=>h.id==1661).ToList()) {
+                list.Add(GetHRDepartment(deps, d.id));
+            }
+            
+            return Json(list);
+        }
+        //获取人事系统的部门
+        private Department GetHRDepartment(List<vw_hr_department> deps, int rootId)
+        {
+            var rootDep = deps.Single(e => e.id == rootId);
+            Department dep = new Department();
+            dep.text = rootDep.short_name;
+            dep.tags = new string[] { rootDep.id.ToString(), rootDep.id.ToString() };
+            dep.selectable = true;            
+
+            dep.nodes = new List<Department>();
+            foreach (var child in deps
+                .Where(e => e.parent_id == rootId)
+                .OrderBy(e => e.id).ToList()) {
+                dep.nodes.Add(GetHRDepartment(deps, child.id)); //递归获取子节点
+            }
+            if (dep.nodes.Count() == 0) {
+                dep.nodes = null; //没有子节点
+            }
+            return dep;
+        }
+
+
         //获取k3的客户名称，通过客户编码
         public JsonResult GetK3CustomerName(string customerNumber, string company)
         {
-            var list = db.GetK3CustomerNameByNum(customerNumber, company).ToList();
-            if (list.Count() < 1) {
-                return Json(new SimpleResultModel() { suc = false, msg = "客户不存在，请确认客户编码是否正确" });
+            try {
+                var list = db.GetK3CustomerNameByNum(customerNumber, company).ToList();
+                if (list.Count() < 1) {
+                    return Json(new SimpleResultModel() { suc = false, msg = "客户不存在，请确认客户编码是否正确" });
+                }
+                else {
+                    return Json(new SimpleResultModel() { suc = true, extra = list.First() });
+                }
             }
-            else {
-                return Json(new SimpleResultModel() { suc = true, extra = list.First() });
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
             }
-
         }
 
         /// <summary>
@@ -139,6 +177,152 @@ namespace EmpInfo.Controllers
         public JsonResult GetETCustomerAddr(string customerNumber, string company)
         {
             return Json(new ETSv().getCustomerAddr(customerNumber, company));
+        }
+
+        /// <summary>
+        /// 通过K3代码获取名称、型号和单位
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="itemNo"></param>
+        /// <returns></returns>
+        public JsonResult GetK3ItemByNo(string account, string itemNo)
+        {
+            var result = db.GetK3Item(account, itemNo).ToList();
+            if (result.Count() > 0) {
+                return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(result.First()) });
+            }
+            else {
+                return Json(new SimpleResultModel() { suc = false });
+            }
+        }
+
+        /// <summary>
+        /// 辅料订购流程中的事业部和申购部门
+        /// </summary>
+        /// <param name="account"></param>
+        /// <returns></returns>
+        public JsonResult GetApBusAndDepNameInK3(string account)
+        {
+            var result = db.GetApBusAndDepNamesInK3(account).ToList();
+            if (result.Count() > 0) {
+                return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(result) });
+            }
+            else {
+                return Json(new SimpleResultModel() { suc = false });
+            }
+        }
+
+        /// <summary>
+        /// 辅料订购流程的审核人员都可以修改订料数量
+        /// </summary>
+        /// <param name="sysNo"></param>
+        /// <param name="entryNo"></param>
+        /// <param name="qty"></param>
+        /// <returns></returns>
+        public JsonResult UpdateApQty(string sysNo, int entryNo, decimal qty)
+        {
+            try {
+                var ap = new APSv(sysNo);
+                ap.UpdateQty(entryNo, qty,userInfo.name);
+                return Json(new SimpleResultModel() { suc = true });
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = "保存失败：" + ex.Message });
+            }
+        }
+
+
+        public JsonResult GetAPPriceHistory(int itemId)
+        {
+            try {
+                var result = new APSv().GetItemPriceHistory(itemId);
+                if (result != null) {
+                    return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(result) });
+                }
+                else {
+                    return Json(new SimpleResultModel() { suc = false, msg = "找不到相关的采购订单历史记录" });
+                }
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+        }
+
+        public JsonResult GetAPQtyHistory(string itemNumber, string busName, string beginDate, string endDate)
+        {
+            DateTime bd, ed;
+            if (!DateTime.TryParse(beginDate, out bd)) {
+                return Json(new SimpleResultModel() { suc = false, msg = "开始日期不合法" });
+            }
+            if (!DateTime.TryParse(endDate, out ed)) {
+                return Json(new SimpleResultModel() { suc = false, msg = "结束日期不合法" });
+            }
+            try {
+                var result = new APSv().GetItemQtyHistory(itemNumber, busName, bd, ed);
+                if (result.Count() > 0) {
+                    return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(result) });
+                }
+                else {
+                    return Json(new SimpleResultModel() { suc = false, msg = "当前查询条件找不到相关的采购订单历史记录" });
+                }
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+        }
+
+        public JsonResult GetPOInfoFromK3(string account, string poNumber)
+        {
+            try {
+                var result = new APSv().GetPOInfoFromK3(account, poNumber);
+                if (result.Count() < 1) {
+                    return Json(new SimpleResultModel() { suc = false, msg = "找不到符合条件的采购订单" });
+                }
+                return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(result) });
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+        }
+
+        public JsonResult GetItemStockQtyFromK3(string itemNumber)
+        {
+            try {
+                var result = new APSv().GetItemStockQtyFromK3(itemNumber);
+                if (result.Count() < 1) {
+                    return Json(new SimpleResultModel() { suc = false, msg = "此物料当前在各事业部不存在库存" });
+                }
+                return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(result) });
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+        }
+
+        public JsonResult GetHREmpInfoDetail(string cardNumber)
+        {
+            try {
+                var result = db.GetHREmpInfoDetail(cardNumber).FirstOrDefault();
+                if (result == null) {
+                    return Json(new SimpleResultModel() { suc = false, msg = "获取不到此厂牌的人事系统信息" });
+                }
+                return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(result) });
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+        }
+
+        public string test()
+        {
+            //foreach (var l in db.k3_database.Where(d=>!d.account_name.Contains("总部")).ToList()) {
+            //    var result = db.Database.SqlQuery<string>(string.Format("select 1 from [{0}].{1}.dbo.poorderentry where fdate is null", l.server_ip, l.database_name)).ToList();
+            //    if(result.Count()<1){
+            //        return l.account_name;
+            //    }
+            //}
+
+            return "OK";
         }
 
     }

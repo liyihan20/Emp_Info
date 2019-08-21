@@ -80,6 +80,18 @@ namespace EmpInfo.Services
             return cards;
         }
 
+        //根据姓名(厂牌)取得姓名
+        protected string GetUserNameByNameAndCardNum(string nameAndCards)
+        {
+            if (string.IsNullOrEmpty(nameAndCards)) return "";
+            string names = "";
+            foreach (var num in nameAndCards.Split(new char[] { ';', '；' }, StringSplitOptions.RemoveEmptyEntries)) {
+                if (!string.IsNullOrEmpty(names)) names += ";";
+                names += num.Split(new char[] { '(', ')' })[0];
+            }
+            return names;
+        }
+
         //根据厂牌获取邮箱
         protected string GetUserEmailByCardNum(string cardNumbers)
         {
@@ -102,6 +114,9 @@ namespace EmpInfo.Services
             var dep = db.ei_department.Single(d => d.FNumber == depNum);
             if (dep.FIsDeleted == true) {
                 return "已删除部门";
+            }
+            else if (dep.FIsForbit == true) {
+                return "已禁用部门";
             }
 
             string depName = dep.FName;

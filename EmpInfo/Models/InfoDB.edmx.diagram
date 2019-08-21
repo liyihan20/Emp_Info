@@ -93,6 +93,14 @@
         <EntityTypeShape EntityType="ICAuditModel.vw_ETReport" Width="1.5" PointX="2.375" PointY="12.875" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.flow_notifyUsers" Width="1.5" PointX="8.25" PointY="13" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_vacationDays" Width="1.5" PointX="4.125" PointY="12.125" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_apQtyChangeLog" Width="1.5" PointX="2.375" PointY="13.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_hr_department" Width="1.5" PointX="12.625" PointY="3.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.k3_database" Width="1.5" PointX="10.75" PointY="4.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_apApply" Width="1.5" PointX="0.5" PointY="13.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_apApplyEntry" Width="1.5" PointX="0.5" PointY="14.375" IsExpanded="false" />
+        <AssociationConnector Association="ICAuditModel.FK_ei_apApplyEntry_ei_apApply" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_APExcel" Width="1.5" PointX="2.375" PointY="14.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_jqApply" Width="1.5" PointX="6" PointY="14.375" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -236,8 +236,8 @@ namespace EmpInfo.Services
                     if (bill.confirm_time == null) {
                         return new SimpleResultModel() { suc = false, msg = "【处理完成时间】必须填写" };
                     }
-                    if (bill.confirm_time <= bill.accept_time) {
-                        return new SimpleResultModel() { suc = false, msg = "【处理完成时间】必须晚于【接单时间】" };
+                    if (bill.confirm_time <= bill.report_time) {
+                        return new SimpleResultModel() { suc = false, msg = "【处理完成时间】必须晚于【报修时间】" };
                     }
                     if (bill.confirm_time > DateTime.Now) {
                         return new SimpleResultModel() { suc = false, msg = "【处理完成时间】不能晚于当前时间" };
@@ -286,9 +286,8 @@ namespace EmpInfo.Services
                 bool managerPass = bool.Parse(fc.Get("managerPass"));
                 MyUtils.SetFieldValueToModel(fc, bill);
 
-                if (managerPass) {
-                    bill.grade_time = DateTime.Now;
-
+                bill.grade_time = DateTime.Now; //即使拒接，评分时间也要设置，用于超时报表
+                if (managerPass) {  
                     if (string.IsNullOrEmpty(bill.faulty_reason)) {
                         return new SimpleResultModel() { suc = false, msg = "【故障原因】必须填写" };
                     }
@@ -438,6 +437,7 @@ namespace EmpInfo.Services
             //初步筛选出处理时间大于1天的记录
             var record = (from e in db.ei_epApply
                           where e.grade_time != null
+                          && e.difficulty_score != null
                           && e.report_time > beginTime
                           && e.report_time <= endTime
                           && EntityFunctions.DiffMinutes(e.grade_time, e.evaluation_time ?? DateTime.Now) > 24 * 60

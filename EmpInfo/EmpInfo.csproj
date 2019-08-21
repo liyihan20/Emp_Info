@@ -247,6 +247,15 @@
     <Compile Include="Models\ei_ALModifyLog.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_apApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_apApplyEntry.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_apQtyChangeLog.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_askLeave.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -310,6 +319,9 @@
     <Compile Include="Models\ei_groupUser.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_jqApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_k3RestLog.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -366,6 +378,15 @@
     <Compile Include="Models\GenTrulyDeliveryBill_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\GetApBusAndDepNamesInK3_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GetAPHistoryQty_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GetAPPriceHistory_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\GetDormFeeByMonth_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -375,10 +396,19 @@
     <Compile Include="Models\GetEmpDormInfo_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\GetHREmpInfoDetail_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\GetHREmpInfo_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\GetItemStockQtyFromK3_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\GetK3AccoutList_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GetK3Item_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetK3StockAccountList_Result.cs">
@@ -424,6 +454,9 @@
       <DependentUpon>InfoDB.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models\K3Models.cs" />
+    <Compile Include="Models\k3_database.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\laijq20161105_001_Result.cs">
       <DependentUpon>Canteen.tt</DependentUpon>
     </Compile>
@@ -454,6 +487,9 @@
     <Compile Include="Models\ValidateDormStatus_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\vw_APExcel.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\vw_askLeaveReport.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -479,6 +515,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_getAllhrEmp.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\vw_hr_department.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_leaving_days.cs">
@@ -511,12 +550,14 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="Services\ALSv.cs" />
+    <Compile Include="Services\APSv.cs" />
     <Compile Include="Services\BaseSv.cs" />
     <Compile Include="Services\BillSv.cs" />
     <Compile Include="Services\CRSv.cs" />
     <Compile Include="Services\DPSv.cs" />
     <Compile Include="Services\EPSv.cs" />
     <Compile Include="Services\ETSv.cs" />
+    <Compile Include="Services\JQSv.cs" />
     <Compile Include="Services\SASv.cs" />
     <Compile Include="Services\SVSv.cs" />
     <Compile Include="Services\UCSv.cs" />
@@ -722,6 +763,7 @@
     <Content Include="Content\images\book.png" />
     <Content Include="Content\images\box.png" />
     <Content Include="Content\images\bubble-sprite.png" />
+    <Content Include="Content\images\computer.png" />
     <Content Include="Content\images\dep.png" />
     <Content Include="Content\images\elepr.png" />
     <Content Include="Content\images\ep.png" />
@@ -748,6 +790,7 @@
     <Content Include="Content\images\index_bg.jpg" />
     <Content Include="Content\images\index_bg2.jpg" />
     <Content Include="Content\images\public_fund.png" />
+    <Content Include="Content\images\purchase.png" />
     <Content Include="Content\images\rc.png" />
     <Content Include="Content\images\repair.png" />
     <Content Include="Content\images\report.png" />
@@ -1038,6 +1081,7 @@
     <Content Include="Scripts\list.min.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\moment.js" />
+    <Content Include="Scripts\myJs.js" />
     <Content Include="Scripts\particles.js" />
     <Content Include="Scripts\placeholders.js" />
     <Content Include="Scripts\respond.min.js" />
@@ -1191,6 +1235,12 @@
     <Content Include="Views\Report\ETReport.cshtml" />
     <Content Include="Views\Item\PicAttachments.cshtml" />
     <Content Include="Views\Report\ExportAuditTimeExceedExcel.cshtml" />
+    <Content Include="Views\Home\NoPaperProcess.cshtml" />
+    <Content Include="Views\Apply\BeginApplyAP.cshtml" />
+    <Content Include="Views\Apply\CheckAPApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditAPApply.cshtml" />
+    <Content Include="Views\Report\APReport.cshtml" />
+    <Content Include="Views\Shared\_ProgressDialog.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

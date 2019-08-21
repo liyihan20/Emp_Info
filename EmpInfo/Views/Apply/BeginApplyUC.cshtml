@@ -339,7 +339,9 @@
                         <div class="b-input">
                             <select class="form-control" name="arrive_time">
                                 <option value="@DateTime.Now.ToString("yyyy-MM-dd 21:00")">@DateTime.Now.ToString("yyyy-MM-dd 21:00")</option>
-                                <option value="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 21:00")">@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 21:00")</option>                              
+                                <option value="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 21:00")">@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 21:00")</option>
+                                <option value="@DateTime.Now.AddDays(2).ToString("yyyy-MM-dd 21:00")">@DateTime.Now.AddDays(2).ToString("yyyy-MM-dd 21:00")</option>
+                                <option value="@DateTime.Now.AddDays(3).ToString("yyyy-MM-dd 21:00")">@DateTime.Now.AddDays(3).ToString("yyyy-MM-dd 21:00")</option>
                             </select>
                             <div class="text-danger small"><i class="fa fa-info-circle"></i> 指预计实物及数据到达物流中心的时间</div>
                         </div>

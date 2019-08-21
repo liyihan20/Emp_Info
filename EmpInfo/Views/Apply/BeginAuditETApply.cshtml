@@ -1,7 +1,7 @@
 ﻿@using EmpInfo.Models;
 @{
     BeginAuditModel bam = (BeginAuditModel)ViewData["bam"];
-    
+    var deliveryCompanyList = new List<string>() { "百世", "跨越", "恒骏", "顺丰", "邮政", "双亨", "冠粤", "荣鑫", "顺展", "捷易" };
 }
 @section CSS{
     <style type="text/css">
@@ -81,7 +81,7 @@
 <div class="text-center text-danger" id="waiting"><i class="fa fa-3x fa-spinner fa-pulse"></i></div>
 <div id="applyContent"></div>
 
-@*行政审批，需发送信息*@
+@*物流填写信息*@
 @if (bam.isPass == null && bam.stepName == "物流填写信息") {
     <div class="row auditContent" style="visibility:hidden;">
         <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12">
@@ -96,16 +96,10 @@
                         </span>
                         <span class="b-input">
                             <select class="form-control" id="dilivery_company">
-                                <option value="">---- 下拉选择货运公司 ----</option>                                                               
-                                <option value="百世">百世</option>
-                                <option value="跨越">跨越</option>
-                                <option value="恒骏">恒骏</option>
-                                <option value="顺丰">顺丰</option>
-                                <option value="邮政">邮政</option>                                                             
-                                <option value="双亨">双亨</option>
-                                <option value="冠粤">冠粤</option>
-                                <option value="荣鑫">荣鑫</option>
-                                <option value="顺展">顺展</option>
+                                <option value="">---- 下拉选择货运公司 ----</option>
+                                @foreach (var d in deliveryCompanyList) {
+                                    <option value="@d">@d</option>
+                                }                                
                             </select>
                         </span>
                     </div>
