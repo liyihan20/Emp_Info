@@ -1,0 +1,568 @@
+﻿@using EmpInfo.Models;
+@{
+    JQBeforeApplyModel m = ViewData["infoBeforeApply"] as JQBeforeApplyModel;
+    string[] yesNo = new string[] { "是", "否" };
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: middle;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 4px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+
+
+    <script>
+        $(function () {
+
+            $(".datePicker").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd",
+                autoclose: true,
+                startView: 2,
+                minView: 2,
+                initialDate: "@DateTime.Now.ToString("yyyy-MM-dd")"
+            });
+
+            //设置日期联动，结束日期不能大于起始日期
+            $("#dp1").on("changeDate", function (e) {
+                $('#dp2').datetimepicker('setStartDate', e.date);
+            });
+            $("#dp2").on("changeDate", function (e) {
+                $('#dp1').datetimepicker('setEndDate', e.date);
+            });
+
+            $("#card_number").on("blur", function () {
+                if ($("#card_number").val().length > 7) {
+                    getHREmpDetail();
+                } else {
+                    toastr.error("请输入正确的厂牌编号");
+                }
+            });
+
+            $("#quit_type").on("change", function () {
+                if ($(this).val() == "辞职") {
+                    $("#card_number").val("@m.applierNum");
+                    $("#card_number").attr("readonly", "readonly");
+                    getHREmpDetail();
+                    $("#autoQuit").hide();
+                    $("#normalQuit").show();
+                } else {
+                    $("#card_number").removeAttr("readonly");
+                    $("#autoQuit").show();
+                    $("#normalQuit").hide();
+                }
+            });
+
+            $(".selectUser").on("click", function () {
+                var self = this;
+                openSelectUserDialog($(self).val(), 3, function (result) {
+                    $(self).val(result);
+                });
+            });
+
+            $("#apply_bt").on("click", function () {
+                var obj = utils.getFormObj($("#fm"));
+                
+                if (obj.quit_type == "") {
+                    toastr.error("离职类别必须选择");
+                    return;
+                }
+                if (obj.card_number == "") {
+                    toastr.error("厂牌编码必须填写");
+                    return;
+                }
+
+                if (obj.quit_type == "辞职") {
+                    if (obj.card_number != "@m.applierNum") {
+                        toastr.error("辞职的必须由本人填写申请");
+                        return;
+                    }
+                    if (obj.quit_reason == "") {
+                        toastr.error("辞职原因必须填写");
+                        return;
+                    }                    
+                } else {
+                    if (obj.absent_from == "") {
+                        toastr.error("旷工开始日期必须填写");
+                        return;
+                    }
+                    if (obj.absent_to == "") {
+                        toastr.error("旷工结束日期必须填写");
+                        return;
+                    }
+                    if (obj.absent_days == "") {
+                        toastr.error("旷工天数必须填写");
+                        return;
+                    }
+                    if (isNaN(obj.absent_days)) {
+                        toastr.error("旷工天数必须是纯数字格式");
+                        return;
+                    }
+                    if (obj.has_connect_emp = "") {
+                        toastr.error("必须选择是否已联系到该员工");
+                        return;
+                    }
+                    if (obj.has_connect_family = "") {
+                        toastr.error("必须选择是否已联系到该员工家属");
+                        return;
+                    }
+                    if (obj.has_resign_apply = "") {
+                        toastr.error("必须选择是否已提交辞职申请表");
+                        return;
+                    }
+                }
+                if (obj.salary_type == "月薪") {
+                    if (obj.dep_charger_name == "") {
+                        toastr.error("必须选择部门负责人");
+                        return;
+                    }
+                    if (obj.highest_charger_name == "") {
+                        toastr.error("必须选择最高负责人");
+                        return;
+                    }
+                } else if (obj.salary_type == "计件") {
+                    if (obj.group_leader_name == "") {
+                        toastr.error("必须选择组长");
+                        return;
+                    }
+                    if (obj.charger_name == "") {
+                        toastr.error("必须选择主管");
+                        return;
+                    }
+                    if (obj.produce_minister_name == "") {
+                        toastr.error("必须选择生产部长");
+                        return;
+                    }
+                } else {
+                    toastr.error("只有月薪或计件的员工才能申请此流程");
+                    return;
+                }
+                
+                openConfirmDialog("确定要提交申请吗？", function () {
+                    $("#apply_bt").button("loading");
+                    $.ajax({
+                        type: 'post',
+                        url: 'SaveApply',
+                        data: $("#fm").serialize(),
+                        cache: false,
+                        dataType: 'json',
+                        success: function (data) {
+                            $("#apply_bt").button("reset");
+                            if (data.suc) {
+                                toastr.success("提交成功:" + data.msg);
+                                setTimeout(function () { window.location.href = "CheckApply?sysNo=" + obj.sys_no; }, 2000);
+                            } else {
+                                toastr.error("提交失败：" + data.msg);
+                                $("#apply_bt").button("reset");
+                            }
+
+                        }
+                    });
+                });
+            });
+
+        });
+
+        function getHREmpDetail() {
+            var num = $("#card_number").val();
+            $.post("@Url.Content("~/Item/GetHREmpInfoDetail")", { cardNumber: num }, function (data) {
+                if (data.suc) {
+                    var info = JSON.parse(data.extra);
+                    utils.loadObjData($("#fm"), info);
+                    if (info.salary_type == "计件") {
+                        $("#auditors1").show();
+                        $("#auditors2").hide();
+                    } else if (info.salary_type == "月薪") {
+                        $("#auditors2").show();
+                        $("#auditors1").hide();
+                    }
+
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+        }
+
+    </script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Home/NoPaperProcess")">无纸化流程</a></li>
+            <li><a href="ApplyIndex?billType=JQ">员工辞职/自离流程</a></li>
+            <li class="active">开始申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <form id="fm">
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请流水号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="sys_no" value="@m.sysNum" readonly />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            离职类型:
+                        </span>
+                        <div class="b-input">
+                            <select class="form-control" name="quit_type" id="quit_type">
+                                <option value="">---- 下拉选择离职类型 ----</option>
+                                @foreach (var d in new string[] { "辞职", "自离" }) {
+                                    <option value="@d">@d</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            厂牌编码:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="card_number" id="card_number" placeholder="辞职/自离员工厂牌编码" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            姓名:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="name" placeholder="填入厂牌编码后带出" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            性别:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="sex" placeholder="填入厂牌编码后带出" readonly />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            人事部门:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="dep_name" placeholder="填入厂牌编码后带出" readonly />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            职位:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="position" placeholder="填入厂牌编码后带出" readonly />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            工资类型:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="salary_type" placeholder="填入厂牌编码后带出" readonly />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            账号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="account" placeholder="填入厂牌编码后带出" readonly />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            学历:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="education" placeholder="填入厂牌编码后带出" readonly />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            籍贯:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="hometown" placeholder="填入厂牌编码后带出" readonly />
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            @*自离的*@
+            <div id="autoQuit" style="display:none;">
+                <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">自离调查</h4>
+                <div class="row">
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label" style="vertical-align:top;margin-top:6px;">
+                                旷工日期从:
+                            </span>
+                            <span class="b-input">
+                                <span class="input-group date datePicker" id="dp1">
+                                    <input class="form-control" type="text" id="absent_from" name="absent_from" autocomplete="off" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label" style="vertical-align:top;margin-top:6px;">
+                                旷工日期到：
+                            </span>
+                            <span class="b-input">
+                                <span class="input-group date datePicker" id="dp2">
+                                    <input class="form-control" type="text" id="absent_to" name="absent_to" autocomplete="off" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label" style="vertical-align:top;margin-top:6px;">
+                                旷工天数：
+                            </span>
+                            <span class="b-input">
+                                <span class="input-group">
+                                    <input class="form-control" type="text" id="absent_days" name="absent_days" />
+                                    <span class="input-group-addon">天</span>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                已联系到该员工:
+                            </span>
+                            <div class="b-input">
+                                <select class="form-control" name="has_connect_emp" id="has_connect_emp">
+                                    <option value="">---- 下拉选择 ----</option>
+                                    @foreach (var d in yesNo) {
+                                    <option value="@d">@d</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                该员工电话:
+                            </span>
+                            <div class="b-input">
+                                <input type="text" class="form-control" name="connect_emp_phone" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                已联系到该员工家属:
+                            </span>
+                            <div class="b-input">
+                                <select class="form-control" name="has_connect_family" id="has_connect_family">
+                                    <option value="">---- 下拉选择 ----</option>
+                                    @foreach (var d in yesNo) {
+                                    <option value="@d">@d</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                家属电话:
+                            </span>
+                            <div class="b-input">
+                                <input type="text" class="form-control" name="connect_family_phone" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                已提交辞职申请表:
+                            </span>
+                            <div class="b-input">
+                                <select class="form-control" name="has_resign_apply" id="has_resign_apply">
+                                    <option value="">---- 下拉选择 ----</option>
+                                    @foreach (var d in yesNo) {
+                                    <option value="@d">@d</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label" style="vertical-align:top;margin-top:6px;">
+                                提交日期:
+                            </span>
+                            <div class="b-input">
+                                <span class="input-group date datePicker">
+                                    <input class="form-control" type="text" id="resign_apply_date" name="resign_apply_date" autocomplete="off" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;">
+                        自离补充说明:
+                    </span>
+                    <span style="display:inline-block;width:70%">
+                        <textarea type="text" class="form-control" rows="3" id="auto_quit_comment" name="auto_quit_comment"></textarea>
+                    </span>
+                </div>
+            </div>
+
+            @*辞职的*@
+            <div id="normalQuit" style="display:none;">
+                <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">辞职调查</h4>
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;">
+                        辞职原因:
+                    </span>
+                    <span style="display:inline-block;width:70%">
+                        <textarea type="text" class="form-control" rows="3" id="quit_reason" name="quit_reason" placeholder="必填，可从晋升空间/工资福利/上班时间/上司与同事关系/个人原因等方面填写原因"></textarea>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;">
+                        意见建议:
+                    </span>
+                    <span style="display:inline-block;width:70%">
+                        <textarea type="text" class="form-control" rows="3" id="quit_suggestion" name="quit_suggestion" placeholder="选填，对公司/本职位的建议"></textarea>
+                    </span>
+                </div>
+            </div>
+            
+            @*计件审核人*@
+            <div id="auditors1" style="display:none;">
+                <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">计件员工离职审批人</h4>
+                <div class="row">
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                组长:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control selectUser" name="group_leader_name" placeholder="选择组长" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                主管:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control selectUser" name="charger_name" placeholder="选择主管" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                生产部长:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control selectUser" name="produce_minister_name" placeholder="选择生产部长" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <p class="small text-danger"><i class="fa fa-info-circle"></i> 以上处理节点可选1~3个处理人，如选择多人，其中1人处理完成即可</p>
+            </div>
+            
+            @*月薪审核人*@
+            <div id="auditors2" style="display:none;">
+                <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">月薪员工离职审批人</h4>
+                <div class="row">
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                部门负责人:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control selectUser" name="dep_charger_name" placeholder="选择部门负责人" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                最高负责人:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control selectUser" name="highest_charger_name" placeholder="选择最高负责人" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <p class="small text-danger"><i class="fa fa-info-circle"></i> 以上处理节点可选1~3个处理人，如选择多人，其中1人处理完成即可</p>
+            </div>
+
+            <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:12px;"><i class="fa fa-check-circle-o"></i> 提交申请</button>
+        </form>
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_SelectUsers")
+}

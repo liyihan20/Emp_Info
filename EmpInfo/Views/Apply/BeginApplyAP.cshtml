@@ -146,6 +146,7 @@
     var items = [];
     var bus_dep_names = [];
     var qtyModalParam = {};
+    var canSearch = true;
     $(function () {
 
         $(".datePicker").datetimepicker({
@@ -399,7 +400,8 @@
             if (rows.length == 0) {
                 toastr.error("请先选择一行后再查询");
                 return;
-            }
+            }            
+
             $('#qty_tb').bootstrapTable('load', []);
             qtyModalParam.item_no = rows[0].item_no; @*212382*@
             $("#qtyModal").modal("show");
@@ -419,16 +421,21 @@
                 return;
             }
 
+            if (!canSearch) return;
+            toastr.info("正在查询历史数量，请稍等...");
+            canSearch = false;
+
             $.post("@Url.Content("~/Item/GetAPQtyHistory")",{
                 itemNumber: qtyModalParam.item_no,
                 busName:qtyModalParam.bus_name,
                 beginDate:qtyModalParam.begin_date,
                 endDate:qtyModalParam.end_date
-            },function(data){
+            }, function (data) {
+                canSearch = true;
                 if(data.suc){
                     var itemQtyInfo=JSON.parse(data.extra);
                     $('#qty_tb').bootstrapTable('load', itemQtyInfo);
-                    toastr.success("查询成功，行数：" + itemQtyInfo.length);
+                    toastr.success("查询成功，行数：" + itemQtyInfo.length);                    
                 }else{
                     toastr.error(data.msg);
                 }
@@ -441,16 +448,22 @@
                 toastr.error("请先选择一行后再查询");
                 return;
             }
+
+            if (!canSearch) return;
+            toastr.info("正在查询库存记录，请稍等...");
+            canSearch = false;
+
             $('#stock_tb').bootstrapTable('load', []);            
 
             $.post("@Url.Content("~/Item/GetItemStockQtyFromK3")",{
                 itemNumber: rows[0].item_no
-            },function(data){
+            }, function (data) {
+                canSearch = true;
                 if (data.suc) {
                     var stockInfo = JSON.parse(data.extra);
                     $('#stock_tb').bootstrapTable('load', stockInfo);
                     $("#stock_item_info").html("物料名称：" + stockInfo[0].item_name + " ；规格型号：" + stockInfo[0].item_modual);
-                    $("#stockModal").modal("show");
+                    $("#stockModal").modal("show");                    
                 }else{
                     toastr.error(data.msg);
                 }

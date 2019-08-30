@@ -340,6 +340,9 @@
     <Compile Include="Models\ei_resVisitLog.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_sjApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_specialUsers.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -520,10 +523,16 @@
     <Compile Include="Models\vw_hr_department.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\vw_JQExcel.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\vw_leaving_days.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_push_users.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\vw_SJExcel.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_svReport.cs">
@@ -557,6 +566,7 @@
     <Compile Include="Services\DPSv.cs" />
     <Compile Include="Services\EPSv.cs" />
     <Compile Include="Services\ETSv.cs" />
+    <Compile Include="Services\SJSv.cs" />
     <Compile Include="Services\JQSv.cs" />
     <Compile Include="Services\SASv.cs" />
     <Compile Include="Services\SVSv.cs" />
@@ -791,6 +801,7 @@
     <Content Include="Content\images\index_bg2.jpg" />
     <Content Include="Content\images\public_fund.png" />
     <Content Include="Content\images\purchase.png" />
+    <Content Include="Content\images\quit.png" />
     <Content Include="Content\images\rc.png" />
     <Content Include="Content\images\repair.png" />
     <Content Include="Content\images\report.png" />
@@ -800,6 +811,7 @@
     <Content Include="Content\images\statistics_48.png" />
     <Content Include="Content\images\stock.png" />
     <Content Include="Content\images\sv.png" />
+    <Content Include="Content\images\switch.png" />
     <Content Include="Content\images\truck.png" />
     <Content Include="Content\images\Truly.gif" />
     <Content Include="Content\images\truly_home.gif" />
@@ -1241,6 +1253,14 @@
     <Content Include="Views\Apply\BeginAuditAPApply.cshtml" />
     <Content Include="Views\Report\APReport.cshtml" />
     <Content Include="Views\Shared\_ProgressDialog.cshtml" />
+    <Content Include="Views\Apply\BeginApplyJQ.cshtml" />
+    <Content Include="Views\Apply\CheckJQApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditJQApply.cshtml" />
+    <Content Include="Views\Report\JQReport.cshtml" />
+    <Content Include="Views\Apply\BeginApplySJ.cshtml" />
+    <Content Include="Views\Report\SJReport.cshtml" />
+    <Content Include="Views\Apply\CheckSJApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditApplyW.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

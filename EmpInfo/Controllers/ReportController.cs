@@ -1681,12 +1681,299 @@ namespace EmpInfo.Controllers
 
                 cells.Add(rowIndex, ++colIndex, d.usage);
 
-                var p = sv.GetItemPriceHistory((int)d.item_id);
+                var p = sv.GetItemPriceHistory(d.item_no);
                 if (p != null) {
                     cells.Add(rowIndex, ++colIndex, p.price);
                     cells.Add(rowIndex, ++colIndex, p.tax_rate);
                     cells.Add(rowIndex, ++colIndex, p.supplier_name);
                 }
+            }
+
+            xls.Send();
+        }
+
+        #endregion
+
+        #region 离职流程
+
+        [SessionTimeOutFilter]
+        public ActionResult JQReport()
+        {
+            JQSearchParam sm;
+            var cookie = Request.Cookies["jqReport"];
+            if (cookie == null) {
+                sm = new JQSearchParam();
+                sm.fromDate = DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd");
+                sm.toDate = DateTime.Now.ToString("yyyy-MM-dd");
+                sm.depName = "";
+            }
+            else {
+                sm = JsonConvert.DeserializeObject<JQSearchParam>(MyUtils.DecodeToUTF8(cookie.Values.Get("sm")));
+            }
+
+            ViewData["sm"] = sm;
+            return View();
+        }
+
+        public IQueryable<vw_JQExcel> SearchJQData(DateTime fromDate, DateTime toDate, string depName,string empName,string sysNum)
+        {
+            depName = depName.Trim();
+
+            //保存到cookie
+            JQSearchParam p = new JQSearchParam();
+            p.fromDate = fromDate.ToString("yyyy-MM-dd");
+            p.toDate = toDate.ToString("yyyy-MM-dd");
+            p.depName = depName;
+            p.empName = empName;
+            p.sysNum = sysNum;
+            var cookie = new HttpCookie("jqReport");
+            cookie.Values.Add("sm", MyUtils.EncodeToUTF8(JsonConvert.SerializeObject(p)));
+            cookie.Expires = DateTime.Now.AddDays(30);
+            Response.AppendCookie(cookie);
+
+            toDate = toDate.AddDays(1);
+            var result = db.vw_JQExcel.Where(u => u.apply_time > fromDate && u.apply_time <= toDate);
+            if (!string.IsNullOrWhiteSpace(depName)) result = result.Where(r => r.dep_name.Contains(depName));
+            if (!string.IsNullOrWhiteSpace(empName)) result = result.Where(r => r.name.Contains(empName));
+            if (!string.IsNullOrWhiteSpace(sysNum)) result = result.Where(r => r.sys_no.Contains(sysNum));
+            return result;
+        }
+
+        public JsonResult CheckJQReport(DateTime fromDate, DateTime toDate, string depName = "", string empName = "", string sysNum = "")
+        {
+            var result = SearchJQData(fromDate,toDate,depName,empName,sysNum)
+                .Select(u => new
+                {
+                    u.sys_no,
+                    u.dep_name,
+                    u.name,
+                    u.account,
+                    u.applier_name,
+                    u.apply_time,
+                    u.quit_type,
+                    u.audit_result,
+                    u.salary_type
+                }).OrderBy(u => u.apply_time).ToList();
+            return Json(result);
+        }
+
+        public void BeginExportJQReport(DateTime fromDate, DateTime toDate, string depName = "", string empName = "", string sysNum = "")
+        {
+            toDate = toDate.AddDays(1);
+            var result = SearchJQData(fromDate, toDate, depName, empName, sysNum).OrderBy(s => s.apply_time).ToList();
+
+            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "申请时间","离职类型", "离职人", "离职人账号", "离职人厂牌", "人事部门","工资类别",
+                                              "旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工作评价","工作评价描述","原部是否愿意再录用", "是否愿意再录用原因" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "员工离职申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("离职申请详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result) {
+                colIndex = 1;
+
+                //"处理结果","申请流水号", "申请人", "申请时间","离职类型", "离职人", "离职人账号", "离职人厂牌", "人事部门","工资类别",
+                //"旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工作评价","工作评价描述","原部是否愿意再录用", "是否愿意再录用原因"
+                cells.Add(++rowIndex, colIndex, d.audit_result);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.applier_name);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.quit_type);
+                cells.Add(rowIndex, ++colIndex, d.name);
+                cells.Add(rowIndex, ++colIndex, d.account);
+                cells.Add(rowIndex, ++colIndex, d.card_number);
+                cells.Add(rowIndex, ++colIndex, d.dep_name);
+                cells.Add(rowIndex, ++colIndex, d.salary_type);
+
+                cells.Add(rowIndex, ++colIndex, d.absent_from == null ? "" : ((DateTime)d.absent_from).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.absent_to == null ? "" : ((DateTime)d.absent_to).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.absent_days);
+                cells.Add(rowIndex, ++colIndex, d.quit_reason);
+                cells.Add(rowIndex, ++colIndex, d.quit_suggestion);
+                cells.Add(rowIndex, ++colIndex, d.work_evaluation);
+                cells.Add(rowIndex, ++colIndex, d.work_comment);
+                cells.Add(rowIndex, ++colIndex, d.wanna_employ);
+                cells.Add(rowIndex, ++colIndex, d.employ_comment);                
+            }
+
+            xls.Send();
+        }
+
+        #endregion
+
+        #region 调动流程
+
+        [SessionTimeOutFilter]
+        public ActionResult SJReport()
+        {
+            SJSearchParam sm;
+            var cookie = Request.Cookies["sjReport"];
+            if (cookie == null) {
+                sm = new SJSearchParam();
+                sm.fromDate = DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd");
+                sm.toDate = DateTime.Now.ToString("yyyy-MM-dd");
+                sm.inDepName = "";
+                sm.outDepName = "";
+                sm.empName = "";
+                sm.sysNum = "";
+            }
+            else {
+                sm = JsonConvert.DeserializeObject<SJSearchParam>(MyUtils.DecodeToUTF8(cookie.Values.Get("sm")));
+            }
+
+            ViewData["sm"] = sm;
+            return View();
+        }
+
+        public IQueryable<vw_SJExcel> SearchSJData(DateTime fromDate, DateTime toDate, string inDepName = "", string outDepName = "", string empName = "", string sysNum = "")
+        {
+            inDepName = inDepName.Trim();
+            outDepName = outDepName.Trim();
+            empName = empName.Trim();
+            sysNum = sysNum.Trim();
+
+            //保存到cookie
+            SJSearchParam p = new SJSearchParam();
+            p.fromDate = fromDate.ToString("yyyy-MM-dd");
+            p.toDate = toDate.ToString("yyyy-MM-dd");
+            p.inDepName = inDepName;
+            p.outDepName = outDepName;
+            p.empName = empName;
+            p.sysNum = sysNum;
+            var cookie = new HttpCookie("sjReport");
+            cookie.Values.Add("sm", MyUtils.EncodeToUTF8(JsonConvert.SerializeObject(p)));
+            cookie.Expires = DateTime.Now.AddDays(30);
+            Response.AppendCookie(cookie);
+
+            toDate = toDate.AddDays(1);
+            var result = db.vw_SJExcel.Where(u => u.apply_time > fromDate && u.apply_time <= toDate);
+            if (!string.IsNullOrWhiteSpace(inDepName)) result = result.Where(r => r.in_dep_name.StartsWith(inDepName));
+            if (!string.IsNullOrWhiteSpace(outDepName)) result = result.Where(r => r.out_dep_name.StartsWith(outDepName));
+            if (!string.IsNullOrWhiteSpace(empName)) result = result.Where(r => r.name.Contains(empName));
+            if (!string.IsNullOrWhiteSpace(sysNum)) result = result.Where(r => r.sys_no.Contains(sysNum));
+
+            return result;
+        }
+
+        public JsonResult CheckSJReport(DateTime fromDate, DateTime toDate, string inDepName = "",string outDepName="",string empName="",string sysNum="")
+        {
+            var result = SearchSJData(fromDate, toDate, inDepName, outDepName, empName, sysNum)
+                .Select(u => new
+                {
+                    u.sys_no,
+                    u.out_dep_name,
+                    u.in_dep_name,
+                    u.name,
+                    u.salary_type,
+                    u.account,
+                    u.applier_name,
+                    u.apply_time,
+                    u.audit_result
+                }).OrderBy(u => u.apply_time).ToList();
+            return Json(result);
+        }
+
+        public void BeginExportJQReport(DateTime fromDate, DateTime toDate, string inDepName = "", string outDepName = "", string empName = "", string sysNum = "")
+        {
+            var result = SearchSJData(fromDate, toDate, inDepName, outDepName, empName, sysNum).OrderBy(u => u.apply_time).ToList();
+
+            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "申请时间","调动类型", "姓名", "账号", "厂牌","工资类别", "调出部门名称",
+                                              "调出部门岗位", "调出时间", "调入部门名称", "调入部门岗位","到岗时间","调动原因/说明" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "员工调动申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("调动申请详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result) {
+                colIndex = 1;
+
+                //"处理结果","申请流水号", "申请人", "申请时间","调动类型", "姓名", "账号", "厂牌","工资类别", "调出部门名称",
+                //"调出部门岗位", "调出时间", "调入部门名称", "调入部门岗位","到岗时间","调动原因/说明"
+                cells.Add(++rowIndex, colIndex, d.audit_result);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.applier_name);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.switch_type);
+                cells.Add(rowIndex, ++colIndex, d.name);
+                cells.Add(rowIndex, ++colIndex, d.account);
+                cells.Add(rowIndex, ++colIndex, d.card_number);
+                cells.Add(rowIndex, ++colIndex, d.salary_type);
+                cells.Add(rowIndex, ++colIndex, d.out_dep_name);
+
+                cells.Add(rowIndex, ++colIndex, d.out_dep_position);
+                cells.Add(rowIndex, ++colIndex, d.out_time == null ? "" : ((DateTime)d.out_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.in_dep_name);
+                cells.Add(rowIndex, ++colIndex, d.in_dep_position);
+                cells.Add(rowIndex, ++colIndex, d.in_time == null ? "" : ((DateTime)d.in_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.comment);
             }
 
             xls.Send();

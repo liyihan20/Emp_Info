@@ -104,6 +104,9 @@ namespace EmpInfo.Models
         public DbSet<ei_apApplyEntry> ei_apApplyEntry { get; set; }
         public DbSet<vw_APExcel> vw_APExcel { get; set; }
         public DbSet<ei_jqApply> ei_jqApply { get; set; }
+        public DbSet<vw_JQExcel> vw_JQExcel { get; set; }
+        public DbSet<ei_sjApply> ei_sjApply { get; set; }
+        public DbSet<vw_SJExcel> vw_SJExcel { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {
@@ -474,15 +477,6 @@ namespace EmpInfo.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetApBusAndDepNamesInK3_Result>("GetApBusAndDepNamesInK3", accountParameter);
         }
     
-        public virtual ObjectResult<GetAPPriceHistory_Result> GetAPPriceHistory(Nullable<int> item_id)
-        {
-            var item_idParameter = item_id.HasValue ?
-                new ObjectParameter("item_id", item_id) :
-                new ObjectParameter("item_id", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetAPPriceHistory_Result>("GetAPPriceHistory", item_idParameter);
-        }
-    
         public virtual ObjectResult<GetItemStockQtyFromK3_Result> GetItemStockQtyFromK3(string item_no)
         {
             var item_noParameter = item_no != null ?
@@ -511,6 +505,15 @@ namespace EmpInfo.Models
                 new ObjectParameter("end_date", typeof(System.DateTime));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetAPHistoryQty_Result>("GetAPHistoryQty", item_numberParameter, bus_nameParameter, begin_dateParameter, end_dateParameter);
+        }
+    
+        public virtual ObjectResult<GetAPPriceHistory_Result> GetAPPriceHistory(string item_no)
+        {
+            var item_noParameter = item_no != null ?
+                new ObjectParameter("item_no", item_no) :
+                new ObjectParameter("item_no", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetAPPriceHistory_Result>("GetAPPriceHistory", item_noParameter);
         }
     
         public virtual ObjectResult<GetHREmpInfoDetail_Result> GetHREmpInfoDetail(string card_no)

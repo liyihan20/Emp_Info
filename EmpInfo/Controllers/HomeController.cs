@@ -281,10 +281,16 @@ namespace EmpInfo.Controllers
         [SessionTimeOutFilter]
         public ActionResult CheckDinningCard()
         {
-            var model = dinningCarStatusModel;
-            ViewData["CardStatus"] = model;
-            WriteEventLog("饭卡查询", "主界面，余额为：" + model.remainingSum);
-            return View();
+            try {
+                var model = dinningCarStatusModel;
+                ViewData["CardStatus"] = model;
+                WriteEventLog("饭卡查询", "主界面，余额为：" + model.remainingSum);
+                return View();
+            }
+            catch (Exception ex) {
+                ViewBag.tip = "饭卡查询出错："+ex.Message;
+                return View("Error");
+            }
         }
 
         //消费记录

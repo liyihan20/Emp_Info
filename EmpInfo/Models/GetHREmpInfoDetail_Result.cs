@@ -21,5 +21,6 @@ namespace EmpInfo.Models
         public string salary_type { get; set; }
         public string hometown { get; set; }
         public string account { get; set; }
+        public int dep_id { get; set; }
     }
 }

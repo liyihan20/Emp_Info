@@ -1,0 +1,478 @@
+﻿@using EmpInfo.Models;
+@{
+    string sysNum = ViewData["infoBeforeApply"] as string;
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: middle;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 4px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+
+
+    <script>
+        $(function () {
+
+            $(".datePicker").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd",
+                autoclose: true,
+                startView: 2,
+                minView: 2,
+                initialDate: "@DateTime.Now.ToString("yyyy-MM-dd")"
+            });
+
+            //设置日期联动，结束日期不能大于起始日期
+            $("#dp1").on("changeDate", function (e) {
+                $('#dp2').datetimepicker('setStartDate', e.date);
+            });
+            $("#dp2").on("changeDate", function (e) {
+                $('#dp1').datetimepicker('setEndDate', e.date);
+            });
+
+            $("#card_number").on("blur", function () {
+                if ($("#card_number").val().length > 7) {
+                    getHREmpDetail();
+                } else {
+                    toastr.error("请输入正确的厂牌编号");
+                }
+            });
+
+
+            $("#in_dep_name").on("click", function () {
+                openSelectDepDialog(2, function (selectedDep) {
+                    $("#in_dep_name").val(selectedDep.depLongName);
+                    $("#in_dep_id").val(selectedDep.depId);
+                });
+            });
+            
+            $("#out_dep_name").on("click", function () {
+                openSelectDepDialog(2, function (selectedDep) {
+                    $("#out_dep_name").val(selectedDep.depLongName);
+                    $("#out_dep_id").val(selectedDep.depId);
+                });
+            });
+
+            $("#salary_type").on("change", function () {
+                if ($(this).val() == "计件") {
+                    $("#out_minister_div").hide();
+                    $("#in_minister_div").hide();
+                } else {
+                    $("#out_minister_div").show();
+                    $("#in_minister_div").show();
+                }
+            });
+
+            $(".selectUser").on("click", function () {
+                var self = this;
+                openSelectUserDialog($(self).val(), 3, function (result) {
+                    $(self).val(result);
+                });
+            });
+
+            $("#apply_bt").on("click", function () {
+                var obj = utils.getFormObj($("#fm"));
+
+                if (obj.switch_type == "") {
+                    toastr.error("调动类型必须选择");
+                    return;
+                }
+                if (obj.salary_type == "") {
+                    toastr.error("工资类型必须选择");
+                    return;
+                }
+                if (obj.card_number == "") {
+                    toastr.error("厂牌编码必须填写");
+                    return;
+                }
+
+                if (obj.out_dep_name == "") {
+                    toastr.error("调出部门名称必须选择");
+                    return;
+                }
+                if (obj.out_dep_position == "") {
+                    toastr.error("调出部门岗位必须填写");
+                    return;
+                }
+                if (obj.out_time == "") {
+                    toastr.error("调出时间必须填写");
+                    return;
+                }
+                if (obj.out_clerk_name == "") {
+                    toastr.error("调出部门文员必须选择");
+                    return;
+                }
+                if (obj.out_manager_name == "") {
+                    toastr.error("调出部门主管/经理必须选择");
+                    return;
+                }
+                if (obj.in_dep_name == "") {
+                    toastr.error("调入部门名称必须选择");
+                    return;
+                }
+                if (obj.in_dep_position == "") {
+                    toastr.error("调入部门岗位必须填写");
+                    return;
+                }
+                if (obj.in_time == "") {
+                    toastr.error("到岗时间必须填写");
+                    return;
+                }
+                if (obj.in_clerk_name == "") {
+                    toastr.error("调入部门文员必须选择");
+                    return;
+                }
+                if (obj.in_manager_name == "") {
+                    toastr.error("调入部门主管/经理必须选择");
+                    return;
+                }
+                if (obj.comment == "") {
+                    toastr.error("调动原因/说明必须填写");
+                    return;
+                }
+                if (obj.salary_type != "计件") {
+                    if (obj.out_minister_name == "") {
+                        toastr.error("必须选择调出部门部长/助理");
+                        return;
+                    }
+                    if (obj.in_minister_name == "") {
+                        toastr.error("必须选择调入部门部长/助理");
+                        return;
+                    }
+                }
+
+                openConfirmDialog("确定要提交申请吗？", function () {
+                    $("#apply_bt").button("loading");
+                    $.ajax({
+                        type: 'post',
+                        url: 'SaveApply',
+                        data: $("#fm").serialize(),
+                        cache: false,
+                        dataType: 'json',
+                        success: function (data) {
+                            $("#apply_bt").button("reset");
+                            if (data.suc) {
+                                toastr.success("提交成功:" + data.msg);
+                                setTimeout(function () { window.location.href = "CheckApply?sysNo=" + obj.sys_no; }, 2000);
+                            } else {
+                                toastr.error("提交失败：" + data.msg);
+                                $("#apply_bt").button("reset");
+                            }
+
+                        }
+                    });
+                });
+            });
+
+        });
+
+        function getHREmpDetail() {
+            var num = $("#card_number").val();
+            $.post("@Url.Content("~/Item/GetHREmpInfoDetail")", { cardNumber: num }, function (data) {
+                if (data.suc) {
+                    var info = JSON.parse(data.extra);                    
+                    //info.out_dep_id = info.dep_id;
+                    //info.out_dep_name = info.dep_name;
+                    delete info.salary_type;
+                    //delete info.dep_id;
+                    //delete info.dep_name;
+                    utils.loadObjData($("#fm"), info);
+
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+        }
+
+    </script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Home/NoPaperProcess")">无纸化流程</a></li>
+            <li><a href="ApplyIndex?billType=SJ">员工调动申请流程</a></li>
+            <li class="active">开始申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <form id="fm">
+            <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">调动基础信息</h4>
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请流水号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="sys_no" value="@sysNum" readonly />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            调动类型:
+                        </span>
+                        <div class="b-input">
+                            <select class="form-control" name="switch_type" id="switch_type">
+                                <option value="">---- 下拉选择调动类型 ----</option>
+                                @foreach (var d in new string[] { "公司内", "跨公司" }) {
+                                    <option value="@d">@d</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            工资类型:
+                        </span>
+                        <span class="b-input">
+                            <select class="form-control" name="salary_type" id="salary_type">
+                                <option value="">---- 下拉选择工资类型 ----</option>
+                                @foreach (var d in new string[] { "计件", "月薪", "计转月", "月转计" }) {
+                                    <option value="@d">@d</option>
+                                }
+                            </select>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            厂牌编码:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="card_number" id="card_number" placeholder="调动员工厂牌编码" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            姓名:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="name" placeholder="填入厂牌编码后带出" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            性别:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="sex" placeholder="填入厂牌编码后带出" readonly />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            账号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="account" placeholder="填入厂牌编码后带出" readonly />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            学历:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="education" placeholder="填入厂牌编码后带出" readonly />
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label" style="vertical-align:top;">
+                    调动原因/说明:
+                </span>
+                <span style="display:inline-block;width:70%">
+                    <textarea type="text" class="form-control" rows="2" id="comment" name="comment"></textarea>
+                </span>
+            </div>
+
+            @*调出部门信息*@
+            <div id="outInfo">
+                <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">调出部门信息</h4>
+                <div class="row">
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                调出部门名称:
+                            </span>
+                            <span class="b-input">
+                                @*<span class="input-group">*@
+                                    <input type="text" class="form-control" name="out_dep_name" id="out_dep_name" placeholder="点击选择调入人事部门" />
+                                    @*<span class="input-group-addon" style="cursor:pointer;" onclick="showDepName()"><i class="fa fa-info text-danger"></i></span>*@
+                                @*</span>*@
+                                <input type="hidden" id="out_dep_id" name="out_dep_id" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                调出部门岗位:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="out_dep_position" placeholder="填入厂牌编码后带出" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label" style="vertical-align:top;height:40px;">
+                                调出时间:
+                            </span>
+                            <span class="b-input">
+                                <span class="input-group date datePicker" id="dp1">
+                                    <input class="form-control" type="text" id="out_time" name="out_time" autocomplete="off" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                调出部门文员:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control selectUser" name="out_clerk_name" placeholder="选择文员" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                调出部门主管/经理:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control selectUser" name="out_manager_name" placeholder="选择主管/经理" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12" id="out_minister_div" style="display:none;">
+                        <div class="b-div">
+                            <span class="b-label">
+                                调出部门部长/助理:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control selectUser" name="out_minister_name" placeholder="调出部门部长/助理" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <p class="small text-danger"><i class="fa fa-info-circle"></i> 以上处理节点可选1~3个处理人，如选择多人，其中1人处理完成即可</p>
+            </div>
+
+            @*调入部门信息*@
+            <div id="inInfo">
+                <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">调入部门信息</h4>
+                <div class="row">
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                调入部门名称:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="in_dep_name" id="in_dep_name" placeholder="点击选择调入人事部门" />
+                                <input type="hidden" id="in_dep_id" name="in_dep_id" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                调入部门岗位:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="in_dep_position" placeholder="填入厂牌编码后带出" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label" style="vertical-align:top;height:40px;">
+                                到岗时间：
+                            </span>
+                            <span class="b-input">
+                                <span class="input-group date datePicker" id="dp2">
+                                    <input class="form-control" type="text" id="in_time" name="in_time" autocomplete="off" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                调入部门文员:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control selectUser" name="in_clerk_name" placeholder="选择文员" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                调入部门主管/经理:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control selectUser" name="in_manager_name" placeholder="选择主管/经理" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12" id="in_minister_div" style="display:none;">
+                        <div class="b-div">
+                            <span class="b-label">
+                                调入部门部长/助理:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control selectUser" name="in_minister_name" placeholder="调出部门部长/助理" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <p class="small text-danger"><i class="fa fa-info-circle"></i> 以上处理节点可选1~3个处理人，如选择多人，其中1人处理完成即可</p>
+            </div>
+
+            <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:12px;"><i class="fa fa-check-circle-o"></i> 提交申请</button>
+        </form>
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_SelectUsers")
+    @Html.Partial("_SelectDep")
+}

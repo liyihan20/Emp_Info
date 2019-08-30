@@ -680,7 +680,7 @@
           <Property Name="account" Type="varchar" MaxLength="50" />
           <Property Name="absent_from" Type="smalldatetime" />
           <Property Name="absent_to" Type="smalldatetime" />
-          <Property Name="absent_days" Type="int" />
+          <Property Name="absent_days" Type="decimal" Precision="4" Scale="1" />
           <Property Name="has_connect_emp" Type="nchar" MaxLength="1" />
           <Property Name="connect_emp_phone" Type="varchar" MaxLength="50" />
           <Property Name="has_connect_family" Type="nchar" MaxLength="1" />
@@ -703,6 +703,7 @@
           <Property Name="dep_charger_num" Type="varchar" MaxLength="50" />
           <Property Name="highest_charger_name" Type="nvarchar" MaxLength="50" />
           <Property Name="highest_charger_num" Type="varchar" MaxLength="50" />
+          <Property Name="resign_apply_date" Type="smalldatetime" />
         </EntityType>
         <EntityType Name="ei_k3RestLog">
           <Key>
@@ -806,6 +807,44 @@
           <Property Name="user_name" Type="varchar" MaxLength="50" />
           <Property Name="res_no" Type="varchar" MaxLength="20" />
           <Property Name="visit_date" Type="smalldatetime" />
+        </EntityType>
+        <EntityType Name="ei_sjApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="apply_time" Type="datetime" />
+          <Property Name="salary_type" Type="nvarchar" MaxLength="50" />
+          <Property Name="switch_type" Type="nvarchar" MaxLength="10" />
+          <Property Name="card_number" Type="varchar" MaxLength="50" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" />
+          <Property Name="sex" Type="nvarchar" MaxLength="10" />
+          <Property Name="education" Type="nvarchar" MaxLength="50" />
+          <Property Name="account" Type="varchar" MaxLength="50" />
+          <Property Name="out_dep_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="out_dep_id" Type="int" />
+          <Property Name="out_dep_position" Type="nvarchar" MaxLength="50" />
+          <Property Name="out_time" Type="smalldatetime" />
+          <Property Name="out_clerk_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="out_clerk_num" Type="varchar" MaxLength="50" />
+          <Property Name="out_manager_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="out_manager_num" Type="varchar" MaxLength="50" />
+          <Property Name="out_minister_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="out_minister_num" Type="varchar" MaxLength="50" />
+          <Property Name="in_dep_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="in_dep_id" Type="int" />
+          <Property Name="in_dep_position" Type="nvarchar" MaxLength="50" />
+          <Property Name="in_time" Type="smalldatetime" />
+          <Property Name="in_clerk_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="in_clerk_num" Type="varchar" MaxLength="50" />
+          <Property Name="in_manager_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="in_manager_num" Type="varchar" MaxLength="50" />
+          <Property Name="in_minister_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="in_minister_num" Type="varchar" MaxLength="50" />
+          <Property Name="comment" Type="nvarchar" MaxLength="1000" />
         </EntityType>
         <EntityType Name="ei_specialUsers">
           <Key>
@@ -1327,6 +1366,39 @@
           <Property Name="parent_id" Type="int" />
         </EntityType>
         <!--生成过程中发现错误:
+警告 6002: 表/视图“ICAudit.dbo.vw_JQExcel”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vw_JQExcel">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="audit_result" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="apply_time" Type="datetime" />
+          <Property Name="quit_type" Type="nvarchar" MaxLength="10" />
+          <Property Name="card_number" Type="varchar" MaxLength="50" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" />
+          <Property Name="sex" Type="nvarchar" MaxLength="10" />
+          <Property Name="dep_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="position" Type="nvarchar" MaxLength="50" />
+          <Property Name="education" Type="nvarchar" MaxLength="50" />
+          <Property Name="salary_type" Type="nvarchar" MaxLength="50" />
+          <Property Name="hometown" Type="nvarchar" MaxLength="50" />
+          <Property Name="account" Type="varchar" MaxLength="50" />
+          <Property Name="absent_from" Type="smalldatetime" />
+          <Property Name="absent_to" Type="smalldatetime" />
+          <Property Name="absent_days" Type="decimal" Precision="4" Scale="1" />
+          <Property Name="quit_reason" Type="nvarchar" MaxLength="1000" />
+          <Property Name="quit_suggestion" Type="nvarchar" MaxLength="1000" />
+          <Property Name="work_evaluation" Type="nvarchar" MaxLength="50" />
+          <Property Name="work_comment" Type="nvarchar" MaxLength="500" />
+          <Property Name="wanna_employ" Type="nvarchar" MaxLength="50" />
+          <Property Name="employ_comment" Type="nvarchar" MaxLength="500" />
+          <Property Name="audit_result" Type="varchar" MaxLength="6" Nullable="false" />
+        </EntityType>
+        <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_leaving_days”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
         <EntityType Name="vw_leaving_days">
           <Key>
@@ -1361,6 +1433,48 @@
           <Property Name="wx_push_consume_info" Type="bit" />
           <Property Name="wx_push_flow_info" Type="bit" />
           <Property Name="wx_check_salary_info" Type="bit" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“ICAudit.dbo.vw_SJExcel”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vw_SJExcel">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="audit_result" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="apply_time" Type="datetime" />
+          <Property Name="salary_type" Type="nvarchar" MaxLength="50" />
+          <Property Name="switch_type" Type="nvarchar" MaxLength="10" />
+          <Property Name="card_number" Type="varchar" MaxLength="50" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" />
+          <Property Name="sex" Type="nvarchar" MaxLength="10" />
+          <Property Name="education" Type="nvarchar" MaxLength="50" />
+          <Property Name="account" Type="varchar" MaxLength="50" />
+          <Property Name="out_dep_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="out_dep_id" Type="int" />
+          <Property Name="out_dep_position" Type="nvarchar" MaxLength="50" />
+          <Property Name="out_time" Type="smalldatetime" />
+          <Property Name="out_clerk_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="out_clerk_num" Type="varchar" MaxLength="50" />
+          <Property Name="out_manager_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="out_manager_num" Type="varchar" MaxLength="50" />
+          <Property Name="out_minister_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="out_minister_num" Type="varchar" MaxLength="50" />
+          <Property Name="in_dep_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="in_dep_id" Type="int" />
+          <Property Name="in_dep_position" Type="nvarchar" MaxLength="50" />
+          <Property Name="in_time" Type="smalldatetime" />
+          <Property Name="in_clerk_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="in_clerk_num" Type="varchar" MaxLength="50" />
+          <Property Name="in_manager_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="in_manager_num" Type="varchar" MaxLength="50" />
+          <Property Name="in_minister_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="in_minister_num" Type="varchar" MaxLength="50" />
+          <Property Name="comment" Type="nvarchar" MaxLength="1000" />
+          <Property Name="audit_result" Type="varchar" MaxLength="6" Nullable="false" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_svReport”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -1700,7 +1814,7 @@
           <Parameter Name="end_date" Type="datetime" Mode="In" />
         </Function>
         <Function Name="GetAPPriceHistory" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="item_id" Type="int" Mode="In" />
+          <Parameter Name="item_no" Type="varchar" Mode="In" />
         </Function>
         <Function Name="GetDormChargeMonth" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="GetDormFeeByMonth" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
@@ -1849,6 +1963,7 @@
           <EntitySet Name="ei_pushMsg" EntityType="Self.ei_pushMsg" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_PushResponse" EntityType="Self.ei_PushResponse" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_resVisitLog" EntityType="Self.ei_resVisitLog" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_sjApply" EntityType="Self.ei_sjApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_specialUsers" EntityType="Self.ei_specialUsers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_stockAdminApply" EntityType="Self.ei_stockAdminApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_SVApply" EntityType="Self.ei_SVApply" Schema="dbo" store:Type="Tables" />
@@ -2128,6 +2243,35 @@ FROM [dbo].[vw_getAllhrEmp] AS [vw_getAllhrEmp]</DefiningQuery>
 [vw_hr_department].[parent_id] AS [parent_id]
 FROM [dbo].[vw_hr_department] AS [vw_hr_department]</DefiningQuery>
           </EntitySet>
+          <EntitySet Name="vw_JQExcel" EntityType="Self.vw_JQExcel" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vw_JQExcel].[id] AS [id], 
+[vw_JQExcel].[sys_no] AS [sys_no], 
+[vw_JQExcel].[applier_num] AS [applier_num], 
+[vw_JQExcel].[applier_name] AS [applier_name], 
+[vw_JQExcel].[apply_time] AS [apply_time], 
+[vw_JQExcel].[quit_type] AS [quit_type], 
+[vw_JQExcel].[card_number] AS [card_number], 
+[vw_JQExcel].[name] AS [name], 
+[vw_JQExcel].[sex] AS [sex], 
+[vw_JQExcel].[dep_name] AS [dep_name], 
+[vw_JQExcel].[position] AS [position], 
+[vw_JQExcel].[education] AS [education], 
+[vw_JQExcel].[salary_type] AS [salary_type], 
+[vw_JQExcel].[hometown] AS [hometown], 
+[vw_JQExcel].[account] AS [account], 
+[vw_JQExcel].[absent_from] AS [absent_from], 
+[vw_JQExcel].[absent_to] AS [absent_to], 
+[vw_JQExcel].[absent_days] AS [absent_days], 
+[vw_JQExcel].[quit_reason] AS [quit_reason], 
+[vw_JQExcel].[quit_suggestion] AS [quit_suggestion], 
+[vw_JQExcel].[work_evaluation] AS [work_evaluation], 
+[vw_JQExcel].[work_comment] AS [work_comment], 
+[vw_JQExcel].[wanna_employ] AS [wanna_employ], 
+[vw_JQExcel].[employ_comment] AS [employ_comment], 
+[vw_JQExcel].[audit_result] AS [audit_result]
+FROM [dbo].[vw_JQExcel] AS [vw_JQExcel]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="vw_leaving_days" EntityType="Self.vw_leaving_days" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
 [vw_leaving_days].[id] AS [id], 
@@ -2156,6 +2300,44 @@ FROM [dbo].[vw_leaving_days] AS [vw_leaving_days]</DefiningQuery>
 [vw_push_users].[wx_push_flow_info] AS [wx_push_flow_info], 
 [vw_push_users].[wx_check_salary_info] AS [wx_check_salary_info]
 FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_SJExcel" EntityType="Self.vw_SJExcel" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vw_SJExcel].[id] AS [id], 
+[vw_SJExcel].[sys_no] AS [sys_no], 
+[vw_SJExcel].[applier_num] AS [applier_num], 
+[vw_SJExcel].[applier_name] AS [applier_name], 
+[vw_SJExcel].[apply_time] AS [apply_time], 
+[vw_SJExcel].[salary_type] AS [salary_type], 
+[vw_SJExcel].[switch_type] AS [switch_type], 
+[vw_SJExcel].[card_number] AS [card_number], 
+[vw_SJExcel].[name] AS [name], 
+[vw_SJExcel].[sex] AS [sex], 
+[vw_SJExcel].[education] AS [education], 
+[vw_SJExcel].[account] AS [account], 
+[vw_SJExcel].[out_dep_name] AS [out_dep_name], 
+[vw_SJExcel].[out_dep_id] AS [out_dep_id], 
+[vw_SJExcel].[out_dep_position] AS [out_dep_position], 
+[vw_SJExcel].[out_time] AS [out_time], 
+[vw_SJExcel].[out_clerk_name] AS [out_clerk_name], 
+[vw_SJExcel].[out_clerk_num] AS [out_clerk_num], 
+[vw_SJExcel].[out_manager_name] AS [out_manager_name], 
+[vw_SJExcel].[out_manager_num] AS [out_manager_num], 
+[vw_SJExcel].[out_minister_name] AS [out_minister_name], 
+[vw_SJExcel].[out_minister_num] AS [out_minister_num], 
+[vw_SJExcel].[in_dep_name] AS [in_dep_name], 
+[vw_SJExcel].[in_dep_id] AS [in_dep_id], 
+[vw_SJExcel].[in_dep_position] AS [in_dep_position], 
+[vw_SJExcel].[in_time] AS [in_time], 
+[vw_SJExcel].[in_clerk_name] AS [in_clerk_name], 
+[vw_SJExcel].[in_clerk_num] AS [in_clerk_num], 
+[vw_SJExcel].[in_manager_name] AS [in_manager_name], 
+[vw_SJExcel].[in_manager_num] AS [in_manager_num], 
+[vw_SJExcel].[in_minister_name] AS [in_minister_name], 
+[vw_SJExcel].[in_minister_num] AS [in_minister_num], 
+[vw_SJExcel].[comment] AS [comment], 
+[vw_SJExcel].[audit_result] AS [audit_result]
+FROM [dbo].[vw_SJExcel] AS [vw_SJExcel]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="vw_svReport" EntityType="Self.vw_svReport" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
@@ -2566,9 +2748,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Parameter Name="account" Mode="In" Type="String" />
           </FunctionImport>
           <EntitySet Name="ei_apQtyChangeLog" EntityType="ICAuditModel.ei_apQtyChangeLog" />
-          <FunctionImport Name="GetAPPriceHistory" ReturnType="Collection(ICAuditModel.GetAPPriceHistory_Result)">
-          <Parameter Name="item_id" Mode="In" Type="Int32" />
-          </FunctionImport>
           <EntitySet Name="vw_hr_department" EntityType="ICAuditModel.vw_hr_department" />
           <EntitySet Name="k3_database" EntityType="ICAuditModel.k3_database" />
           <EntitySet Name="ei_apApply" EntityType="ICAuditModel.ei_apApply" />
@@ -2588,9 +2767,15 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <Parameter Name="end_date" Mode="In" Type="DateTime" />
           </FunctionImport>
           <EntitySet Name="ei_jqApply" EntityType="ICAuditModel.ei_jqApply" />
-          <FunctionImport Name="GetHREmpInfoDetail" ReturnType="Collection(ICAuditModel.GetHREmpInfoDetail_Result)">
-            <Parameter Name="card_no" Mode="In" Type="String" />
+          <EntitySet Name="vw_JQExcel" EntityType="ICAuditModel.vw_JQExcel" />
+          <FunctionImport Name="GetAPPriceHistory" ReturnType="Collection(ICAuditModel.GetAPPriceHistory_Result)">
+          <Parameter Name="item_no" Mode="In" Type="String" />
           </FunctionImport>
+          <EntitySet Name="ei_sjApply" EntityType="ICAuditModel.ei_sjApply" />
+          <FunctionImport Name="GetHREmpInfoDetail" ReturnType="Collection(ICAuditModel.GetHREmpInfoDetail_Result)">
+          <Parameter Name="card_no" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="vw_SJExcel" EntityType="ICAuditModel.vw_SJExcel" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -4267,14 +4452,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="old_qty" Type="Decimal" Precision="12" Scale="2" />
           <Property Name="new_qy" Type="Decimal" Precision="12" Scale="2" />
         </EntityType>
-        <ComplexType Name="GetAPPriceHistory_Result">
-          <Property Type="String" Name="account" Nullable="false" MaxLength="6" />
-          <Property Type="DateTime" Name="po_date" Nullable="true" Precision="23" />
-          <Property Type="String" Name="bill_no" Nullable="false" MaxLength="255" />
-          <Property Type="String" Name="supplier_name" Nullable="true" MaxLength="80" />
-          <Property Type="Decimal" Name="price" Nullable="false" Precision="28" Scale="10" />
-          <Property Type="Decimal" Name="tax_rate" Nullable="false" Precision="20" Scale="2" />
-        </ComplexType>
         <EntityType Name="vw_hr_department">
           <Key>
             <PropertyRef Name="id" />
@@ -4423,7 +4600,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="account" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="absent_from" Type="DateTime" Precision="0" />
           <Property Name="absent_to" Type="DateTime" Precision="0" />
-          <Property Name="absent_days" Type="Int32" />
+          <Property Name="absent_days" Type="Decimal" Precision="4" Scale="1" />
           <Property Name="has_connect_emp" Type="String" MaxLength="1" FixedLength="true" Unicode="true" />
           <Property Name="connect_emp_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="has_connect_family" Type="String" MaxLength="1" FixedLength="true" Unicode="true" />
@@ -4446,6 +4623,84 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="dep_charger_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="highest_charger_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="highest_charger_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="resign_apply_date" Type="DateTime" Precision="0" />
+        </EntityType>
+        <EntityType Name="vw_JQExcel">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="audit_result" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="quit_type" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="card_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="sex" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="dep_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="position" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="education" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="salary_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="hometown" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="account" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="absent_from" Type="DateTime" Precision="0" />
+          <Property Name="absent_to" Type="DateTime" Precision="0" />
+          <Property Name="absent_days" Type="Decimal" Precision="4" Scale="1" />
+          <Property Name="quit_reason" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="quit_suggestion" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="work_evaluation" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="work_comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="wanna_employ" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="employ_comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="audit_result" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <ComplexType Name="GetAPPriceHistory_Result">
+          <Property Type="String" Name="account" Nullable="false" MaxLength="6" />
+          <Property Type="DateTime" Name="po_date" Nullable="true" Precision="23" />
+          <Property Type="String" Name="bill_no" Nullable="false" MaxLength="255" />
+          <Property Type="String" Name="supplier_name" Nullable="true" MaxLength="80" />
+          <Property Type="Decimal" Name="price" Nullable="false" Precision="28" Scale="10" />
+          <Property Type="Decimal" Name="tax_rate" Nullable="false" Precision="20" Scale="2" />
+        </ComplexType>
+        <EntityType Name="ei_sjApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="salary_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="switch_type" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="card_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="sex" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="education" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="account" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="out_dep_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="out_dep_id" Type="Int32" />
+          <Property Name="out_dep_position" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="out_time" Type="DateTime" Precision="0" />
+          <Property Name="out_clerk_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="out_clerk_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="out_manager_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="out_manager_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="out_minister_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="out_minister_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="in_dep_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="in_dep_id" Type="Int32" />
+          <Property Name="in_dep_position" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="in_time" Type="DateTime" Precision="0" />
+          <Property Name="in_clerk_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="in_clerk_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="in_manager_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="in_manager_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="in_minister_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="in_minister_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="comment" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
         </EntityType>
         <ComplexType Name="GetHREmpInfoDetail_Result">
           <Property Type="String" Name="name" Nullable="true" MaxLength="50" />
@@ -4456,7 +4711,48 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Type="String" Name="salary_type" Nullable="true" MaxLength="50" />
           <Property Type="String" Name="hometown" Nullable="true" MaxLength="150" />
           <Property Type="String" Name="account" Nullable="true" MaxLength="10" />
+          <Property Type="Int32" Name="dep_id" Nullable="false" />
         </ComplexType>
+        <EntityType Name="vw_SJExcel">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="audit_result" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="salary_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="switch_type" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="card_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="sex" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="education" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="account" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="out_dep_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="out_dep_id" Type="Int32" />
+          <Property Name="out_dep_position" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="out_time" Type="DateTime" Precision="0" />
+          <Property Name="out_clerk_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="out_clerk_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="out_manager_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="out_manager_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="out_minister_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="out_minister_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="in_dep_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="in_dep_id" Type="Int32" />
+          <Property Name="in_dep_position" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="in_time" Type="DateTime" Precision="0" />
+          <Property Name="in_clerk_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="in_clerk_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="in_manager_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="in_manager_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="in_minister_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="in_minister_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="comment" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="audit_result" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -6004,18 +6300,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="GetAPPriceHistory" FunctionName="ICAuditModel.Store.GetAPPriceHistory">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ICAuditModel.GetAPPriceHistory_Result">
-                <ScalarProperty Name="account" ColumnName="account" />
-                <ScalarProperty Name="po_date" ColumnName="po_date" />
-                <ScalarProperty Name="bill_no" ColumnName="bill_no" />
-                <ScalarProperty Name="supplier_name" ColumnName="supplier_name" />
-                <ScalarProperty Name="price" ColumnName="price" />
-                <ScalarProperty Name="tax_rate" ColumnName="tax_rate" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
           <EntitySetMapping Name="vw_hr_department">
             <EntityTypeMapping TypeName="ICAuditModel.vw_hr_department">
               <MappingFragment StoreEntitySet="vw_hr_department">
@@ -6142,6 +6426,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_jqApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_jqApply">
               <MappingFragment StoreEntitySet="ei_jqApply">
+                <ScalarProperty Name="resign_apply_date" ColumnName="resign_apply_date" />
                 <ScalarProperty Name="highest_charger_num" ColumnName="highest_charger_num" />
                 <ScalarProperty Name="highest_charger_name" ColumnName="highest_charger_name" />
                 <ScalarProperty Name="dep_charger_num" ColumnName="dep_charger_num" />
@@ -6185,6 +6470,88 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="vw_JQExcel">
+            <EntityTypeMapping TypeName="ICAuditModel.vw_JQExcel">
+              <MappingFragment StoreEntitySet="vw_JQExcel">
+                <ScalarProperty Name="audit_result" ColumnName="audit_result" />
+                <ScalarProperty Name="employ_comment" ColumnName="employ_comment" />
+                <ScalarProperty Name="wanna_employ" ColumnName="wanna_employ" />
+                <ScalarProperty Name="work_comment" ColumnName="work_comment" />
+                <ScalarProperty Name="work_evaluation" ColumnName="work_evaluation" />
+                <ScalarProperty Name="quit_suggestion" ColumnName="quit_suggestion" />
+                <ScalarProperty Name="quit_reason" ColumnName="quit_reason" />
+                <ScalarProperty Name="absent_days" ColumnName="absent_days" />
+                <ScalarProperty Name="absent_to" ColumnName="absent_to" />
+                <ScalarProperty Name="absent_from" ColumnName="absent_from" />
+                <ScalarProperty Name="account" ColumnName="account" />
+                <ScalarProperty Name="hometown" ColumnName="hometown" />
+                <ScalarProperty Name="salary_type" ColumnName="salary_type" />
+                <ScalarProperty Name="education" ColumnName="education" />
+                <ScalarProperty Name="position" ColumnName="position" />
+                <ScalarProperty Name="dep_name" ColumnName="dep_name" />
+                <ScalarProperty Name="sex" ColumnName="sex" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
+                <ScalarProperty Name="quit_type" ColumnName="quit_type" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetAPPriceHistory" FunctionName="ICAuditModel.Store.GetAPPriceHistory">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetAPPriceHistory_Result">
+                <ScalarProperty Name="account" ColumnName="account" />
+                <ScalarProperty Name="po_date" ColumnName="po_date" />
+                <ScalarProperty Name="bill_no" ColumnName="bill_no" />
+                <ScalarProperty Name="supplier_name" ColumnName="supplier_name" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="tax_rate" ColumnName="tax_rate" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="ei_sjApply">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_sjApply">
+              <MappingFragment StoreEntitySet="ei_sjApply">
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="in_minister_num" ColumnName="in_minister_num" />
+                <ScalarProperty Name="in_minister_name" ColumnName="in_minister_name" />
+                <ScalarProperty Name="in_manager_num" ColumnName="in_manager_num" />
+                <ScalarProperty Name="in_manager_name" ColumnName="in_manager_name" />
+                <ScalarProperty Name="in_clerk_num" ColumnName="in_clerk_num" />
+                <ScalarProperty Name="in_clerk_name" ColumnName="in_clerk_name" />
+                <ScalarProperty Name="in_time" ColumnName="in_time" />
+                <ScalarProperty Name="in_dep_position" ColumnName="in_dep_position" />
+                <ScalarProperty Name="in_dep_id" ColumnName="in_dep_id" />
+                <ScalarProperty Name="in_dep_name" ColumnName="in_dep_name" />
+                <ScalarProperty Name="out_minister_num" ColumnName="out_minister_num" />
+                <ScalarProperty Name="out_minister_name" ColumnName="out_minister_name" />
+                <ScalarProperty Name="out_manager_num" ColumnName="out_manager_num" />
+                <ScalarProperty Name="out_manager_name" ColumnName="out_manager_name" />
+                <ScalarProperty Name="out_clerk_num" ColumnName="out_clerk_num" />
+                <ScalarProperty Name="out_clerk_name" ColumnName="out_clerk_name" />
+                <ScalarProperty Name="out_time" ColumnName="out_time" />
+                <ScalarProperty Name="out_dep_position" ColumnName="out_dep_position" />
+                <ScalarProperty Name="out_dep_id" ColumnName="out_dep_id" />
+                <ScalarProperty Name="out_dep_name" ColumnName="out_dep_name" />
+                <ScalarProperty Name="account" ColumnName="account" />
+                <ScalarProperty Name="education" ColumnName="education" />
+                <ScalarProperty Name="sex" ColumnName="sex" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
+                <ScalarProperty Name="switch_type" ColumnName="switch_type" />
+                <ScalarProperty Name="salary_type" ColumnName="salary_type" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <FunctionImportMapping FunctionImportName="GetHREmpInfoDetail" FunctionName="ICAuditModel.Store.GetHREmpInfoDetail">
             <ResultMapping>
               <ComplexTypeMapping TypeName="ICAuditModel.GetHREmpInfoDetail_Result">
@@ -6196,9 +6563,50 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="salary_type" ColumnName="salary_type" />
                 <ScalarProperty Name="hometown" ColumnName="hometown" />
                 <ScalarProperty Name="account" ColumnName="account" />
+                <ScalarProperty Name="dep_id" ColumnName="dep_id" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="vw_SJExcel">
+            <EntityTypeMapping TypeName="ICAuditModel.vw_SJExcel">
+              <MappingFragment StoreEntitySet="vw_SJExcel">
+                <ScalarProperty Name="audit_result" ColumnName="audit_result" />
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="in_minister_num" ColumnName="in_minister_num" />
+                <ScalarProperty Name="in_minister_name" ColumnName="in_minister_name" />
+                <ScalarProperty Name="in_manager_num" ColumnName="in_manager_num" />
+                <ScalarProperty Name="in_manager_name" ColumnName="in_manager_name" />
+                <ScalarProperty Name="in_clerk_num" ColumnName="in_clerk_num" />
+                <ScalarProperty Name="in_clerk_name" ColumnName="in_clerk_name" />
+                <ScalarProperty Name="in_time" ColumnName="in_time" />
+                <ScalarProperty Name="in_dep_position" ColumnName="in_dep_position" />
+                <ScalarProperty Name="in_dep_id" ColumnName="in_dep_id" />
+                <ScalarProperty Name="in_dep_name" ColumnName="in_dep_name" />
+                <ScalarProperty Name="out_minister_num" ColumnName="out_minister_num" />
+                <ScalarProperty Name="out_minister_name" ColumnName="out_minister_name" />
+                <ScalarProperty Name="out_manager_num" ColumnName="out_manager_num" />
+                <ScalarProperty Name="out_manager_name" ColumnName="out_manager_name" />
+                <ScalarProperty Name="out_clerk_num" ColumnName="out_clerk_num" />
+                <ScalarProperty Name="out_clerk_name" ColumnName="out_clerk_name" />
+                <ScalarProperty Name="out_time" ColumnName="out_time" />
+                <ScalarProperty Name="out_dep_position" ColumnName="out_dep_position" />
+                <ScalarProperty Name="out_dep_id" ColumnName="out_dep_id" />
+                <ScalarProperty Name="out_dep_name" ColumnName="out_dep_name" />
+                <ScalarProperty Name="account" ColumnName="account" />
+                <ScalarProperty Name="education" ColumnName="education" />
+                <ScalarProperty Name="sex" ColumnName="sex" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
+                <ScalarProperty Name="switch_type" ColumnName="switch_type" />
+                <ScalarProperty Name="salary_type" ColumnName="salary_type" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

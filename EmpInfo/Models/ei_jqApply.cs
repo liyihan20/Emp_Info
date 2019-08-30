@@ -31,7 +31,7 @@ namespace EmpInfo.Models
         public string account { get; set; }
         public Nullable<System.DateTime> absent_from { get; set; }
         public Nullable<System.DateTime> absent_to { get; set; }
-        public Nullable<int> absent_days { get; set; }
+        public Nullable<decimal> absent_days { get; set; }
         public string has_connect_emp { get; set; }
         public string connect_emp_phone { get; set; }
         public string has_connect_family { get; set; }
@@ -54,5 +54,6 @@ namespace EmpInfo.Models
         public string dep_charger_num { get; set; }
         public string highest_charger_name { get; set; }
         public string highest_charger_num { get; set; }
+        public Nullable<System.DateTime> resign_apply_date { get; set; }
     }
 }

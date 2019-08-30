@@ -100,7 +100,10 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_apApplyEntry" Width="1.5" PointX="0.5" PointY="14.375" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_apApplyEntry_ei_apApply" />
         <EntityTypeShape EntityType="ICAuditModel.vw_APExcel" Width="1.5" PointX="2.375" PointY="14.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_jqApply" Width="1.5" PointX="6" PointY="14.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_jqApply" Width="1.5" PointX="6" PointY="13.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_JQExcel" Width="1.5" PointX="8.25" PointY="13.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_sjApply" Width="1.5" PointX="6" PointY="14.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_SJExcel" Width="1.5" PointX="8.25" PointY="14.375" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -1,6 +1,15 @@
-﻿@section CSS{
+﻿@using EmpInfo.Models;
+@{
+    JQSearchParam sm = ViewData["sm"] as JQSearchParam;
+}
+@section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        .lbText{
+            font-style:italic;
+        }
+    </style>
 }
 @section Scripts {
     @*加入以下js，使IE8支持datetimepicker组件*@
@@ -59,10 +68,13 @@
                 return;
             }
             toastr.info("数据正在导出，请稍等...");
-            window.location.href = "@Url.Content("~/Report/BeginExportAPReport?")"
+            window.location.href = "@Url.Content("~/Report/BeginExportJQReport?")"
                 + "fromDate=" + $("#fromDate").val()
                 + "&toDate=" + $("#toDate").val()
-                ;
+                + "&depName=" + $("#depName").val()
+                + "&empName=" + $("#empName").val()
+                + "&sysNum=" + $("#sysNum").val()
+            ;
             });
 
         $("#checkBt").on("click", function () {
@@ -75,9 +87,12 @@
                 return;
             }
             
-            $.post("@Url.Content("~/Report/CheckAPReport")", {
+            $.post("@Url.Content("~/Report/CheckJQReport")", {
                 fromDate: $("#fromDate").val(),
-                toDate: $("#toDate").val()
+                toDate: $("#toDate").val(),
+                depName: $("#depName").val(),
+                empName: $("#empName").val(),
+                sysNum:$("#sysNum").val()
             }, function (data) {
                 $('#check_tb').bootstrapTable('load', data);
                 if (data.length == 0) {
@@ -102,11 +117,20 @@
                     field: "sys_no",
                     title: "流水号"
                 }, {
-                    field: "bus_name",
-                    title: "事业部"
-                }, {
                     field: "dep_name",
-                    title: "申购部门"
+                    title: "人事部门"
+                }, {
+                    field: "quit_type",
+                    title: "离职类型"
+                }, {
+                    field: "name",
+                    title: "离职人"
+                }, {
+                    field: "account",
+                    title: "离职账号"
+                }, {
+                    field: "salary_type",
+                    title: "工资类别"
                 }, {
                     field: "applier_name",
                     title: "申请人"
@@ -116,9 +140,6 @@
                     formatter: function (value, row, index, field) {
                         return utils.parseTDate(value,true);
                     }
-                }, {
-                    field: "po_number",
-                    title: "PR单号"
                 }, {
                     field: "audit_result",
                     title: "处理结果"
@@ -145,34 +166,45 @@
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
             <li><a href="@Url.Content("~/Home/NoPaperProcess")">无纸化流程</a></li>
-            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=AP")">辅料订购申请</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=JQ")">员工辞职/自离流程</a></li>
             <li class="active">查询报表</li>
         </ol>
     </div>
     <div class="panel-body">
-        <div class="row" style="margin-bottom:20px;">
+        <div class="row" style="margin-bottom:6px;">
             <div class="col-xs-12 col-sm-6 col-md-4">
-                
+                <div class="lbText">提交日期从：</div>
                 <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    <input class="form-control" type="text" id="fromDate" name="fromDate" placeholder="请输入起始日期" readonly />
+                    <input class="form-control" type="text" id="fromDate" name="fromDate" readonly value="@sm.fromDate" />
                 </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">提交日期到：</div>
                 <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    <input class="form-control" type="text" id="toDate" name="toDate" placeholder="请输入结束日期" readonly />
+                    <input class="form-control" type="text" id="toDate" name="toDate" readonly value="@sm.toDate" />
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-4">
-                <div class="btn-group btn-group-justified" role="group" style="margin:6px 0;">
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-primary" id="checkBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
-                    </div>
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-success" id="reportBt" data-loading-text="导出中..."><i class="fa fa-file-excel-o"></i> 导出报表</button>
-                    </div>
-                </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">员工姓名：</div>
+                <input type="text" class="form-control" name="empName" id="empName" style="margin:6px 0;" value="@sm.empName" />
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">                
+                <div class="lbText">人事部门名称：</div>
+                <input type="text" class="form-control" name="depName" id="depName" style="margin:6px 0;" value="@sm.depName" />                
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">流水号：</div>
+                <input type="text" class="form-control" name="sysNum" id="sysNum" style="margin:6px 0;" value="@sm.sysNum" />                
+            </div>
+        </div>
+        <div class="btn-group btn-group-justified" role="group" style="margin-bottom:20px;">
+            <div class="btn-group" role="group">
+                <button class="btn btn-primary" id="checkBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
+            </div>
+            <div class="btn-group" role="group">
+                <button class="btn btn-success" id="reportBt" data-loading-text="导出中..."><i class="fa fa-file-excel-o"></i> 导出报表</button>
             </div>
         </div>
 

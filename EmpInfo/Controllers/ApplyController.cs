@@ -30,7 +30,7 @@ namespace EmpInfo.Controllers
             ViewData["billName"] = bill.BillTypeName;
             ViewData["menuItems"] = bill.GetApplyMenuItems(userInfo);
             ViewData["navigatorLinks"] = bill.GetApplyNavigatorLinks();
-            WriteEventLog(billType, "打开主界面");
+            //WriteEventLog(billType, "打开主界面");
 
             return View();
         }
@@ -125,7 +125,7 @@ namespace EmpInfo.Controllers
             ViewData["billTypeName"] = bill.BillTypeName;
             ViewData["navigatorLinks"] = bill.GetApplyNavigatorLinks();
 
-            WriteEventLog(bill.BillTypeName, "打开我申请的界面");
+            //WriteEventLog(bill.BillTypeName, "打开我申请的界面");
             return View(bill.GetMyAppliesViewName());
         }
 
@@ -175,14 +175,14 @@ namespace EmpInfo.Controllers
         public ActionResult GetMyAuditingList(string billType)
         {
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { billType }, 400).ToList();
+            List<FlowAuditListModel> list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { billType }, 400).ToList();
             list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
             SetBillByType(billType);
             ViewData["list"] = list;
             ViewData["billType"] = billType;
             ViewData["billTypeName"] = bill.BillTypeName;
             ViewData["navigatorLinks"] = bill.GetApplyNavigatorLinks();
-            WriteEventLog(billType, "打开我的待办界面");
+            //WriteEventLog(billType, "打开我的待办界面");
 
             return View();
         }
@@ -221,7 +221,7 @@ namespace EmpInfo.Controllers
             ViewData["billTypeName"] = bill.BillTypeName;
             ViewData["navigatorLinks"] = bill.GetApplyNavigatorLinks();
 
-            WriteEventLog(billType, "打开我的已办界面");
+            //WriteEventLog(billType, "打开我的已办界面");
             return View("GetMyAuditedList");
         }
 

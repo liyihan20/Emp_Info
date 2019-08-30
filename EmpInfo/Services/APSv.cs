@@ -157,6 +157,18 @@ namespace EmpInfo.Services
                 bill.po_number = poNumber;
             }
 
+            //审核人一开始没有在权限组里，在这里加入
+            var autGroup = db.ei_groups.Where(g => g.name == "辅料订购申请组").FirstOrDefault();
+            if (autGroup != null) {
+                if (db.ei_groupUser.Where(gu => gu.group_id == autGroup.id && gu.user_id == userInfo.id).Count() < 1) {
+                    db.ei_groupUser.Add(new ei_groupUser()
+                    {
+                        group_id = autGroup.id,
+                        user_id = userInfo.id
+                    });
+                }
+            }
+
             var setting = new JsonSerializerSettings();
             setting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             string formJson = JsonConvert.SerializeObject(bill, setting);
@@ -257,9 +269,9 @@ namespace EmpInfo.Services
         /// </summary>
         /// <param name="itemId"></param>
         /// <returns></returns>
-        public GetAPPriceHistory_Result GetItemPriceHistory(int itemId)
+        public GetAPPriceHistory_Result GetItemPriceHistory(string itemNo)
         {
-            return db.GetAPPriceHistory(itemId).FirstOrDefault();            
+            return db.GetAPPriceHistory(itemNo).FirstOrDefault();            
         }
 
         /// <summary>

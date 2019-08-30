@@ -1,0 +1,144 @@
+﻿@using EmpInfo.Models;
+@using Newtonsoft.Json;
+@{
+    BeginAuditModel bam = (BeginAuditModel)ViewData["bam"];
+    string auditJson = JsonConvert.SerializeObject(bam.otherInfo);
+}
+@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: middle;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+
+        .op_bt {
+            cursor: pointer;
+        }
+    </style>
+
+}
+@section Scripts {
+    <script>
+        $(function () {
+            $("#applyContent").load("CheckApply", { sysNo: "@bam.sysNum" }, function () {
+                $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> @bam.billTypeName 详情");
+                $("#waiting").remove();
+                $(".auditContent").css("visibility", "visible");
+            });
+            utils.loadObjData($("#auditForm"),@Html.Raw(auditJson));
+        });
+        function audit(isPass) {
+            openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此申请吗？", function () {
+                $.post("HandleApply", {
+                    sysNo: "@bam.sysNum",
+                    step: "@bam.step",
+                    stepName:"@bam.stepName",
+                    isPass: isPass,
+                    work_evaluation: $("#work_evaluation").val(),
+                    work_comment: $("#work_comment").val(),
+                    wanna_employ: $("#wanna_employ").val(),
+                    employ_comment: $("#employ_comment").val()
+                }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+        }
+</script>
+
+}
+@*通过load获取申请单内容*@
+<div class="text-center text-danger" id="waiting"><i class="fa fa-3x fa-spinner fa-pulse"></i></div>
+<div id="applyContent"></div>
+
+@*审批信息*@
+<div class="auditContent">
+    <div class="panel panel-primary">
+        <div class="panel-heading" id="auditHead">
+            <i class='fa fa-pencil'></i> 开始审批
+        </div>
+        <div class="panel-body">
+            @if (bam.isPass == null) { 
+            <form id="auditForm">
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;">
+                        工作评价:
+                    </span>
+                    <span style="display:inline-block;width:70%">
+                        <select class="form-control" name="work_evaluation" id="work_evaluation">
+                                <option value="">---- 下拉选择评价 ----</option>
+                                @foreach (var d in new string[] { "良好", "一般", "较差" }) {
+                                    <option value="@d">@d</option>
+                                }
+                        </select>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;">
+                        工作评价描述:
+                    </span>
+                    <span style="display:inline-block;width:70%">
+                        <textarea type="text" class="form-control" rows="3" id="work_comment" name="work_comment" placeholder="对离职员工的工作情况进行描述"></textarea>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;">
+                        原部是否愿意再录用:
+                    </span>
+                    <span style="display:inline-block;width:70%">
+                        <select class="form-control" name="wanna_employ" id="wanna_employ">
+                                <option value="">---- 下拉进行选择 ----</option>
+                                @foreach (var d in new string[] { "是", "否", "建议公司不再录用" }) {
+                                    <option value="@d">@d</option>
+                                }
+                        </select>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;">
+                        是否愿意再录用原因:
+                    </span>
+                    <span style="display:inline-block;width:70%">
+                        <textarea type="text" class="form-control" rows="3" id="employ_comment" name="employ_comment" placeholder="是否愿意再次录用此离职员工的原因"></textarea>
+                    </span>
+                </div>
+            </form>
+            }
+            <div style="margin-top:12px;"></div>
+            @if (bam.isPass == null) {
+                <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
+                    </div>
+                </div>
+            }
+            else if ((bool)bam.isPass) {
+                <button type="button" class="btn btn-block btn-success disabled">已同意此申请</button>
+            }
+            else {
+                <button type="button" class="btn btn-block btn-danger disabled">已拒绝此申请</button>
+            }
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+}

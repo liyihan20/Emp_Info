@@ -44,6 +44,7 @@
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
     <script>
         var qtyModalParam={item_no:"",bus_name:"@h.bus_name",begin_date:"",end_date:""};
+        var canSearch=true;
         $("#tb").bootstrapTable({
             striped: true,
             mobileResponsive: true,
@@ -112,7 +113,7 @@
                         }
                         bts.push("<i class='fa fa-search op_bt text-danger' onclick='checkInfo(\""+row.item_no+"\",\""+row.item_name+"\",\""+row.item_modual.replace(/"/g,'#quot;')+"\")' title='历史记录'></i>");
                         if("@bam.stepName" == "采购确认" || "@bam.stepName" == "总裁办审批" ){
-                            bts.push("<i class='fa fa-cny op_bt text-info' onclick='checkPrice("+row.item_id+",\""+row.item_name+"\",\""+row.item_modual.replace(/"/g,'#quot;')+"\")' title='历史价格'></i>");
+                            bts.push("<i class='fa fa-cny op_bt text-info' onclick='checkPrice(\""+row.item_no+"\",\""+row.item_name+"\",\""+row.item_modual.replace(/"/g,'#quot;')+"\")' title='历史价格'></i>");
                         }
                         bts.push("<i class='fa fa-th op_bt text-primary' onclick='checkStock("+"\""+row.item_no+"\")' title='即时库存'></i>");
                         return bts.join(" | ");
@@ -198,9 +199,13 @@
             $("#qty_item_info").html("物料名称："+item_name+" ；规格型号："+item_modual.replace(/#quot;/g,'"'));
         }
 
-        function checkPrice(item_id,item_name,item_modual){
-            if(item_id){
-                $.post("@Url.Content("~/Item/GetAPPriceHistory")",{itemId:item_id},function(data){
+        function checkPrice(item_no,item_name,item_modual){
+            if(!canSearch) return;
+            toastr.info("正在查询价格信息，请稍等...");
+            canSearch=false;
+            if(item_no){
+                canSearch=true;
+                $.post("@Url.Content("~/Item/GetAPPriceHistory")",{itemNo:item_no},function(data){
                     if(data.suc){
                         var history=JSON.parse(data.extra);
                         var tb='<table style="width:100%;" cellspacing="4" cellpadding="4" class="price_tb">';
@@ -214,7 +219,7 @@
                         tb+='<tr><td><i class="fa fa-caret-right fa-fw"></i> 税率：</td><td>'+history.tax_rate+'%</td></tr>';
                         tb+='</table>';
                         openMessageDialog(tb,'历史价格信息');
-                        $(".price_tb tr td:odd").addClass("text-danger");
+                        $(".price_tb tr td:odd").addClass("text-danger");                        
                     } else{
                         toastr.error(data.msg);
                     }
@@ -223,16 +228,21 @@
         }
 
         function checkStock(item_number){
+            if(!canSearch) return;
+            toastr.info("正在查询库存信息，请稍等...");
+            canSearch=false;
+
             $('#stock_tb').bootstrapTable('load', []);            
 
             $.post("@Url.Content("~/Item/GetItemStockQtyFromK3")",{
                 itemNumber: item_number
             },function(data){
+                canSearch=true;
                 if (data.suc) {
                     var stockInfo = JSON.parse(data.extra);
                     $('#stock_tb').bootstrapTable('load', stockInfo);
                     $("#stock_item_info").html("物料名称：" + stockInfo[0].item_name + " ；规格型号：" + stockInfo[0].item_modual);
-                    $("#stockModal").modal("show");
+                    $("#stockModal").modal("show");                    
                 }else{
                     toastr.error(data.msg);
                 }
@@ -256,16 +266,21 @@
                 if(qtyModalParam.end_date=="") return;
                 if(qtyModalParam.item_no=="") return;
                 
+                if(!canSearch) return;
+                toastr.info("正在查询历史数量信息，请稍等...");
+                canSearch=false;
+
                 $.post("@Url.Content("~/Item/GetAPQtyHistory")",{
                     itemNumber:qtyModalParam.item_no,
                     busName:qtyModalParam.bus_name,
                     beginDate:qtyModalParam.begin_date,
                     endDate:qtyModalParam.end_date
                 },function(data){
+                    canSearch=true;
                     if(data.suc){                        
                         var itemQtyInfo=JSON.parse(data.extra);
                         $('#qty_tb').bootstrapTable('load', itemQtyInfo);
-                        toastr.success("查询成功，行数：" + itemQtyInfo.length);
+                        toastr.success("查询成功，行数：" + itemQtyInfo.length);                        
                     }else{
                         toastr.error(data.msg);
                     }

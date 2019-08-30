@@ -68,4 +68,23 @@ namespace EmpInfo.Models
         public string equitmentDepName { get; set; }
     }
 
+    public class JQSearchParam
+    {
+        public string fromDate { get; set; }
+        public string toDate { get; set; }
+        public string depName { get; set; }
+        public string empName { get; set; }
+        public string sysNum { get; set; }
+    }
+
+    public class SJSearchParam
+    {
+        public string fromDate { get; set; }
+        public string toDate { get; set; }
+        public string inDepName { get; set; }
+        public string outDepName { get; set; }
+        public string empName { get; set; }
+        public string sysNum { get; set; }
+    }
+
 }

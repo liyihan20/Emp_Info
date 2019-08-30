@@ -232,10 +232,10 @@ namespace EmpInfo.Controllers
         }
 
 
-        public JsonResult GetAPPriceHistory(int itemId)
+        public JsonResult GetAPPriceHistory(string itemNo)
         {
             try {
-                var result = new APSv().GetItemPriceHistory(itemId);
+                var result = new APSv().GetItemPriceHistory(itemNo);
                 if (result != null) {
                     return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(result) });
                 }
@@ -305,7 +305,7 @@ namespace EmpInfo.Controllers
                 var result = db.GetHREmpInfoDetail(cardNumber).FirstOrDefault();
                 if (result == null) {
                     return Json(new SimpleResultModel() { suc = false, msg = "获取不到此厂牌的人事系统信息" });
-                }
+                }                
                 return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(result) });
             }
             catch (Exception ex) {

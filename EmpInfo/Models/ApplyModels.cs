@@ -187,4 +187,10 @@ namespace EmpInfo.Models
         public List<ei_apApplyEntry> entrys { get; set; }
     }
 
+    public class JQBeforeApplyModel
+    {
+        public string sysNum { get; set; }
+        public string applierNum { get; set; }
+    }
+
 }

@@ -1,6 +1,15 @@
-﻿@section CSS{
+﻿@using EmpInfo.Models;
+@{
+    SJSearchParam sm = ViewData["sm"] as SJSearchParam;
+}
+@section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        .lbText{
+            font-style:italic;
+        }
+    </style>
 }
 @section Scripts {
     @*加入以下js，使IE8支持datetimepicker组件*@
@@ -31,7 +40,6 @@
     <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
     <script>
-    var currentTr;
     $(function () {
         $(".form_date").datetimepicker({
             language: 'zh-CN',
@@ -49,6 +57,13 @@
             $('#fromDatePicker1').datetimepicker('setEndDate', e.date);
         });
 
+        $("#inDepName,#outDepName").on("click", function () {
+            var self = this;
+            openSelectDepDialog(2, function (selectedDep) {
+                $(self).val(selectedDep.depLongName);
+            });
+        });
+
         $("#reportBt").on("click", function () {
             if ($("#fromDate").val() == "") {
                 toastr.error("请先输入开始日期");
@@ -59,10 +74,14 @@
                 return;
             }
             toastr.info("数据正在导出，请稍等...");
-            window.location.href = "@Url.Content("~/Report/BeginExportAPReport?")"
+            window.location.href = "@Url.Content("~/Report/BeginExportJQReport?")"
                 + "fromDate=" + $("#fromDate").val()
                 + "&toDate=" + $("#toDate").val()
-                ;
+                + "&empName=" + $("#empName").val()
+                + "&outDepName" + $("#outDepName").val()
+                + "&inDepName" + $("#inDepName").val()
+                + "&sysNum" + $("#sysNum").val()
+            ;
             });
 
         $("#checkBt").on("click", function () {
@@ -75,9 +94,13 @@
                 return;
             }
             
-            $.post("@Url.Content("~/Report/CheckAPReport")", {
+            $.post("@Url.Content("~/Report/CheckSJReport")", {
                 fromDate: $("#fromDate").val(),
-                toDate: $("#toDate").val()
+                toDate: $("#toDate").val(),
+                empName: $("#empName").val(),
+                outDepName: $("#outDepName").val(),
+                inDepName: $("#inDepName").val(),
+                sysNum: $("#sysNum").val()
             }, function (data) {
                 $('#check_tb').bootstrapTable('load', data);
                 if (data.length == 0) {
@@ -95,18 +118,27 @@
             mobileResponsive: true,
             pagination: true,
             pageSize: 40,
-            pageList: [20, 40, 60, 100],
+            pageList:[20,40,60,100],
             search:true,
             columns: [
                 {
                     field: "sys_no",
                     title: "流水号"
                 }, {
-                    field: "bus_name",
-                    title: "事业部"
+                    field: "out_dep_name",
+                    title: "调出部门"
                 }, {
-                    field: "dep_name",
-                    title: "申购部门"
+                    field: "in_dep_name",
+                    title: "调入部门"
+                }, {
+                    field: "name",
+                    title: "姓名"
+                }, {
+                    field: "account",
+                    title: "账号"
+                }, {
+                    field: "salary_type",
+                    title: "工资类别"
                 }, {
                     field: "applier_name",
                     title: "申请人"
@@ -116,9 +148,6 @@
                     formatter: function (value, row, index, field) {
                         return utils.parseTDate(value,true);
                     }
-                }, {
-                    field: "po_number",
-                    title: "PR单号"
                 }, {
                     field: "audit_result",
                     title: "处理结果"
@@ -145,34 +174,49 @@
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
             <li><a href="@Url.Content("~/Home/NoPaperProcess")">无纸化流程</a></li>
-            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=AP")">辅料订购申请</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=SJ")">员工调动流程</a></li>
             <li class="active">查询报表</li>
         </ol>
     </div>
     <div class="panel-body">
-        <div class="row" style="margin-bottom:20px;">
+        <div class="row" style="margin-bottom:6px;">
             <div class="col-xs-12 col-sm-6 col-md-4">
-                
+                <div class="lbText">提交日期从：</div>
                 <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    <input class="form-control" type="text" id="fromDate" name="fromDate" placeholder="请输入起始日期" readonly />
+                    <input class="form-control" type="text" id="fromDate" name="fromDate" readonly value="@sm.fromDate" />
                 </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">提交日期到：</div>
                 <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    <input class="form-control" type="text" id="toDate" name="toDate" placeholder="请输入结束日期" readonly />
+                    <input class="form-control" type="text" id="toDate" name="toDate" readonly value="@sm.toDate" />
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-4">
-                <div class="btn-group btn-group-justified" role="group" style="margin:6px 0;">
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-primary" id="checkBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
-                    </div>
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-success" id="reportBt" data-loading-text="导出中..."><i class="fa fa-file-excel-o"></i> 导出报表</button>
-                    </div>
-                </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">员工姓名：</div>
+                <input type="text" class="form-control" name="empName" id="empName" style="margin:6px 0;" value="@sm.empName" />
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">调出部门名称：</div>
+                <input type="text" class="form-control" name="outDepName" id="outDepName" style="margin:6px 0;" value="@sm.outDepName" />
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">调入部门名称：</div>
+                <input type="text" class="form-control" name="inDepName" id="inDepName" style="margin:6px 0;" value="@sm.inDepName" />                
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">流水号：</div>
+                <input type="text" class="form-control" name="sysNum" id="sysNum" style="margin:6px 0;" value="@sm.sysNum" />                
+            </div>
+        </div>
+        <div class="btn-group btn-group-justified" role="group" style="margin-bottom:20px;">
+            <div class="btn-group" role="group">
+                <button class="btn btn-primary" id="checkBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
+            </div>
+            <div class="btn-group" role="group">
+                <button class="btn btn-success" id="reportBt" data-loading-text="导出中..."><i class="fa fa-file-excel-o"></i> 导出报表</button>
             </div>
         </div>
 
@@ -181,3 +225,6 @@
     </div>
 </div>
 
+@section Modal {
+    @Html.Partial("_SelectDep")
+}
