@@ -343,6 +343,9 @@
     <Compile Include="Models\ei_sjApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_spApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_specialUsers.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -535,6 +538,9 @@
     <Compile Include="Models\vw_SJExcel.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\vw_spExcel.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\vw_svReport.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -569,6 +575,7 @@
     <Compile Include="Services\SJSv.cs" />
     <Compile Include="Services\JQSv.cs" />
     <Compile Include="Services\SASv.cs" />
+    <Compile Include="Services\SPSv.cs" />
     <Compile Include="Services\SVSv.cs" />
     <Compile Include="Services\UCSv.cs" />
     <Compile Include="Util\BillUtils.cs" />
@@ -773,6 +780,7 @@
     <Content Include="Content\images\book.png" />
     <Content Include="Content\images\box.png" />
     <Content Include="Content\images\bubble-sprite.png" />
+    <Content Include="Content\images\cargo.png" />
     <Content Include="Content\images\computer.png" />
     <Content Include="Content\images\dep.png" />
     <Content Include="Content\images\elepr.png" />
@@ -1261,6 +1269,10 @@
     <Content Include="Views\Report\SJReport.cshtml" />
     <Content Include="Views\Apply\CheckSJApply.cshtml" />
     <Content Include="Views\Apply\BeginAuditApplyW.cshtml" />
+    <Content Include="Views\Admin\UpdateHREmpDept.cshtml" />
+    <Content Include="Views\Apply\BeginApplySP.cshtml" />
+    <Content Include="Views\Apply\CheckSPApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditSPApply.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

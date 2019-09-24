@@ -299,13 +299,30 @@ namespace EmpInfo.Controllers
             }
         }
 
-        public JsonResult GetHREmpInfoDetail(string cardNumber)
+        public JsonResult GetHREmpInfoDetail(string cardNumber,string empStatus = "")
         {
             try {
-                var result = db.GetHREmpInfoDetail(cardNumber).FirstOrDefault();
+                var result = db.GetHREmpInfoDetail(cardNumber).FirstOrDefault();                
                 if (result == null) {
                     return Json(new SimpleResultModel() { suc = false, msg = "获取不到此厂牌的人事系统信息" });
-                }                
+                }
+                if (!string.IsNullOrWhiteSpace(empStatus)) {
+                    if (result.emp_status != empStatus) {
+                        return Json(new SimpleResultModel() { suc = false, msg = "操作失败，此厂牌的当前状态是:" + result.emp_status });
+                    }
+                }
+                return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(result) });
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+        }
+
+        public JsonResult GetSPExInfo(string sysNum)
+        {
+            try {
+                var result = new SPSv(sysNum).GetExInfo();
+                if (result.Count() == 0) return Json(new SimpleResultModel() { suc = false, msg = "查询不到任何快递信息" });
                 return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(result) });
             }
             catch (Exception ex) {

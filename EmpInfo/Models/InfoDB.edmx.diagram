@@ -104,6 +104,8 @@
         <EntityTypeShape EntityType="ICAuditModel.vw_JQExcel" Width="1.5" PointX="8.25" PointY="13.75" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_sjApply" Width="1.5" PointX="6" PointY="14.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_SJExcel" Width="1.5" PointX="8.25" PointY="14.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_spApply" Width="1.5" PointX="6" PointY="15" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_spExcel" Width="1.5" PointX="8.25" PointY="15" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

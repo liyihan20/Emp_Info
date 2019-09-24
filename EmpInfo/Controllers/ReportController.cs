@@ -472,10 +472,10 @@ namespace EmpInfo.Controllers
             toDate = toDate.AddDays(1);
             var result = db.vw_UCExcel.Where(u => u.apply_time > fromDate && u.apply_time <= toDate).ToList();
 
-            ushort[] colWidth = new ushort[] { 8, 16, 12, 16, 16, 16, 24, 12,
+            ushort[] colWidth = new ushort[] { 12, 8, 16, 12, 16, 16, 16, 24, 12,
                                                24, 16, 24, 24, 12, 32 };
 
-            string[] colName = new string[] { "序号", "申请流水号", "申请人", "申请时间", "完成申请时间","到达时间", "市场部", "出货公司",
+            string[] colName = new string[] { "处理状态", "序号", "申请流水号", "申请人", "申请时间", "完成申请时间","到达时间", "市场部", "出货公司",
                                               "客户", "生产事业部", "货运公司", "出货型号", "出货数量","申请原因" };
 
             //設置excel文件名和sheet名
@@ -514,13 +514,14 @@ namespace EmpInfo.Controllers
             foreach (var d in result) {
                 colIndex = 1;
 
-                //"序号", "申请流水号", "申请人", "申请时间", "完成申请时间", "市场部", "出货公司"
+                //处理状态 ,"序号", "申请流水号", "申请人", "申请时间", "完成申请时间", "市场部", "出货公司"
                 //"客户", "生产事业部", "货运公司", "出货型号", "出货数量","申请原因"
-                cells.Add(++rowIndex, colIndex, rowIndex - 1);
+                cells.Add(++rowIndex, colIndex, d.audit_result);
+                cells.Add(rowIndex, ++colIndex, rowIndex - 1);
                 cells.Add(rowIndex, ++colIndex, d.sys_no);
                 cells.Add(rowIndex, ++colIndex, d.applier_name);
                 cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
-                cells.Add(rowIndex, ++colIndex, ((DateTime)d.finish_date).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.finish_date == null ? "" : ((DateTime)d.finish_date).ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, ((DateTime)d.arrive_time).ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, d.market_name);
                 cells.Add(rowIndex, ++colIndex, d.company);
@@ -1763,7 +1764,7 @@ namespace EmpInfo.Controllers
             var result = SearchJQData(fromDate, toDate, depName, empName, sysNum).OrderBy(s => s.apply_time).ToList();
 
             string[] colName = new string[] { "处理结果","申请流水号", "申请人", "申请时间","离职类型", "离职人", "离职人账号", "离职人厂牌", "人事部门","工资类别",
-                                              "旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工作评价","工作评价描述","原部是否愿意再录用", "是否愿意再录用原因" };
+                                              "旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工资发放方式","批准离职时间","工作评价","工作评价描述","原部是否愿意再录用", "是否愿意再录用原因" };
             ushort[] colWidth = new ushort[colName.Length];
 
             for (var i = 0; i < colWidth.Length; i++) {
@@ -1824,6 +1825,8 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.absent_days);
                 cells.Add(rowIndex, ++colIndex, d.quit_reason);
                 cells.Add(rowIndex, ++colIndex, d.quit_suggestion);
+                cells.Add(rowIndex, ++colIndex, d.salary_clear_way);
+                cells.Add(rowIndex, ++colIndex, d.leave_date == null ? "" : ((DateTime)d.leave_date).ToString("yyyy-MM-dd"));
                 cells.Add(rowIndex, ++colIndex, d.work_evaluation);
                 cells.Add(rowIndex, ++colIndex, d.work_comment);
                 cells.Add(rowIndex, ++colIndex, d.wanna_employ);
@@ -1907,7 +1910,7 @@ namespace EmpInfo.Controllers
             return Json(result);
         }
 
-        public void BeginExportJQReport(DateTime fromDate, DateTime toDate, string inDepName = "", string outDepName = "", string empName = "", string sysNum = "")
+        public void BeginExportSJReport(DateTime fromDate, DateTime toDate, string inDepName = "", string outDepName = "", string empName = "", string sysNum = "")
         {
             var result = SearchSJData(fromDate, toDate, inDepName, outDepName, empName, sysNum).OrderBy(u => u.apply_time).ToList();
 
@@ -1974,6 +1977,76 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.in_dep_position);
                 cells.Add(rowIndex, ++colIndex, d.in_time == null ? "" : ((DateTime)d.in_time).ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, d.comment);
+            }
+
+            xls.Send();
+        }
+
+        #endregion
+
+
+        #region 部门收件/寄件流程
+
+        public ActionResult SPReport()
+        {
+            return View();
+        }
+
+        public void BeginExportSPReport(DateTime fromDate, DateTime toDate)
+        {
+            toDate = toDate.AddDays(1);
+            var result = db.vw_spExcel.Where(u => u.apply_time > fromDate && u.apply_time <= toDate).ToList();
+
+            string[] colName = new string[] { "处理结果","流水号","申请人","申请时间","联系电话","收寄类型","公司","部门","放行条编号","收寄内容", };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "辅料订购申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("辅料订购详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+            var sv = new APSv();
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result) {
+                colIndex = 1;
+
+                //"申请流水号", "申请人", "公司", "事业部", "申购部门", "申请时间", "PR单号","物料代码",
+                //"物料名称", "规格型号", "实际数量", "单位","品牌","最晚到货期","使用频率","订购周期",
+                //"订购用途", "历史单价", "税率","供应商"
+                cells.Add(++rowIndex, colIndex, d.audit_result);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.applier_name);
             }
 
             xls.Send();

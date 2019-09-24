@@ -1,4 +1,5 @@
 ﻿var utils = {
+    //将对象的属性值插入表单的同名元素中
     loadObjData: function ($fm, obj) {
         var key, value, tagName, type, arr;
         for (x in obj) {
@@ -28,14 +29,16 @@
             });
         }
     },
+    //将表单元素的值提取放入对象中
     getFormObj: function ($form) {
         var array = $form.serializeArray();
         var obj = {};
         for (var i = 0; i < array.length; i++) {
-            obj[array[i].name] = array[i].value;
+            obj[array[i].name] = $.trim(array[i].value); //将值设置到对象，顺便去掉前后空格
         }
         return obj;
     },
+    //将数组元素去重后返回
     unique: function (arr) {
         var formArr = arr.sort();
         var newArr = [formArr[0]];
@@ -46,6 +49,7 @@
         }
         return newArr;
     },
+    //将后台到前台的日期格式化为年-月-日的格式，第二个参数指定是否包含小时和分钟
     parseTDate: function (d, hasHour) {
         if (d.indexOf("T") > 0) {
             return d.split("T")[0];
@@ -59,5 +63,21 @@
         } else {
             return d;
         }
+    },
+    //测试是否尺寸，必须符合 数字*数字*数字 的格式，数字可包含小数
+    testIsSize: function (str) {
+        var reg = new RegExp(/^[0-9]+(\.{1}[0-9]+){0,1}(\*[0-9]+(\.{1}[0-9]+){0,1}){2}$/);
+        return reg.test(str);
+    },
+    //测试是否整数
+    testIsInt: function (str) {
+        var reg = new RegExp(/^[0-9]+$/);
+        return reg.test(str);
+    },
+    //测试是否符合指定小数位的数字，如果指定小数位是3，那给出的必须是小于3位的小数或整数；如果不指定小数位，则最多可以包含100个小数位，相当于没限制
+    testIsFloat: function (str, digitPoint) {
+        if (!digitPoint || isNaN(digitPoint)) digitPoint = 100;
+        var reg = new RegExp("^[0-9]+(\.[0-9]{1," + digitPoint + "}){0,1}$");
+        return reg.test(str);
     }
 }  

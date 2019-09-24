@@ -1,0 +1,322 @@
+﻿@using EmpInfo.Models;
+@{
+    ei_spApply m = ViewData["am"] as ei_spApply;
+}
+@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: top;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        $(function () {
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.sys_no" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+            });
+        });
+    </script>
+}
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="ApplyIndex?billType=SP">部门寄件收件申请</a></li>
+            <li class="active">查看详情</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div>
+            <div class="b-div">
+                <span class="b-label">
+                    流转记录:
+                </span>
+                <span class="b-input">
+                    <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+                </span>
+            </div>
+        </div>
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请流水号:
+                        </span>
+                        <span class="b-input">
+                            @m.sys_no
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            联系电话:
+                        </span>
+                        <span class="b-input">
+                            @m.applier_phone
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            公司:
+                        </span>
+                        <div class="b-input">
+                            @m.company
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            部门:
+                        </span>
+                        <div class="b-input">
+                            @m.bus_name
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            收寄类型:
+                        </span>
+                        <div class="b-input">
+                            @m.send_or_receive
+                        </div>
+                    </div>
+                </div>
+                @if (m.send_or_receive == "寄件") {
+                    <div class="col-md-4 col-sm-6 col-xs-12 send_extra_info">
+                        <div class="b-div">
+                            <span class="b-label">
+                                放行条编号:
+                            </span>
+                            <span class="b-input">
+                                @m.send_no
+                            </span>
+                        </div>
+                    </div>
+                }
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            收寄内容:
+                        </span>
+                        <div class="b-input">
+                            @m.content_type
+                        </div>
+                    </div>
+                </div>
+                @if (m.content_type == "产品") {
+                    <div class="col-md-4 col-sm-6 col-xs-12 product_extra_info">
+                        <div class="b-div">
+                            <span class="b-label">
+                                产品名称:
+                            </span>
+                            <span class="b-input">
+                                @m.content_name
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12 product_extra_info">
+                        <div class="b-div">
+                            <span class="b-label">
+                                产品型号:
+                            </span>
+                            <span class="b-input">
+                                @m.content_modual
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12 product_extra_info">
+                        <div class="b-div">
+                            <span class="b-label">
+                                件数:
+                            </span>
+                            <span class="b-input">
+                                @m.package_num
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12 product_extra_info">
+                        <div class="b-div">
+                            <span class="b-label">
+                                包装箱尺寸:
+                            </span>
+                            <span class="b-input">
+                                @m.box_size
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12 product_extra_info">
+                        <div class="b-div">
+                            <span class="b-label">
+                                卡板尺寸:
+                            </span>
+                            <span class="b-input">
+                                @m.cardboard_size
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12 product_extra_info">
+                        <div class="b-div">
+                            <span class="b-label">
+                                卡板数:
+                            </span>
+                            <span class="b-input">
+                                @m.cardboard_num
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12 product_extra_info">
+                        <div class="b-div">
+                            <span class="b-label">
+                                配送时效:
+                            </span>
+                            <div class="b-input">
+                                @m.aging
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            配送数量:
+                        </span>
+                        <span class="b-input">
+                            @m.item_qty
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            总毛重(KG):
+                        </span>
+                        <span class="b-input">
+                            @m.total_weight
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            寄件地址:
+                        </span>
+                        <span class="b-input">
+                            @m.from_addr
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            收件地址:
+                        </span>
+                        <span class="b-input">
+                            @m.to_addr
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            收件人:
+                        </span>
+                        <span class="b-input">
+                            @m.receiver_name
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            收件人电话:
+                        </span>
+                        <span class="b-input">
+                            @m.receiver_phone
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请原因:
+                        </span>
+                        <span class="b-input">
+                            @m.apply_reason
+                        </span>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(m.ex_company)) {
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                快递公司:
+                            </span>
+                            <span class="b-input">
+                                @m.ex_company
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                快递方式:
+                            </span>
+                            <span class="b-input">
+                                @m.ex_type
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                运费:
+                            </span>
+                            <span class="b-input">
+                                @m.ex_price
+                            </span>
+                        </div>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(m.ex_no)) {
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                快递单号:
+                            </span>
+                            <span class="b-input">
+                                @m.ex_no
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @section Modal {
+        @Html.Partial("_MessageDialog")
+    }

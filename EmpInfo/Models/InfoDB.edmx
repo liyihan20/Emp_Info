@@ -704,6 +704,8 @@
           <Property Name="highest_charger_name" Type="nvarchar" MaxLength="50" />
           <Property Name="highest_charger_num" Type="varchar" MaxLength="50" />
           <Property Name="resign_apply_date" Type="smalldatetime" />
+          <Property Name="salary_clear_way" Type="nvarchar" MaxLength="50" />
+          <Property Name="leave_date" Type="smalldatetime" />
         </EntityType>
         <EntityType Name="ei_k3RestLog">
           <Key>
@@ -845,6 +847,40 @@
           <Property Name="in_minister_name" Type="nvarchar" MaxLength="50" />
           <Property Name="in_minister_num" Type="varchar" MaxLength="50" />
           <Property Name="comment" Type="nvarchar" MaxLength="1000" />
+        </EntityType>
+        <EntityType Name="ei_spApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="applier_phone" Type="varchar" MaxLength="50" />
+          <Property Name="apply_time" Type="datetime" />
+          <Property Name="send_or_receive" Type="nvarchar" MaxLength="50" />
+          <Property Name="company" Type="nvarchar" MaxLength="50" />
+          <Property Name="bus_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="send_no" Type="varchar" MaxLength="50" />
+          <Property Name="content_type" Type="nvarchar" MaxLength="50" />
+          <Property Name="content_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="content_modual" Type="nvarchar" MaxLength="200" />
+          <Property Name="package_num" Type="int" />
+          <Property Name="total_weight" Type="decimal" Precision="12" Scale="1" />
+          <Property Name="item_qty" Type="int" />
+          <Property Name="cardboard_num" Type="int" />
+          <Property Name="cardboard_size" Type="varchar" MaxLength="50" />
+          <Property Name="box_size" Type="varchar" MaxLength="50" />
+          <Property Name="aging" Type="nvarchar" MaxLength="50" />
+          <Property Name="from_addr" Type="nvarchar" MaxLength="200" />
+          <Property Name="to_addr" Type="nvarchar" MaxLength="200" />
+          <Property Name="receiver_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="receiver_phone" Type="varchar" MaxLength="50" />
+          <Property Name="ex_company" Type="nvarchar" MaxLength="50" />
+          <Property Name="ex_type" Type="nvarchar" MaxLength="50" />
+          <Property Name="ex_price" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="ex_no" Type="varchar" MaxLength="50" />
+          <Property Name="apply_reason" Type="nvarchar" MaxLength="500" />
         </EntityType>
         <EntityType Name="ei_specialUsers">
           <Key>
@@ -1396,6 +1432,8 @@
           <Property Name="work_comment" Type="nvarchar" MaxLength="500" />
           <Property Name="wanna_employ" Type="nvarchar" MaxLength="50" />
           <Property Name="employ_comment" Type="nvarchar" MaxLength="500" />
+          <Property Name="salary_clear_way" Type="nvarchar" MaxLength="50" />
+          <Property Name="leave_date" Type="smalldatetime" />
           <Property Name="audit_result" Type="varchar" MaxLength="6" Nullable="false" />
         </EntityType>
         <!--生成过程中发现错误:
@@ -1477,6 +1515,44 @@
           <Property Name="audit_result" Type="varchar" MaxLength="6" Nullable="false" />
         </EntityType>
         <!--生成过程中发现错误:
+警告 6002: 表/视图“ICAudit.dbo.vw_spExcel”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vw_spExcel">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="audit_result" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="applier_phone" Type="varchar" MaxLength="50" />
+          <Property Name="apply_time" Type="datetime" />
+          <Property Name="send_or_receive" Type="nvarchar" MaxLength="50" />
+          <Property Name="company" Type="nvarchar" MaxLength="50" />
+          <Property Name="bus_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="send_no" Type="varchar" MaxLength="50" />
+          <Property Name="content_type" Type="nvarchar" MaxLength="50" />
+          <Property Name="content_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="content_modual" Type="nvarchar" MaxLength="200" />
+          <Property Name="package_num" Type="int" />
+          <Property Name="total_weight" Type="decimal" Precision="12" Scale="1" />
+          <Property Name="item_qty" Type="int" />
+          <Property Name="cardboard_num" Type="int" />
+          <Property Name="cardboard_size" Type="varchar" MaxLength="50" />
+          <Property Name="box_size" Type="varchar" MaxLength="50" />
+          <Property Name="aging" Type="nvarchar" MaxLength="50" />
+          <Property Name="from_addr" Type="nvarchar" MaxLength="200" />
+          <Property Name="to_addr" Type="nvarchar" MaxLength="200" />
+          <Property Name="receiver_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="receiver_phone" Type="varchar" MaxLength="50" />
+          <Property Name="ex_company" Type="nvarchar" MaxLength="50" />
+          <Property Name="ex_type" Type="nvarchar" MaxLength="50" />
+          <Property Name="ex_price" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="ex_no" Type="varchar" MaxLength="50" />
+          <Property Name="apply_reason" Type="nvarchar" MaxLength="500" />
+          <Property Name="audit_result" Type="varchar" MaxLength="6" Nullable="false" />
+        </EntityType>
+        <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_svReport”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
         <EntityType Name="vw_svReport">
           <Key>
@@ -1510,6 +1586,7 @@
           <Key>
             <PropertyRef Name="id" />
             <PropertyRef Name="entry_id" />
+            <PropertyRef Name="audit_result" />
           </Key>
           <Property Name="id" Type="int" Nullable="false" />
           <Property Name="entry_id" Type="int" Nullable="false" />
@@ -1526,6 +1603,7 @@
           <Property Name="qty" Type="decimal" Precision="18" Scale="4" />
           <Property Name="reason" Type="varchar" MaxLength="1000" />
           <Property Name="arrive_time" Type="datetime" />
+          <Property Name="audit_result" Type="varchar" MaxLength="6" Nullable="false" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_UCReport”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -1913,6 +1991,12 @@
           <Parameter Name="name" Type="varchar" Mode="In" />
           <Parameter Name="reject" Type="bit" Mode="In" />
         </Function>
+        <Function Name="UpdateHrEmpDept" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="card_number" Type="varchar" Mode="In" />
+          <Parameter Name="dep_id" Type="int" Mode="In" />
+          <Parameter Name="in_time" Type="datetime" Mode="In" />
+          <Parameter Name="position" Type="varchar" Mode="In" />
+        </Function>
         <Function Name="ValidateDormStatus" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="account" Type="varchar" Mode="In" />
         </Function>
@@ -1964,6 +2048,7 @@
           <EntitySet Name="ei_PushResponse" EntityType="Self.ei_PushResponse" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_resVisitLog" EntityType="Self.ei_resVisitLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_sjApply" EntityType="Self.ei_sjApply" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_spApply" EntityType="Self.ei_spApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_specialUsers" EntityType="Self.ei_specialUsers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_stockAdminApply" EntityType="Self.ei_stockAdminApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_SVApply" EntityType="Self.ei_SVApply" Schema="dbo" store:Type="Tables" />
@@ -2269,6 +2354,8 @@ FROM [dbo].[vw_hr_department] AS [vw_hr_department]</DefiningQuery>
 [vw_JQExcel].[work_comment] AS [work_comment], 
 [vw_JQExcel].[wanna_employ] AS [wanna_employ], 
 [vw_JQExcel].[employ_comment] AS [employ_comment], 
+[vw_JQExcel].[salary_clear_way] AS [salary_clear_way], 
+[vw_JQExcel].[leave_date] AS [leave_date], 
 [vw_JQExcel].[audit_result] AS [audit_result]
 FROM [dbo].[vw_JQExcel] AS [vw_JQExcel]</DefiningQuery>
           </EntitySet>
@@ -2339,6 +2426,40 @@ FROM [dbo].[vw_push_users] AS [vw_push_users]</DefiningQuery>
 [vw_SJExcel].[audit_result] AS [audit_result]
 FROM [dbo].[vw_SJExcel] AS [vw_SJExcel]</DefiningQuery>
           </EntitySet>
+          <EntitySet Name="vw_spExcel" EntityType="Self.vw_spExcel" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vw_spExcel].[id] AS [id], 
+[vw_spExcel].[sys_no] AS [sys_no], 
+[vw_spExcel].[applier_num] AS [applier_num], 
+[vw_spExcel].[applier_name] AS [applier_name], 
+[vw_spExcel].[applier_phone] AS [applier_phone], 
+[vw_spExcel].[apply_time] AS [apply_time], 
+[vw_spExcel].[send_or_receive] AS [send_or_receive], 
+[vw_spExcel].[company] AS [company], 
+[vw_spExcel].[bus_name] AS [bus_name], 
+[vw_spExcel].[send_no] AS [send_no], 
+[vw_spExcel].[content_type] AS [content_type], 
+[vw_spExcel].[content_name] AS [content_name], 
+[vw_spExcel].[content_modual] AS [content_modual], 
+[vw_spExcel].[package_num] AS [package_num], 
+[vw_spExcel].[total_weight] AS [total_weight], 
+[vw_spExcel].[item_qty] AS [item_qty], 
+[vw_spExcel].[cardboard_num] AS [cardboard_num], 
+[vw_spExcel].[cardboard_size] AS [cardboard_size], 
+[vw_spExcel].[box_size] AS [box_size], 
+[vw_spExcel].[aging] AS [aging], 
+[vw_spExcel].[from_addr] AS [from_addr], 
+[vw_spExcel].[to_addr] AS [to_addr], 
+[vw_spExcel].[receiver_name] AS [receiver_name], 
+[vw_spExcel].[receiver_phone] AS [receiver_phone], 
+[vw_spExcel].[ex_company] AS [ex_company], 
+[vw_spExcel].[ex_type] AS [ex_type], 
+[vw_spExcel].[ex_price] AS [ex_price], 
+[vw_spExcel].[ex_no] AS [ex_no], 
+[vw_spExcel].[apply_reason] AS [apply_reason], 
+[vw_spExcel].[audit_result] AS [audit_result]
+FROM [dbo].[vw_spExcel] AS [vw_spExcel]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="vw_svReport" EntityType="Self.vw_svReport" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
 [vw_svReport].[id] AS [id], 
@@ -2378,7 +2499,8 @@ FROM [dbo].[vw_svReport] AS [vw_svReport]</DefiningQuery>
 [vw_UCExcel].[moduel] AS [moduel], 
 [vw_UCExcel].[qty] AS [qty], 
 [vw_UCExcel].[reason] AS [reason], 
-[vw_UCExcel].[arrive_time] AS [arrive_time]
+[vw_UCExcel].[arrive_time] AS [arrive_time], 
+[vw_UCExcel].[audit_result] AS [audit_result]
 FROM [dbo].[vw_UCExcel] AS [vw_UCExcel]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="vw_UCReport" EntityType="Self.vw_UCReport" store:Type="Views" store:Schema="dbo">
@@ -2772,10 +2894,18 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Parameter Name="item_no" Mode="In" Type="String" />
           </FunctionImport>
           <EntitySet Name="ei_sjApply" EntityType="ICAuditModel.ei_sjApply" />
+          <EntitySet Name="vw_SJExcel" EntityType="ICAuditModel.vw_SJExcel" />
           <FunctionImport Name="GetHREmpInfoDetail" ReturnType="Collection(ICAuditModel.GetHREmpInfoDetail_Result)">
           <Parameter Name="card_no" Mode="In" Type="String" />
           </FunctionImport>
-          <EntitySet Name="vw_SJExcel" EntityType="ICAuditModel.vw_SJExcel" />
+          <FunctionImport Name="UpdateHrEmpDept">
+            <Parameter Name="card_number" Mode="In" Type="String" />
+            <Parameter Name="dep_id" Mode="In" Type="Int32" />
+            <Parameter Name="in_time" Mode="In" Type="DateTime" />
+            <Parameter Name="position" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="ei_spApply" EntityType="ICAuditModel.ei_spApply" />
+          <EntitySet Name="vw_spExcel" EntityType="ICAuditModel.vw_spExcel" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -4251,6 +4381,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Key>
             <PropertyRef Name="id" />
             <PropertyRef Name="entry_id" />
+            <PropertyRef Name="audit_result" />
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" />
           <Property Name="entry_id" Type="Int32" Nullable="false" />
@@ -4267,6 +4398,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="qty" Type="Decimal" Precision="18" Scale="4" />
           <Property Name="reason" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
           <Property Name="arrive_time" Type="DateTime" Precision="3" />
+          <Property Name="audit_result" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="ei_etApplyEntry">
           <Key>
@@ -4624,6 +4756,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="highest_charger_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="highest_charger_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="resign_apply_date" Type="DateTime" Precision="0" />
+          <Property Name="salary_clear_way" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="leave_date" Type="DateTime" Precision="0" />
         </EntityType>
         <EntityType Name="vw_JQExcel">
           <Key>
@@ -4655,6 +4789,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="wanna_employ" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="employ_comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="audit_result" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="salary_clear_way" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="leave_date" Type="DateTime" Precision="0" />
         </EntityType>
         <ComplexType Name="GetAPPriceHistory_Result">
           <Property Type="String" Name="account" Nullable="false" MaxLength="6" />
@@ -4702,17 +4838,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="in_minister_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="comment" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
         </EntityType>
-        <ComplexType Name="GetHREmpInfoDetail_Result">
-          <Property Type="String" Name="name" Nullable="true" MaxLength="50" />
-          <Property Type="String" Name="sex" Nullable="true" MaxLength="2" />
-          <Property Type="String" Name="dep_name" Nullable="true" MaxLength="100" />
-          <Property Type="String" Name="position" Nullable="true" MaxLength="30" />
-          <Property Type="String" Name="education" Nullable="true" MaxLength="20" />
-          <Property Type="String" Name="salary_type" Nullable="true" MaxLength="50" />
-          <Property Type="String" Name="hometown" Nullable="true" MaxLength="150" />
-          <Property Type="String" Name="account" Nullable="true" MaxLength="10" />
-          <Property Type="Int32" Name="dep_id" Nullable="false" />
-        </ComplexType>
         <EntityType Name="vw_SJExcel">
           <Key>
             <PropertyRef Name="id" />
@@ -4751,6 +4876,88 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="in_minister_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="in_minister_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="comment" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="audit_result" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <ComplexType Name="GetHREmpInfoDetail_Result">
+          <Property Type="String" Name="name" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="sex" Nullable="true" MaxLength="2" />
+          <Property Type="String" Name="dep_name" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="position" Nullable="true" MaxLength="30" />
+          <Property Type="String" Name="education" Nullable="true" MaxLength="20" />
+          <Property Type="String" Name="salary_type" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="hometown" Nullable="true" MaxLength="150" />
+          <Property Type="String" Name="account" Nullable="true" MaxLength="10" />
+          <Property Type="Int32" Name="dep_id" Nullable="false" />
+          <Property Type="String" Name="emp_status" Nullable="false" MaxLength="4" />
+        </ComplexType>
+        <EntityType Name="ei_spApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="applier_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="send_or_receive" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="company" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="bus_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="send_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="content_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="content_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="content_modual" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="package_num" Type="Int32" />
+          <Property Name="total_weight" Type="Decimal" Precision="12" Scale="1" />
+          <Property Name="item_qty" Type="Int32" />
+          <Property Name="cardboard_num" Type="Int32" />
+          <Property Name="cardboard_size" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="box_size" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="aging" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="from_addr" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="to_addr" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="receiver_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="receiver_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ex_company" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ex_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ex_price" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="ex_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="apply_reason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="vw_spExcel">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="audit_result" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="applier_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="send_or_receive" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="company" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="bus_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="send_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="content_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="content_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="content_modual" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="package_num" Type="Int32" />
+          <Property Name="total_weight" Type="Decimal" Precision="12" Scale="1" />
+          <Property Name="item_qty" Type="Int32" />
+          <Property Name="cardboard_num" Type="Int32" />
+          <Property Name="cardboard_size" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="box_size" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="aging" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="from_addr" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="to_addr" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="receiver_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="receiver_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ex_company" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ex_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ex_price" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="ex_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="apply_reason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="audit_result" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
         </EntityType>
         </Schema>
@@ -6105,6 +6312,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="vw_UCExcel">
             <EntityTypeMapping TypeName="ICAuditModel.vw_UCExcel">
               <MappingFragment StoreEntitySet="vw_UCExcel">
+                <ScalarProperty Name="audit_result" ColumnName="audit_result" />
                 <ScalarProperty Name="arrive_time" ColumnName="arrive_time" />
                 <ScalarProperty Name="reason" ColumnName="reason" />
                 <ScalarProperty Name="qty" ColumnName="qty" />
@@ -6426,6 +6634,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_jqApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_jqApply">
               <MappingFragment StoreEntitySet="ei_jqApply">
+                <ScalarProperty Name="leave_date" ColumnName="leave_date" />
+                <ScalarProperty Name="salary_clear_way" ColumnName="salary_clear_way" />
                 <ScalarProperty Name="resign_apply_date" ColumnName="resign_apply_date" />
                 <ScalarProperty Name="highest_charger_num" ColumnName="highest_charger_num" />
                 <ScalarProperty Name="highest_charger_name" ColumnName="highest_charger_name" />
@@ -6473,6 +6683,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="vw_JQExcel">
             <EntityTypeMapping TypeName="ICAuditModel.vw_JQExcel">
               <MappingFragment StoreEntitySet="vw_JQExcel">
+                <ScalarProperty Name="leave_date" ColumnName="leave_date" />
+                <ScalarProperty Name="salary_clear_way" ColumnName="salary_clear_way" />
                 <ScalarProperty Name="audit_result" ColumnName="audit_result" />
                 <ScalarProperty Name="employ_comment" ColumnName="employ_comment" />
                 <ScalarProperty Name="wanna_employ" ColumnName="wanna_employ" />
@@ -6552,21 +6764,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="GetHREmpInfoDetail" FunctionName="ICAuditModel.Store.GetHREmpInfoDetail">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ICAuditModel.GetHREmpInfoDetail_Result">
-                <ScalarProperty Name="name" ColumnName="name" />
-                <ScalarProperty Name="sex" ColumnName="sex" />
-                <ScalarProperty Name="dep_name" ColumnName="dep_name" />
-                <ScalarProperty Name="position" ColumnName="position" />
-                <ScalarProperty Name="education" ColumnName="education" />
-                <ScalarProperty Name="salary_type" ColumnName="salary_type" />
-                <ScalarProperty Name="hometown" ColumnName="hometown" />
-                <ScalarProperty Name="account" ColumnName="account" />
-                <ScalarProperty Name="dep_id" ColumnName="dep_id" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
           <EntitySetMapping Name="vw_SJExcel">
             <EntityTypeMapping TypeName="ICAuditModel.vw_SJExcel">
               <MappingFragment StoreEntitySet="vw_SJExcel">
@@ -6600,6 +6797,94 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="switch_type" ColumnName="switch_type" />
                 <ScalarProperty Name="salary_type" ColumnName="salary_type" />
                 <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetHREmpInfoDetail" FunctionName="ICAuditModel.Store.GetHREmpInfoDetail">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetHREmpInfoDetail_Result">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="sex" ColumnName="sex" />
+                <ScalarProperty Name="dep_name" ColumnName="dep_name" />
+                <ScalarProperty Name="position" ColumnName="position" />
+                <ScalarProperty Name="education" ColumnName="education" />
+                <ScalarProperty Name="salary_type" ColumnName="salary_type" />
+                <ScalarProperty Name="hometown" ColumnName="hometown" />
+                <ScalarProperty Name="account" ColumnName="account" />
+                <ScalarProperty Name="dep_id" ColumnName="dep_id" />
+                <ScalarProperty Name="emp_status" ColumnName="emp_status" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="UpdateHrEmpDept" FunctionName="ICAuditModel.Store.UpdateHrEmpDept" />
+          <EntitySetMapping Name="ei_spApply">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_spApply">
+              <MappingFragment StoreEntitySet="ei_spApply">
+                <ScalarProperty Name="apply_reason" ColumnName="apply_reason" />
+                <ScalarProperty Name="ex_no" ColumnName="ex_no" />
+                <ScalarProperty Name="ex_price" ColumnName="ex_price" />
+                <ScalarProperty Name="ex_type" ColumnName="ex_type" />
+                <ScalarProperty Name="ex_company" ColumnName="ex_company" />
+                <ScalarProperty Name="receiver_phone" ColumnName="receiver_phone" />
+                <ScalarProperty Name="receiver_name" ColumnName="receiver_name" />
+                <ScalarProperty Name="to_addr" ColumnName="to_addr" />
+                <ScalarProperty Name="from_addr" ColumnName="from_addr" />
+                <ScalarProperty Name="aging" ColumnName="aging" />
+                <ScalarProperty Name="box_size" ColumnName="box_size" />
+                <ScalarProperty Name="cardboard_size" ColumnName="cardboard_size" />
+                <ScalarProperty Name="cardboard_num" ColumnName="cardboard_num" />
+                <ScalarProperty Name="item_qty" ColumnName="item_qty" />
+                <ScalarProperty Name="total_weight" ColumnName="total_weight" />
+                <ScalarProperty Name="package_num" ColumnName="package_num" />
+                <ScalarProperty Name="content_modual" ColumnName="content_modual" />
+                <ScalarProperty Name="content_name" ColumnName="content_name" />
+                <ScalarProperty Name="content_type" ColumnName="content_type" />
+                <ScalarProperty Name="send_no" ColumnName="send_no" />
+                <ScalarProperty Name="bus_name" ColumnName="bus_name" />
+                <ScalarProperty Name="company" ColumnName="company" />
+                <ScalarProperty Name="send_or_receive" ColumnName="send_or_receive" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_phone" ColumnName="applier_phone" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_spExcel">
+            <EntityTypeMapping TypeName="ICAuditModel.vw_spExcel">
+              <MappingFragment StoreEntitySet="vw_spExcel">
+                <ScalarProperty Name="audit_result" ColumnName="audit_result" />
+                <ScalarProperty Name="apply_reason" ColumnName="apply_reason" />
+                <ScalarProperty Name="ex_no" ColumnName="ex_no" />
+                <ScalarProperty Name="ex_price" ColumnName="ex_price" />
+                <ScalarProperty Name="ex_type" ColumnName="ex_type" />
+                <ScalarProperty Name="ex_company" ColumnName="ex_company" />
+                <ScalarProperty Name="receiver_phone" ColumnName="receiver_phone" />
+                <ScalarProperty Name="receiver_name" ColumnName="receiver_name" />
+                <ScalarProperty Name="to_addr" ColumnName="to_addr" />
+                <ScalarProperty Name="from_addr" ColumnName="from_addr" />
+                <ScalarProperty Name="aging" ColumnName="aging" />
+                <ScalarProperty Name="box_size" ColumnName="box_size" />
+                <ScalarProperty Name="cardboard_size" ColumnName="cardboard_size" />
+                <ScalarProperty Name="cardboard_num" ColumnName="cardboard_num" />
+                <ScalarProperty Name="item_qty" ColumnName="item_qty" />
+                <ScalarProperty Name="total_weight" ColumnName="total_weight" />
+                <ScalarProperty Name="package_num" ColumnName="package_num" />
+                <ScalarProperty Name="content_modual" ColumnName="content_modual" />
+                <ScalarProperty Name="content_name" ColumnName="content_name" />
+                <ScalarProperty Name="content_type" ColumnName="content_type" />
+                <ScalarProperty Name="send_no" ColumnName="send_no" />
+                <ScalarProperty Name="bus_name" ColumnName="bus_name" />
+                <ScalarProperty Name="company" ColumnName="company" />
+                <ScalarProperty Name="send_or_receive" ColumnName="send_or_receive" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_phone" ColumnName="applier_phone" />
                 <ScalarProperty Name="applier_name" ColumnName="applier_name" />
                 <ScalarProperty Name="applier_num" ColumnName="applier_num" />
                 <ScalarProperty Name="sys_no" ColumnName="sys_no" />

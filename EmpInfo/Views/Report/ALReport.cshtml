@@ -123,9 +123,7 @@
 
         });
 
-        $("#alCheckBt").on("click", function () {
-            $(this).button("loading");
-            $("#alReportBt").addClass("disabled");
+        $("#alCheckBt").on("click", function () {            
             exportDatas("CheckALDatas",1);
         });
 
@@ -232,6 +230,9 @@
             toastr.error("请先选择结束日期");
             return;
         }
+
+        $("#alCheckBt").button("loading");
+        $("#alReportBt").addClass("disabled");
         window.location.href = "@Url.Content("~/Report/")" + method
             + "?depId=" + depId
             + "&fromDate=" + fd

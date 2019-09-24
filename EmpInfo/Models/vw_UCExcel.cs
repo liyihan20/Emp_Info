@@ -29,5 +29,6 @@ namespace EmpInfo.Models
         public Nullable<decimal> qty { get; set; }
         public string reason { get; set; }
         public Nullable<System.DateTime> arrive_time { get; set; }
+        public string audit_result { get; set; }
     }
 }

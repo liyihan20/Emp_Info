@@ -193,4 +193,27 @@ namespace EmpInfo.Models
         public string applierNum { get; set; }
     }
 
+    public class JQAuditOtherInfoModel
+    {
+        public string work_evaluation { get; set; }
+        public string work_comment { get; set; }
+        public string wanna_employ { get; set; }
+        public string employ_comment { get; set; }
+        public string quit_type { get; set; }
+    }
+
+    public class SPBeforeApplyModel
+    {
+        public string sysNum { get; set; }
+        public string applierPhone { get; set; }
+        public List<string> busDepList { get; set; }
+    }
+
+    public class SPExInfoModel
+    {
+        public string FName { get; set; }
+        public string FDelivery { get; set; }
+        public decimal FReed { get; set; }
+    }
+
 }

@@ -48,9 +48,8 @@ namespace EmpInfo.Controllers
                 return View("Error");
             }
 
-            SetBillByType(billType);
-
             try {
+                SetBillByType(billType);
                 ViewData["infoBeforeApply"] = bill.GetInfoBeforeApply(userInfo, userInfoDetail);
             }
             catch (Exception ex) {

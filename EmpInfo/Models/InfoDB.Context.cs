@@ -107,6 +107,8 @@ namespace EmpInfo.Models
         public DbSet<vw_JQExcel> vw_JQExcel { get; set; }
         public DbSet<ei_sjApply> ei_sjApply { get; set; }
         public DbSet<vw_SJExcel> vw_SJExcel { get; set; }
+        public DbSet<ei_spApply> ei_spApply { get; set; }
+        public DbSet<vw_spExcel> vw_spExcel { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {
@@ -523,6 +525,27 @@ namespace EmpInfo.Models
                 new ObjectParameter("card_no", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetHREmpInfoDetail_Result>("GetHREmpInfoDetail", card_noParameter);
+        }
+    
+        public virtual int UpdateHrEmpDept(string card_number, Nullable<int> dep_id, Nullable<System.DateTime> in_time, string position)
+        {
+            var card_numberParameter = card_number != null ?
+                new ObjectParameter("card_number", card_number) :
+                new ObjectParameter("card_number", typeof(string));
+    
+            var dep_idParameter = dep_id.HasValue ?
+                new ObjectParameter("dep_id", dep_id) :
+                new ObjectParameter("dep_id", typeof(int));
+    
+            var in_timeParameter = in_time.HasValue ?
+                new ObjectParameter("in_time", in_time) :
+                new ObjectParameter("in_time", typeof(System.DateTime));
+    
+            var positionParameter = position != null ?
+                new ObjectParameter("position", position) :
+                new ObjectParameter("position", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("UpdateHrEmpDept", card_numberParameter, dep_idParameter, in_timeParameter, positionParameter);
         }
     }
 }

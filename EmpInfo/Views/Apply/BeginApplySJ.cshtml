@@ -185,16 +185,16 @@
 
         function getHREmpDetail() {
             var num = $("#card_number").val();
-            $.post("@Url.Content("~/Item/GetHREmpInfoDetail")", { cardNumber: num }, function (data) {
+            $.post("@Url.Content("~/Item/GetHREmpInfoDetail")", { cardNumber: num, empStatus: "在职" }, function (data) {
                 if (data.suc) {
-                    var info = JSON.parse(data.extra);                    
+                    var info = JSON.parse(data.extra);
                     //info.out_dep_id = info.dep_id;
                     //info.out_dep_name = info.dep_name;
+                    info.out_dep_position = info.position;
                     delete info.salary_type;
                     //delete info.dep_id;
                     //delete info.dep_name;
                     utils.loadObjData($("#fm"), info);
-
                 } else {
                     toastr.error(data.msg);
                 }
@@ -386,7 +386,7 @@
                                 调出部门部长/助理:
                             </span>
                             <span class="b-input">
-                                <input type="text" class="form-control selectUser" name="out_minister_name" placeholder="调出部门部长/助理" />
+                                <input type="text" class="form-control selectUser" name="out_minister_name" placeholder="选择调出部门部长/助理" />
                             </span>
                         </div>
                     </div>
@@ -415,7 +415,7 @@
                                 调入部门岗位:
                             </span>
                             <span class="b-input">
-                                <input type="text" class="form-control" name="in_dep_position" placeholder="填入厂牌编码后带出" />
+                                <input type="text" class="form-control" name="in_dep_position" placeholder="输入调入部门岗位" />
                             </span>
                         </div>
                     </div>
@@ -458,7 +458,7 @@
                                 调入部门部长/助理:
                             </span>
                             <span class="b-input">
-                                <input type="text" class="form-control selectUser" name="in_minister_name" placeholder="调出部门部长/助理" />
+                                <input type="text" class="form-control selectUser" name="in_minister_name" placeholder="选择调入部门部长/助理" />
                             </span>
                         </div>
                     </div>

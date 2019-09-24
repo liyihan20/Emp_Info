@@ -7,6 +7,7 @@ using EmpInfo.Models;
 using EmpInfo.Filter;
 using EmpInfo.Util;
 using System.Configuration;
+using EmpInfo.Services;
 
 
 namespace EmpInfo.Controllers
@@ -842,6 +843,32 @@ namespace EmpInfo.Controllers
             }
             db.SaveChanges();
             return "ok";
+        }
+
+        [AuthorityFilter]
+        public ActionResult UpdateHREmpDept()
+        {
+            return View();
+        }
+
+        public JsonResult BeginUpdateHREmpDept(string cardNumber, int depId, DateTime inDate, string position)
+        {
+            if (string.IsNullOrWhiteSpace(cardNumber)) {
+                return Json(new SimpleResultModel() { suc = false, msg = "厂牌编号必须填写" });
+            }
+            if (string.IsNullOrWhiteSpace(position)) {
+                return Json(new SimpleResultModel() { suc = false, msg = "调入部门岗位必须填写" });
+            }
+
+            try {
+                new SJSv().UpdateHREmpDept(cardNumber, depId, inDate, position);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = "操作失败：" + ex.Message });
+            }
+            WriteEventLog("员工调动", cardNumber + ":" + depId.ToString() + ";" + inDate.ToShortDateString() + ";" + position);
+            return Json(new SimpleResultModel() { suc = true, msg = "操作成功" });
+
         }
 
         #endregion

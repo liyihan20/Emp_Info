@@ -55,5 +55,7 @@ namespace EmpInfo.Models
         public string highest_charger_name { get; set; }
         public string highest_charger_num { get; set; }
         public Nullable<System.DateTime> resign_apply_date { get; set; }
+        public string salary_clear_way { get; set; }
+        public Nullable<System.DateTime> leave_date { get; set; }
     }
 }

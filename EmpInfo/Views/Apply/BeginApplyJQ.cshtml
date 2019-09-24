@@ -27,7 +27,6 @@
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
 
-
     <script>
         $(function () {
 
@@ -67,6 +66,12 @@
                     $("#card_number").removeAttr("readonly");
                     $("#autoQuit").show();
                     $("#normalQuit").hide();
+                }
+            });
+
+            $("#salary_clear_way").on("change", function () {
+                if ($(this).val() == "离职当天现金结算") {
+                    alert("请与组长或直接上级确认同意后再选择此项");
                 }
             });
 
@@ -487,6 +492,17 @@
                     </span>
                     <span style="display:inline-block;width:70%">
                         <textarea type="text" class="form-control" rows="3" id="quit_suggestion" name="quit_suggestion" placeholder="选填，对公司/本职位的建议"></textarea>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;">
+                        工资发放要求:
+                    </span>
+                    <span style="display:inline-block;width:70%">
+                        <select class="form-control" name="salary_clear_way" id="salary_clear_way">                           
+                            <option value="离职当天现金结算">离职当天现金结算</option>
+                            <option value="同部门在职员工同步发放工资卡" selected>同部门在职员工同步发放工资卡</option>
+                        </select>
                     </span>
                 </div>
             </div>

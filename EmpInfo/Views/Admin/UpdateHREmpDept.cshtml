@@ -1,0 +1,178 @@
+﻿@{
+    ViewBag.Title = "UpdateHREmpDept";
+}
+
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <style type="text/css">
+        .lbText{
+            font-style:italic;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+
+    <script>
+    $(function () {
+        $(".datePicker").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            startView: 2,
+            minView: 2,
+            initialDate: "@DateTime.Now.ToString("yyyy-MM-dd")"
+            });
+
+            $("#newDepName").on("click", function () {
+                openSelectDepDialog(2, function (selectedDep) {
+                    $("#newDepName").val(selectedDep.depLongName);
+                    $("#newDepId").val(selectedDep.depId);
+                });
+            });
+
+            $("#cardNumber").on("blur", function () {
+                if ($("#cardNumber").val().length > 7) {
+                    getHREmpDetail();
+                } else {
+                    toastr.error("请输入正确的厂牌编号");
+                }
+            });
+
+            $("#updateBt").on("click", function () {
+                var cardNumber = $("#cardNumber").val();
+                var newDepId = $("#newDepId").val();
+                var position = $("#position").val();
+                var inDate = $("#inDate").val();
+
+                if (cardNumber == "") {
+                    toastr.error("厂牌编码必须录入");
+                    return;
+                }
+                if (newDepId=="") {
+                    toastr.error("调入部门必须选择");
+                    return;
+                }
+                if (position == "") {
+                    toastr.error("调入部门岗位必须录入");
+                    return;
+                }
+                if (inDate == "") {
+                    toastr.error("到岗时间必须选择");
+                    return;
+                }
+
+                openConfirmDialog("确定要调动吗？", function () {
+                    $("#updateBt").button("loading");
+                    $.post("@Url.Content("~/Admin/BeginUpdateHREmpDept")",
+                        {
+                            cardNumber: cardNumber,
+                            depId: newDepId,
+                            inDate: inDate,
+                            position:position
+                        },
+                        function (data) {
+                            $("#updateBt").button("reset");
+                            if (data.suc) {
+                                toastr.success(data.msg);
+                            } else {
+                                toastr.error(data.msg);
+                            }
+                        });
+                });
+            });
+
+        });
+        function getHREmpDetail() {
+            var num = $("#cardNumber").val();
+            $.post("@Url.Content("~/Item/GetHREmpInfoDetail")", { cardNumber: num, empStatus: "在职" }, function (data) {
+                if (data.suc) {
+                    var info = JSON.parse(data.extra);
+                    $("#name").val(info.name);
+                    $("#oldDepName").val(info.dep_name);
+                } else {
+                    toastr.error(data.msg);
+                }
+            });
+        }
+    </script>
+    }
+<div class="row" style="margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                    <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                    <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                    <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+                    <li><a href="@Url.Content("~/Home/NoPaperProcess")">无纸化流程</a></li>
+                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=SJ")">员工调动流程</a></li>
+                    <li class="active">人工调动</li>
+                </ol>
+            </div>
+            <div class="panel-body">
+                <div>
+                    <div class="lbText">
+                        厂牌编号：
+                    </div>
+                    <div>
+                        <input type="text" class="form-control" id="cardNumber" />
+                    </div>
+                </div>
+                <div style="margin-top:8px;">
+                    <div class="lbText">
+                        姓名：
+                    </div>
+                    <div>
+                        <input type="text" class="form-control" id="name" readonly />
+                    </div>
+                </div>
+                <div style="margin-top:8px;">
+                    <div class="lbText">
+                        调出部门：
+                    </div>
+                    <div>
+                        <input type="text" class="form-control" id="oldDepName" readonly />
+                    </div>
+                </div>
+                <div style="margin-top:8px;">
+                    <div class="lbText">
+                        调入部门：
+                    </div>
+                    <div>
+                        <input type="text" class="form-control" id="newDepName" />
+                        <input type="hidden" id="newDepId" />
+                    </div>
+                </div>
+                <div style="margin-top:8px;">
+                    <div class="lbText">
+                        调入部门岗位：
+                    </div>
+                    <div>
+                        <input type="text" class="form-control" id="position" />
+                    </div>
+                </div>
+                <div style="margin-top:8px;">
+                    <div class="lbText">
+                        到岗时间：
+                    </div>
+                    <div>
+                        <span class="input-group date datePicker">
+                            <input class="form-control" type="text" id="inDate" autocomplete="off" />
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-block btn-danger" id="updateBt" style="margin-top:12px;" data-loading-text="处理中..."><i class="fa fa-check"></i>开始调动</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_SelectDep")
+}

@@ -48,6 +48,7 @@
                         longName = parent.text + "/" + longName;
                         parent = $('#depTree').treeview('getParent', parent);
                     }
+                    longName = longName.replace("信利国际控股有限公司", "");
                     selectedDep = { depNum: num, depShortName: name, depLongName: longName, depId: id };
                 }
             });

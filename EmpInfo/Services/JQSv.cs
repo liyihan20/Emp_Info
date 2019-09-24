@@ -74,6 +74,8 @@ namespace EmpInfo.Services
             bill = new ei_jqApply();
             MyUtils.SetFieldValueToModel(fc, bill);
 
+            if (!bill.dep_name.Contains("CCM")) throw new Exception("当前是测试阶段，只有CCM的才能申请，正式运行后会通知");
+
             if (bill.quit_reason.Length > 1000) throw new Exception("离职原因内容太多，请删减");
             if (bill.quit_suggestion.Length > 1000) throw new Exception("离职建议内容太多，请删减");
 
@@ -141,12 +143,13 @@ namespace EmpInfo.Services
         {
             var jq = db.ei_jqApply.SingleOrDefault(j => j.sys_no == sysNo);
             if (jq == null) throw new Exception("单据不存在");
-            return new
+            return new JQAuditOtherInfoModel()
             {
-                jq.work_evaluation,
-                jq.work_comment,
-                jq.wanna_employ,
-                jq.employ_comment
+                work_evaluation = jq.work_evaluation,
+                work_comment = jq.work_comment,
+                wanna_employ = jq.wanna_employ,
+                employ_comment = jq.employ_comment,
+                quit_type = jq.quit_type
             };
         }
 
@@ -155,6 +158,16 @@ namespace EmpInfo.Services
             int step = Int32.Parse(fc.Get("step"));
             string stepName = fc.Get("stepName");
             bool isPass = bool.Parse(fc.Get("isPass"));
+            string leaveDate = fc.Get("leave_date");
+            DateTime leaveDateDt;
+            if (isPass && bill.quit_type == "辞职") {
+                if (!DateTime.TryParse(leaveDate, out leaveDateDt)) {
+                    return new SimpleResultModel() { suc = false, msg = "批准离职时间必须填写" };
+                }
+                else {
+                    bill.leave_date = leaveDateDt;
+                }
+            }
 
             bill.work_evaluation = fc.Get("work_evaluation");
             bill.work_comment = fc.Get("work_comment");

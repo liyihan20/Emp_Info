@@ -38,13 +38,13 @@
       <script src="@Url.Content("~/Scripts/html5shiv.min.js")"></script>
       <script src="@Url.Content("~/Scripts/respond.min.js")"></script>
     <![endif]-->
+
 </head>
-<body>
+<body>    
     <div class="container" id="topContainer">
         @RenderBody()
-
     </div>
     @RenderSection("Modal", false)
-    @RenderSection("Scripts",false)
+    @RenderSection("Scripts",false)    
 </body>
 </html>

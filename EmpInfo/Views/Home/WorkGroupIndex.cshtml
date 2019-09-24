@@ -89,6 +89,14 @@
                         <p class="text-center">紧急出货运输</p>
                     </a>
                 </div>
+            }            
+            @if (auts.IndexOf("ModuelTest") >= 0) {
+            <div class="col-xs-4 col-sm-3 col-md-2">
+                <a href="@Url.Content("~/Apply/ApplyIndex?billType=SP")">
+                    <img src="@Url.Content("~/Content/images/cargo.png")" alt="sp" class="center-block" />
+                    <p class="text-center">部门寄件/收件流程</p>
+                </a>
+            </div>
             }
             @if (auts.IndexOf("AssistantEmps") >= 0) {
                 <div class="col-xs-4 col-sm-3 col-md-2">
@@ -109,15 +117,13 @@
                     <img src="@Url.Content("~/Content/images/elepr.png")" alt="elepr" class="center-block" />
                     <p class="text-center">电子公司专用流程</p>
                 </a>
-            </div>
-            @if (auts.IndexOf("NoPaper") >= 0) {
+            </div>            
             <div class="col-xs-4 col-sm-3 col-md-2">
                 <a href="@Url.Content("~/Home/NoPaperProcess")">
                     <img src="@Url.Content("~/Content/images/computer.png")" alt="computer" class="center-block" />
                     <p class="text-center">无纸化流程</p>
                 </a>
             </div>
-            }
         </div>
     </div>
 </div>

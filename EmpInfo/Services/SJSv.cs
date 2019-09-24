@@ -42,7 +42,7 @@ namespace EmpInfo.Services
             );
             return list;
         }
-                
+        
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
             var menus = base.GetApplyMenuItems(userInfo);
@@ -53,9 +53,17 @@ namespace EmpInfo.Services
                     text = "查询报表",
                     iconFont = "fa-file-text-o",
                     url = "../Report/SJReport"
-                });
+                });                
             }
 
+            if(MyUtils.hasGotPower(userInfo.id,"Admin","UpdateHREmpDept")){
+                menus.Add(new ApplyMenuItemModel()
+                {
+                    text = "人工调动",
+                    iconFont = "fa-refresh",
+                    url = "../Admin/UpdateHREmpDept"
+                });
+            }
             return menus;
         }
 
@@ -97,6 +105,33 @@ namespace EmpInfo.Services
 
                 bill.in_minister_num = GetUserCardByNameAndCardNum(bill.in_minister_name);
                 bill.out_minister_num = GetUserCardByNameAndCardNum(bill.out_minister_name);
+            }
+
+            //公司内、跨公司调动判断部门
+            string[] copKeys = new string[] { "信利半导体", "信利光电股份", "信利电子", "信利仪器", "信利工业", "信元光电", "第三方", "光电仁寿" };
+            foreach (var k in copKeys) {
+                if (bill.switch_type == "公司内") {
+                    if (bill.out_dep_name.Contains(k) && !bill.in_dep_name.Contains(k)) {
+                        throw new Exception("调入部门和调出部门不属于同一公司，调动类型必须选择跨公司");
+                    }
+                }
+                if (bill.switch_type == "跨公司") {
+                    if (bill.out_dep_name.Contains(k) && bill.in_dep_name.Contains(k)) {
+                        throw new Exception("调入部门和调出部门属于同一公司，调动类型必须选择公司内");
+                    }
+                }
+            }
+
+            //审核人一开始没有在权限组里，在这里加入
+            var autGroup = db.ei_groups.Where(g => g.name == "员工调动申请组").FirstOrDefault();
+            if (autGroup != null) {
+                if (db.ei_groupUser.Where(gu => gu.group_id == autGroup.id && gu.user_id == userInfo.id).Count() < 1) {
+                    db.ei_groupUser.Add(new ei_groupUser()
+                    {
+                        group_id = autGroup.id,
+                        user_id = userInfo.id
+                    });
+                }
             }
 
             bill.applier_name = userInfo.name;
@@ -217,5 +252,11 @@ namespace EmpInfo.Services
                 }
             }
         }
+
+        public void UpdateHREmpDept(string cardNumber, int depId, DateTime inDate, string position)
+        {
+            db.UpdateHrEmpDept(cardNumber, depId, inDate, position);
+        }
+
     }
 }

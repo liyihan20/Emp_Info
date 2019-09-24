@@ -22,5 +22,6 @@ namespace EmpInfo.Models
         public string hometown { get; set; }
         public string account { get; set; }
         public int dep_id { get; set; }
+        public string emp_status { get; set; }
     }
 }
