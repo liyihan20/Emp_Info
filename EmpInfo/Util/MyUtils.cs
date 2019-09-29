@@ -522,6 +522,23 @@ namespace EmpInfo.Util
         }
 
         /// <summary>
+        /// 将指定对象的属性值设置到目标对象，名称形同有效
+        /// </summary>
+        /// <param name="fromObj"></param>
+        /// <param name="toObj"></param>
+        public static void CopyPropertyValue(object fromObj, object toObj)
+        {
+            foreach (var p in fromObj.GetType().GetProperties()) {
+                var tp = toObj.GetType().GetProperties().Where(t => t.Name == p.Name).FirstOrDefault();
+                if (tp != null) {
+                    if (tp.PropertyType.Equals(p.PropertyType)) {
+                        tp.SetValue(toObj, p.GetValue(fromObj,null), null);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// 获取申请单号所在的附件文件夹
         /// </summary>
         /// <param name="sysNum">申请单号</param>

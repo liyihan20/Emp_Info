@@ -147,9 +147,7 @@
         });*@
 
         //进入饭卡查询界面
-        $("#diningCardBt,#mealImg").click(function () {
-            toastr.error("因食堂服务器出现故障，此功能暂停使用");
-            return;
+        $("#diningCardBt,#mealImg").click(function () {            
             window.location.href = "@Url.Content("~/Home/CheckDinningCard")";
         });
         //管理员入口

@@ -545,23 +545,24 @@ namespace EmpInfo.Controllers
         public ActionResult AssistantEmps()
         {
             return View();
-        }
+        }               
 
-        public ActionResult SearchAssistantEmps(string value)
-        {
-            var list = db.vw_assistantEmps
-                .Where(a => a.emp_name.Contains(value) || a.emp_no1.Contains(value))
-                .Select(a => new AssistantEmpModel()
-                {
-                    depName = a.dept_name,
-                    cardNumber = a.emp_no1,
-                    empName = a.emp_name,
-                    empType = a.emp_type
-                }).ToList();
+        public JsonResult GetAssistantEmps(string search="", int offset = 0, int limit = 10)
+        {            
+            var result = (from v in db.vw_assistantEmps
+                          where v.emp_name.Contains(search) || v.emp_no1.Contains(search)
+                          orderby v.dept_name
+                          select new AssistantEmpModel()
+                          {
+                              depName = v.dept_name,
+                              cardNumber = v.emp_no1,
+                              empName = v.emp_name,
+                              empType = v.emp_type
+                          });
+            int total = result.Count();
+            result = result.Skip(offset).Take(limit);
 
-            ViewData["list"] = list;
-            ViewData["searchValue"] = value;
-            return View("AssistantEmps");
+            return Json(new { total = total, rows = result.ToList() },JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult CheckAssistantEmp(string empType, string cardNumber)
@@ -1997,7 +1998,10 @@ namespace EmpInfo.Controllers
             toDate = toDate.AddDays(1);
             var result = db.vw_spExcel.Where(u => u.apply_time > fromDate && u.apply_time <= toDate).ToList();
 
-            string[] colName = new string[] { "处理结果","流水号","申请人","申请时间","联系电话","收寄类型","公司","部门","放行条编号","收寄内容", };
+            string[] colName = new string[] { "处理结果", "公司", "部门", "申请人","快递公司","运费","快递单号","快递方式", "收寄类型", "流水号", "申请时间"
+                                            , "联系电话","放行条编号", "收寄内容","产品名称","规格型号","配送数量","件数","总净重","卡板数"
+                                            , "卡板尺寸","装箱尺寸","配送时效","寄件地址","收件地址","收件人","收件人电话","申请原因"
+            };
             ushort[] colWidth = new ushort[colName.Length];
 
             for (var i = 0; i < colWidth.Length; i++) {
@@ -2006,8 +2010,8 @@ namespace EmpInfo.Controllers
 
             //設置excel文件名和sheet名
             XlsDocument xls = new XlsDocument();
-            xls.FileName = "辅料订购申请列表_" + DateTime.Now.ToString("MMddHHmmss");
-            Worksheet sheet = xls.Workbook.Worksheets.Add("辅料订购详情");
+            xls.FileName = "部门收寄件申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("收件寄件详情");
 
             //设置各种样式
 
@@ -2041,12 +2045,39 @@ namespace EmpInfo.Controllers
             foreach (var d in result) {
                 colIndex = 1;
 
-                //"申请流水号", "申请人", "公司", "事业部", "申购部门", "申请时间", "PR单号","物料代码",
-                //"物料名称", "规格型号", "实际数量", "单位","品牌","最晚到货期","使用频率","订购周期",
-                //"订购用途", "历史单价", "税率","供应商"
+                //"处理结果", "公司", "部门", "申请人","快递公司","运费","快递单号","快递方式", "收寄类型", "流水号", "申请时间"
+                //, "联系电话","放行条编号", "收寄内容","产品名称","规格型号","配送数量","件数","总净重","卡板数"
+                //, "卡板尺寸","装箱尺寸","配送时效","寄件地址","收件地址","收件人","收件人电话","申请原因"
                 cells.Add(++rowIndex, colIndex, d.audit_result);
-                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.company);
+                cells.Add(rowIndex, ++colIndex, d.bus_name);
                 cells.Add(rowIndex, ++colIndex, d.applier_name);
+                cells.Add(rowIndex, ++colIndex, d.ex_company);
+                cells.Add(rowIndex, ++colIndex, d.ex_price);
+                cells.Add(rowIndex, ++colIndex, d.ex_no);
+                cells.Add(rowIndex, ++colIndex, d.ex_type);
+                cells.Add(rowIndex, ++colIndex, d.send_or_receive);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+
+                cells.Add(rowIndex, ++colIndex, d.applier_phone);
+                cells.Add(rowIndex, ++colIndex, d.send_no);
+                cells.Add(rowIndex, ++colIndex, d.content_type);
+                cells.Add(rowIndex, ++colIndex, d.content_name);
+                cells.Add(rowIndex, ++colIndex, d.content_modual);
+                cells.Add(rowIndex, ++colIndex, d.item_qty);
+                cells.Add(rowIndex, ++colIndex, d.package_num);
+                cells.Add(rowIndex, ++colIndex, d.total_weight);
+                cells.Add(rowIndex, ++colIndex, d.cardboard_num);
+
+                cells.Add(rowIndex, ++colIndex, d.cardboard_size);
+                cells.Add(rowIndex, ++colIndex, d.box_size);
+                cells.Add(rowIndex, ++colIndex, d.aging);
+                cells.Add(rowIndex, ++colIndex, d.from_addr);
+                cells.Add(rowIndex, ++colIndex, d.to_addr);
+                cells.Add(rowIndex, ++colIndex, d.receiver_name);
+                cells.Add(rowIndex, ++colIndex, d.receiver_phone);
+                cells.Add(rowIndex, ++colIndex, d.apply_reason);
             }
 
             xls.Send();

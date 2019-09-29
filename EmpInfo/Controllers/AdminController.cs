@@ -8,6 +8,7 @@ using EmpInfo.Filter;
 using EmpInfo.Util;
 using System.Configuration;
 using EmpInfo.Services;
+using Newtonsoft.Json;
 
 
 namespace EmpInfo.Controllers
@@ -869,6 +870,127 @@ namespace EmpInfo.Controllers
             WriteEventLog("员工调动", cardNumber + ":" + depId.ToString() + ";" + inDate.ToShortDateString() + ";" + position);
             return Json(new SimpleResultModel() { suc = true, msg = "操作成功" });
 
+        }
+
+        #endregion
+
+        #region 审核人与通知人设置
+
+        [AuthorityFilter]
+        public ActionResult AuditorSetting()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public JsonResult GetFlowAuditors()
+        {
+            var result = (from a in db.flow_auditorRelation
+                          join u in db.ei_users on a.relate_value equals u.card_number
+                          orderby a.bill_type, a.relate_name, a.relate_text
+                          select new
+                          {
+                              a.id,
+                              a.relate_value,
+                              u.name,
+                              a.bill_type,
+                              a.relate_name,
+                              a.relate_text
+                          }).ToList();
+            return Json(result,JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult SaveFlowAuditors(string obj)
+        {
+            flow_auditorRelation f = JsonConvert.DeserializeObject<flow_auditorRelation>(obj);
+
+            if (f.bill_type == null || f.relate_name == null || f.relate_value == null) {
+                return Json(new SimpleResultModel() { suc = false, msg = "表单值不完整" }); 
+            }
+
+            f.relate_value = GetUserCardByNameAndCardNum(f.relate_value);
+
+            if (f.id == 0) {
+                db.flow_auditorRelation.Add(f);
+            }
+            else {
+                var currentF = db.flow_auditorRelation.Single(a => a.id == f.id);
+                MyUtils.CopyPropertyValue(f, currentF);
+            }
+
+            try {
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+
+            return Json(new SimpleResultModel() { suc = true });
+
+        }
+
+        public JsonResult RemoveFlowAudiors(int id)
+        {
+            try {
+                var f = db.flow_auditorRelation.Single(a => a.id == id);
+                db.flow_auditorRelation.Remove(f);
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+
+            return Json(new SimpleResultModel() { suc = true });
+        }
+
+        public JsonResult GetFlowNotifiers()
+        {
+            var result = db.flow_notifyUsers.OrderBy(f => f.bill_type).ThenBy(f => f.cond1).ToList();
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult SaveFlowNotifiers(string obj)
+        {
+            flow_notifyUsers f = JsonConvert.DeserializeObject<flow_notifyUsers>(obj);
+
+            if (f.bill_type == null || f.card_number == null) {
+                return Json(new SimpleResultModel() { suc = false, msg = "表单值不完整" });
+            }
+
+            f.name = GetUserNameByNameAndCardNum(f.card_number);
+            f.card_number = GetUserCardByNameAndCardNum(f.card_number);
+
+            if (f.id == 0) {
+                db.flow_notifyUsers.Add(f);
+            }
+            else {
+                var currentF = db.flow_notifyUsers.Single(a => a.id == f.id);
+                MyUtils.CopyPropertyValue(f, currentF);
+            }
+
+            try {
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+
+            return Json(new SimpleResultModel() { suc = true });
+
+        }
+
+        public JsonResult RemoveFlowNotifiers(int id)
+        {
+            try {
+                var f = db.flow_notifyUsers.Single(a => a.id == id);
+                db.flow_notifyUsers.Remove(f);
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+
+            return Json(new SimpleResultModel() { suc = true });
         }
 
         #endregion

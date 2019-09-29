@@ -27,7 +27,7 @@ namespace EmpInfo.Services
 
         public override string BillTypeName
         {
-            get { return "部门寄件/收件申请"; }
+            get { return "寄/收件申请"; }
         }
 
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
@@ -67,6 +67,10 @@ namespace EmpInfo.Services
             bill.applier_num = userInfo.cardNo;
             bill.apply_time = DateTime.Now;
 
+            if (GetExInfo().Count() == 0) {
+                throw new Exception("根据当前收寄件地址找不到合适的物流公司，请与物流部周秀花联系");
+            }
+
             FlowSvrSoapClient client = new FlowSvrSoapClient();
             var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.bus_name, bill.content_type + bill.send_or_receive + "申请");
             if (result.suc) {
@@ -104,12 +108,22 @@ namespace EmpInfo.Services
             string exNo = fc.Get("ex_no");
 
             if (stepName.Contains("事业部") || stepName.Contains("物流")) {
-                bill.ex_company = exCompany;
-                bill.ex_type = exType;
-                bill.ex_price = decimal.Parse(exPriceStr);
+                if (isPass) {
+                    if (string.IsNullOrEmpty(exCompany)) {
+                        return new SimpleResultModel() { suc = false, msg = "请先选择物流信息" };
+                    }
+                    bill.ex_company = exCompany;
+                    bill.ex_type = exType;
+                    bill.ex_price = decimal.Parse(exPriceStr);
+                }                
             }
             if (stepName.Contains("申请人") || stepName.Contains("物流")) {
-                bill.ex_no = exNo;
+                if (isPass) {
+                    if (string.IsNullOrEmpty(exNo)) {
+                        return new SimpleResultModel() { suc = false, msg = "请先填写快递编号" };
+                    }
+                    bill.ex_no = exNo;
+                }
             }
 
             string formJson = JsonConvert.SerializeObject(bill);

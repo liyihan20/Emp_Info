@@ -776,6 +776,7 @@
     <Content Include="Content\fontawesome\fontcss\font-awesome.min.css" />
     <Content Include="Content\fontawesome\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\images\assist.png" />
+    <Content Include="Content\images\auditors.png" />
     <Content Include="Content\images\bind.gif" />
     <Content Include="Content\images\book.png" />
     <Content Include="Content\images\box.png" />
@@ -1273,6 +1274,8 @@
     <Content Include="Views\Apply\BeginApplySP.cshtml" />
     <Content Include="Views\Apply\CheckSPApply.cshtml" />
     <Content Include="Views\Apply\BeginAuditSPApply.cshtml" />
+    <Content Include="Views\Report\SPReport.cshtml" />
+    <Content Include="Views\Admin\AuditorSetting.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

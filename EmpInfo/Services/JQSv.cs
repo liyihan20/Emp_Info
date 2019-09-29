@@ -76,8 +76,8 @@ namespace EmpInfo.Services
 
             if (!bill.dep_name.Contains("CCM")) throw new Exception("当前是测试阶段，只有CCM的才能申请，正式运行后会通知");
 
-            if (bill.quit_reason.Length > 1000) throw new Exception("离职原因内容太多，请删减");
-            if (bill.quit_suggestion.Length > 1000) throw new Exception("离职建议内容太多，请删减");
+            if (bill.quit_reason != null && bill.quit_reason.Length > 1000) throw new Exception("离职原因内容太多，请删减");
+            if (bill.quit_suggestion != null && bill.quit_suggestion.Length > 1000) throw new Exception("离职建议内容太多，请删减");
 
             if ("自离".Equals(bill.quit_type)) {
                 if (bill.absent_from == null) throw new Exception("必须填写正确的旷工开始日期");

@@ -47,7 +47,7 @@
 
             $("#ucReportBt").on("click", function () {
                 toastr.info("数据正在导出，请稍等...");
-                window.location.href = "@Url.Content("~/Report/BeginExportUCReport?")"
+                window.location.href = "@Url.Content("~/Report/BeginExportSPReport?")"
                 + "fromDate=" + $("#fromDate").val()
                 + "&toDate=" + $("#toDate").val();
                 ;
@@ -65,7 +65,7 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=UC")">非正常时间出货</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=SP")">寄/收件申请</a></li>
             <li class="active">查询报表</li>
         </ol>
     </div>

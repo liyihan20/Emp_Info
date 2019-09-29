@@ -318,6 +318,18 @@ namespace EmpInfo.Controllers
             return cards;
         }
 
+        //根据姓名(厂牌)取得姓名
+        protected string GetUserNameByNameAndCardNum(string nameAndCards)
+        {
+            if (string.IsNullOrEmpty(nameAndCards)) return "";
+            string names = "";
+            foreach (var num in nameAndCards.Split(new char[] { ';', '；' }, StringSplitOptions.RemoveEmptyEntries)) {
+                if (!string.IsNullOrEmpty(names)) names += ";";
+                names += num.Split(new char[] { '(', ')' })[0];
+            }
+            return names;
+        }
+
         //根据厂牌获取邮箱
         protected string GetUserEmailByCardNum(string cardNumbers)
         {

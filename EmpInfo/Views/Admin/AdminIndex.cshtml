@@ -82,6 +82,14 @@
                     </a>
                 </div>
             }
+            @if (auts.IndexOf("AuditorAndNotifier") >= 0) {
+                <div class="col-xs-4 col-sm-3 col-md-2">
+                    <a href="@Url.Content("~/Admin/AuditorSetting")">
+                        <img src="@Url.Content("~/Content/images/auditors.png")" alt="auditors" class="center-block" />
+                        <p class="text-center">审核人&通知人</p>
+                    </a>
+                </div>
+            }
         </div>
     </div>
 </div>

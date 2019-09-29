@@ -1,0 +1,95 @@
+﻿@{
+    List<EmpInfo.FlowSvr.FlowAuditListModel> list = (List<EmpInfo.FlowSvr.FlowAuditListModel>)ViewData["list"];
+    string billType = (string)ViewData["billType"];
+}
+@section CSS{
+    
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+
+    <style type="text/css">
+        #applyDiv img {
+            opacity: 1;
+        }
+
+            #applyDiv img:hover {
+                opacity: 0.6;
+            }
+    </style>
+}
+@section Scripts{
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>        
+        $("#tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            search: true,
+            searchOnEnterKey: true,
+            rowStyle:function(){
+                return {
+                    css: {"cursor":"pointer"}
+                };
+            },
+            onClickRow: function (row, ele, field) {
+                var sysNo = $.trim(row[0]);
+                var step = $.trim(row[1]);
+                window.location.href = "BeginAuditApply?sysNo=" + sysNo.split(" ")[0] + "&step=" + step;
+            }
+        });
+
+        $(function () {
+            $("#exportExcelBt").on("click", function () {
+                toastr.info("请稍等，不要重复点击，正在导出......");
+                window.location.href = "@Url.Content("~/Report/BeginExportALAuditingExcel")";
+            });
+        })
+
+    </script>
+}
+<div class="panel panel-success" id="applyDiv">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li class="active">我的待办</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+
+        
+        <h4 class="text-danger"><i>可以查看到最多400条待办记录:</i> </h4>
+        <hr />
+        @if (billType.Equals("AL")) { 
+            <button class="btn btn-default pull-right" id="exportExcelBt"><i class="fa fa-file-excel-o"></i> 导出到excel</button>
+            <div class="clearfix"></div>
+        }
+        <table data-toggle="table" id="tb">
+            <thead>
+                <tr>
+                    <th>申请流水号</th>
+                    <th data-visible="false">step</th>
+                    <th>申请人</th>
+                    <th>申请时间</th>
+                    <th>申请信息</th>
+                    <th>审核节点</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var i in list) {
+                    <tr>
+                        <td>@i.sysNo @if (i.isUserAobrt) {<span class="text-danger">(申请撤销)</span>}
+                        </td>
+                        <td>@i.step</td>
+                        <td>@i.applier</td>
+                        <td>@(((DateTime)i.applyTime).ToString("yyyy-MM-dd HH:mm:ss"))</td>
+                        <td>@i.subTitle</td>
+                        <td>@i.stepName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

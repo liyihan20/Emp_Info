@@ -1,0 +1,292 @@
+﻿@using EmpInfo.Models;
+@{
+    ei_epEqDeps eqDep = ViewData["eqDep"] as ei_epEqDeps;
+    List<PrDepUserModel> userList = ViewData["userList"] as List<PrDepUserModel>;
+    List<ei_epPrDeps> prDepList = ViewData["prDepList"] as List<ei_epPrDeps>;
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />    
+}
+@section Scripts{
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    
+    <script>
+        $("#tb1").bootstrapTable({
+            url: "GetFlowAuditors",
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 20,
+            pageList: [20, 50, 100, 200],
+            search: true,
+            clickToSelect: true,
+            columns: [
+                {
+                    radio: true
+                },{
+                    field: "bill_type",
+                    title: "单据类型"
+                }, {
+                    field: "relate_name",
+                    title: "审核节点"
+                }, {
+                    field: "relate_text",
+                    title: "关联值"
+                }, {
+                    field: "name",
+                    title: "审核人姓名"
+                }, {
+                    field: "relate_value",
+                    title: "审核人厂牌"
+                }
+            ]
+        });
+
+        $("#tb2").bootstrapTable({
+            url: "GetFlowNotifiers",
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 20,
+            pageList: [20, 50, 100, 200],
+            search: true,
+            clickToSelect: true,
+            columns: [
+                {
+                    radio: true
+                }, {
+                    field: "bill_type",
+                    title: "单据类型"
+                }, {
+                    field: "card_number",
+                    title: "厂牌"
+                }, {
+                    field: "name",
+                    title: "姓名"
+                }, {
+                    field: "cond1",
+                    title: "条件1"
+                }, {
+                    field: "cond2",
+                    title: "条件2"
+                }
+            ]
+        });
+
+        $(function () {
+            $("#tb1AddBt").on("click", function () {
+                $("#tb1Form")[0].reset();
+                $("#tb1Form input[name='id']").val("0");
+                $("#tb1Modal").modal("show");
+            });
+            
+            $("#tb1ModifyBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再查询");
+                    return;
+                }
+                rows[0].relate_value = rows[0].name + "(" + rows[0].relate_value + ")";
+                utils.loadObjData($("#tb1Form"), rows[0]);
+                $("#tb1Modal").modal("show");
+            });
+
+            $("#tb1RemoveBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                openConfirmDialog("确定要删除选中行吗？", function () {
+                    $.post("RemoveFlowAudiors", { id: rows[0].id }, function (data) {
+                        if (data.suc) {
+                            toastr.success("删除成功");
+                            $('#tb1').bootstrapTable('refresh');
+                        } else {
+                            toastr.error("删除失败：" + data.msg);
+                        }
+                    })
+                });
+            });
+
+            $("#saveTb1FormBt").on("click", function () {
+                var obj = utils.getFormObj($("#tb1Form"));
+                if (obj.bill_type == "" || obj.relate_name == "" || obj.relate_value == "") {
+                    toastr.error("缺少值");
+                    return;
+                }
+                console.log(obj);
+                $.post("SaveFlowAuditors", { obj: JSON.stringify(obj) }, function (data) {
+                    if (data.suc) {
+                        $("#tb1Modal").modal("hide");
+                        toastr.success("保存成功");
+                        $('#tb1').bootstrapTable('refresh');
+                    } else {
+                        toastr.error("保存失败：" + data.msg);
+                    }
+                });
+            });
+
+            $("#tb2AddBt").on("click", function () {
+                $("#tb2Form")[0].reset();
+                $("#tb2Modal").modal("show");
+            });
+
+            $("#tb2ModifyBt").on("click", function () {
+                var rows = $('#tb2').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再查询");
+                    return;
+                }
+                rows[0].card_number = rows[0].name + "(" + rows[0].card_number + ")";
+                utils.loadObjData($("#tb2Form"), rows[0]);
+                $("#tb2Modal").modal("show");
+            });
+
+            $("#tb2RemoveBt").on("click", function () {
+                var rows = $('#tb2').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                openConfirmDialog("确定要删除选中行吗？", function () {
+                    $.post("RemoveFlowNotifiers", { id: rows[0].id }, function (data) {
+                        if (data.suc) {
+                            toastr.success("删除成功");
+                            $('#tb2').bootstrapTable('refresh');
+                        } else {
+                            toastr.error("删除失败：" + data.msg);
+                        }
+                    })
+                });
+            });
+
+            $("#saveTb2FormBt").on("click", function () {
+                var obj = utils.getFormObj($("#tb2Form"));
+                if (obj.bill_type == "" || obj.card_number == "") {
+                    toastr.error("缺少值");
+                    return;
+                }
+                console.log(obj);
+                $.post("SaveFlowNotifiers", { obj: JSON.stringify(obj) }, function (data) {
+                    if (data.suc) {
+                        $("#tb2Modal").modal("hide");
+                        toastr.success("保存成功");
+                        $('#tb2').bootstrapTable('refresh');
+                    } else {
+                        toastr.error("保存失败：" + data.msg);
+                    }
+                });
+            });
+
+            $(".user-select").on("click", function () {
+                var self = this;
+                openSelectUserDialog($(self).val(), 1, function (result) {
+                    $(self).val(result);
+                });
+            });
+
+        });
+    </script>
+}
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Admin/AdminIndex")">管理员工具栏</a></li>
+            <li class="active">审核人与通知人</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">审核人</a></li>
+            <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">通知人</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">            
+            <div role="tabpanel" class="tab-pane fade in active" id="tab1">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        <div>
+                            <button class="btn btn-success" id="tb1AddBt"><i class="fa fa-plus"></i> 增加</button>
+                            <button class="btn btn-primary" id="tb1ModifyBt"><i class="fa fa-edit"></i> 修改</button>
+                            <button class="btn btn-danger" id="tb1RemoveBt"><i class="fa fa-plus"></i> 删除</button>
+                        </div>
+
+                        <table id="tb1"></table>
+                    </div>                    
+                </div>
+            </div>
+            
+            <div role="tabpanel" class="tab-pane fade" id="tab2">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        <div>
+                            <button class="btn btn-success" id="tb2AddBt"><i class="fa fa-plus"></i> 增加</button>
+                            <button class="btn btn-primary" id="tb2ModifyBt"><i class="fa fa-edit"></i> 修改</button>
+                            <button class="btn btn-danger" id="tb2RemoveBt"><i class="fa fa-plus"></i> 删除</button>
+                        </div>
+
+                        <table id="tb2"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Modal{
+    <div class="modal fade" id="tb1Modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="tb1Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> 增加审核人</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="tb1Form">
+                        <input type="hidden" name="id" value="0" />
+                        <input type="text" class="form-control" name="bill_type" placeholder="单据类型" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="relate_name" placeholder="审核节点" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="relate_text" placeholder="关联值" style="margin-top:4px;" />
+                        <input type="text" class="form-control user-select" name="relate_value" placeholder="审核人厂牌" style="margin-top:4px;" />
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-reply"></i> 取消</button>
+                    <button id="saveTb1FormBt" type="button" class="btn btn-success"><i class="fa fa-check"></i> 确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="tb2Modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="tb2Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> 增加通知人</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="tb2Form">
+                        <input type="hidden" name="id" value="0" />
+                        <input type="text" class="form-control" name="bill_type" placeholder="单据类型" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="cond1" placeholder="条件1" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="cond2" placeholder="条件2" style="margin-top:4px;" />
+                        <input type="text" class="form-control user-select" name="card_number" placeholder="通知人" style="margin-top:4px;" />
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-reply"></i> 取消</button>
+                    <button id="saveTb2FormBt" type="button" class="btn btn-success"><i class="fa fa-check"></i> 确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_SelectUsers")
+}

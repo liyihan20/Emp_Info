@@ -1,6 +1,6 @@
 ﻿@using EmpInfo.Models;
 @{
-    List<AssistantEmpModel> list = (List<AssistantEmpModel>)ViewData["list"];
+    //List<AssistantEmpModel> list = (List<AssistantEmpModel>)ViewData["list"];
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
@@ -12,7 +12,7 @@
     <script>
 
         $(function () {
-            $("#searchText").keyup(function () {
+            @*$("#searchText").keyup(function () {
                 if (event.keyCode == 13) {
                     $("#searchBt").click();
                 }
@@ -21,7 +21,7 @@
             $("#searchBt").on("click", function () {
                 var searchValue = $("#searchText").val();
                 window.location.href = "@Url.Content("~/Report/SearchAssistantEmps?value=")" + searchValue;
-            });
+            });*@
 
 
         });
@@ -30,15 +30,31 @@
             striped: true,
             mobileResponsive: true,
             pagination: true,
+            sidePagination: "server",
+            url: "GetAssistantEmps",
+            search:true,
+            columns: [            
+            {
+                field: "empName",
+                title: "姓名"
+            }, {
+                field: "cardNumber",
+                title: "厂牌"
+            }, {
+                field: "empType",
+                title: "类型"
+            }, {
+                field: "depName",
+                title: "部门"
+            }
+            ],
             rowStyle: function () {
                 return {
                     css: { "cursor": "pointer" }
                 };
             },
-            onClickRow: function (row, ele, field) {
-                var empType = $.trim(row[2]);
-                var cardNumber = $.trim(row[1]);
-                window.location.href = "CheckAssistantEmp?empType=" + empType + "&cardNumber=" + cardNumber;
+            onClickRow: function (row, ele, field) { 
+                window.location.href = "CheckAssistantEmp?empType=" + row.empType + "&cardNumber=" + row.cardNumber;
             }
         });
         
@@ -51,44 +67,10 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-            <li class="active">基干/辅助员工查询</li>
+            <li class="active">基辅员工查询</li>
         </ol>
     </div>
-    <div class="panel-body">
-
-        <div class="input-group">
-            <input type="text" class="form-control" id="searchText" placeholder="输入厂牌、姓名搜索" value="@ViewData["searchValue"]">
-            <span class="input-group-btn">
-                <button class="btn btn-primary" type="button" id="searchBt"><span class="fa fa-search"></span> 搜索</button>
-            </span>
-        </div>
-        @if (list != null) {
-            if (list.Count() == 0) {
-                <p class="text-center text-warning" style="margin-top:20px;">查询不到符合条件的记录</p>
-            }
-            else {
-                <hr style="margin:12px 0" />
-                <table data-toggle="table" id="tb">
-                    <thead>
-                        <tr>
-                            <th>姓名</th>
-                            <th>厂牌</th>
-                            <th>类型</th>
-                            <th>部门</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var i in list) {
-                            <tr>
-                                <td>@i.empName</td>
-                                <td>@i.cardNumber</td>
-                                <td>@i.empType</td>
-                                <td>@i.depName</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-        }
+    <div class="panel-body">        
+        <table id="tb"></table>        
     </div>
 </div>

@@ -132,7 +132,7 @@ namespace EmpInfo.Controllers
         [SessionTimeOutJsonFilter]
         public JsonResult AbortApply(string sysNo, string reason = "")
         {
-            SetBillBySysNo(sysNo);
+            SetBillByType(sysNo);
             var result = bill.AbortApply(userInfo, sysNo, reason);
 
             WriteEventLog(bill.BillTypeName, "撤销、中止流程：" + sysNo + ";result:" + result.msg);
