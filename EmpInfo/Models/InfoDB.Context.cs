@@ -109,6 +109,7 @@ namespace EmpInfo.Models
         public DbSet<vw_SJExcel> vw_SJExcel { get; set; }
         public DbSet<ei_spApply> ei_spApply { get; set; }
         public DbSet<vw_spExcel> vw_spExcel { get; set; }
+        public DbSet<ei_flowAuthority> ei_flowAuthority { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {

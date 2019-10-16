@@ -31,7 +31,9 @@
 
             $("#send_or_receive").on("change", function () {
                 if ($(this).val() == "寄件") {
-                    $(".send_extra_info").show();
+                    if ($("#content_type").val() == "产品") {
+                        $(".send_extra_info").show();
+                    }
                 } else {
                     $(".send_extra_info").hide();
                 }
@@ -39,8 +41,12 @@
 
             $("#content_type").on("change", function () {
                 if ($(this).val() == "产品") {
+                    if ($("#send_or_receive").val() == "寄件") {
+                        $(".send_extra_info").show();
+                    }
                     $(".product_extra_info").show();
                 } else {
+                    $(".send_extra_info").hide();
                     $(".product_extra_info").hide();
                 }
             });
@@ -64,8 +70,8 @@
                     return;
                 }
                 if (obj.send_or_receive == "寄件") {
-                    if (obj.send_no == "") {
-                        toastr.error("寄件时，放行条编号必须填写");
+                    if (obj.content_type == "产品" && obj.send_no == "") {
+                        toastr.error("寄产品时，放行条编号必须填写");
                         return;
                     }
                     if (obj.from_addr.indexOf("汕尾") < 0) {
@@ -99,14 +105,14 @@
                         toastr.error("包装箱尺寸必须填写");
                         return;
                     }
-                    if (obj.cardboard_size == "") {
-                        toastr.error("卡板尺寸必须填写");
-                        return;
-                    }
-                    if (obj.cardboard_num == "") {
-                        toastr.error("卡板数必须填写");
-                        return;
-                    }
+                    //if (obj.cardboard_size == "") {
+                    //    toastr.error("卡板尺寸必须填写");
+                    //    return;
+                    //}
+                    //if (obj.cardboard_num == "") {
+                    //    toastr.error("卡板数必须填写");
+                    //    return;
+                    //}
                     if (obj.aging == "") {
                         toastr.error("配送时效必须选择");
                         return;
@@ -115,15 +121,17 @@
                         toastr.error("包装箱尺寸格式不正确，必须是【数字*数字*数字】");
                         return;
                     }
-                    if (!utils.testIsSize(obj.cardboard_size)) {
-                        toastr.error("卡板尺寸格式不正确，必须是【数字*数字*数字】");
-                        return;
+                    if (obj.cardboard_size != "" && obj.cardboard_size != "0") {
+                        if (!utils.testIsSize(obj.cardboard_size)) {
+                            toastr.error("卡板尺寸格式不正确，必须是【数字*数字*数字】");
+                            return;
+                        }
                     }
                     if (!utils.testIsInt(obj.package_num)) {
                         toastr.error("件数必须录入整数");
                         return;
                     }
-                    if (!utils.testIsInt(obj.cardboard_num)) {
+                    if (obj.cardboard_num != "" && !utils.testIsInt(obj.cardboard_num)) {
                         toastr.error("卡板数必须录入整数");
                         return;
                     }
@@ -265,16 +273,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-6 col-xs-12 send_extra_info">
-                    <div class="b-div">
-                        <span class="b-label">
-                            放行条编号:
-                        </span>
-                        <span class="b-input">
-                            <input type="text" class="form-control" name="send_no" />
-                        </span>
-                    </div>
-                </div>
                 <div class="col-md-4 col-sm-6 col-xs-12">
                     <div class="b-div">
                         <span class="b-label">
@@ -287,6 +285,16 @@
                                 <option value="文件">文件</option>
                             </select>
                         </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12 send_extra_info">
+                    <div class="b-div">
+                        <span class="b-label">
+                            放行条编号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="send_no" />
+                        </span>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-6 col-xs-12 product_extra_info">

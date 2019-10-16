@@ -407,17 +407,20 @@
             
         @if (!string.IsNullOrEmpty(m.work_evaluation)) {
             <div>
-                <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">处理人评价信息</h4>
-                @if (m.quit_type == "辞职") { 
+                <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">处理人评价信息</h4>                
                 <div class="b-div">
                     <span class="b-label" style="vertical-align:top;width:150px;">
-                        批准离职时间:
+                        @if (m.quit_type == "辞职") { 
+                            <span>批准离职时间:</span>
+                        }
+                        else {
+                            <span>自离时间:</span>
+                        }
                     </span>
                     <span style="display:inline-block;width:70%">
                         @(m.leave_date==null?"":((DateTime)m.leave_date).ToString("yyyy-MM-dd"))
                     </span>
-                </div>
-                }
+                </div>                
                 <div class="b-div">
                     <span class="b-label" style="vertical-align:top;width:150px;">
                         工作评价:

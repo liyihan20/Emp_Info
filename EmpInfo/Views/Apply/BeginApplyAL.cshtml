@@ -80,14 +80,14 @@
         });
 
         //选择代理人
-        $("#agentMan").on("click", function () {
+        $("#agentMan").on("click focus", function () {
             openSelectUserDialog($("#agentMan").val(), 1, function (result) {
                 $("#agentMan").val(result);
             });
         });
 
         //选择知会人
-        $("#informMan").on("click", function () {
+        $("#informMan").on("click focus", function () {
             openSelectUserDialog($("#informMan").val(), 10, function (result) {
                 $("#informMan").val(result);
             });

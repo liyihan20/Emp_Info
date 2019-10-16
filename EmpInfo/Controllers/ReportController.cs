@@ -1717,7 +1717,7 @@ namespace EmpInfo.Controllers
             return View();
         }
 
-        public IQueryable<vw_JQExcel> SearchJQData(DateTime fromDate, DateTime toDate, string depName,string empName,string sysNum)
+        public IQueryable<vw_JQExcel> SearchJQData(DateTime fromDate, DateTime toDate, string depName, string empName, string sysNum)
         {
             depName = depName.Trim();
 
@@ -1738,7 +1738,26 @@ namespace EmpInfo.Controllers
             if (!string.IsNullOrWhiteSpace(depName)) result = result.Where(r => r.dep_name.Contains(depName));
             if (!string.IsNullOrWhiteSpace(empName)) result = result.Where(r => r.name.Contains(empName));
             if (!string.IsNullOrWhiteSpace(sysNum)) result = result.Where(r => r.sys_no.Contains(sysNum));
+            
             return result;
+        }
+
+        public JsonResult ToggleJQCheck1(string sysNo)
+        {
+            string check1 = "";
+            try {
+                var jq = db.ei_jqApply.Where(j => j.sys_no == sysNo).FirstOrDefault();
+                if (jq != null) {
+                    check1 = (!(jq.check1 ?? false)).ToString();
+                    jq.check1 = !(jq.check1 ?? false);
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+            WriteEventLog("离职报表", "切换标志1：" + sysNo + ">" + check1);
+            return Json(new SimpleResultModel() { suc = true });
         }
 
         public JsonResult CheckJQReport(DateTime fromDate, DateTime toDate, string depName = "", string empName = "", string sysNum = "")
@@ -1754,8 +1773,11 @@ namespace EmpInfo.Controllers
                     u.apply_time,
                     u.quit_type,
                     u.audit_result,
-                    u.salary_type
+                    u.salary_type,
+                    u.check1,
+                    u.leave_date
                 }).OrderBy(u => u.apply_time).ToList();
+
             return Json(result);
         }
 
@@ -1765,7 +1787,7 @@ namespace EmpInfo.Controllers
             var result = SearchJQData(fromDate, toDate, depName, empName, sysNum).OrderBy(s => s.apply_time).ToList();
 
             string[] colName = new string[] { "处理结果","申请流水号", "申请人", "申请时间","离职类型", "离职人", "离职人账号", "离职人厂牌", "人事部门","工资类别",
-                                              "旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工资发放方式","批准离职时间","工作评价","工作评价描述","原部是否愿意再录用", "是否愿意再录用原因" };
+                                              "旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工资发放方式","离职时间","综合表现" };
             ushort[] colWidth = new ushort[colName.Length];
 
             for (var i = 0; i < colWidth.Length; i++) {
@@ -1828,10 +1850,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.quit_suggestion);
                 cells.Add(rowIndex, ++colIndex, d.salary_clear_way);
                 cells.Add(rowIndex, ++colIndex, d.leave_date == null ? "" : ((DateTime)d.leave_date).ToString("yyyy-MM-dd"));
-                cells.Add(rowIndex, ++colIndex, d.work_evaluation);
-                cells.Add(rowIndex, ++colIndex, d.work_comment);
-                cells.Add(rowIndex, ++colIndex, d.wanna_employ);
-                cells.Add(rowIndex, ++colIndex, d.employ_comment);                
+                cells.Add(rowIndex, ++colIndex, string.Format("工作评价:{0},{1};是否再录用：{2},{3}",d.work_evaluation,d.work_comment,d.wanna_employ,d.employ_comment));
             }
 
             xls.Send();
@@ -1991,7 +2010,7 @@ namespace EmpInfo.Controllers
         public ActionResult SPReport()
         {
             return View();
-        }
+        }        
 
         public void BeginExportSPReport(DateTime fromDate, DateTime toDate)
         {

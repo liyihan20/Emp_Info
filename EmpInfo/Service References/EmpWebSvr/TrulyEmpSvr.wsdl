@@ -60,6 +60,20 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="RecivedMessage">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RecivedMessageResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="RecivedMessageResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="UserLogin">
         <s:complexType>
           <s:sequence>
@@ -169,6 +183,20 @@
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="UpdateUserInfoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CheckLoginDevice">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CheckLoginDeviceResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="CheckLoginDeviceResult" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -462,6 +490,146 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="GetSalaryBankCard">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSalaryBankCardResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSalaryBankCardResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDPDealingCount">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDPDealingCountResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetDPDealingCountResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BeginDPApply">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BeginDPApplyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="BeginDPApplyResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SubmitDPApply">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SubmitDPApplyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SubmitDPApplyResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDPItemList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDPItemListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetDPItemListResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CheckAndAuditDP">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CheckAndAuditDPResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="CheckAndAuditDPResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RoommateComfirmDP">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RoommateComfirmDPResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="RoommateComfirmDPResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AccepterComfirmDP">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AccepterComfirmDPResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AccepterComfirmDPResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RepairerFinishDP">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RepairerFinishDPResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="RepairerFinishDPResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ApplierEvalateDP">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="jsonParam" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ApplierEvalateDPResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ApplierEvalateDPResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
     </s:schema>
   </wsdl:types>
   <wsdl:message name="SendToAllSoapIn">
@@ -487,6 +655,12 @@
   </wsdl:message>
   <wsdl:message name="QuerySendResultSoapOut">
     <wsdl:part name="parameters" element="tns:QuerySendResultResponse" />
+  </wsdl:message>
+  <wsdl:message name="RecivedMessageSoapIn">
+    <wsdl:part name="parameters" element="tns:RecivedMessage" />
+  </wsdl:message>
+  <wsdl:message name="RecivedMessageSoapOut">
+    <wsdl:part name="parameters" element="tns:RecivedMessageResponse" />
   </wsdl:message>
   <wsdl:message name="UserLoginSoapIn">
     <wsdl:part name="parameters" element="tns:UserLogin" />
@@ -535,6 +709,12 @@
   </wsdl:message>
   <wsdl:message name="UpdateUserInfoSoapOut">
     <wsdl:part name="parameters" element="tns:UpdateUserInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="CheckLoginDeviceSoapIn">
+    <wsdl:part name="parameters" element="tns:CheckLoginDevice" />
+  </wsdl:message>
+  <wsdl:message name="CheckLoginDeviceSoapOut">
+    <wsdl:part name="parameters" element="tns:CheckLoginDeviceResponse" />
   </wsdl:message>
   <wsdl:message name="IsUserInDormSoapIn">
     <wsdl:part name="parameters" element="tns:IsUserInDorm" />
@@ -662,6 +842,66 @@
   <wsdl:message name="GetSalaryDetailSoapOut">
     <wsdl:part name="parameters" element="tns:GetSalaryDetailResponse" />
   </wsdl:message>
+  <wsdl:message name="GetSalaryBankCardSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSalaryBankCard" />
+  </wsdl:message>
+  <wsdl:message name="GetSalaryBankCardSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSalaryBankCardResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetDPDealingCountSoapIn">
+    <wsdl:part name="parameters" element="tns:GetDPDealingCount" />
+  </wsdl:message>
+  <wsdl:message name="GetDPDealingCountSoapOut">
+    <wsdl:part name="parameters" element="tns:GetDPDealingCountResponse" />
+  </wsdl:message>
+  <wsdl:message name="BeginDPApplySoapIn">
+    <wsdl:part name="parameters" element="tns:BeginDPApply" />
+  </wsdl:message>
+  <wsdl:message name="BeginDPApplySoapOut">
+    <wsdl:part name="parameters" element="tns:BeginDPApplyResponse" />
+  </wsdl:message>
+  <wsdl:message name="SubmitDPApplySoapIn">
+    <wsdl:part name="parameters" element="tns:SubmitDPApply" />
+  </wsdl:message>
+  <wsdl:message name="SubmitDPApplySoapOut">
+    <wsdl:part name="parameters" element="tns:SubmitDPApplyResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetDPItemListSoapIn">
+    <wsdl:part name="parameters" element="tns:GetDPItemList" />
+  </wsdl:message>
+  <wsdl:message name="GetDPItemListSoapOut">
+    <wsdl:part name="parameters" element="tns:GetDPItemListResponse" />
+  </wsdl:message>
+  <wsdl:message name="CheckAndAuditDPSoapIn">
+    <wsdl:part name="parameters" element="tns:CheckAndAuditDP" />
+  </wsdl:message>
+  <wsdl:message name="CheckAndAuditDPSoapOut">
+    <wsdl:part name="parameters" element="tns:CheckAndAuditDPResponse" />
+  </wsdl:message>
+  <wsdl:message name="RoommateComfirmDPSoapIn">
+    <wsdl:part name="parameters" element="tns:RoommateComfirmDP" />
+  </wsdl:message>
+  <wsdl:message name="RoommateComfirmDPSoapOut">
+    <wsdl:part name="parameters" element="tns:RoommateComfirmDPResponse" />
+  </wsdl:message>
+  <wsdl:message name="AccepterComfirmDPSoapIn">
+    <wsdl:part name="parameters" element="tns:AccepterComfirmDP" />
+  </wsdl:message>
+  <wsdl:message name="AccepterComfirmDPSoapOut">
+    <wsdl:part name="parameters" element="tns:AccepterComfirmDPResponse" />
+  </wsdl:message>
+  <wsdl:message name="RepairerFinishDPSoapIn">
+    <wsdl:part name="parameters" element="tns:RepairerFinishDP" />
+  </wsdl:message>
+  <wsdl:message name="RepairerFinishDPSoapOut">
+    <wsdl:part name="parameters" element="tns:RepairerFinishDPResponse" />
+  </wsdl:message>
+  <wsdl:message name="ApplierEvalateDPSoapIn">
+    <wsdl:part name="parameters" element="tns:ApplierEvalateDP" />
+  </wsdl:message>
+  <wsdl:message name="ApplierEvalateDPSoapOut">
+    <wsdl:part name="parameters" element="tns:ApplierEvalateDPResponse" />
+  </wsdl:message>
   <wsdl:portType name="TrulyEmpSvrSoap">
     <wsdl:operation name="SendToAll">
       <wsdl:input message="tns:SendToAllSoapIn" />
@@ -678,6 +918,10 @@
     <wsdl:operation name="QuerySendResult">
       <wsdl:input message="tns:QuerySendResultSoapIn" />
       <wsdl:output message="tns:QuerySendResultSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="RecivedMessage">
+      <wsdl:input message="tns:RecivedMessageSoapIn" />
+      <wsdl:output message="tns:RecivedMessageSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="UserLogin">
       <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">用户登录验证</wsdl:documentation>
@@ -711,6 +955,10 @@
     <wsdl:operation name="UpdateUserInfo">
       <wsdl:input message="tns:UpdateUserInfoSoapIn" />
       <wsdl:output message="tns:UpdateUserInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CheckLoginDevice">
+      <wsdl:input message="tns:CheckLoginDeviceSoapIn" />
+      <wsdl:output message="tns:CheckLoginDeviceSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="IsUserInDorm">
       <wsdl:input message="tns:IsUserInDormSoapIn" />
@@ -796,6 +1044,46 @@
       <wsdl:input message="tns:GetSalaryDetailSoapIn" />
       <wsdl:output message="tns:GetSalaryDetailSoapOut" />
     </wsdl:operation>
+    <wsdl:operation name="GetSalaryBankCard">
+      <wsdl:input message="tns:GetSalaryBankCardSoapIn" />
+      <wsdl:output message="tns:GetSalaryBankCardSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDPDealingCount">
+      <wsdl:input message="tns:GetDPDealingCountSoapIn" />
+      <wsdl:output message="tns:GetDPDealingCountSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="BeginDPApply">
+      <wsdl:input message="tns:BeginDPApplySoapIn" />
+      <wsdl:output message="tns:BeginDPApplySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SubmitDPApply">
+      <wsdl:input message="tns:SubmitDPApplySoapIn" />
+      <wsdl:output message="tns:SubmitDPApplySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDPItemList">
+      <wsdl:input message="tns:GetDPItemListSoapIn" />
+      <wsdl:output message="tns:GetDPItemListSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CheckAndAuditDP">
+      <wsdl:input message="tns:CheckAndAuditDPSoapIn" />
+      <wsdl:output message="tns:CheckAndAuditDPSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="RoommateComfirmDP">
+      <wsdl:input message="tns:RoommateComfirmDPSoapIn" />
+      <wsdl:output message="tns:RoommateComfirmDPSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AccepterComfirmDP">
+      <wsdl:input message="tns:AccepterComfirmDPSoapIn" />
+      <wsdl:output message="tns:AccepterComfirmDPSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="RepairerFinishDP">
+      <wsdl:input message="tns:RepairerFinishDPSoapIn" />
+      <wsdl:output message="tns:RepairerFinishDPSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ApplierEvalateDP">
+      <wsdl:input message="tns:ApplierEvalateDPSoapIn" />
+      <wsdl:output message="tns:ApplierEvalateDPSoapOut" />
+    </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="TrulyEmpSvrSoap" type="tns:TrulyEmpSvrSoap">
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
@@ -828,6 +1116,15 @@
     </wsdl:operation>
     <wsdl:operation name="QuerySendResult">
       <soap:operation soapAction="http://ic.truly.com.cn/QuerySendResult" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RecivedMessage">
+      <soap:operation soapAction="http://ic.truly.com.cn/RecivedMessage" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -900,6 +1197,15 @@
     </wsdl:operation>
     <wsdl:operation name="UpdateUserInfo">
       <soap:operation soapAction="http://ic.truly.com.cn/UpdateUserInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CheckLoginDevice">
+      <soap:operation soapAction="http://ic.truly.com.cn/CheckLoginDevice" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -1096,6 +1402,96 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetSalaryBankCard">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetSalaryBankCard" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDPDealingCount">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetDPDealingCount" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BeginDPApply">
+      <soap:operation soapAction="http://ic.truly.com.cn/BeginDPApply" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SubmitDPApply">
+      <soap:operation soapAction="http://ic.truly.com.cn/SubmitDPApply" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDPItemList">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetDPItemList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CheckAndAuditDP">
+      <soap:operation soapAction="http://ic.truly.com.cn/CheckAndAuditDP" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RoommateComfirmDP">
+      <soap:operation soapAction="http://ic.truly.com.cn/RoommateComfirmDP" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AccepterComfirmDP">
+      <soap:operation soapAction="http://ic.truly.com.cn/AccepterComfirmDP" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RepairerFinishDP">
+      <soap:operation soapAction="http://ic.truly.com.cn/RepairerFinishDP" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ApplierEvalateDP">
+      <soap:operation soapAction="http://ic.truly.com.cn/ApplierEvalateDP" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="TrulyEmpSvrSoap12" type="tns:TrulyEmpSvrSoap">
     <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
@@ -1128,6 +1524,15 @@
     </wsdl:operation>
     <wsdl:operation name="QuerySendResult">
       <soap12:operation soapAction="http://ic.truly.com.cn/QuerySendResult" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RecivedMessage">
+      <soap12:operation soapAction="http://ic.truly.com.cn/RecivedMessage" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -1200,6 +1605,15 @@
     </wsdl:operation>
     <wsdl:operation name="UpdateUserInfo">
       <soap12:operation soapAction="http://ic.truly.com.cn/UpdateUserInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CheckLoginDevice">
+      <soap12:operation soapAction="http://ic.truly.com.cn/CheckLoginDevice" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -1389,6 +1803,96 @@
     </wsdl:operation>
     <wsdl:operation name="GetSalaryDetail">
       <soap12:operation soapAction="http://ic.truly.com.cn/GetSalaryDetail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSalaryBankCard">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetSalaryBankCard" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDPDealingCount">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetDPDealingCount" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BeginDPApply">
+      <soap12:operation soapAction="http://ic.truly.com.cn/BeginDPApply" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SubmitDPApply">
+      <soap12:operation soapAction="http://ic.truly.com.cn/SubmitDPApply" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDPItemList">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetDPItemList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CheckAndAuditDP">
+      <soap12:operation soapAction="http://ic.truly.com.cn/CheckAndAuditDP" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RoommateComfirmDP">
+      <soap12:operation soapAction="http://ic.truly.com.cn/RoommateComfirmDP" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AccepterComfirmDP">
+      <soap12:operation soapAction="http://ic.truly.com.cn/AccepterComfirmDP" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RepairerFinishDP">
+      <soap12:operation soapAction="http://ic.truly.com.cn/RepairerFinishDP" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ApplierEvalateDP">
+      <soap12:operation soapAction="http://ic.truly.com.cn/ApplierEvalateDP" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

@@ -129,7 +129,6 @@ namespace EmpInfo.Services
                 al.auditor_queues = JsonConvert.SerializeObject(queueList);
             }
 
-
             if (al.to_date == null || al.from_date == null) {
                 throw new Exception("请假日期不合法");
             }

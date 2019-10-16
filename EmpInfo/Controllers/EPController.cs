@@ -265,7 +265,8 @@ namespace EmpInfo.Controllers
                 //if (db.ei_epPrDeps.Where(e => e.dep_num == prDepNo).Count() > 0) {
                 //    return Json(new { suc = false, msg = "此生产部门编码已存在，不能重复保存" });
                 //}
-                if (db.ei_epPrDeps.Where(e => e.dep_name == prDepName).Count() > 0) {
+                
+                if (db.ei_epPrDeps.Where(e => e.dep_name == prDepName && (e.is_forbit==null || e.is_forbit==false)).Count() > 0) {
                     return Json(new { suc = false, msg = "此生产部门名称已存在，不能重复保存" });
                 }
                 dep = new ei_epPrDeps();
@@ -392,7 +393,12 @@ namespace EmpInfo.Controllers
                 var prDepIdInt = prDepIds.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(u => Int32.Parse(u)).ToList();
                 var prDeps = db.ei_epPrDeps.Where(e => prDepIdInt.Contains(e.id));
                 foreach (var prDep in prDeps) {
-                    prDep.is_forbit = !prDep.is_forbit;
+                    if (prDep.is_forbit == true) {
+                        if (db.ei_epPrDeps.Where(e => e.dep_name == prDep.dep_name && e.id != prDep.id && e.is_forbit == false).Count() > 0) {
+                            return Json(new SimpleResultModel() { suc = false, msg = "已存在同名的生产部门[" + prDep.dep_name + "],启用失败" });
+                        }
+                    }
+                    prDep.is_forbit = !prDep.is_forbit;                    
                 }
                 db.SaveChanges();
                 return Json(new { suc = true, msg = "操作成功" });

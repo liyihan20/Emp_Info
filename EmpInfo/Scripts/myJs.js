@@ -51,6 +51,7 @@
     },
     //将后台到前台的日期格式化为年-月-日的格式，第二个参数指定是否包含小时和分钟
     parseTDate: function (d, hasHour) {
+        if (!d) return "";
         if (d.indexOf("T") > 0) {
             return d.split("T")[0];
         } else if (d.indexOf("Date") >= 0) {
@@ -79,5 +80,12 @@
         if (!digitPoint || isNaN(digitPoint)) digitPoint = 100;
         var reg = new RegExp("^[0-9]+(\.[0-9]{1," + digitPoint + "}){0,1}$");
         return reg.test(str);
+    },
+    //重置form表单，reset方法默认不能重置hidden的值，此方法完善此功能
+    resetForm: function ($fm) {
+        $fm[0].reset();
+        $fm.find("input[type='hidden']").each(function (v) {
+            $(this).val($(this).attr("data-value"));
+        });
     }
 }  

@@ -911,9 +911,23 @@ namespace EmpInfo.Controllers
             f.relate_value = GetUserCardByNameAndCardNum(f.relate_value);
 
             if (f.id == 0) {
-                db.flow_auditorRelation.Add(f);
+                if (f.relate_value.Contains(";")) {
+                    foreach (var v in f.relate_value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
+                        flow_auditorRelation ar = new flow_auditorRelation();
+                        MyUtils.CopyPropertyValue(f, ar);
+                        ar.relate_value = v;
+                        db.flow_auditorRelation.Add(ar);
+                    }
+                }
+                else {
+                    db.flow_auditorRelation.Add(f);
+                }
             }
             else {
+                if (f.relate_value.Contains(";")) {
+                    return Json(new SimpleResultModel() { suc = false, msg = "修改时不能选择多人" });
+                }
+
                 var currentF = db.flow_auditorRelation.Single(a => a.id == f.id);
                 MyUtils.CopyPropertyValue(f, currentF);
             }
@@ -957,15 +971,30 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = "表单值不完整" });
             }
 
-            f.name = GetUserNameByNameAndCardNum(f.card_number);
-            f.card_number = GetUserCardByNameAndCardNum(f.card_number);
-
             if (f.id == 0) {
-                db.flow_notifyUsers.Add(f);
+                if (f.card_number.Contains(";")) {
+                    foreach (var v in f.card_number.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
+                        flow_notifyUsers ar = new flow_notifyUsers();
+                        MyUtils.CopyPropertyValue(f, ar);
+                        ar.card_number = GetUserCardByNameAndCardNum(v);
+                        ar.name = GetUserNameByNameAndCardNum(v);
+                        db.flow_notifyUsers.Add(ar);
+                    }
+                }
+                else {
+                    f.name = GetUserNameByNameAndCardNum(f.card_number);
+                    f.card_number = GetUserCardByNameAndCardNum(f.card_number);
+                    db.flow_notifyUsers.Add(f);
+                }
             }
             else {
-                var currentF = db.flow_notifyUsers.Single(a => a.id == f.id);
+                if (f.card_number.Contains(";")) {
+                    return Json(new SimpleResultModel() { suc = false, msg = "修改时不能选择多人" });
+                }
+                var currentF = db.flow_notifyUsers.Single(a => a.id == f.id);               
                 MyUtils.CopyPropertyValue(f, currentF);
+                currentF.name = GetUserNameByNameAndCardNum(f.card_number);
+                currentF.card_number = GetUserCardByNameAndCardNum(f.card_number);
             }
 
             try {

@@ -102,30 +102,43 @@ namespace EmpInfo.Services
             string stepName = fc.Get("stepName");
             bool isPass = bool.Parse(fc.Get("isPass"));
             string opinion = fc.Get("opinion");
-            string exCompany = fc.Get("ex_company");
-            string exType = fc.Get("ex_type");
-            string exPriceStr = fc.Get("ex_price");
-            string exNo = fc.Get("ex_no");
 
-            if (stepName.Contains("事业部") || stepName.Contains("物流")) {
-                if (isPass) {
+            if (isPass) {
+                string exCompany = fc.Get("ex_company");
+                string exType = fc.Get("ex_type");
+                string exPriceStr = fc.Get("ex_price");
+                string exNo = fc.Get("ex_no");
+                if (stepName.Contains("物流")) {
+                    if (string.IsNullOrEmpty(exCompany)) {
+                        return new SimpleResultModel() { suc = false, msg = "请先选择物流信息" };
+                    }
+                    if (string.IsNullOrEmpty(exNo)) {
+                        return new SimpleResultModel() { suc = false, msg = "请先填写快递编号" };
+                    }
+                    if (!exCompany.Equals(bill.ex_company)) {
+                        bill.ex_log = string.Format("{0}({1})[{2}]:{3}==>{4}({5})[{6}]:{7}", bill.ex_company, bill.ex_type, bill.ex_no, bill.ex_price, exCompany, exType, exNo, exPriceStr);
+                    }
+                    bill.ex_no = exNo;
+                    bill.ex_company = exCompany;
+                    bill.ex_type = exType;
+                    bill.ex_price = decimal.Parse(exPriceStr);
+                }
+
+                if (stepName.Contains("事业部")) {
                     if (string.IsNullOrEmpty(exCompany)) {
                         return new SimpleResultModel() { suc = false, msg = "请先选择物流信息" };
                     }
                     bill.ex_company = exCompany;
                     bill.ex_type = exType;
                     bill.ex_price = decimal.Parse(exPriceStr);
-                }                
-            }
-            if (stepName.Contains("申请人") || stepName.Contains("物流")) {
-                if (isPass) {
+                }
+                if (stepName.Contains("申请人")) {
                     if (string.IsNullOrEmpty(exNo)) {
                         return new SimpleResultModel() { suc = false, msg = "请先填写快递编号" };
                     }
                     bill.ex_no = exNo;
                 }
             }
-
             string formJson = JsonConvert.SerializeObject(bill);
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
             var result = flow.BeginAudit(bill.sys_no, step, userInfo.cardNo, isPass, opinion, formJson);
@@ -149,14 +162,14 @@ namespace EmpInfo.Services
                         bill.sys_no,
                         BillTypeName + "已" + (isSuc ? "批准" : "被拒绝"),
                         bill.applier_name,
-                        string.Format("你申请的单号为【{0}】的{1}已{2}，请知悉。", bill.sys_no, BillTypeName, (isSuc ? "批准" : "被拒绝")),
+                        string.Format("你申请的单号为【{0}】的{1}已{2}{3}，请知悉。", bill.sys_no, BillTypeName, (isSuc ? "批准" : "被拒绝"), bill.ex_log == null ? "" : "(快递信息有变更)"),
                         GetUserEmailByCardNum(bill.applier_num),
                         ccEmails
                         );
 
                     SendWxMessageForCompleted(
                         BillTypeName,
-                        bill.sys_no,
+                        bill.sys_no + (bill.ex_log == null ? "" : "(快递信息有变更)"),
                         (isSuc ? "批准" : "被拒绝"),
                         pushUsers
                         );

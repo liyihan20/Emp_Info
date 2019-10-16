@@ -43,5 +43,6 @@ namespace EmpInfo.Models
         public Nullable<decimal> ex_price { get; set; }
         public string ex_no { get; set; }
         public string apply_reason { get; set; }
+        public string ex_log { get; set; }
     }
 }

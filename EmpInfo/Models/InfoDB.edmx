@@ -635,6 +635,17 @@
           <Property Name="op_date" Type="smalldatetime" />
           <Property Name="ip" Type="varchar" MaxLength="64" />
         </EntityType>
+        <EntityType Name="ei_flowAuthority">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="bill_type" Type="varchar" MaxLength="10" />
+          <Property Name="relate_type" Type="nvarchar" MaxLength="50" />
+          <Property Name="relate_value" Type="varchar" MaxLength="50" />
+          <Property Name="cond1" Type="nvarchar" MaxLength="50" />
+          <Property Name="cond2" Type="nvarchar" MaxLength="50" />
+        </EntityType>
         <EntityType Name="ei_groupAuthority">
           <Key>
             <PropertyRef Name="id" />
@@ -706,6 +717,7 @@
           <Property Name="resign_apply_date" Type="smalldatetime" />
           <Property Name="salary_clear_way" Type="nvarchar" MaxLength="50" />
           <Property Name="leave_date" Type="smalldatetime" />
+          <Property Name="check1" Type="bit" />
         </EntityType>
         <EntityType Name="ei_k3RestLog">
           <Key>
@@ -881,6 +893,7 @@
           <Property Name="ex_price" Type="decimal" Precision="18" Scale="2" />
           <Property Name="ex_no" Type="varchar" MaxLength="50" />
           <Property Name="apply_reason" Type="nvarchar" MaxLength="500" />
+          <Property Name="ex_log" Type="nvarchar" MaxLength="200" />
         </EntityType>
         <EntityType Name="ei_specialUsers">
           <Key>
@@ -1434,7 +1447,8 @@
           <Property Name="employ_comment" Type="nvarchar" MaxLength="500" />
           <Property Name="salary_clear_way" Type="nvarchar" MaxLength="50" />
           <Property Name="leave_date" Type="smalldatetime" />
-          <Property Name="audit_result" Type="varchar" MaxLength="6" Nullable="false" />
+          <Property Name="check1" Type="bit" />
+          <Property Name="audit_result" Type="varchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_leaving_days”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -2037,6 +2051,7 @@
           <EntitySet Name="ei_etApply" EntityType="Self.ei_etApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_etApplyEntry" EntityType="Self.ei_etApplyEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_event_log" EntityType="Self.ei_event_log" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_flowAuthority" EntityType="Self.ei_flowAuthority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groupAuthority" EntityType="Self.ei_groupAuthority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groups" EntityType="Self.ei_groups" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groupUser" EntityType="Self.ei_groupUser" Schema="dbo" store:Type="Tables" />
@@ -2356,6 +2371,7 @@ FROM [dbo].[vw_hr_department] AS [vw_hr_department]</DefiningQuery>
 [vw_JQExcel].[employ_comment] AS [employ_comment], 
 [vw_JQExcel].[salary_clear_way] AS [salary_clear_way], 
 [vw_JQExcel].[leave_date] AS [leave_date], 
+[vw_JQExcel].[check1] AS [check1], 
 [vw_JQExcel].[audit_result] AS [audit_result]
 FROM [dbo].[vw_JQExcel] AS [vw_JQExcel]</DefiningQuery>
           </EntitySet>
@@ -2906,6 +2922,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           </FunctionImport>
           <EntitySet Name="ei_spApply" EntityType="ICAuditModel.ei_spApply" />
           <EntitySet Name="vw_spExcel" EntityType="ICAuditModel.vw_spExcel" />
+          <EntitySet Name="ei_flowAuthority" EntityType="ICAuditModel.ei_flowAuthority" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -4758,6 +4775,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="resign_apply_date" Type="DateTime" Precision="0" />
           <Property Name="salary_clear_way" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="leave_date" Type="DateTime" Precision="0" />
+          <Property Name="check1" Type="Boolean" />
         </EntityType>
         <EntityType Name="vw_JQExcel">
           <Key>
@@ -4788,9 +4806,10 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="work_comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="wanna_employ" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="employ_comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="audit_result" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="audit_result" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="salary_clear_way" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="leave_date" Type="DateTime" Precision="0" />
+          <Property Name="check1" Type="Boolean" />
         </EntityType>
         <ComplexType Name="GetAPPriceHistory_Result">
           <Property Type="String" Name="account" Nullable="false" MaxLength="6" />
@@ -4923,6 +4942,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="ex_price" Type="Decimal" Precision="18" Scale="2" />
           <Property Name="ex_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="apply_reason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="ex_log" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="vw_spExcel">
           <Key>
@@ -4959,6 +4979,17 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="ex_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="apply_reason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="audit_result" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ei_flowAuthority">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="bill_type" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="relate_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="relate_value" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="cond1" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="cond2" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -6634,6 +6665,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_jqApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_jqApply">
               <MappingFragment StoreEntitySet="ei_jqApply">
+                <ScalarProperty Name="check1" ColumnName="check1" />
                 <ScalarProperty Name="leave_date" ColumnName="leave_date" />
                 <ScalarProperty Name="salary_clear_way" ColumnName="salary_clear_way" />
                 <ScalarProperty Name="resign_apply_date" ColumnName="resign_apply_date" />
@@ -6683,6 +6715,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="vw_JQExcel">
             <EntityTypeMapping TypeName="ICAuditModel.vw_JQExcel">
               <MappingFragment StoreEntitySet="vw_JQExcel">
+                <ScalarProperty Name="check1" ColumnName="check1" />
                 <ScalarProperty Name="leave_date" ColumnName="leave_date" />
                 <ScalarProperty Name="salary_clear_way" ColumnName="salary_clear_way" />
                 <ScalarProperty Name="audit_result" ColumnName="audit_result" />
@@ -6824,6 +6857,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_spApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_spApply">
               <MappingFragment StoreEntitySet="ei_spApply">
+                <ScalarProperty Name="ex_log" ColumnName="ex_log" />
                 <ScalarProperty Name="apply_reason" ColumnName="apply_reason" />
                 <ScalarProperty Name="ex_no" ColumnName="ex_no" />
                 <ScalarProperty Name="ex_price" ColumnName="ex_price" />
@@ -6888,6 +6922,18 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="applier_name" ColumnName="applier_name" />
                 <ScalarProperty Name="applier_num" ColumnName="applier_num" />
                 <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_flowAuthority">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_flowAuthority">
+              <MappingFragment StoreEntitySet="ei_flowAuthority">
+                <ScalarProperty Name="cond2" ColumnName="cond2" />
+                <ScalarProperty Name="cond1" ColumnName="cond1" />
+                <ScalarProperty Name="relate_value" ColumnName="relate_value" />
+                <ScalarProperty Name="relate_type" ColumnName="relate_type" />
+                <ScalarProperty Name="bill_type" ColumnName="bill_type" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

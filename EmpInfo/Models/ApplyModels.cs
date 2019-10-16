@@ -200,6 +200,7 @@ namespace EmpInfo.Models
         public string wanna_employ { get; set; }
         public string employ_comment { get; set; }
         public string quit_type { get; set; }
+        public string leave_date { get; set; }
     }
 
     public class SPBeforeApplyModel

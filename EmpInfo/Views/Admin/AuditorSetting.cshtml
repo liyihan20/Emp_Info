@@ -77,8 +77,9 @@
 
         $(function () {
             $("#tb1AddBt").on("click", function () {
-                $("#tb1Form")[0].reset();
-                $("#tb1Form input[name='id']").val("0");
+                $("#tb1Modal .modal-title").html("增加审核人");
+                //utils.resetForm($("#tb1Form"));
+                $("#tb1Form input[name='id']").val("0");                
                 $("#tb1Modal").modal("show");
             });
             
@@ -88,6 +89,7 @@
                     toastr.error("请先选择一行后再查询");
                     return;
                 }
+                $("#tb1Modal .modal-title").html("修改审核人");                
                 rows[0].relate_value = rows[0].name + "(" + rows[0].relate_value + ")";
                 utils.loadObjData($("#tb1Form"), rows[0]);
                 $("#tb1Modal").modal("show");
@@ -129,8 +131,8 @@
                 });
             });
 
-            $("#tb2AddBt").on("click", function () {
-                $("#tb2Form")[0].reset();
+            $("#tb2AddBt").on("click", function () {                
+                utils.resetForm($("#tb2Form")); //可以reset掉hidden的值，默认的不行
                 $("#tb2Modal").modal("show");
             });
 
@@ -181,13 +183,13 @@
                 });
             });
 
-            $(".user-select").on("click", function () {
+            $(".user-select").on("click focus", function () {
                 var self = this;
-                openSelectUserDialog($(self).val(), 1, function (result) {
+                openSelectUserDialog($(self).val(), 100, function (result) {
                     $(self).val(result);
                 });
             });
-
+            
         });
     </script>
 }
@@ -250,7 +252,7 @@
                 </div>
                 <div class="modal-body">
                     <form id="tb1Form">
-                        <input type="hidden" name="id" value="0" />
+                        <input type="hidden" name="id" data-value="0" />
                         <input type="text" class="form-control" name="bill_type" placeholder="单据类型" style="margin-top:4px;" />
                         <input type="text" class="form-control" name="relate_name" placeholder="审核节点" style="margin-top:4px;" />
                         <input type="text" class="form-control" name="relate_text" placeholder="关联值" style="margin-top:4px;" />
@@ -273,7 +275,7 @@
                 </div>
                 <div class="modal-body">
                     <form id="tb2Form">
-                        <input type="hidden" name="id" value="0" />
+                        <input type="hidden" name="id" data-value="0" />
                         <input type="text" class="form-control" name="bill_type" placeholder="单据类型" style="margin-top:4px;" />
                         <input type="text" class="form-control" name="cond1" placeholder="条件1" style="margin-top:4px;" />
                         <input type="text" class="form-control" name="cond2" placeholder="条件2" style="margin-top:4px;" />

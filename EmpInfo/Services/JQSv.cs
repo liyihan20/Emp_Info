@@ -27,7 +27,7 @@ namespace EmpInfo.Services
 
         public override string BillTypeName
         {
-            get { return "员工辞职/自离流程"; }
+            get { return "员工辞职/自离申请单"; }
         }
 
         public override List<ApplyNavigatorModel> GetApplyNavigatorLinks()
@@ -56,6 +56,28 @@ namespace EmpInfo.Services
                 });
             }
 
+            var fas = db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_value == userInfo.cardNo).ToList();
+
+            //主管可修改离职日期
+            if (fas.Where(f => f.relate_type == "修改离职日期").Count() > 0) {
+                menus.Add(new ApplyMenuItemModel()
+                {
+                    text = "修改离职日期",
+                    iconFont = "fa-edit",
+                    url = "../ApplyExtra/ChargerUpdateLeaveDay"
+                });
+            }
+
+            //AH部作废单据
+            if (fas.Where(f => f.relate_type == "作废单据").Count() > 0) {
+                menus.Add(new ApplyMenuItemModel()
+                {
+                    text = "作废离职申请",
+                    iconFont = "fa-ban",
+                    url = "../ApplyExtra/CancelJQApply"
+                });
+            }
+
             return menus;
         }
 
@@ -74,7 +96,7 @@ namespace EmpInfo.Services
             bill = new ei_jqApply();
             MyUtils.SetFieldValueToModel(fc, bill);
 
-            if (!bill.dep_name.Contains("CCM")) throw new Exception("当前是测试阶段，只有CCM的才能申请，正式运行后会通知");
+            //if (!bill.dep_name.Contains("CCM")) throw new Exception("当前是测试阶段，只有CCM的才能申请，正式运行后会通知");
 
             if (bill.quit_reason != null && bill.quit_reason.Length > 1000) throw new Exception("离职原因内容太多，请删减");
             if (bill.quit_suggestion != null && bill.quit_suggestion.Length > 1000) throw new Exception("离职建议内容太多，请删减");
@@ -91,19 +113,19 @@ namespace EmpInfo.Services
 
             if ("计件".Equals(bill.salary_type)) {
                 if (string.IsNullOrWhiteSpace(bill.group_leader_name)) throw new Exception("必须选择组长");
-                if (string.IsNullOrWhiteSpace(bill.charger_name)) throw new Exception("必须选择主管");
-                if (string.IsNullOrWhiteSpace(bill.produce_minister_name)) throw new Exception("必须选择生产部长");
+                //if (string.IsNullOrWhiteSpace(bill.charger_name)) throw new Exception("必须选择主管");
+                //if (string.IsNullOrWhiteSpace(bill.produce_minister_name)) throw new Exception("必须选择生产部长");
 
                 bill.group_leader_num = GetUserCardByNameAndCardNum(bill.group_leader_name);
-                bill.charger_num = GetUserCardByNameAndCardNum(bill.charger_name);
-                bill.produce_minister_num = GetUserCardByNameAndCardNum(bill.produce_minister_name);
+                //bill.charger_num = GetUserCardByNameAndCardNum(bill.charger_name);
+                //bill.produce_minister_num = GetUserCardByNameAndCardNum(bill.produce_minister_name);
             }
             else if ("月薪".Equals(bill.salary_type)) {
                 if (string.IsNullOrWhiteSpace(bill.dep_charger_name)) throw new Exception("必须选择部门负责人");
-                if (string.IsNullOrWhiteSpace(bill.highest_charger_name)) throw new Exception("必须最高负责人");
+                //if (string.IsNullOrWhiteSpace(bill.highest_charger_name)) throw new Exception("必须最高负责人");
 
                 bill.dep_charger_num = GetUserCardByNameAndCardNum(bill.dep_charger_name);
-                bill.highest_charger_num = GetUserCardByNameAndCardNum(bill.highest_charger_name);
+                //bill.highest_charger_num = GetUserCardByNameAndCardNum(bill.highest_charger_name);
             }
             else {
                 throw new Exception("工资类型只有计件或月薪的才能申请此流程");
@@ -143,14 +165,16 @@ namespace EmpInfo.Services
         {
             var jq = db.ei_jqApply.SingleOrDefault(j => j.sys_no == sysNo);
             if (jq == null) throw new Exception("单据不存在");
-            return new JQAuditOtherInfoModel()
-            {
-                work_evaluation = jq.work_evaluation,
-                work_comment = jq.work_comment,
-                wanna_employ = jq.wanna_employ,
-                employ_comment = jq.employ_comment,
-                quit_type = jq.quit_type
-            };
+            return jq;
+            //return new JQAuditOtherInfoModel()
+            //{
+            //    work_evaluation = jq.work_evaluation,
+            //    work_comment = jq.work_comment,
+            //    wanna_employ = jq.wanna_employ,
+            //    employ_comment = jq.employ_comment,
+            //    quit_type = jq.quit_type,
+            //    leave_date = jq.leave_date == null ? "" : ((DateTime)jq.leave_date).ToString("yyyy-MM-dd")
+            //};
         }
 
         public override SimpleResultModel HandleApply(System.Web.Mvc.FormCollection fc, UserInfo userInfo)
@@ -158,25 +182,37 @@ namespace EmpInfo.Services
             int step = Int32.Parse(fc.Get("step"));
             string stepName = fc.Get("stepName");
             bool isPass = bool.Parse(fc.Get("isPass"));
+
+            MyUtils.SetFieldValueToModel(fc, bill);
+
             string leaveDate = fc.Get("leave_date");
-            DateTime leaveDateDt;
-            if (isPass && bill.quit_type == "辞职") {
-                if (!DateTime.TryParse(leaveDate, out leaveDateDt)) {
-                    return new SimpleResultModel() { suc = false, msg = "批准离职时间必须填写" };
+            if (isPass) {
+                if (bill.leave_date == null) return new SimpleResultModel() { suc = false, msg = "离职时间必须填写" };
+                if (stepName.Contains("组长")) {
+                    if (string.IsNullOrEmpty(bill.charger_name)) return new SimpleResultModel() { suc = false, msg = "请选择主管审核人" };
+                    if(string.IsNullOrEmpty(bill.charger_num)) bill.charger_num = GetUserCardByNameAndCardNum(bill.charger_name);
                 }
-                else {
-                    bill.leave_date = leaveDateDt;
+                if (stepName.Contains("主管")) {
+                    if (string.IsNullOrEmpty(bill.produce_minister_name)) return new SimpleResultModel() { suc = false, msg = "请选择生产部长审核人" };
+                    if (string.IsNullOrEmpty(bill.produce_minister_num)) bill.produce_minister_num = GetUserCardByNameAndCardNum(bill.produce_minister_name);
+                    //加入到主管修改离职日期的表
+                    if (db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "修改离职日期" && f.relate_value == userInfo.cardNo).Count() < 1) {
+                        db.ei_flowAuthority.Add(new ei_flowAuthority()
+                        {
+                            bill_type = BillType,
+                            relate_type = "修改离职日期",
+                            relate_value = userInfo.cardNo
+                        });
+                    }
+                }
+                if (stepName.Contains("部门负责人")) {
+                    if (string.IsNullOrEmpty(bill.highest_charger_name)) return new SimpleResultModel() { suc = false, msg = "请选择部门最高审核人" };
+                    if (string.IsNullOrEmpty(bill.highest_charger_num)) bill.highest_charger_num = GetUserCardByNameAndCardNum(bill.highest_charger_name);
                 }
             }
 
-            bill.work_evaluation = fc.Get("work_evaluation");
-            bill.work_comment = fc.Get("work_comment");
-            bill.wanna_employ = fc.Get("wanna_employ");
-            bill.employ_comment = fc.Get("employ_comment");
-
-            if (bill.work_comment.Length > 500) return new SimpleResultModel() { suc = false, msg = "工作评价描述内容长度太多，请删减" };
-            if (bill.employ_comment.Length > 500) return new SimpleResultModel() { suc = false, msg = "是否再录用描述内容长度太多，请删减" };
-                        
+            if (bill.work_comment != null && bill.work_comment.Length > 500) return new SimpleResultModel() { suc = false, msg = "工作评价描述内容长度太多，请删减" };
+            if (bill.employ_comment != null && bill.employ_comment.Length > 500) return new SimpleResultModel() { suc = false, msg = "是否再录用描述内容长度太多，请删减" };
 
             string formJson = JsonConvert.SerializeObject(bill);
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
@@ -187,6 +223,70 @@ namespace EmpInfo.Services
                 SendNotification(result);
             }
             return new SimpleResultModel() { suc = result.suc, msg = result.msg };
+        }
+
+        /// <summary>
+        /// 获取离职申请内容，可通过流水号或厂牌
+        /// </summary>
+        /// <param name="searchContent"></param>
+        /// <returns></returns>
+        public ei_jqApply GetJQApply(string searchContent)
+        {
+            ei_jqApply jq;
+            if (searchContent.StartsWith("JQ")) {
+                jq = db.ei_jqApply.Where(j => j.sys_no == searchContent).FirstOrDefault();
+            }
+            else {
+                jq = db.ei_jqApply.Where(j => j.card_number == searchContent).OrderByDescending(j => j.id).FirstOrDefault();
+            }
+
+            return jq;
+        }
+
+        /// <summary>
+        /// 主管可以修改离职日期
+        /// </summary>
+        /// <param name="newDay"></param>
+        public void UpdateLeaveDay(DateTime newDay,string notifyUsers,string cardNumber) {
+            if (bill.charger_num != null && !bill.charger_num.Contains(cardNumber)) {
+                throw new Exception("你没有修改此离职单日期的权限");
+            }
+
+            var leaveDateBefore = bill.leave_date??DateTime.Parse("2019-10-1");
+
+            
+            var notifyNames = GetUserNameByNameAndCardNum(notifyUsers);
+            var notifyCardNumber = GetUserCardByNameAndCardNum(notifyUsers);
+            var emails = GetUserEmailByCardNum(notifyCardNumber);
+
+            if (string.IsNullOrWhiteSpace(emails)) {
+                throw new Exception("选择的文员没有在E家登记邮箱，不能发送邮件通知。请先通知文员到此系统点击头像登记邮箱后再修改离职日期");
+            }
+
+            bill.leave_date = newDay;
+            db.SaveChanges();
+
+            //发送通知邮件给文员
+            SendEmailForCompleted(
+                bill.sys_no,
+                "离职日期变更通知",
+                notifyNames,
+                string.Format("单号为【{0}】的{1}离职日期已被主管修改：离职人【{2}】,离职日期从【{3:yyyy-MM-dd}】变更为【{4:yyyy-MM-dd}】，请知悉。", bill.sys_no, BillTypeName,bill.name,leaveDateBefore,newDay),
+                emails,
+                GetUserEmailByCardNum(bill.applier_num)
+             );
+        }
+
+
+        public void CancelApply(string cardNumber)
+        {
+            if (db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "作废单据" && f.relate_value == cardNumber).Count() < 1) {
+                throw new Exception("没有权限作废离职申请单");
+            }
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            var result = flow.CancelFlowAfterFinish(bill.sys_no, cardNumber);
+            if (!result.suc) throw new Exception(result.msg);
+            
         }
 
         public override void SendNotification(FlowSvr.FlowResultModel model)

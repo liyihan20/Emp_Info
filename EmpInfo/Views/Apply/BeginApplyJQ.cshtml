@@ -77,7 +77,7 @@
 
             $(".selectUser").on("click", function () {
                 var self = this;
-                openSelectUserDialog($(self).val(), 3, function (result) {
+                openSelectUserDialog($(self).val(), 1, function (result) {
                     $(self).val(result);
                 });
             });
@@ -138,23 +138,23 @@
                         toastr.error("必须选择部门负责人");
                         return;
                     }
-                    if (obj.highest_charger_name == "") {
-                        toastr.error("必须选择最高负责人");
-                        return;
-                    }
+                    //if (obj.highest_charger_name == "") {
+                    //    toastr.error("必须选择最高负责人");
+                    //    return;
+                    //}
                 } else if (obj.salary_type == "计件") {
                     if (obj.group_leader_name == "") {
                         toastr.error("必须选择组长");
                         return;
                     }
-                    if (obj.charger_name == "") {
-                        toastr.error("必须选择主管");
-                        return;
-                    }
-                    if (obj.produce_minister_name == "") {
-                        toastr.error("必须选择生产部长");
-                        return;
-                    }
+                    //if (obj.charger_name == "") {
+                    //    toastr.error("必须选择主管");
+                    //    return;
+                    //}
+                    //if (obj.produce_minister_name == "") {
+                    //    toastr.error("必须选择生产部长");
+                    //    return;
+                    //}
                 } else {
                     toastr.error("只有月薪或计件的员工才能申请此流程");
                     return;
@@ -521,7 +521,7 @@
                             </span>
                         </div>
                     </div>
-                    <div class="col-md-4 col-sm-6 col-xs-12">
+                    @*<div class="col-md-4 col-sm-6 col-xs-12">
                         <div class="b-div">
                             <span class="b-label">
                                 主管:
@@ -540,9 +540,9 @@
                                 <input type="text" class="form-control selectUser" name="produce_minister_name" placeholder="选择生产部长" />
                             </span>
                         </div>
-                    </div>
+                    </div>*@
                 </div>
-                <p class="small text-danger"><i class="fa fa-info-circle"></i> 以上处理节点可选1~3个处理人，如选择多人，其中1人处理完成即可</p>
+                <p class="small text-danger"><i class="fa fa-info-circle"></i> 只需选择组长处理人</p>
             </div>
             
             @*月薪审核人*@
@@ -559,7 +559,7 @@
                             </span>
                         </div>
                     </div>
-                    <div class="col-md-4 col-sm-6 col-xs-12">
+                    @*<div class="col-md-4 col-sm-6 col-xs-12">
                         <div class="b-div">
                             <span class="b-label">
                                 最高负责人:
@@ -568,9 +568,9 @@
                                 <input type="text" class="form-control selectUser" name="highest_charger_name" placeholder="选择最高负责人" />
                             </span>
                         </div>
-                    </div>
+                    </div>*@
                 </div>
-                <p class="small text-danger"><i class="fa fa-info-circle"></i> 以上处理节点可选1~3个处理人，如选择多人，其中1人处理完成即可</p>
+                <p class="small text-danger"><i class="fa fa-info-circle"></i> 只需选择直接部门负责人，然后由部门负责人审批时选择最高负责人</p>
             </div>
 
             <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:12px;"><i class="fa fa-check-circle-o"></i> 提交申请</button>

@@ -106,6 +106,7 @@
         <EntityTypeShape EntityType="ICAuditModel.vw_SJExcel" Width="1.5" PointX="8.25" PointY="14.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_spApply" Width="1.5" PointX="6" PointY="15" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_spExcel" Width="1.5" PointX="8.25" PointY="15" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_flowAuthority" Width="1.5" PointX="4.125" PointY="12.875" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -105,18 +105,6 @@
                         </div>
                     </div>
                 </div>
-                @if (m.send_or_receive == "寄件") {
-                    <div class="col-md-4 col-sm-6 col-xs-12 send_extra_info">
-                        <div class="b-div">
-                            <span class="b-label">
-                                放行条编号:
-                            </span>
-                            <span class="b-input">
-                                @m.send_no
-                            </span>
-                        </div>
-                    </div>
-                }
                 <div class="col-md-4 col-sm-6 col-xs-12">
                     <div class="b-div">
                         <span class="b-label">
@@ -128,6 +116,18 @@
                     </div>
                 </div>
                 @if (m.content_type == "产品") {
+                    if (m.send_or_receive == "寄件") {
+                        <div class="col-md-4 col-sm-6 col-xs-12 send_extra_info">
+                            <div class="b-div">
+                                <span class="b-label">
+                                    放行条编号:
+                                </span>
+                                <span class="b-input">
+                                    @m.send_no
+                                </span>
+                            </div>
+                        </div>
+                    }
                     <div class="col-md-4 col-sm-6 col-xs-12 product_extra_info">
                         <div class="b-div">
                             <span class="b-label">

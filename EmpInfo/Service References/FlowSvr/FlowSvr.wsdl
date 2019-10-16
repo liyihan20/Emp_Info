@@ -345,6 +345,38 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="ReturnToBeforeStep">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="cardNumber" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="currentStepName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="returnToStepName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnToBeforeStepResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnToBeforeStepResult" type="tns:FlowResultModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CancelFlowAfterFinish">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="cardNumber" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CancelFlowAfterFinishResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="CancelFlowAfterFinishResult" type="tns:FlowResultModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="AbortAfterFinish">
         <s:complexType>
           <s:sequence>
@@ -426,7 +458,7 @@
       <s:element name="TestGetAuditQueue">
         <s:complexType>
           <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="depNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="salaryType" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -535,6 +567,18 @@
   <wsdl:message name="StepRollBackSoapOut">
     <wsdl:part name="parameters" element="tns:StepRollBackResponse" />
   </wsdl:message>
+  <wsdl:message name="ReturnToBeforeStepSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnToBeforeStep" />
+  </wsdl:message>
+  <wsdl:message name="ReturnToBeforeStepSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnToBeforeStepResponse" />
+  </wsdl:message>
+  <wsdl:message name="CancelFlowAfterFinishSoapIn">
+    <wsdl:part name="parameters" element="tns:CancelFlowAfterFinish" />
+  </wsdl:message>
+  <wsdl:message name="CancelFlowAfterFinishSoapOut">
+    <wsdl:part name="parameters" element="tns:CancelFlowAfterFinishResponse" />
+  </wsdl:message>
   <wsdl:message name="AbortAfterFinishSoapIn">
     <wsdl:part name="parameters" element="tns:AbortAfterFinish" />
   </wsdl:message>
@@ -641,6 +685,14 @@
     <wsdl:operation name="StepRollBack">
       <wsdl:input message="tns:StepRollBackSoapIn" />
       <wsdl:output message="tns:StepRollBackSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnToBeforeStep">
+      <wsdl:input message="tns:ReturnToBeforeStepSoapIn" />
+      <wsdl:output message="tns:ReturnToBeforeStepSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CancelFlowAfterFinish">
+      <wsdl:input message="tns:CancelFlowAfterFinishSoapIn" />
+      <wsdl:output message="tns:CancelFlowAfterFinishSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="AbortAfterFinish">
       <wsdl:input message="tns:AbortAfterFinishSoapIn" />
@@ -810,6 +862,24 @@
     </wsdl:operation>
     <wsdl:operation name="StepRollBack">
       <soap:operation soapAction="http://ic.truly.com.cn/StepRollBack" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnToBeforeStep">
+      <soap:operation soapAction="http://ic.truly.com.cn/ReturnToBeforeStep" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CancelFlowAfterFinish">
+      <soap:operation soapAction="http://ic.truly.com.cn/CancelFlowAfterFinish" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -1020,6 +1090,24 @@
     </wsdl:operation>
     <wsdl:operation name="StepRollBack">
       <soap12:operation soapAction="http://ic.truly.com.cn/StepRollBack" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnToBeforeStep">
+      <soap12:operation soapAction="http://ic.truly.com.cn/ReturnToBeforeStep" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CancelFlowAfterFinish">
+      <soap12:operation soapAction="http://ic.truly.com.cn/CancelFlowAfterFinish" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

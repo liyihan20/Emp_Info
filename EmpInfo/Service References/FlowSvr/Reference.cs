@@ -866,6 +866,14 @@ namespace EmpInfo.FlowSvr {
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/StepRollBack", ReplyAction="*")]
         EmpInfo.FlowSvr.StepRollBackResponse StepRollBack(EmpInfo.FlowSvr.StepRollBackRequest request);
         
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 cardNumber 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/ReturnToBeforeStep", ReplyAction="*")]
+        EmpInfo.FlowSvr.ReturnToBeforeStepResponse ReturnToBeforeStep(EmpInfo.FlowSvr.ReturnToBeforeStepRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/CancelFlowAfterFinish", ReplyAction="*")]
+        EmpInfo.FlowSvr.CancelFlowAfterFinishResponse CancelFlowAfterFinish(EmpInfo.FlowSvr.CancelFlowAfterFinishRequest request);
+        
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/AbortAfterFinish", ReplyAction="*")]
         EmpInfo.FlowSvr.AbortAfterFinishResponse AbortAfterFinish(EmpInfo.FlowSvr.AbortAfterFinishRequest request);
@@ -890,7 +898,7 @@ namespace EmpInfo.FlowSvr {
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestMyFlowList", ReplyAction="*")]
         EmpInfo.FlowSvr.TestMyFlowListResponse TestMyFlowList(EmpInfo.FlowSvr.TestMyFlowListRequest request);
         
-        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 depNo 以后生成的消息协定未标记为 nillable
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 salaryType 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestGetAuditQueue", ReplyAction="*")]
         EmpInfo.FlowSvr.TestGetAuditQueueResponse TestGetAuditQueue(EmpInfo.FlowSvr.TestGetAuditQueueRequest request);
     }
@@ -2124,6 +2132,158 @@ namespace EmpInfo.FlowSvr {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class ReturnToBeforeStepRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="ReturnToBeforeStep", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.ReturnToBeforeStepRequestBody Body;
+        
+        public ReturnToBeforeStepRequest() {
+        }
+        
+        public ReturnToBeforeStepRequest(EmpInfo.FlowSvr.ReturnToBeforeStepRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class ReturnToBeforeStepRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string cardNumber;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string sysNo;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public string currentStepName;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string returnToStepName;
+        
+        public ReturnToBeforeStepRequestBody() {
+        }
+        
+        public ReturnToBeforeStepRequestBody(string cardNumber, string sysNo, string currentStepName, string returnToStepName) {
+            this.cardNumber = cardNumber;
+            this.sysNo = sysNo;
+            this.currentStepName = currentStepName;
+            this.returnToStepName = returnToStepName;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class ReturnToBeforeStepResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="ReturnToBeforeStepResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.ReturnToBeforeStepResponseBody Body;
+        
+        public ReturnToBeforeStepResponse() {
+        }
+        
+        public ReturnToBeforeStepResponse(EmpInfo.FlowSvr.ReturnToBeforeStepResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class ReturnToBeforeStepResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public EmpInfo.FlowSvr.FlowResultModel ReturnToBeforeStepResult;
+        
+        public ReturnToBeforeStepResponseBody() {
+        }
+        
+        public ReturnToBeforeStepResponseBody(EmpInfo.FlowSvr.FlowResultModel ReturnToBeforeStepResult) {
+            this.ReturnToBeforeStepResult = ReturnToBeforeStepResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class CancelFlowAfterFinishRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="CancelFlowAfterFinish", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.CancelFlowAfterFinishRequestBody Body;
+        
+        public CancelFlowAfterFinishRequest() {
+        }
+        
+        public CancelFlowAfterFinishRequest(EmpInfo.FlowSvr.CancelFlowAfterFinishRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class CancelFlowAfterFinishRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string sysNo;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string cardNumber;
+        
+        public CancelFlowAfterFinishRequestBody() {
+        }
+        
+        public CancelFlowAfterFinishRequestBody(string sysNo, string cardNumber) {
+            this.sysNo = sysNo;
+            this.cardNumber = cardNumber;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class CancelFlowAfterFinishResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="CancelFlowAfterFinishResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.CancelFlowAfterFinishResponseBody Body;
+        
+        public CancelFlowAfterFinishResponse() {
+        }
+        
+        public CancelFlowAfterFinishResponse(EmpInfo.FlowSvr.CancelFlowAfterFinishResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class CancelFlowAfterFinishResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public EmpInfo.FlowSvr.FlowResultModel CancelFlowAfterFinishResult;
+        
+        public CancelFlowAfterFinishResponseBody() {
+        }
+        
+        public CancelFlowAfterFinishResponseBody(EmpInfo.FlowSvr.FlowResultModel CancelFlowAfterFinishResult) {
+            this.CancelFlowAfterFinishResult = CancelFlowAfterFinishResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class AbortAfterFinishRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="AbortAfterFinish", Namespace="http://ic.truly.com.cn/", Order=0)]
@@ -2546,13 +2706,13 @@ namespace EmpInfo.FlowSvr {
     public partial class TestGetAuditQueueRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public string depNo;
+        public string salaryType;
         
         public TestGetAuditQueueRequestBody() {
         }
         
-        public TestGetAuditQueueRequestBody(string depNo) {
-            this.depNo = depNo;
+        public TestGetAuditQueueRequestBody(string salaryType) {
+            this.salaryType = salaryType;
         }
     }
     
@@ -2861,6 +3021,36 @@ namespace EmpInfo.FlowSvr {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.FlowSvr.ReturnToBeforeStepResponse EmpInfo.FlowSvr.FlowSvrSoap.ReturnToBeforeStep(EmpInfo.FlowSvr.ReturnToBeforeStepRequest request) {
+            return base.Channel.ReturnToBeforeStep(request);
+        }
+        
+        public EmpInfo.FlowSvr.FlowResultModel ReturnToBeforeStep(string cardNumber, string sysNo, string currentStepName, string returnToStepName) {
+            EmpInfo.FlowSvr.ReturnToBeforeStepRequest inValue = new EmpInfo.FlowSvr.ReturnToBeforeStepRequest();
+            inValue.Body = new EmpInfo.FlowSvr.ReturnToBeforeStepRequestBody();
+            inValue.Body.cardNumber = cardNumber;
+            inValue.Body.sysNo = sysNo;
+            inValue.Body.currentStepName = currentStepName;
+            inValue.Body.returnToStepName = returnToStepName;
+            EmpInfo.FlowSvr.ReturnToBeforeStepResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).ReturnToBeforeStep(inValue);
+            return retVal.Body.ReturnToBeforeStepResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.FlowSvr.CancelFlowAfterFinishResponse EmpInfo.FlowSvr.FlowSvrSoap.CancelFlowAfterFinish(EmpInfo.FlowSvr.CancelFlowAfterFinishRequest request) {
+            return base.Channel.CancelFlowAfterFinish(request);
+        }
+        
+        public EmpInfo.FlowSvr.FlowResultModel CancelFlowAfterFinish(string sysNo, string cardNumber) {
+            EmpInfo.FlowSvr.CancelFlowAfterFinishRequest inValue = new EmpInfo.FlowSvr.CancelFlowAfterFinishRequest();
+            inValue.Body = new EmpInfo.FlowSvr.CancelFlowAfterFinishRequestBody();
+            inValue.Body.sysNo = sysNo;
+            inValue.Body.cardNumber = cardNumber;
+            EmpInfo.FlowSvr.CancelFlowAfterFinishResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).CancelFlowAfterFinish(inValue);
+            return retVal.Body.CancelFlowAfterFinishResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         EmpInfo.FlowSvr.AbortAfterFinishResponse EmpInfo.FlowSvr.FlowSvrSoap.AbortAfterFinish(EmpInfo.FlowSvr.AbortAfterFinishRequest request) {
             return base.Channel.AbortAfterFinish(request);
         }
@@ -2943,10 +3133,10 @@ namespace EmpInfo.FlowSvr {
             return base.Channel.TestGetAuditQueue(request);
         }
         
-        public EmpInfo.FlowSvr.FlowResultModel TestGetAuditQueue(string depNo) {
+        public EmpInfo.FlowSvr.FlowResultModel TestGetAuditQueue(string salaryType) {
             EmpInfo.FlowSvr.TestGetAuditQueueRequest inValue = new EmpInfo.FlowSvr.TestGetAuditQueueRequest();
             inValue.Body = new EmpInfo.FlowSvr.TestGetAuditQueueRequestBody();
-            inValue.Body.depNo = depNo;
+            inValue.Body.salaryType = salaryType;
             EmpInfo.FlowSvr.TestGetAuditQueueResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).TestGetAuditQueue(inValue);
             return retVal.Body.TestGetAuditQueueResult;
         }

@@ -97,8 +97,6 @@
                 $('#check_tb').bootstrapTable('load', data);
                 if (data.length == 0) {
                     toastr.error("当前时间段查无申请");
-                } else {
-                    toastr.success("已成功加载申请行数：" + data.length);
                 }
             });
             
@@ -106,12 +104,15 @@
     });
 
         $("#check_tb").bootstrapTable({
+            maintainSelected: true,
             striped: true,
             mobileResponsive: true,
             pagination: true,
             pageSize: 40,
             pageList: [20, 40, 60, 100],
-            search:true,
+            search: true,
+            checkboxHeader: false,
+            uniqueId: "sys_no",
             columns: [
                 {
                     field: "sys_no",
@@ -131,10 +132,19 @@
                 }, {
                     field: "salary_type",
                     title: "工资类别"
-                }, {
-                    field: "applier_name",
-                    title: "申请人"
-                }, {
+                },
+                //{
+                //    field: "applier_name",
+                //    title: "申请人"
+                //},
+                {
+                    field: "leave_date",
+                    title: "离职时间",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(row.leave_date);
+                    }
+                },
+                {
                     field: "apply_time",
                     title: "申请时间",
                     formatter: function (value, row, index, field) {
@@ -143,17 +153,43 @@
                 }, {
                     field: "audit_result",
                     title: "处理结果"
+                }, {
+                    showSelectTitle: true,
+                    field: "check1",                    
+                    title: "标识1",
+                    checkbox: true
                 }
             ],
-            onClickRow: function (row, $element, field) {
+            @*onClickRow: function (row, $element, field) {
                 if (row.sys_no) {
                     window.open("@Url.Content("~/Apply/CheckApply?sysNo=")" + row.sys_no);
                 }
+            },*@
+            onClickCell: function (field, value, row, $element) {
+                if (field != "check1") {
+                    if (row.sys_no) {
+                        window.open("@Url.Content("~/Apply/CheckApply?sysNo=")" + row.sys_no);
+                    }
+                }
+            },
+            onCheck: function (row, $element) {
+                toggleCheck1(row.sys_no);                
+            },
+            onUncheck: function (row, $element) {
+                toggleCheck1(row.sys_no);
             },
             rowStyle: function (row, index) {
                 return { css: { cursor: 'pointer' } };
             }
         });
+
+        function toggleCheck1(sysNo) {
+            $.post("ToggleJQCheck1", { sysNo: sysNo }, function (data) {
+                if (!data.suc) {
+                    toastr.error(data.msg);
+                }
+            });
+        }
 
     </script>
 

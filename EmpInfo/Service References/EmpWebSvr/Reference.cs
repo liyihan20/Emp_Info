@@ -32,6 +32,10 @@ namespace EmpInfo.EmpWebSvr {
         EmpInfo.EmpWebSvr.QuerySendResultResponse QuerySendResult(EmpInfo.EmpWebSvr.QuerySendResultRequest request);
         
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/RecivedMessage", ReplyAction="*")]
+        EmpInfo.EmpWebSvr.RecivedMessageResponse RecivedMessage(EmpInfo.EmpWebSvr.RecivedMessageRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/UserLogin", ReplyAction="*")]
         EmpInfo.EmpWebSvr.UserLoginResponse UserLogin(EmpInfo.EmpWebSvr.UserLoginRequest request);
         
@@ -62,6 +66,10 @@ namespace EmpInfo.EmpWebSvr {
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/UpdateUserInfo", ReplyAction="*")]
         EmpInfo.EmpWebSvr.UpdateUserInfoResponse UpdateUserInfo(EmpInfo.EmpWebSvr.UpdateUserInfoRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/CheckLoginDevice", ReplyAction="*")]
+        EmpInfo.EmpWebSvr.CheckLoginDeviceResponse CheckLoginDevice(EmpInfo.EmpWebSvr.CheckLoginDeviceRequest request);
         
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/IsUserInDorm", ReplyAction="*")]
@@ -146,6 +154,46 @@ namespace EmpInfo.EmpWebSvr {
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetSalaryDetail", ReplyAction="*")]
         EmpInfo.EmpWebSvr.GetSalaryDetailResponse GetSalaryDetail(EmpInfo.EmpWebSvr.GetSalaryDetailRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetSalaryBankCard", ReplyAction="*")]
+        EmpInfo.EmpWebSvr.GetSalaryBankCardResponse GetSalaryBankCard(EmpInfo.EmpWebSvr.GetSalaryBankCardRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetDPDealingCount", ReplyAction="*")]
+        EmpInfo.EmpWebSvr.GetDPDealingCountResponse GetDPDealingCount(EmpInfo.EmpWebSvr.GetDPDealingCountRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/BeginDPApply", ReplyAction="*")]
+        EmpInfo.EmpWebSvr.BeginDPApplyResponse BeginDPApply(EmpInfo.EmpWebSvr.BeginDPApplyRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/SubmitDPApply", ReplyAction="*")]
+        EmpInfo.EmpWebSvr.SubmitDPApplyResponse SubmitDPApply(EmpInfo.EmpWebSvr.SubmitDPApplyRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetDPItemList", ReplyAction="*")]
+        EmpInfo.EmpWebSvr.GetDPItemListResponse GetDPItemList(EmpInfo.EmpWebSvr.GetDPItemListRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/CheckAndAuditDP", ReplyAction="*")]
+        EmpInfo.EmpWebSvr.CheckAndAuditDPResponse CheckAndAuditDP(EmpInfo.EmpWebSvr.CheckAndAuditDPRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/RoommateComfirmDP", ReplyAction="*")]
+        EmpInfo.EmpWebSvr.RoommateComfirmDPResponse RoommateComfirmDP(EmpInfo.EmpWebSvr.RoommateComfirmDPRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/AccepterComfirmDP", ReplyAction="*")]
+        EmpInfo.EmpWebSvr.AccepterComfirmDPResponse AccepterComfirmDP(EmpInfo.EmpWebSvr.AccepterComfirmDPRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/RepairerFinishDP", ReplyAction="*")]
+        EmpInfo.EmpWebSvr.RepairerFinishDPResponse RepairerFinishDP(EmpInfo.EmpWebSvr.RepairerFinishDPRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 jsonParam 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/ApplierEvalateDP", ReplyAction="*")]
+        EmpInfo.EmpWebSvr.ApplierEvalateDPResponse ApplierEvalateDP(EmpInfo.EmpWebSvr.ApplierEvalateDPRequest request);
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -425,6 +473,74 @@ namespace EmpInfo.EmpWebSvr {
         
         public QuerySendResultResponseBody(string QuerySendResultResult) {
             this.QuerySendResultResult = QuerySendResultResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class RecivedMessageRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="RecivedMessage", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.RecivedMessageRequestBody Body;
+        
+        public RecivedMessageRequest() {
+        }
+        
+        public RecivedMessageRequest(EmpInfo.EmpWebSvr.RecivedMessageRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class RecivedMessageRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string jsonParam;
+        
+        public RecivedMessageRequestBody() {
+        }
+        
+        public RecivedMessageRequestBody(string jsonParam) {
+            this.jsonParam = jsonParam;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class RecivedMessageResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="RecivedMessageResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.RecivedMessageResponseBody Body;
+        
+        public RecivedMessageResponse() {
+        }
+        
+        public RecivedMessageResponse(EmpInfo.EmpWebSvr.RecivedMessageResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class RecivedMessageResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string RecivedMessageResult;
+        
+        public RecivedMessageResponseBody() {
+        }
+        
+        public RecivedMessageResponseBody(string RecivedMessageResult) {
+            this.RecivedMessageResult = RecivedMessageResult;
         }
     }
     
@@ -969,6 +1085,74 @@ namespace EmpInfo.EmpWebSvr {
         
         public UpdateUserInfoResponseBody(string UpdateUserInfoResult) {
             this.UpdateUserInfoResult = UpdateUserInfoResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class CheckLoginDeviceRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="CheckLoginDevice", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.CheckLoginDeviceRequestBody Body;
+        
+        public CheckLoginDeviceRequest() {
+        }
+        
+        public CheckLoginDeviceRequest(EmpInfo.EmpWebSvr.CheckLoginDeviceRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class CheckLoginDeviceRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string jsonParam;
+        
+        public CheckLoginDeviceRequestBody() {
+        }
+        
+        public CheckLoginDeviceRequestBody(string jsonParam) {
+            this.jsonParam = jsonParam;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class CheckLoginDeviceResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="CheckLoginDeviceResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.CheckLoginDeviceResponseBody Body;
+        
+        public CheckLoginDeviceResponse() {
+        }
+        
+        public CheckLoginDeviceResponse(EmpInfo.EmpWebSvr.CheckLoginDeviceResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class CheckLoginDeviceResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string CheckLoginDeviceResult;
+        
+        public CheckLoginDeviceResponseBody() {
+        }
+        
+        public CheckLoginDeviceResponseBody(string CheckLoginDeviceResult) {
+            this.CheckLoginDeviceResult = CheckLoginDeviceResult;
         }
     }
     
@@ -2393,6 +2577,686 @@ namespace EmpInfo.EmpWebSvr {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetSalaryBankCardRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetSalaryBankCard", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.GetSalaryBankCardRequestBody Body;
+        
+        public GetSalaryBankCardRequest() {
+        }
+        
+        public GetSalaryBankCardRequest(EmpInfo.EmpWebSvr.GetSalaryBankCardRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetSalaryBankCardRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string jsonParam;
+        
+        public GetSalaryBankCardRequestBody() {
+        }
+        
+        public GetSalaryBankCardRequestBody(string jsonParam) {
+            this.jsonParam = jsonParam;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetSalaryBankCardResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetSalaryBankCardResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.GetSalaryBankCardResponseBody Body;
+        
+        public GetSalaryBankCardResponse() {
+        }
+        
+        public GetSalaryBankCardResponse(EmpInfo.EmpWebSvr.GetSalaryBankCardResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetSalaryBankCardResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string GetSalaryBankCardResult;
+        
+        public GetSalaryBankCardResponseBody() {
+        }
+        
+        public GetSalaryBankCardResponseBody(string GetSalaryBankCardResult) {
+            this.GetSalaryBankCardResult = GetSalaryBankCardResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetDPDealingCountRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetDPDealingCount", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.GetDPDealingCountRequestBody Body;
+        
+        public GetDPDealingCountRequest() {
+        }
+        
+        public GetDPDealingCountRequest(EmpInfo.EmpWebSvr.GetDPDealingCountRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetDPDealingCountRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string jsonParam;
+        
+        public GetDPDealingCountRequestBody() {
+        }
+        
+        public GetDPDealingCountRequestBody(string jsonParam) {
+            this.jsonParam = jsonParam;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetDPDealingCountResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetDPDealingCountResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.GetDPDealingCountResponseBody Body;
+        
+        public GetDPDealingCountResponse() {
+        }
+        
+        public GetDPDealingCountResponse(EmpInfo.EmpWebSvr.GetDPDealingCountResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetDPDealingCountResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string GetDPDealingCountResult;
+        
+        public GetDPDealingCountResponseBody() {
+        }
+        
+        public GetDPDealingCountResponseBody(string GetDPDealingCountResult) {
+            this.GetDPDealingCountResult = GetDPDealingCountResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class BeginDPApplyRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="BeginDPApply", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.BeginDPApplyRequestBody Body;
+        
+        public BeginDPApplyRequest() {
+        }
+        
+        public BeginDPApplyRequest(EmpInfo.EmpWebSvr.BeginDPApplyRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class BeginDPApplyRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string jsonParam;
+        
+        public BeginDPApplyRequestBody() {
+        }
+        
+        public BeginDPApplyRequestBody(string jsonParam) {
+            this.jsonParam = jsonParam;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class BeginDPApplyResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="BeginDPApplyResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.BeginDPApplyResponseBody Body;
+        
+        public BeginDPApplyResponse() {
+        }
+        
+        public BeginDPApplyResponse(EmpInfo.EmpWebSvr.BeginDPApplyResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class BeginDPApplyResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string BeginDPApplyResult;
+        
+        public BeginDPApplyResponseBody() {
+        }
+        
+        public BeginDPApplyResponseBody(string BeginDPApplyResult) {
+            this.BeginDPApplyResult = BeginDPApplyResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class SubmitDPApplyRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="SubmitDPApply", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.SubmitDPApplyRequestBody Body;
+        
+        public SubmitDPApplyRequest() {
+        }
+        
+        public SubmitDPApplyRequest(EmpInfo.EmpWebSvr.SubmitDPApplyRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class SubmitDPApplyRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string jsonParam;
+        
+        public SubmitDPApplyRequestBody() {
+        }
+        
+        public SubmitDPApplyRequestBody(string jsonParam) {
+            this.jsonParam = jsonParam;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class SubmitDPApplyResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="SubmitDPApplyResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.SubmitDPApplyResponseBody Body;
+        
+        public SubmitDPApplyResponse() {
+        }
+        
+        public SubmitDPApplyResponse(EmpInfo.EmpWebSvr.SubmitDPApplyResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class SubmitDPApplyResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string SubmitDPApplyResult;
+        
+        public SubmitDPApplyResponseBody() {
+        }
+        
+        public SubmitDPApplyResponseBody(string SubmitDPApplyResult) {
+            this.SubmitDPApplyResult = SubmitDPApplyResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetDPItemListRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetDPItemList", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.GetDPItemListRequestBody Body;
+        
+        public GetDPItemListRequest() {
+        }
+        
+        public GetDPItemListRequest(EmpInfo.EmpWebSvr.GetDPItemListRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetDPItemListRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string jsonParam;
+        
+        public GetDPItemListRequestBody() {
+        }
+        
+        public GetDPItemListRequestBody(string jsonParam) {
+            this.jsonParam = jsonParam;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetDPItemListResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetDPItemListResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.GetDPItemListResponseBody Body;
+        
+        public GetDPItemListResponse() {
+        }
+        
+        public GetDPItemListResponse(EmpInfo.EmpWebSvr.GetDPItemListResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetDPItemListResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string GetDPItemListResult;
+        
+        public GetDPItemListResponseBody() {
+        }
+        
+        public GetDPItemListResponseBody(string GetDPItemListResult) {
+            this.GetDPItemListResult = GetDPItemListResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class CheckAndAuditDPRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="CheckAndAuditDP", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.CheckAndAuditDPRequestBody Body;
+        
+        public CheckAndAuditDPRequest() {
+        }
+        
+        public CheckAndAuditDPRequest(EmpInfo.EmpWebSvr.CheckAndAuditDPRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class CheckAndAuditDPRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string jsonParam;
+        
+        public CheckAndAuditDPRequestBody() {
+        }
+        
+        public CheckAndAuditDPRequestBody(string jsonParam) {
+            this.jsonParam = jsonParam;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class CheckAndAuditDPResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="CheckAndAuditDPResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.CheckAndAuditDPResponseBody Body;
+        
+        public CheckAndAuditDPResponse() {
+        }
+        
+        public CheckAndAuditDPResponse(EmpInfo.EmpWebSvr.CheckAndAuditDPResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class CheckAndAuditDPResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string CheckAndAuditDPResult;
+        
+        public CheckAndAuditDPResponseBody() {
+        }
+        
+        public CheckAndAuditDPResponseBody(string CheckAndAuditDPResult) {
+            this.CheckAndAuditDPResult = CheckAndAuditDPResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class RoommateComfirmDPRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="RoommateComfirmDP", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.RoommateComfirmDPRequestBody Body;
+        
+        public RoommateComfirmDPRequest() {
+        }
+        
+        public RoommateComfirmDPRequest(EmpInfo.EmpWebSvr.RoommateComfirmDPRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class RoommateComfirmDPRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string jsonParam;
+        
+        public RoommateComfirmDPRequestBody() {
+        }
+        
+        public RoommateComfirmDPRequestBody(string jsonParam) {
+            this.jsonParam = jsonParam;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class RoommateComfirmDPResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="RoommateComfirmDPResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.RoommateComfirmDPResponseBody Body;
+        
+        public RoommateComfirmDPResponse() {
+        }
+        
+        public RoommateComfirmDPResponse(EmpInfo.EmpWebSvr.RoommateComfirmDPResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class RoommateComfirmDPResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string RoommateComfirmDPResult;
+        
+        public RoommateComfirmDPResponseBody() {
+        }
+        
+        public RoommateComfirmDPResponseBody(string RoommateComfirmDPResult) {
+            this.RoommateComfirmDPResult = RoommateComfirmDPResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class AccepterComfirmDPRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="AccepterComfirmDP", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.AccepterComfirmDPRequestBody Body;
+        
+        public AccepterComfirmDPRequest() {
+        }
+        
+        public AccepterComfirmDPRequest(EmpInfo.EmpWebSvr.AccepterComfirmDPRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class AccepterComfirmDPRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string jsonParam;
+        
+        public AccepterComfirmDPRequestBody() {
+        }
+        
+        public AccepterComfirmDPRequestBody(string jsonParam) {
+            this.jsonParam = jsonParam;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class AccepterComfirmDPResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="AccepterComfirmDPResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.AccepterComfirmDPResponseBody Body;
+        
+        public AccepterComfirmDPResponse() {
+        }
+        
+        public AccepterComfirmDPResponse(EmpInfo.EmpWebSvr.AccepterComfirmDPResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class AccepterComfirmDPResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string AccepterComfirmDPResult;
+        
+        public AccepterComfirmDPResponseBody() {
+        }
+        
+        public AccepterComfirmDPResponseBody(string AccepterComfirmDPResult) {
+            this.AccepterComfirmDPResult = AccepterComfirmDPResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class RepairerFinishDPRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="RepairerFinishDP", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.RepairerFinishDPRequestBody Body;
+        
+        public RepairerFinishDPRequest() {
+        }
+        
+        public RepairerFinishDPRequest(EmpInfo.EmpWebSvr.RepairerFinishDPRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class RepairerFinishDPRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string jsonParam;
+        
+        public RepairerFinishDPRequestBody() {
+        }
+        
+        public RepairerFinishDPRequestBody(string jsonParam) {
+            this.jsonParam = jsonParam;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class RepairerFinishDPResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="RepairerFinishDPResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.RepairerFinishDPResponseBody Body;
+        
+        public RepairerFinishDPResponse() {
+        }
+        
+        public RepairerFinishDPResponse(EmpInfo.EmpWebSvr.RepairerFinishDPResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class RepairerFinishDPResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string RepairerFinishDPResult;
+        
+        public RepairerFinishDPResponseBody() {
+        }
+        
+        public RepairerFinishDPResponseBody(string RepairerFinishDPResult) {
+            this.RepairerFinishDPResult = RepairerFinishDPResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class ApplierEvalateDPRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="ApplierEvalateDP", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.ApplierEvalateDPRequestBody Body;
+        
+        public ApplierEvalateDPRequest() {
+        }
+        
+        public ApplierEvalateDPRequest(EmpInfo.EmpWebSvr.ApplierEvalateDPRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class ApplierEvalateDPRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string jsonParam;
+        
+        public ApplierEvalateDPRequestBody() {
+        }
+        
+        public ApplierEvalateDPRequestBody(string jsonParam) {
+            this.jsonParam = jsonParam;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class ApplierEvalateDPResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="ApplierEvalateDPResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.EmpWebSvr.ApplierEvalateDPResponseBody Body;
+        
+        public ApplierEvalateDPResponse() {
+        }
+        
+        public ApplierEvalateDPResponse(EmpInfo.EmpWebSvr.ApplierEvalateDPResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class ApplierEvalateDPResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string ApplierEvalateDPResult;
+        
+        public ApplierEvalateDPResponseBody() {
+        }
+        
+        public ApplierEvalateDPResponseBody(string ApplierEvalateDPResult) {
+            this.ApplierEvalateDPResult = ApplierEvalateDPResult;
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public interface TrulyEmpSvrSoapChannel : EmpInfo.EmpWebSvr.TrulyEmpSvrSoap, System.ServiceModel.IClientChannel {
     }
@@ -2472,6 +3336,19 @@ namespace EmpInfo.EmpWebSvr {
             inValue.Body.msgId = msgId;
             EmpInfo.EmpWebSvr.QuerySendResultResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).QuerySendResult(inValue);
             return retVal.Body.QuerySendResultResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.EmpWebSvr.RecivedMessageResponse EmpInfo.EmpWebSvr.TrulyEmpSvrSoap.RecivedMessage(EmpInfo.EmpWebSvr.RecivedMessageRequest request) {
+            return base.Channel.RecivedMessage(request);
+        }
+        
+        public string RecivedMessage(string jsonParam) {
+            EmpInfo.EmpWebSvr.RecivedMessageRequest inValue = new EmpInfo.EmpWebSvr.RecivedMessageRequest();
+            inValue.Body = new EmpInfo.EmpWebSvr.RecivedMessageRequestBody();
+            inValue.Body.jsonParam = jsonParam;
+            EmpInfo.EmpWebSvr.RecivedMessageResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).RecivedMessage(inValue);
+            return retVal.Body.RecivedMessageResult;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -2576,6 +3453,19 @@ namespace EmpInfo.EmpWebSvr {
             inValue.Body.jsonParam = jsonParam;
             EmpInfo.EmpWebSvr.UpdateUserInfoResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).UpdateUserInfo(inValue);
             return retVal.Body.UpdateUserInfoResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.EmpWebSvr.CheckLoginDeviceResponse EmpInfo.EmpWebSvr.TrulyEmpSvrSoap.CheckLoginDevice(EmpInfo.EmpWebSvr.CheckLoginDeviceRequest request) {
+            return base.Channel.CheckLoginDevice(request);
+        }
+        
+        public string CheckLoginDevice(string jsonParam) {
+            EmpInfo.EmpWebSvr.CheckLoginDeviceRequest inValue = new EmpInfo.EmpWebSvr.CheckLoginDeviceRequest();
+            inValue.Body = new EmpInfo.EmpWebSvr.CheckLoginDeviceRequestBody();
+            inValue.Body.jsonParam = jsonParam;
+            EmpInfo.EmpWebSvr.CheckLoginDeviceResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).CheckLoginDevice(inValue);
+            return retVal.Body.CheckLoginDeviceResult;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -2848,6 +3738,136 @@ namespace EmpInfo.EmpWebSvr {
             inValue.Body.jsonParam = jsonParam;
             EmpInfo.EmpWebSvr.GetSalaryDetailResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).GetSalaryDetail(inValue);
             return retVal.Body.GetSalaryDetailResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.EmpWebSvr.GetSalaryBankCardResponse EmpInfo.EmpWebSvr.TrulyEmpSvrSoap.GetSalaryBankCard(EmpInfo.EmpWebSvr.GetSalaryBankCardRequest request) {
+            return base.Channel.GetSalaryBankCard(request);
+        }
+        
+        public string GetSalaryBankCard(string jsonParam) {
+            EmpInfo.EmpWebSvr.GetSalaryBankCardRequest inValue = new EmpInfo.EmpWebSvr.GetSalaryBankCardRequest();
+            inValue.Body = new EmpInfo.EmpWebSvr.GetSalaryBankCardRequestBody();
+            inValue.Body.jsonParam = jsonParam;
+            EmpInfo.EmpWebSvr.GetSalaryBankCardResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).GetSalaryBankCard(inValue);
+            return retVal.Body.GetSalaryBankCardResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.EmpWebSvr.GetDPDealingCountResponse EmpInfo.EmpWebSvr.TrulyEmpSvrSoap.GetDPDealingCount(EmpInfo.EmpWebSvr.GetDPDealingCountRequest request) {
+            return base.Channel.GetDPDealingCount(request);
+        }
+        
+        public string GetDPDealingCount(string jsonParam) {
+            EmpInfo.EmpWebSvr.GetDPDealingCountRequest inValue = new EmpInfo.EmpWebSvr.GetDPDealingCountRequest();
+            inValue.Body = new EmpInfo.EmpWebSvr.GetDPDealingCountRequestBody();
+            inValue.Body.jsonParam = jsonParam;
+            EmpInfo.EmpWebSvr.GetDPDealingCountResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).GetDPDealingCount(inValue);
+            return retVal.Body.GetDPDealingCountResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.EmpWebSvr.BeginDPApplyResponse EmpInfo.EmpWebSvr.TrulyEmpSvrSoap.BeginDPApply(EmpInfo.EmpWebSvr.BeginDPApplyRequest request) {
+            return base.Channel.BeginDPApply(request);
+        }
+        
+        public string BeginDPApply(string jsonParam) {
+            EmpInfo.EmpWebSvr.BeginDPApplyRequest inValue = new EmpInfo.EmpWebSvr.BeginDPApplyRequest();
+            inValue.Body = new EmpInfo.EmpWebSvr.BeginDPApplyRequestBody();
+            inValue.Body.jsonParam = jsonParam;
+            EmpInfo.EmpWebSvr.BeginDPApplyResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).BeginDPApply(inValue);
+            return retVal.Body.BeginDPApplyResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.EmpWebSvr.SubmitDPApplyResponse EmpInfo.EmpWebSvr.TrulyEmpSvrSoap.SubmitDPApply(EmpInfo.EmpWebSvr.SubmitDPApplyRequest request) {
+            return base.Channel.SubmitDPApply(request);
+        }
+        
+        public string SubmitDPApply(string jsonParam) {
+            EmpInfo.EmpWebSvr.SubmitDPApplyRequest inValue = new EmpInfo.EmpWebSvr.SubmitDPApplyRequest();
+            inValue.Body = new EmpInfo.EmpWebSvr.SubmitDPApplyRequestBody();
+            inValue.Body.jsonParam = jsonParam;
+            EmpInfo.EmpWebSvr.SubmitDPApplyResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).SubmitDPApply(inValue);
+            return retVal.Body.SubmitDPApplyResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.EmpWebSvr.GetDPItemListResponse EmpInfo.EmpWebSvr.TrulyEmpSvrSoap.GetDPItemList(EmpInfo.EmpWebSvr.GetDPItemListRequest request) {
+            return base.Channel.GetDPItemList(request);
+        }
+        
+        public string GetDPItemList(string jsonParam) {
+            EmpInfo.EmpWebSvr.GetDPItemListRequest inValue = new EmpInfo.EmpWebSvr.GetDPItemListRequest();
+            inValue.Body = new EmpInfo.EmpWebSvr.GetDPItemListRequestBody();
+            inValue.Body.jsonParam = jsonParam;
+            EmpInfo.EmpWebSvr.GetDPItemListResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).GetDPItemList(inValue);
+            return retVal.Body.GetDPItemListResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.EmpWebSvr.CheckAndAuditDPResponse EmpInfo.EmpWebSvr.TrulyEmpSvrSoap.CheckAndAuditDP(EmpInfo.EmpWebSvr.CheckAndAuditDPRequest request) {
+            return base.Channel.CheckAndAuditDP(request);
+        }
+        
+        public string CheckAndAuditDP(string jsonParam) {
+            EmpInfo.EmpWebSvr.CheckAndAuditDPRequest inValue = new EmpInfo.EmpWebSvr.CheckAndAuditDPRequest();
+            inValue.Body = new EmpInfo.EmpWebSvr.CheckAndAuditDPRequestBody();
+            inValue.Body.jsonParam = jsonParam;
+            EmpInfo.EmpWebSvr.CheckAndAuditDPResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).CheckAndAuditDP(inValue);
+            return retVal.Body.CheckAndAuditDPResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.EmpWebSvr.RoommateComfirmDPResponse EmpInfo.EmpWebSvr.TrulyEmpSvrSoap.RoommateComfirmDP(EmpInfo.EmpWebSvr.RoommateComfirmDPRequest request) {
+            return base.Channel.RoommateComfirmDP(request);
+        }
+        
+        public string RoommateComfirmDP(string jsonParam) {
+            EmpInfo.EmpWebSvr.RoommateComfirmDPRequest inValue = new EmpInfo.EmpWebSvr.RoommateComfirmDPRequest();
+            inValue.Body = new EmpInfo.EmpWebSvr.RoommateComfirmDPRequestBody();
+            inValue.Body.jsonParam = jsonParam;
+            EmpInfo.EmpWebSvr.RoommateComfirmDPResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).RoommateComfirmDP(inValue);
+            return retVal.Body.RoommateComfirmDPResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.EmpWebSvr.AccepterComfirmDPResponse EmpInfo.EmpWebSvr.TrulyEmpSvrSoap.AccepterComfirmDP(EmpInfo.EmpWebSvr.AccepterComfirmDPRequest request) {
+            return base.Channel.AccepterComfirmDP(request);
+        }
+        
+        public string AccepterComfirmDP(string jsonParam) {
+            EmpInfo.EmpWebSvr.AccepterComfirmDPRequest inValue = new EmpInfo.EmpWebSvr.AccepterComfirmDPRequest();
+            inValue.Body = new EmpInfo.EmpWebSvr.AccepterComfirmDPRequestBody();
+            inValue.Body.jsonParam = jsonParam;
+            EmpInfo.EmpWebSvr.AccepterComfirmDPResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).AccepterComfirmDP(inValue);
+            return retVal.Body.AccepterComfirmDPResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.EmpWebSvr.RepairerFinishDPResponse EmpInfo.EmpWebSvr.TrulyEmpSvrSoap.RepairerFinishDP(EmpInfo.EmpWebSvr.RepairerFinishDPRequest request) {
+            return base.Channel.RepairerFinishDP(request);
+        }
+        
+        public string RepairerFinishDP(string jsonParam) {
+            EmpInfo.EmpWebSvr.RepairerFinishDPRequest inValue = new EmpInfo.EmpWebSvr.RepairerFinishDPRequest();
+            inValue.Body = new EmpInfo.EmpWebSvr.RepairerFinishDPRequestBody();
+            inValue.Body.jsonParam = jsonParam;
+            EmpInfo.EmpWebSvr.RepairerFinishDPResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).RepairerFinishDP(inValue);
+            return retVal.Body.RepairerFinishDPResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.EmpWebSvr.ApplierEvalateDPResponse EmpInfo.EmpWebSvr.TrulyEmpSvrSoap.ApplierEvalateDP(EmpInfo.EmpWebSvr.ApplierEvalateDPRequest request) {
+            return base.Channel.ApplierEvalateDP(request);
+        }
+        
+        public string ApplierEvalateDP(string jsonParam) {
+            EmpInfo.EmpWebSvr.ApplierEvalateDPRequest inValue = new EmpInfo.EmpWebSvr.ApplierEvalateDPRequest();
+            inValue.Body = new EmpInfo.EmpWebSvr.ApplierEvalateDPRequestBody();
+            inValue.Body.jsonParam = jsonParam;
+            EmpInfo.EmpWebSvr.ApplierEvalateDPResponse retVal = ((EmpInfo.EmpWebSvr.TrulyEmpSvrSoap)(this)).ApplierEvalateDP(inValue);
+            return retVal.Body.ApplierEvalateDPResult;
         }
     }
 }
