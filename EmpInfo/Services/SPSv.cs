@@ -51,31 +51,82 @@ namespace EmpInfo.Services
 
         public override object GetInfoBeforeApply(UserInfo userInfo, UserInfoDetail userInfoDetail)
         {
+            //throw new Exception("新流程正在开发中，将加入放行条功能，等待开发完成后再开放此流程");
+            string sysNo = GetNextSysNum(BillType);
+            var sp = db.ei_spApply.Where(s => s.applier_num == userInfo.cardNo).OrderByDescending(s => s.id).FirstOrDefault();
+            var busDepList = db.flow_auditorRelation.Where(f => f.bill_type == BillType && f.relate_name == "事业部审批").Select(f => f.relate_text).Distinct().ToList();
+            if (sp == null) {
+                return new SPBeforeApplyModel()
+                {
+                    sys_no = sysNo,
+                    applier_phone = string.IsNullOrWhiteSpace(userInfoDetail.shortPhone) ? userInfoDetail.phone : userInfoDetail.shortPhone,
+                    busDepList = busDepList
+                };
+            }
             return new SPBeforeApplyModel()
             {
-                sysNum = GetNextSysNum(BillType),
-                applierPhone = string.IsNullOrWhiteSpace(userInfoDetail.shortPhone) ? userInfoDetail.phone : userInfoDetail.shortPhone,
-                busDepList = db.flow_auditorRelation.Where(f => f.bill_type == BillType).Select(f => f.relate_text).Distinct().ToList()
+                sys_no = sysNo,
+                applier_phone = sp.applier_phone,
+                bus_name = sp.bus_name,
+                company = sp.company,
+                content_type = sp.content_type,
+                from_addr = sp.from_addr,
+                receiver_name = sp.receiver_name,
+                receiver_phone = sp.receiver_phone,
+                send_or_receive = sp.send_or_receive,
+                to_addr = sp.to_addr,
+                aging = sp.aging,
+                scope = sp.scope,
+                busDepList = busDepList
             };
         }
 
         public override void SaveApply(System.Web.Mvc.FormCollection fc, UserInfo userInfo)
         {
             bill = JsonConvert.DeserializeObject<ei_spApply>(fc.Get("sp"));
+            var entry = JsonConvert.DeserializeObject<List<ei_spApplyEntry>>(fc.Get("entry"));
 
             bill.applier_name = userInfo.name;
             bill.applier_num = userInfo.cardNo;
             bill.apply_time = DateTime.Now;
 
-            if (GetExInfo().Count() == 0) {
-                throw new Exception("根据当前收寄件地址找不到合适的物流公司，请与物流部周秀花联系");
+            int addrFlag = (bill.from_addr.Contains("广东") ? 1 : 0) + (bill.to_addr.Contains("广东") ? 1 : 0);
+            if ("省内".Equals(bill.scope)) {
+                if (addrFlag != 2) throw new Exception("收寄范围是省内时，寄件和收件地址都必须包含广东");
             }
+            else {
+                if (addrFlag != 1) throw new Exception("收寄范围是" + bill.scope + "时，寄件和收件地址只能包含一个广东");
+            }
+            
+            
 
-            FlowSvrSoapClient client = new FlowSvrSoapClient();
+            if (string.IsNullOrEmpty(bill.ex_company)) {
+                throw new Exception("请先选择快递公司。如果快递公司不存在，请与物流部周秀花联系");
+            }
+            if (string.IsNullOrWhiteSpace(bill.ex_no)) {
+                throw new Exception("请填写快递单号");
+            }
+            if (bill.content_type == "文件") {
+                bill.package_num = null;
+                bill.box_size = null;
+                bill.cardboard_num = null;
+                bill.cardboard_size = null;
+            }
+            else {
+                if (entry.Count() < 1) {
+                    throw new Exception("请至少填写一项产品明细");
+                }
+            }
+            
+            FlowSvrSoapClient client = new FlowSvrSoapClient();            
             var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.bus_name, bill.content_type + bill.send_or_receive + "申请");
             if (result.suc) {
                 try {
                     db.ei_spApply.Add(bill);
+                    foreach (var e in entry) {
+                        e.ei_spApply = bill;
+                        db.ei_spApplyEntry.Add(e);
+                    }
                     db.SaveChanges();
                 }
                 catch (Exception ex) {
@@ -116,30 +167,27 @@ namespace EmpInfo.Services
                         return new SimpleResultModel() { suc = false, msg = "请先填写快递编号" };
                     }
                     if (!exCompany.Equals(bill.ex_company)) {
-                        bill.ex_log = string.Format("{0}({1})[{2}]:{3}==>{4}({5})[{6}]:{7}", bill.ex_company, bill.ex_type, bill.ex_no, bill.ex_price, exCompany, exType, exNo, exPriceStr);
+                        bill.ex_log = string.Format("{0}({1})[{2}]:{3}==>{4}({5})[{6}]:{7}", bill.ex_company, bill.ex_type ?? "", bill.ex_no, bill.ex_price ?? 0, exCompany, exType ?? "", exNo, exPriceStr);
                     }
                     bill.ex_no = exNo;
                     bill.ex_company = exCompany;
                     bill.ex_type = exType;
-                    bill.ex_price = decimal.Parse(exPriceStr);
-                }
-
-                if (stepName.Contains("事业部")) {
-                    if (string.IsNullOrEmpty(exCompany)) {
-                        return new SimpleResultModel() { suc = false, msg = "请先选择物流信息" };
+                    if (string.IsNullOrEmpty(exPriceStr)) {
+                        bill.ex_price = 0;
                     }
-                    bill.ex_company = exCompany;
-                    bill.ex_type = exType;
-                    bill.ex_price = decimal.Parse(exPriceStr);
-                }
-                if (stepName.Contains("申请人")) {
-                    if (string.IsNullOrEmpty(exNo)) {
-                        return new SimpleResultModel() { suc = false, msg = "请先填写快递编号" };
+                    else {
+                        bill.ex_price = decimal.Parse(exPriceStr);
                     }
-                    bill.ex_no = exNo;
+                }
+                if (stepName.Contains("行政")) {
+                    bill.can_print = true; //可打印放行条并可被扫描
+                    bill.out_status = "已打印";
                 }
             }
-            string formJson = JsonConvert.SerializeObject(bill);
+            
+            JsonSerializerSettings js = new JsonSerializerSettings();
+            js.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            string formJson = JsonConvert.SerializeObject(bill,js);
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
             var result = flow.BeginAudit(bill.sys_no, step, userInfo.cardNo, isPass, opinion, formJson);
             if (result.suc) {
@@ -207,18 +255,58 @@ namespace EmpInfo.Services
             return new SPSv(sysNo).bill;
         }
 
+        /// <summary>
+        /// 表中已有数据时，选择物流公司
+        /// </summary>
+        /// <returns></returns>
         public List<SPExInfoModel> GetExInfo()
         {
-            return db.Database.SqlQuery<SPExInfoModel>("exec GetExpressInfo @Adr = {0},@DocQty = {1},@Size = {2}, @CardQty = {3},@CSize = {4},@FQty = {5},@FWeight = {6}",
+            if (bill.content_type == "文件") {
+                bill.package_num = 1;
+                bill.box_size = "0";
+                bill.cardboard_num = 0;
+                bill.cardboard_size = "0";
+                bill.aging = "";
+            }
+            var result = db.Database.SqlQuery<SPExInfoModel>("exec GetExpressInfo @Adr = {0},@DocQty = {1},@Size = {2},@CardQty = {3},@CSize = {4},@FQty = {5},@FWeight = {6}",
                 bill.send_or_receive == "寄件" ? bill.to_addr : bill.from_addr,
                 bill.package_num ?? 1,
                 bill.box_size ?? "0",
                 bill.cardboard_num ?? 0,
                 bill.cardboard_size ?? "0",
-                bill.item_qty ?? 1,
+                0,
                 bill.total_weight ?? 1
                 ).Where(s => s.FReed > 0).ToList();
+
+            if (bill.content_type == "文件") {
+                //文件的只能选择顺丰标快
+                result = result.Where(r => r.FName == "顺丰" && r.FDelivery.Contains("标快")).ToList();
+            }else if (bill.total_weight < 10) {
+                if (bill.scope == "省内") {
+                    result = result.Where(r => r.FName == "顺丰" && r.FDelivery.Contains("标快")).ToList();
+                }
+                else if (bill.scope == "省外" || bill.scope=="港澳台") {
+                    if (bill.aging.Contains("次日达")) {
+                        result = result.Where(r => r.FName == "顺丰" && r.FDelivery.Contains("标快")).ToList();
+                    }
+                    else {
+                        result = result.Where(r => r.FName == "顺丰" && r.FDelivery.Contains("特惠")).ToList();
+                    }
+                }
+            }
+
+            return result;
         }
 
+        /// <summary>
+        /// 申请时选择物流公司，此时数据表中还未保存数据
+        /// </summary>
+        /// <param name="sp"></param>
+        /// <returns></returns>
+        public List<SPExInfoModel> GetExInfoWithoutBill(ei_spApply sp)
+        {
+            bill = sp;
+            return GetExInfo();
+        }
     }
 }

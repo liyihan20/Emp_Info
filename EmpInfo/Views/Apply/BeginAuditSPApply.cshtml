@@ -29,20 +29,20 @@
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
     <script>
-    var ex={
-        ex_company:"",
-        ex_type:"",
-        ex_price:""
+    var ex = {
+        ex_company: "",
+        ex_type: "",
+        ex_price: ""
     };
     $("#ex_tb").bootstrapTable({
         striped: true,
         pagination: true,
         pageSize: 5,
         pageList: [5, 10, 20],
-        clickToSelect:true,
+        clickToSelect: true,
         columns: [
             {
-                radio:true
+                radio: true
             },
             {
                 field: "FName",
@@ -61,23 +61,24 @@
     $(function () {
         $("#applyContent").load("CheckApply #topContainer", { sysNo: "@bam.sysNum" }, function () {
             $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> @bam.billTypeName 详情");
-                $("#waiting").remove();
-                $(".auditContent").css("visibility", "visible");
-                $("#flowRecordBt").on("click", function () {
-                    var box = $("<div></div>");
-                    $(box).load("CheckFlowRecord .list-group", { sysNo: "@bam.sysNum" }, function () {
-                        openMessageDialog($(box).html(), "查看流转记录");
-                    });
+            $("#waiting").remove();
+            $(".auditContent").css("visibility", "visible");
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@bam.sysNum" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
                 });
             });
-            displayExInfo();
+            $("#attDiv").load("../Item/PicAttachments", { sysNo: "@bam.sysNum" }, function () { });
+        });
+        displayExInfo();
 
-            $("#checkExBtn").on("click",function(){
-                if ($('#ex_tb').bootstrapTable('getData').length > 0) {
-                    $("#exModal").modal("show");
-                    return;
-                }
-                $.post("@Url.Content("~/Item/GetSPExInfo")", { sysNum: "@bam.sysNum" }, function (data) {
+        $("#checkExBtn").on("click", function () {
+            if ($('#ex_tb').bootstrapTable('getData').length > 0) {
+                $("#exModal").modal("show");
+                return;
+            }
+            $.post("@Url.Content("~/Item/GetSPExInfo")", { sysNum: "@bam.sysNum" }, function (data) {
                 if (data.suc) {
                     $("#exModal").modal("show");
                     $('#ex_tb').bootstrapTable('load', JSON.parse(data.extra));
@@ -87,7 +88,7 @@
             });
         });
 
-        $("#selectExBt").on("click",function(){
+        $("#selectExBt").on("click", function () {
             var rows = $('#ex_tb').bootstrapTable('getSelections');
             if (rows.length == 0) {
                 toastr.error("请先选择一行后再查询");
@@ -102,11 +103,14 @@
 
     });
     function audit(isPass) {
+        if (!ex.ex_company) {
+            ex.ex_company = $("#ex_company").val(); //国外件
+        }
         openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此申请吗？", function () {
             $.post("HandleApply", {
                 sysNo: "@bam.sysNum",
                 step: "@bam.step",
-                stepName:"@bam.stepName",
+                stepName: "@bam.stepName",
                 isPass: isPass,
                 opinion: $("#opinion").val(),
                 ex_company: ex.ex_company,
@@ -126,7 +130,7 @@
     function displayExInfo() {
         var info = "快递公司：" + ex.ex_company + "\n快递方式：" + ex.ex_type + "\n运费（元）：" + ex.ex_price;
         $("#exInfo").html(info);
-    }    
+    }
     </script>
     @if (bam.isPass != null) {
         <script>
@@ -136,7 +140,7 @@
             });
         </script>
     }
-    @if (!string.IsNullOrEmpty(sp.ex_company)) {
+    @if (!string.IsNullOrEmpty(sp.ex_type)) {
         <script>
             ex.ex_company = "@sp.ex_company";
             ex.ex_type = "@sp.ex_type";
@@ -158,11 +162,21 @@
         <div class="panel-body">
             @if (bam.isPass == null) {
                 <form id="auditForm">
-                    @if (bam.stepName.Contains("事业部") || bam.stepName.Contains("物流")) {
-                        <div><button type="button" class="btn btn-primary" id="checkExBtn"><i class="fa fa-search"></i> 选择快递公司</button></div>                        
-                        <textarea class="form-control" id="exInfo" rows="3" readonly style="margin-top:6px;"></textarea>
-                    }
-                    @if (bam.stepName.Contains("申请人") || bam.stepName.Contains("物流")) {
+                    @if (bam.stepName.Contains("物流")) {
+                        if (sp.scope != "国外") { 
+                            <div><button type="button" class="btn btn-primary" id="checkExBtn"><i class="fa fa-search"></i> 选择快递公司</button></div>                        
+                            <textarea class="form-control" id="exInfo" rows="3" readonly style="margin-top:6px;"></textarea>
+                        }
+                        else {
+                            <div class="b-div">
+                                <span class="b-label" style="vertical-align:top;">
+                                    快递公司:
+                                </span>
+                                <span style="display:inline-block;width:70%">
+                                    <input type="text" class="form-control" name="ex_company" id="ex_company" value="@sp.ex_company" />
+                                </span>
+                            </div>
+                        }
                         <div class="b-div">
                             <span class="b-label" style="vertical-align:top;">
                                 快递单号:
@@ -198,7 +212,7 @@
 @section Modal {
     @Html.Partial("_MessageDialog")
     @Html.Partial("_ConfirmDialog")
-<div class="modal fade" id="exModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+    <div class="modal fade" id="exModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

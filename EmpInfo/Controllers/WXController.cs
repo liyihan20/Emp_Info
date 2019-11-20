@@ -47,7 +47,7 @@ namespace EmpInfo.Controllers
                 openId = MyUtils.AESDecrypt(openId);
             }
             catch {
-                return JsonConvert.SerializeObject(new { suc = 0,msg="openid不合法" });
+                return JsonConvert.SerializeObject(new { suc = 0, msg = "openid不合法" });
             }
             var emps = db.ei_users.Where(u => u.wx_openid == openId && u.wx_easy_login == true);
             if (emps.Count() == 0) {

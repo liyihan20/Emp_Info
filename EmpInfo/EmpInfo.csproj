@@ -322,6 +322,12 @@
     <Compile Include="Models\ei_groupUser.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_ieApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_ieAuditors.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_jqApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -349,6 +355,9 @@
     <Compile Include="Models\ei_spApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_spApplyEntry.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_specialUsers.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -356,6 +365,12 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_SVApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_TIApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_TIApplyEntry.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_ucApply.cs">
@@ -544,7 +559,13 @@
     <Compile Include="Models\vw_spExcel.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\vw_SPReport.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\vw_svReport.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\vw_TIExcel.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_UCExcel.cs">
@@ -575,11 +596,13 @@
     <Compile Include="Services\DPSv.cs" />
     <Compile Include="Services\EPSv.cs" />
     <Compile Include="Services\ETSv.cs" />
+    <Compile Include="Services\IESv.cs" />
     <Compile Include="Services\SJSv.cs" />
     <Compile Include="Services\JQSv.cs" />
     <Compile Include="Services\SASv.cs" />
     <Compile Include="Services\SPSv.cs" />
     <Compile Include="Services\SVSv.cs" />
+    <Compile Include="Services\TISv.cs" />
     <Compile Include="Services\UCSv.cs" />
     <Compile Include="Util\BillUtils.cs" />
     <Compile Include="Util\MyEmail.cs" />
@@ -824,6 +847,7 @@
     <Content Include="Content\images\stock.png" />
     <Content Include="Content\images\sv.png" />
     <Content Include="Content\images\switch.png" />
+    <Content Include="Content\images\ti.png" />
     <Content Include="Content\images\truck.png" />
     <Content Include="Content\images\Truly.gif" />
     <Content Include="Content\images\truly_home.gif" />
@@ -1099,6 +1123,7 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\JsBarcode.code128.min.js" />
     <Content Include="Scripts\knockout-3.4.0.debug.js" />
     <Content Include="Scripts\knockout-3.4.0.js" />
     <Content Include="Scripts\lazysizes.min.js" />
@@ -1108,6 +1133,7 @@
     <Content Include="Scripts\myJs.js" />
     <Content Include="Scripts\particles.js" />
     <Content Include="Scripts\placeholders.js" />
+    <Content Include="Scripts\qrcode.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\star-rating.min.js" />
@@ -1281,6 +1307,11 @@
     <Content Include="Views\Admin\AuditorSetting.cshtml" />
     <Content Include="Views\ApplyExtra\ChargerUpdateLeaveDay.cshtml" />
     <Content Include="Views\ApplyExtra\CancelJQApply.cshtml" />
+    <Content Include="Views\Report\PrintSP.cshtml" />
+    <Content Include="Views\Apply\BeginApplyTI.cshtml" />
+    <Content Include="Views\Apply\CheckTIApply.cshtml" />
+    <Content Include="Views\Report\TIViewForGuard.cshtml" />
+    <Content Include="Views\Report\TIReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

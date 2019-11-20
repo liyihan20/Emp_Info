@@ -14,6 +14,11 @@ namespace EmpInfo.Models
     
     public partial class ei_spApply
     {
+        public ei_spApply()
+        {
+            this.ei_spApplyEntry = new HashSet<ei_spApplyEntry>();
+        }
+    
         public int id { get; set; }
         public string sys_no { get; set; }
         public string applier_num { get; set; }
@@ -25,11 +30,8 @@ namespace EmpInfo.Models
         public string bus_name { get; set; }
         public string send_no { get; set; }
         public string content_type { get; set; }
-        public string content_name { get; set; }
-        public string content_modual { get; set; }
         public Nullable<int> package_num { get; set; }
         public Nullable<decimal> total_weight { get; set; }
-        public Nullable<int> item_qty { get; set; }
         public Nullable<int> cardboard_num { get; set; }
         public string cardboard_size { get; set; }
         public string box_size { get; set; }
@@ -44,5 +46,15 @@ namespace EmpInfo.Models
         public string ex_no { get; set; }
         public string apply_reason { get; set; }
         public string ex_log { get; set; }
+        public Nullable<bool> has_attachment { get; set; }
+        public Nullable<System.DateTime> out_time { get; set; }
+        public string out_guard { get; set; }
+        public Nullable<bool> can_print { get; set; }
+        public string scope { get; set; }
+        public string out_status { get; set; }
+        public string out_reason { get; set; }
+        public string isReturnBack { get; set; }
+    
+        public virtual ICollection<ei_spApplyEntry> ei_spApplyEntry { get; set; }
     }
 }

@@ -670,6 +670,61 @@
           <Property Name="group_id" Type="int" />
           <Property Name="user_id" Type="int" />
         </EntityType>
+        <EntityType Name="ei_ieApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="applier_number" Type="varchar" MaxLength="50" />
+          <Property Name="apply_time" Type="datetime" />
+          <Property Name="bus_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="dep_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="project_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="project_no" Type="nvarchar" MaxLength="50" />
+          <Property Name="project_type" Type="nvarchar" MaxLength="50" />
+          <Property Name="project_property" Type="nvarchar" MaxLength="50" />
+          <Property Name="proposer" Type="nvarchar" MaxLength="50" />
+          <Property Name="group_leader" Type="nvarchar" MaxLength="100" />
+          <Property Name="group_member" Type="nvarchar" MaxLength="1000" />
+          <Property Name="before_flow" Type="nvarchar" MaxLength="500" />
+          <Property Name="before_people" Type="nvarchar" MaxLength="1000" />
+          <Property Name="before_production_setup" Type="nvarchar" MaxLength="500" />
+          <Property Name="before_position_beat" Type="nvarchar" MaxLength="500" />
+          <Property Name="improve_method" Type="nvarchar" MaxLength="1000" />
+          <Property Name="equitment_price" Type="decimal" Precision="12" Scale="3" />
+          <Property Name="equitment_qty" Type="int" />
+          <Property Name="after_save_people_sum" Type="int" />
+          <Property Name="after_save_money" Type="decimal" Precision="12" Scale="3" />
+          <Property Name="after_investment_money" Type="decimal" Precision="12" Scale="3" />
+          <Property Name="period1_from" Type="smalldatetime" />
+          <Property Name="period1_to" Type="smalldatetime" />
+          <Property Name="period1_content" Type="nvarchar" MaxLength="500" />
+          <Property Name="period1_man" Type="nvarchar" MaxLength="50" />
+          <Property Name="period2_from" Type="smalldatetime" />
+          <Property Name="period2_to" Type="smalldatetime" />
+          <Property Name="period2_content" Type="nvarchar" MaxLength="500" />
+          <Property Name="period2_man" Type="nvarchar" MaxLength="50" />
+          <Property Name="period3_from" Type="smalldatetime" />
+          <Property Name="period3_to" Type="smalldatetime" />
+          <Property Name="period3_content" Type="nvarchar" MaxLength="500" />
+          <Property Name="period3_man" Type="nvarchar" MaxLength="50" />
+          <Property Name="has_attachment" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ei_ieAuditors">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="bus_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="dep_names" Type="nvarchar" MaxLength="1000" />
+          <Property Name="bus_minister_no" Type="varchar" MaxLength="50" />
+          <Property Name="bus_minister_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="ie_leader_no" Type="varchar" MaxLength="50" />
+          <Property Name="ie_leader_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="is_forbit" Type="bit" />
+        </EntityType>
         <EntityType Name="ei_jqApply">
           <Key>
             <PropertyRef Name="id" />
@@ -875,11 +930,8 @@
           <Property Name="bus_name" Type="nvarchar" MaxLength="50" />
           <Property Name="send_no" Type="varchar" MaxLength="50" />
           <Property Name="content_type" Type="nvarchar" MaxLength="50" />
-          <Property Name="content_name" Type="nvarchar" MaxLength="200" />
-          <Property Name="content_modual" Type="nvarchar" MaxLength="200" />
           <Property Name="package_num" Type="int" />
           <Property Name="total_weight" Type="decimal" Precision="12" Scale="1" />
-          <Property Name="item_qty" Type="int" />
           <Property Name="cardboard_num" Type="int" />
           <Property Name="cardboard_size" Type="varchar" MaxLength="50" />
           <Property Name="box_size" Type="varchar" MaxLength="50" />
@@ -894,6 +946,24 @@
           <Property Name="ex_no" Type="varchar" MaxLength="50" />
           <Property Name="apply_reason" Type="nvarchar" MaxLength="500" />
           <Property Name="ex_log" Type="nvarchar" MaxLength="200" />
+          <Property Name="has_attachment" Type="bit" />
+          <Property Name="out_time" Type="datetime" />
+          <Property Name="out_guard" Type="nvarchar" MaxLength="50" />
+          <Property Name="can_print" Type="bit" />
+          <Property Name="scope" Type="nvarchar" MaxLength="10" />
+          <Property Name="out_status" Type="nvarchar" MaxLength="10" />
+          <Property Name="out_reason" Type="nvarchar" MaxLength="4000" />
+          <Property Name="isReturnBack" Type="nvarchar" MaxLength="10" />
+        </EntityType>
+        <EntityType Name="ei_spApplyEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sp_id" Type="int" />
+          <Property Name="name" Type="nvarchar" MaxLength="500" />
+          <Property Name="modual" Type="nvarchar" MaxLength="500" />
+          <Property Name="qty" Type="int" />
         </EntityType>
         <EntityType Name="ei_specialUsers">
           <Key>
@@ -941,6 +1011,34 @@
           <Property Name="check2" Type="bit" />
           <Property Name="v_days" Type="decimal" Precision="4" Scale="1" />
           <Property Name="is_direct_charge" Type="bit" />
+        </EntityType>
+        <EntityType Name="ei_TIApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="in_day" Type="smalldatetime" />
+          <Property Name="in_timespan" Type="varchar" MaxLength="50" />
+          <Property Name="ex_company" Type="nvarchar" MaxLength="50" />
+          <Property Name="comment" Type="nvarchar" MaxLength="500" />
+          <Property Name="apply_time" Type="datetime" />
+        </EntityType>
+        <EntityType Name="ei_TIApplyEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ti_id" Type="int" />
+          <Property Name="car_type" Type="nvarchar" MaxLength="50" />
+          <Property Name="car_no" Type="nvarchar" MaxLength="50" />
+          <Property Name="driver_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="driver_no" Type="varchar" MaxLength="50" />
+          <Property Name="t_status" Type="nvarchar" MaxLength="20" />
+          <Property Name="in_time" Type="datetime" />
+          <Property Name="out_time" Type="datetime" />
         </EntityType>
         <EntityType Name="ei_ucApply">
           <Key>
@@ -1546,11 +1644,8 @@
           <Property Name="bus_name" Type="nvarchar" MaxLength="50" />
           <Property Name="send_no" Type="varchar" MaxLength="50" />
           <Property Name="content_type" Type="nvarchar" MaxLength="50" />
-          <Property Name="content_name" Type="nvarchar" MaxLength="200" />
-          <Property Name="content_modual" Type="nvarchar" MaxLength="200" />
           <Property Name="package_num" Type="int" />
           <Property Name="total_weight" Type="decimal" Precision="12" Scale="1" />
-          <Property Name="item_qty" Type="int" />
           <Property Name="cardboard_num" Type="int" />
           <Property Name="cardboard_size" Type="varchar" MaxLength="50" />
           <Property Name="box_size" Type="varchar" MaxLength="50" />
@@ -1564,7 +1659,36 @@
           <Property Name="ex_price" Type="decimal" Precision="18" Scale="2" />
           <Property Name="ex_no" Type="varchar" MaxLength="50" />
           <Property Name="apply_reason" Type="nvarchar" MaxLength="500" />
+          <Property Name="scope" Type="nvarchar" MaxLength="10" />
+          <Property Name="entry_id" Type="int" />
+          <Property Name="name" Type="nvarchar" MaxLength="500" />
+          <Property Name="modual" Type="nvarchar" MaxLength="500" />
+          <Property Name="qty" Type="int" />
           <Property Name="audit_result" Type="varchar" MaxLength="6" Nullable="false" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“ICAudit.dbo.vw_SPReport”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vw_SPReport">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="applier_phone" Type="varchar" MaxLength="50" />
+          <Property Name="apply_reason" Type="nvarchar" MaxLength="500" />
+          <Property Name="apply_time" Type="datetime" />
+          <Property Name="bus_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="can_print" Type="bit" />
+          <Property Name="cardboard_num" Type="int" />
+          <Property Name="company" Type="nvarchar" MaxLength="50" />
+          <Property Name="package_num" Type="int" />
+          <Property Name="to_addr" Type="nvarchar" MaxLength="200" />
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="500" />
+          <Property Name="modual" Type="nvarchar" MaxLength="500" />
+          <Property Name="qty" Type="int" />
+          <Property Name="bus_auditor" Type="varchar" MaxLength="100" />
+          <Property Name="administration_auditor" Type="varchar" MaxLength="100" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_svReport”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -1593,6 +1717,33 @@
           <Property Name="check1" Type="bit" />
           <Property Name="check2" Type="bit" />
           <Property Name="status" Type="varchar" MaxLength="6" Nullable="false" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“ICAudit.dbo.vw_TIExcel”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vw_TIExcel">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="entry_id" />
+            <PropertyRef Name="audit_result" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="in_day" Type="smalldatetime" />
+          <Property Name="in_timespan" Type="varchar" MaxLength="50" />
+          <Property Name="ex_company" Type="nvarchar" MaxLength="50" />
+          <Property Name="comment" Type="nvarchar" MaxLength="500" />
+          <Property Name="apply_time" Type="datetime" />
+          <Property Name="entry_id" Type="int" Nullable="false" />
+          <Property Name="driver_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="driver_no" Type="varchar" MaxLength="50" />
+          <Property Name="car_no" Type="nvarchar" MaxLength="50" />
+          <Property Name="car_type" Type="nvarchar" MaxLength="50" />
+          <Property Name="t_status" Type="nvarchar" MaxLength="20" />
+          <Property Name="in_time" Type="datetime" />
+          <Property Name="out_time" Type="datetime" />
+          <Property Name="audit_result" Type="varchar" MaxLength="6" Nullable="false" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_UCExcel”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -1874,6 +2025,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ei_spApplyEntry_ei_spApply">
+          <End Role="ei_spApply" Type="Self.ei_spApply" Multiplicity="0..1" />
+          <End Role="ei_spApplyEntry" Type="Self.ei_spApplyEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_spApply">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_spApplyEntry">
+              <PropertyRef Name="sp_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ei_TIApplyEntry_ei_TIApply">
+          <End Role="ei_TIApply" Type="Self.ei_TIApply" Multiplicity="0..1" />
+          <End Role="ei_TIApplyEntry" Type="Self.ei_TIApplyEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_TIApply">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_TIApplyEntry">
+              <PropertyRef Name="ti_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ei_ucApplyEntry_ei_ucApply">
           <End Role="ei_ucApply" Type="Self.ei_ucApply" Multiplicity="0..1" />
           <End Role="ei_ucApplyEntry" Type="Self.ei_ucApplyEntry" Multiplicity="*" />
@@ -2055,6 +2230,8 @@
           <EntitySet Name="ei_groupAuthority" EntityType="Self.ei_groupAuthority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groups" EntityType="Self.ei_groups" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groupUser" EntityType="Self.ei_groupUser" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_ieApply" EntityType="Self.ei_ieApply" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_ieAuditors" EntityType="Self.ei_ieAuditors" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_jqApply" EntityType="Self.ei_jqApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_k3RestLog" EntityType="Self.ei_k3RestLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_leaveDayExceedPushLog" EntityType="Self.ei_leaveDayExceedPushLog" Schema="dbo" store:Type="Tables" />
@@ -2064,9 +2241,12 @@
           <EntitySet Name="ei_resVisitLog" EntityType="Self.ei_resVisitLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_sjApply" EntityType="Self.ei_sjApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_spApply" EntityType="Self.ei_spApply" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_spApplyEntry" EntityType="Self.ei_spApplyEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_specialUsers" EntityType="Self.ei_specialUsers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_stockAdminApply" EntityType="Self.ei_stockAdminApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_SVApply" EntityType="Self.ei_SVApply" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_TIApply" EntityType="Self.ei_TIApply" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_TIApplyEntry" EntityType="Self.ei_TIApplyEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_ucApply" EntityType="Self.ei_ucApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_ucApplyEntry" EntityType="Self.ei_ucApplyEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_users" EntityType="Self.ei_users" Schema="dbo" store:Type="Tables" />
@@ -2455,11 +2635,8 @@ FROM [dbo].[vw_SJExcel] AS [vw_SJExcel]</DefiningQuery>
 [vw_spExcel].[bus_name] AS [bus_name], 
 [vw_spExcel].[send_no] AS [send_no], 
 [vw_spExcel].[content_type] AS [content_type], 
-[vw_spExcel].[content_name] AS [content_name], 
-[vw_spExcel].[content_modual] AS [content_modual], 
 [vw_spExcel].[package_num] AS [package_num], 
 [vw_spExcel].[total_weight] AS [total_weight], 
-[vw_spExcel].[item_qty] AS [item_qty], 
 [vw_spExcel].[cardboard_num] AS [cardboard_num], 
 [vw_spExcel].[cardboard_size] AS [cardboard_size], 
 [vw_spExcel].[box_size] AS [box_size], 
@@ -2473,8 +2650,34 @@ FROM [dbo].[vw_SJExcel] AS [vw_SJExcel]</DefiningQuery>
 [vw_spExcel].[ex_price] AS [ex_price], 
 [vw_spExcel].[ex_no] AS [ex_no], 
 [vw_spExcel].[apply_reason] AS [apply_reason], 
+[vw_spExcel].[scope] AS [scope], 
+[vw_spExcel].[entry_id] AS [entry_id], 
+[vw_spExcel].[name] AS [name], 
+[vw_spExcel].[modual] AS [modual], 
+[vw_spExcel].[qty] AS [qty], 
 [vw_spExcel].[audit_result] AS [audit_result]
 FROM [dbo].[vw_spExcel] AS [vw_spExcel]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_SPReport" EntityType="Self.vw_SPReport" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vw_SPReport].[sys_no] AS [sys_no], 
+[vw_SPReport].[applier_name] AS [applier_name], 
+[vw_SPReport].[applier_phone] AS [applier_phone], 
+[vw_SPReport].[apply_reason] AS [apply_reason], 
+[vw_SPReport].[apply_time] AS [apply_time], 
+[vw_SPReport].[bus_name] AS [bus_name], 
+[vw_SPReport].[can_print] AS [can_print], 
+[vw_SPReport].[cardboard_num] AS [cardboard_num], 
+[vw_SPReport].[company] AS [company], 
+[vw_SPReport].[package_num] AS [package_num], 
+[vw_SPReport].[to_addr] AS [to_addr], 
+[vw_SPReport].[id] AS [id], 
+[vw_SPReport].[name] AS [name], 
+[vw_SPReport].[modual] AS [modual], 
+[vw_SPReport].[qty] AS [qty], 
+[vw_SPReport].[bus_auditor] AS [bus_auditor], 
+[vw_SPReport].[administration_auditor] AS [administration_auditor]
+FROM [dbo].[vw_SPReport] AS [vw_SPReport]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="vw_svReport" EntityType="Self.vw_svReport" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
@@ -2498,6 +2701,28 @@ FROM [dbo].[vw_spExcel] AS [vw_spExcel]</DefiningQuery>
 [vw_svReport].[check2] AS [check2], 
 [vw_svReport].[status] AS [status]
 FROM [dbo].[vw_svReport] AS [vw_svReport]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_TIExcel" EntityType="Self.vw_TIExcel" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vw_TIExcel].[id] AS [id], 
+[vw_TIExcel].[sys_no] AS [sys_no], 
+[vw_TIExcel].[applier_name] AS [applier_name], 
+[vw_TIExcel].[applier_num] AS [applier_num], 
+[vw_TIExcel].[in_day] AS [in_day], 
+[vw_TIExcel].[in_timespan] AS [in_timespan], 
+[vw_TIExcel].[ex_company] AS [ex_company], 
+[vw_TIExcel].[comment] AS [comment], 
+[vw_TIExcel].[apply_time] AS [apply_time], 
+[vw_TIExcel].[entry_id] AS [entry_id], 
+[vw_TIExcel].[driver_name] AS [driver_name], 
+[vw_TIExcel].[driver_no] AS [driver_no], 
+[vw_TIExcel].[car_no] AS [car_no], 
+[vw_TIExcel].[car_type] AS [car_type], 
+[vw_TIExcel].[t_status] AS [t_status], 
+[vw_TIExcel].[in_time] AS [in_time], 
+[vw_TIExcel].[out_time] AS [out_time], 
+[vw_TIExcel].[audit_result] AS [audit_result]
+FROM [dbo].[vw_TIExcel] AS [vw_TIExcel]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="vw_UCExcel" EntityType="Self.vw_UCExcel" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
@@ -2618,6 +2843,14 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <AssociationSet Name="FK_ei_PushResponse_ei_pushMsg" Association="Self.FK_ei_PushResponse_ei_pushMsg">
             <End Role="ei_pushMsg" EntitySet="ei_pushMsg" />
             <End Role="ei_PushResponse" EntitySet="ei_PushResponse" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ei_spApplyEntry_ei_spApply" Association="Self.FK_ei_spApplyEntry_ei_spApply">
+            <End Role="ei_spApply" EntitySet="ei_spApply" />
+            <End Role="ei_spApplyEntry" EntitySet="ei_spApplyEntry" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ei_TIApplyEntry_ei_TIApply" Association="Self.FK_ei_TIApplyEntry_ei_TIApply">
+            <End Role="ei_TIApply" EntitySet="ei_TIApply" />
+            <End Role="ei_TIApplyEntry" EntitySet="ei_TIApplyEntry" />
           </AssociationSet>
           <AssociationSet Name="FK_ei_ucApplyEntry_ei_ucApply" Association="Self.FK_ei_ucApplyEntry_ei_ucApply">
             <End Role="ei_ucApply" EntitySet="ei_ucApply" />
@@ -2921,8 +3154,23 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <Parameter Name="position" Mode="In" Type="String" />
           </FunctionImport>
           <EntitySet Name="ei_spApply" EntityType="ICAuditModel.ei_spApply" />
-          <EntitySet Name="vw_spExcel" EntityType="ICAuditModel.vw_spExcel" />
           <EntitySet Name="ei_flowAuthority" EntityType="ICAuditModel.ei_flowAuthority" />
+          <EntitySet Name="ei_spApplyEntry" EntityType="ICAuditModel.ei_spApplyEntry" />
+          <AssociationSet Name="FK_ei_spApplyEntry_ei_spApply" Association="ICAuditModel.FK_ei_spApplyEntry_ei_spApply">
+            <End Role="ei_spApply" EntitySet="ei_spApply" />
+            <End Role="ei_spApplyEntry" EntitySet="ei_spApplyEntry" />
+          </AssociationSet>
+          <EntitySet Name="vw_SPReport" EntityType="ICAuditModel.vw_SPReport" />
+          <EntitySet Name="ei_ieApply" EntityType="ICAuditModel.ei_ieApply" />
+          <EntitySet Name="ei_ieAuditors" EntityType="ICAuditModel.ei_ieAuditors" />
+          <EntitySet Name="ei_TIApply" EntityType="ICAuditModel.ei_TIApply" />
+          <EntitySet Name="ei_TIApplyEntry" EntityType="ICAuditModel.ei_TIApplyEntry" />
+          <AssociationSet Name="FK_ei_TIApplyEntry_ei_TIApply" Association="ICAuditModel.FK_ei_TIApplyEntry_ei_TIApply">
+            <End Role="ei_TIApply" EntitySet="ei_TIApply" />
+            <End Role="ei_TIApplyEntry" EntitySet="ei_TIApplyEntry" />
+          </AssociationSet>
+          <EntitySet Name="vw_spExcel" EntityType="ICAuditModel.vw_spExcel" />
+          <EntitySet Name="vw_TIExcel" EntityType="ICAuditModel.vw_TIExcel" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -4924,11 +5172,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="bus_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="send_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="content_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="content_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="content_modual" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
           <Property Name="package_num" Type="Int32" />
           <Property Name="total_weight" Type="Decimal" Precision="12" Scale="1" />
-          <Property Name="item_qty" Type="Int32" />
           <Property Name="cardboard_num" Type="Int32" />
           <Property Name="cardboard_size" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="box_size" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
@@ -4943,7 +5188,169 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="ex_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="apply_reason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="ex_log" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="has_attachment" Type="Boolean" />
+          <Property Name="out_time" Type="DateTime" Precision="3" />
+          <Property Name="out_guard" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="can_print" Type="Boolean" />
+          <NavigationProperty Name="ei_spApplyEntry" Relationship="ICAuditModel.FK_ei_spApplyEntry_ei_spApply" FromRole="ei_spApply" ToRole="ei_spApplyEntry" />
+          <Property Name="scope" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="out_status" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="out_reason" Type="String" MaxLength="4000" FixedLength="false" Unicode="true" />
+          <Property Name="isReturnBack" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
         </EntityType>
+        <EntityType Name="ei_flowAuthority">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="bill_type" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="relate_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="relate_value" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="cond1" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="cond2" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="ei_spApplyEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sp_id" Type="Int32" />
+          <Property Name="name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="modual" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="qty" Type="Int32" />
+          <NavigationProperty Name="ei_spApply" Relationship="ICAuditModel.FK_ei_spApplyEntry_ei_spApply" FromRole="ei_spApplyEntry" ToRole="ei_spApply" />
+        </EntityType>
+        <Association Name="FK_ei_spApplyEntry_ei_spApply">
+          <End Type="ICAuditModel.ei_spApply" Role="ei_spApply" Multiplicity="0..1" />
+          <End Type="ICAuditModel.ei_spApplyEntry" Role="ei_spApplyEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_spApply">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_spApplyEntry">
+              <PropertyRef Name="sp_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="vw_SPReport">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="applier_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="apply_reason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="bus_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="can_print" Type="Boolean" />
+          <Property Name="cardboard_num" Type="Int32" />
+          <Property Name="company" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="package_num" Type="Int32" />
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="modual" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="qty" Type="Int32" />
+          <Property Name="bus_auditor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="administration_auditor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="to_addr" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="ei_ieApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="applier_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="bus_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="dep_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="project_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="project_no" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="project_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="project_property" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="proposer" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="group_leader" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="group_member" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="before_flow" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="before_people" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="before_production_setup" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="before_position_beat" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="improve_method" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="equitment_price" Type="Decimal" Precision="12" Scale="3" />
+          <Property Name="equitment_qty" Type="Int32" />
+          <Property Name="after_save_people_sum" Type="Int32" />
+          <Property Name="after_save_money" Type="Decimal" Precision="12" Scale="3" />
+          <Property Name="after_investment_money" Type="Decimal" Precision="12" Scale="3" />
+          <Property Name="period1_from" Type="DateTime" Precision="0" />
+          <Property Name="period1_to" Type="DateTime" Precision="0" />
+          <Property Name="period1_content" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="period1_man" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="period2_from" Type="DateTime" Precision="0" />
+          <Property Name="period2_to" Type="DateTime" Precision="0" />
+          <Property Name="period2_content" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="period2_man" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="period3_from" Type="DateTime" Precision="0" />
+          <Property Name="period3_to" Type="DateTime" Precision="0" />
+          <Property Name="period3_content" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="period3_man" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="has_attachment" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ei_ieAuditors">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="bus_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="dep_names" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="bus_minister_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="bus_minister_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ie_leader_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ie_leader_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="is_forbit" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="ei_TIApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="in_day" Type="DateTime" Precision="0" />
+          <Property Name="in_timespan" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ex_company" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="ei_TIApplyEntry" Relationship="ICAuditModel.FK_ei_TIApplyEntry_ei_TIApply" FromRole="ei_TIApply" ToRole="ei_TIApplyEntry" />
+        </EntityType>
+        <EntityType Name="ei_TIApplyEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ti_id" Type="Int32" />
+          <Property Name="car_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="car_no" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="driver_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="driver_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ei_TIApply" Relationship="ICAuditModel.FK_ei_TIApplyEntry_ei_TIApply" FromRole="ei_TIApplyEntry" ToRole="ei_TIApply" />
+          <Property Name="t_status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="in_time" Type="DateTime" Precision="3" />
+          <Property Name="out_time" Type="DateTime" Precision="3" />
+        </EntityType>
+        <Association Name="FK_ei_TIApplyEntry_ei_TIApply">
+          <End Type="ICAuditModel.ei_TIApply" Role="ei_TIApply" Multiplicity="0..1" />
+          <End Type="ICAuditModel.ei_TIApplyEntry" Role="ei_TIApplyEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_TIApply">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_TIApplyEntry">
+              <PropertyRef Name="ti_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityType Name="vw_spExcel">
           <Key>
             <PropertyRef Name="id" />
@@ -4960,11 +5367,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="bus_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="send_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="content_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="content_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="content_modual" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
           <Property Name="package_num" Type="Int32" />
           <Property Name="total_weight" Type="Decimal" Precision="12" Scale="1" />
-          <Property Name="item_qty" Type="Int32" />
           <Property Name="cardboard_num" Type="Int32" />
           <Property Name="cardboard_size" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="box_size" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
@@ -4978,18 +5382,37 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="ex_price" Type="Decimal" Precision="18" Scale="2" />
           <Property Name="ex_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="apply_reason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="scope" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="entry_id" Type="Int32" />
+          <Property Name="name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="modual" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="qty" Type="Int32" />
           <Property Name="audit_result" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
         </EntityType>
-        <EntityType Name="ei_flowAuthority">
+        <EntityType Name="vw_TIExcel">
           <Key>
             <PropertyRef Name="id" />
+            <PropertyRef Name="entry_id" />
+            <PropertyRef Name="audit_result" />
           </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="bill_type" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
-          <Property Name="relate_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="relate_value" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="cond1" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="cond2" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="in_day" Type="DateTime" Precision="0" />
+          <Property Name="in_timespan" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ex_company" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="entry_id" Type="Int32" Nullable="false" />
+          <Property Name="driver_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="driver_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="car_no" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="car_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="t_status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="in_time" Type="DateTime" Precision="3" />
+          <Property Name="out_time" Type="DateTime" Precision="3" />
+          <Property Name="audit_result" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -6857,6 +7280,14 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_spApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_spApply">
               <MappingFragment StoreEntitySet="ei_spApply">
+                <ScalarProperty Name="isReturnBack" ColumnName="isReturnBack" />
+                <ScalarProperty Name="out_reason" ColumnName="out_reason" />
+                <ScalarProperty Name="out_status" ColumnName="out_status" />
+                <ScalarProperty Name="scope" ColumnName="scope" />
+                <ScalarProperty Name="can_print" ColumnName="can_print" />
+                <ScalarProperty Name="out_guard" ColumnName="out_guard" />
+                <ScalarProperty Name="out_time" ColumnName="out_time" />
+                <ScalarProperty Name="has_attachment" ColumnName="has_attachment" />
                 <ScalarProperty Name="ex_log" ColumnName="ex_log" />
                 <ScalarProperty Name="apply_reason" ColumnName="apply_reason" />
                 <ScalarProperty Name="ex_no" ColumnName="ex_no" />
@@ -6871,47 +7302,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="box_size" ColumnName="box_size" />
                 <ScalarProperty Name="cardboard_size" ColumnName="cardboard_size" />
                 <ScalarProperty Name="cardboard_num" ColumnName="cardboard_num" />
-                <ScalarProperty Name="item_qty" ColumnName="item_qty" />
                 <ScalarProperty Name="total_weight" ColumnName="total_weight" />
                 <ScalarProperty Name="package_num" ColumnName="package_num" />
-                <ScalarProperty Name="content_modual" ColumnName="content_modual" />
-                <ScalarProperty Name="content_name" ColumnName="content_name" />
-                <ScalarProperty Name="content_type" ColumnName="content_type" />
-                <ScalarProperty Name="send_no" ColumnName="send_no" />
-                <ScalarProperty Name="bus_name" ColumnName="bus_name" />
-                <ScalarProperty Name="company" ColumnName="company" />
-                <ScalarProperty Name="send_or_receive" ColumnName="send_or_receive" />
-                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
-                <ScalarProperty Name="applier_phone" ColumnName="applier_phone" />
-                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
-                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
-                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="vw_spExcel">
-            <EntityTypeMapping TypeName="ICAuditModel.vw_spExcel">
-              <MappingFragment StoreEntitySet="vw_spExcel">
-                <ScalarProperty Name="audit_result" ColumnName="audit_result" />
-                <ScalarProperty Name="apply_reason" ColumnName="apply_reason" />
-                <ScalarProperty Name="ex_no" ColumnName="ex_no" />
-                <ScalarProperty Name="ex_price" ColumnName="ex_price" />
-                <ScalarProperty Name="ex_type" ColumnName="ex_type" />
-                <ScalarProperty Name="ex_company" ColumnName="ex_company" />
-                <ScalarProperty Name="receiver_phone" ColumnName="receiver_phone" />
-                <ScalarProperty Name="receiver_name" ColumnName="receiver_name" />
-                <ScalarProperty Name="to_addr" ColumnName="to_addr" />
-                <ScalarProperty Name="from_addr" ColumnName="from_addr" />
-                <ScalarProperty Name="aging" ColumnName="aging" />
-                <ScalarProperty Name="box_size" ColumnName="box_size" />
-                <ScalarProperty Name="cardboard_size" ColumnName="cardboard_size" />
-                <ScalarProperty Name="cardboard_num" ColumnName="cardboard_num" />
-                <ScalarProperty Name="item_qty" ColumnName="item_qty" />
-                <ScalarProperty Name="total_weight" ColumnName="total_weight" />
-                <ScalarProperty Name="package_num" ColumnName="package_num" />
-                <ScalarProperty Name="content_modual" ColumnName="content_modual" />
-                <ScalarProperty Name="content_name" ColumnName="content_name" />
                 <ScalarProperty Name="content_type" ColumnName="content_type" />
                 <ScalarProperty Name="send_no" ColumnName="send_no" />
                 <ScalarProperty Name="bus_name" ColumnName="bus_name" />
@@ -6934,6 +7326,189 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="relate_value" ColumnName="relate_value" />
                 <ScalarProperty Name="relate_type" ColumnName="relate_type" />
                 <ScalarProperty Name="bill_type" ColumnName="bill_type" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_spApplyEntry">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_spApplyEntry">
+              <MappingFragment StoreEntitySet="ei_spApplyEntry">
+                <ScalarProperty Name="qty" ColumnName="qty" />
+                <ScalarProperty Name="modual" ColumnName="modual" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="sp_id" ColumnName="sp_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_SPReport">
+            <EntityTypeMapping TypeName="ICAuditModel.vw_SPReport">
+              <MappingFragment StoreEntitySet="vw_SPReport">
+                <ScalarProperty Name="to_addr" ColumnName="to_addr" />
+                <ScalarProperty Name="administration_auditor" ColumnName="administration_auditor" />
+                <ScalarProperty Name="bus_auditor" ColumnName="bus_auditor" />
+                <ScalarProperty Name="qty" ColumnName="qty" />
+                <ScalarProperty Name="modual" ColumnName="modual" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="package_num" ColumnName="package_num" />
+                <ScalarProperty Name="company" ColumnName="company" />
+                <ScalarProperty Name="cardboard_num" ColumnName="cardboard_num" />
+                <ScalarProperty Name="can_print" ColumnName="can_print" />
+                <ScalarProperty Name="bus_name" ColumnName="bus_name" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="apply_reason" ColumnName="apply_reason" />
+                <ScalarProperty Name="applier_phone" ColumnName="applier_phone" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_ieApply">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_ieApply">
+              <MappingFragment StoreEntitySet="ei_ieApply">
+                <ScalarProperty Name="has_attachment" ColumnName="has_attachment" />
+                <ScalarProperty Name="period3_man" ColumnName="period3_man" />
+                <ScalarProperty Name="period3_content" ColumnName="period3_content" />
+                <ScalarProperty Name="period3_to" ColumnName="period3_to" />
+                <ScalarProperty Name="period3_from" ColumnName="period3_from" />
+                <ScalarProperty Name="period2_man" ColumnName="period2_man" />
+                <ScalarProperty Name="period2_content" ColumnName="period2_content" />
+                <ScalarProperty Name="period2_to" ColumnName="period2_to" />
+                <ScalarProperty Name="period2_from" ColumnName="period2_from" />
+                <ScalarProperty Name="period1_man" ColumnName="period1_man" />
+                <ScalarProperty Name="period1_content" ColumnName="period1_content" />
+                <ScalarProperty Name="period1_to" ColumnName="period1_to" />
+                <ScalarProperty Name="period1_from" ColumnName="period1_from" />
+                <ScalarProperty Name="after_investment_money" ColumnName="after_investment_money" />
+                <ScalarProperty Name="after_save_money" ColumnName="after_save_money" />
+                <ScalarProperty Name="after_save_people_sum" ColumnName="after_save_people_sum" />
+                <ScalarProperty Name="equitment_qty" ColumnName="equitment_qty" />
+                <ScalarProperty Name="equitment_price" ColumnName="equitment_price" />
+                <ScalarProperty Name="improve_method" ColumnName="improve_method" />
+                <ScalarProperty Name="before_position_beat" ColumnName="before_position_beat" />
+                <ScalarProperty Name="before_production_setup" ColumnName="before_production_setup" />
+                <ScalarProperty Name="before_people" ColumnName="before_people" />
+                <ScalarProperty Name="before_flow" ColumnName="before_flow" />
+                <ScalarProperty Name="group_member" ColumnName="group_member" />
+                <ScalarProperty Name="group_leader" ColumnName="group_leader" />
+                <ScalarProperty Name="proposer" ColumnName="proposer" />
+                <ScalarProperty Name="project_property" ColumnName="project_property" />
+                <ScalarProperty Name="project_type" ColumnName="project_type" />
+                <ScalarProperty Name="project_no" ColumnName="project_no" />
+                <ScalarProperty Name="project_name" ColumnName="project_name" />
+                <ScalarProperty Name="dep_name" ColumnName="dep_name" />
+                <ScalarProperty Name="bus_name" ColumnName="bus_name" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_number" ColumnName="applier_number" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_ieAuditors">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_ieAuditors">
+              <MappingFragment StoreEntitySet="ei_ieAuditors">
+                <ScalarProperty Name="is_forbit" ColumnName="is_forbit" />
+                <ScalarProperty Name="ie_leader_name" ColumnName="ie_leader_name" />
+                <ScalarProperty Name="ie_leader_no" ColumnName="ie_leader_no" />
+                <ScalarProperty Name="bus_minister_name" ColumnName="bus_minister_name" />
+                <ScalarProperty Name="bus_minister_no" ColumnName="bus_minister_no" />
+                <ScalarProperty Name="dep_names" ColumnName="dep_names" />
+                <ScalarProperty Name="bus_name" ColumnName="bus_name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_TIApply">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_TIApply">
+              <MappingFragment StoreEntitySet="ei_TIApply">
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="ex_company" ColumnName="ex_company" />
+                <ScalarProperty Name="in_timespan" ColumnName="in_timespan" />
+                <ScalarProperty Name="in_day" ColumnName="in_day" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_TIApplyEntry">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_TIApplyEntry">
+              <MappingFragment StoreEntitySet="ei_TIApplyEntry">
+                <ScalarProperty Name="out_time" ColumnName="out_time" />
+                <ScalarProperty Name="in_time" ColumnName="in_time" />
+                <ScalarProperty Name="t_status" ColumnName="t_status" />
+                <ScalarProperty Name="driver_no" ColumnName="driver_no" />
+                <ScalarProperty Name="driver_name" ColumnName="driver_name" />
+                <ScalarProperty Name="car_no" ColumnName="car_no" />
+                <ScalarProperty Name="car_type" ColumnName="car_type" />
+                <ScalarProperty Name="ti_id" ColumnName="ti_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_spExcel">
+            <EntityTypeMapping TypeName="ICAuditModel.vw_spExcel">
+              <MappingFragment StoreEntitySet="vw_spExcel">
+                <ScalarProperty Name="audit_result" ColumnName="audit_result" />
+                <ScalarProperty Name="qty" ColumnName="qty" />
+                <ScalarProperty Name="modual" ColumnName="modual" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="entry_id" ColumnName="entry_id" />
+                <ScalarProperty Name="scope" ColumnName="scope" />
+                <ScalarProperty Name="apply_reason" ColumnName="apply_reason" />
+                <ScalarProperty Name="ex_no" ColumnName="ex_no" />
+                <ScalarProperty Name="ex_price" ColumnName="ex_price" />
+                <ScalarProperty Name="ex_type" ColumnName="ex_type" />
+                <ScalarProperty Name="ex_company" ColumnName="ex_company" />
+                <ScalarProperty Name="receiver_phone" ColumnName="receiver_phone" />
+                <ScalarProperty Name="receiver_name" ColumnName="receiver_name" />
+                <ScalarProperty Name="to_addr" ColumnName="to_addr" />
+                <ScalarProperty Name="from_addr" ColumnName="from_addr" />
+                <ScalarProperty Name="aging" ColumnName="aging" />
+                <ScalarProperty Name="box_size" ColumnName="box_size" />
+                <ScalarProperty Name="cardboard_size" ColumnName="cardboard_size" />
+                <ScalarProperty Name="cardboard_num" ColumnName="cardboard_num" />
+                <ScalarProperty Name="total_weight" ColumnName="total_weight" />
+                <ScalarProperty Name="package_num" ColumnName="package_num" />
+                <ScalarProperty Name="content_type" ColumnName="content_type" />
+                <ScalarProperty Name="send_no" ColumnName="send_no" />
+                <ScalarProperty Name="bus_name" ColumnName="bus_name" />
+                <ScalarProperty Name="company" ColumnName="company" />
+                <ScalarProperty Name="send_or_receive" ColumnName="send_or_receive" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_phone" ColumnName="applier_phone" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_TIExcel">
+            <EntityTypeMapping TypeName="ICAuditModel.vw_TIExcel">
+              <MappingFragment StoreEntitySet="vw_TIExcel">
+                <ScalarProperty Name="audit_result" ColumnName="audit_result" />
+                <ScalarProperty Name="out_time" ColumnName="out_time" />
+                <ScalarProperty Name="in_time" ColumnName="in_time" />
+                <ScalarProperty Name="t_status" ColumnName="t_status" />
+                <ScalarProperty Name="car_type" ColumnName="car_type" />
+                <ScalarProperty Name="car_no" ColumnName="car_no" />
+                <ScalarProperty Name="driver_no" ColumnName="driver_no" />
+                <ScalarProperty Name="driver_name" ColumnName="driver_name" />
+                <ScalarProperty Name="entry_id" ColumnName="entry_id" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="ex_company" ColumnName="ex_company" />
+                <ScalarProperty Name="in_timespan" ColumnName="in_timespan" />
+                <ScalarProperty Name="in_day" ColumnName="in_day" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

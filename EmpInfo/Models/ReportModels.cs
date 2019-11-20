@@ -72,6 +72,8 @@ namespace EmpInfo.Models
     {
         public string fromDate { get; set; }
         public string toDate { get; set; }
+        public string qFromDate { get; set; }
+        public string qToDate { get; set; }
         public string depName { get; set; }
         public string empName { get; set; }
         public string sysNum { get; set; }

@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="31485ad8413145feadb8e14bbd6e0c54" Name="Diagram1" ShowGrid="false" >
+      <Diagram DiagramId="31485ad8413145feadb8e14bbd6e0c54" Name="Diagram1" ShowGrid="false" ZoomLevel="99" >
         <EntityTypeShape EntityType="ICAuditModel.ei_users" Width="1.5" PointX="5.375" PointY="1.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_event_log" Width="1.5" PointX="5.375" PointY="5.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_ei_users" Width="1.5" PointX="10.75" PointY="2" IsExpanded="false" />
@@ -105,8 +105,17 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_sjApply" Width="1.5" PointX="6" PointY="14.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_SJExcel" Width="1.5" PointX="8.25" PointY="14.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_spApply" Width="1.5" PointX="6" PointY="15" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.vw_spExcel" Width="1.5" PointX="8.25" PointY="15" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_flowAuthority" Width="1.5" PointX="4.125" PointY="12.875" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_spApplyEntry" Width="1.5" PointX="4.125" PointY="15" IsExpanded="false" />
+        <AssociationConnector Association="ICAuditModel.FK_ei_spApplyEntry_ei_spApply" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_SPReport" Width="1.5" PointX="8.25" PointY="15.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_ieApply" Width="1.5" PointX="4.125" PointY="13.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_ieAuditors" Width="1.5" PointX="4.125" PointY="14.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_TIApply" Width="1.5" PointX="0.5" PointY="15" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_TIApplyEntry" Width="1.5" PointX="0.5" PointY="15.875" IsExpanded="false" />
+        <AssociationConnector Association="ICAuditModel.FK_ei_TIApplyEntry_ei_TIApply" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_spExcel" Width="1.5" PointX="8.25" PointY="15.125" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_TIExcel" Width="1.5" PointX="8.25" PointY="16.375" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

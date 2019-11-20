@@ -93,7 +93,6 @@ namespace EmpInfo.Controllers
             }
             WriteEventLog("修改离职日期", sysNo + ":" + newDay + ";" + notifiers);
             return Json(new SimpleResultModel() { suc = true });
-
         }
 
         public ActionResult CancelJQApply()
@@ -115,6 +114,15 @@ namespace EmpInfo.Controllers
         }
 
         #endregion
+
+        #region IE立项结项
+
+        public ActionResult IEBusAndAuditor()
+        {
+            return View();
+        }
+
+        #endregion        
 
     }
 }

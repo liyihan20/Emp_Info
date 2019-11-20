@@ -81,11 +81,47 @@
         var reg = new RegExp("^[0-9]+(\.[0-9]{1," + digitPoint + "}){0,1}$");
         return reg.test(str);
     },
-    //重置form表单，reset方法默认不能重置hidden的值，此方法完善此功能
+    //重置form表单，reset方法默认不能重置hidden的值，此方法完善此功能,需要配合data-value属性，里面保存默认值
     resetForm: function ($fm) {
         $fm[0].reset();
         $fm.find("input[type='hidden']").each(function (v) {
             $(this).val($(this).attr("data-value"));
         });
+    },
+    //验证表单中的必填项
+    validateRequiredField: function ($fm) {
+        //1. input里面的required属性
+        var suc = true;
+        var msg = "";
+        $fm.find("input:required").each(function (i, v) {            
+            if (!v.value || $.trim(v.value) == "") {
+                console.log(v.name);
+                msg = "【" + utils.getLabelName($fm, v.name) + "】必须填写";
+                suc = false;
+                return false;
+            }
+        });
+        if (!suc) return { suc: suc, msg: msg };
+
+        //2. select里面的required属性
+        $fm.find("select:required").each(function (i, v) {            
+            if (!v.value || $.trim(v.value) == "") {
+                msg = "【" + utils.getLabelName($fm, v.name) + "】必须选择";
+                suc = false;
+                return false;
+            }
+        });
+        if (!suc) return { suc: suc, msg: msg };
+
+        return { suc: true };
+    },
+    //获取表单控件对应的标签。必须是b-label和b-input的格式
+    getLabelName: function ($fm, controlName) {
+        var labelName = $.trim($fm.find("[name=" + controlName + "]").parent(".b-input").prev(".b-label").html());
+        if (labelName == "") {
+            //兼容input-group-addon的格式
+            labelName = $.trim($fm.find("[name=" + controlName + "]").prev(".input-group-addon").html());
+        }
+        return labelName;
     }
 }  

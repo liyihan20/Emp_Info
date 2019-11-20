@@ -74,7 +74,10 @@ namespace EmpInfo.Services
 
         public override object GetInfoBeforeApply(UserInfo userInfo, UserInfoDetail userInfoDetail)
         {
-            return GetNextSysNum(BillType);
+            if (userInfoDetail.depLongName.Contains("ADD") || userInfoDetail.depLongName.Contains("AUTO") || userInfoDetail.depLongName.Contains("信息管理部") || userInfoDetail.depLongName.Contains("TDD")) {
+                return GetNextSysNum(BillType);
+            }
+            throw new Exception("测试阶段只允许ADD和TDD部门的员工申请");
         }
 
         public override void SaveApply(System.Web.Mvc.FormCollection fc, UserInfo userInfo)
@@ -122,17 +125,17 @@ namespace EmpInfo.Services
                 }
             }
 
-            //审核人一开始没有在权限组里，在这里加入
-            var autGroup = db.ei_groups.Where(g => g.name == "员工调动申请组").FirstOrDefault();
-            if (autGroup != null) {
-                if (db.ei_groupUser.Where(gu => gu.group_id == autGroup.id && gu.user_id == userInfo.id).Count() < 1) {
-                    db.ei_groupUser.Add(new ei_groupUser()
-                    {
-                        group_id = autGroup.id,
-                        user_id = userInfo.id
-                    });
-                }
-            }
+            //审核人一开始没有在权限组里，在这里加入b
+            //var autGroup = db.ei_groups.Where(g => g.name == "员工调动申请组").FirstOrDefault();
+            //if (autGroup != null) {
+            //    if (db.ei_groupUser.Where(gu => gu.group_id == autGroup.id && gu.user_id == userInfo.id).Count() < 1) {
+            //        db.ei_groupUser.Add(new ei_groupUser()
+            //        {
+            //            group_id = autGroup.id,
+            //            user_id = userInfo.id
+            //        });
+            //    }
+            //}
 
             bill.applier_name = userInfo.name;
             bill.applier_num = userInfo.cardNo;

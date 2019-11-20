@@ -252,8 +252,8 @@ namespace EmpInfo.Services
                 throw new Exception("你没有修改此离职单日期的权限");
             }
 
-            var leaveDateBefore = bill.leave_date??DateTime.Parse("2019-10-1");
-
+            var leaveDateBefore = bill.leave_date ?? DateTime.Parse("2019-10-1");
+            if (leaveDateBefore.Equals(newDay)) return; //需修改的日期和之前日期一样，就不处理直接返回
             
             var notifyNames = GetUserNameByNameAndCardNum(notifyUsers);
             var notifyCardNumber = GetUserCardByNameAndCardNum(notifyUsers);

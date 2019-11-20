@@ -1717,14 +1717,16 @@ namespace EmpInfo.Controllers
             return View();
         }
 
-        public IQueryable<vw_JQExcel> SearchJQData(DateTime fromDate, DateTime toDate, string depName, string empName, string sysNum)
+        public IQueryable<vw_JQExcel> SearchJQData(DateTime? fromDate, DateTime? toDate,DateTime? qFromDate,DateTime? qToDate, string depName, string empName, string sysNum)
         {
             depName = depName.Trim();
 
             //保存到cookie
             JQSearchParam p = new JQSearchParam();
-            p.fromDate = fromDate.ToString("yyyy-MM-dd");
-            p.toDate = toDate.ToString("yyyy-MM-dd");
+            p.fromDate = fromDate==null?"":((DateTime)fromDate).ToString("yyyy-MM-dd");
+            p.toDate = toDate==null?"":((DateTime)toDate).ToString("yyyy-MM-dd");
+            p.qFromDate = qFromDate == null ? "" : ((DateTime)qFromDate).ToString("yyyy-MM-dd");
+            p.qToDate = qToDate == null ? "" : ((DateTime)qToDate).ToString("yyyy-MM-dd");
             p.depName = depName;
             p.empName = empName;
             p.sysNum = sysNum;
@@ -1733,12 +1735,21 @@ namespace EmpInfo.Controllers
             cookie.Expires = DateTime.Now.AddDays(30);
             Response.AppendCookie(cookie);
 
-            toDate = toDate.AddDays(1);
-            var result = db.vw_JQExcel.Where(u => u.apply_time > fromDate && u.apply_time <= toDate);
+            IQueryable<vw_JQExcel> result = db.vw_JQExcel.Where(v => v.id > 0);
+            if (fromDate != null) result = result.Where(r => r.apply_time >= fromDate);
+            if (toDate != null) {
+                toDate = ((DateTime)toDate).AddDays(1);
+                result = result.Where(r => r.apply_time <= toDate);
+            }            
             if (!string.IsNullOrWhiteSpace(depName)) result = result.Where(r => r.dep_name.Contains(depName));
             if (!string.IsNullOrWhiteSpace(empName)) result = result.Where(r => r.name.Contains(empName));
             if (!string.IsNullOrWhiteSpace(sysNum)) result = result.Where(r => r.sys_no.Contains(sysNum));
-            
+            if (qFromDate != null) result = result.Where(r => r.leave_date >= qFromDate);
+            if (qToDate != null) {
+                qToDate = ((DateTime)qToDate).AddDays(1);
+                result = result.Where(r => r.leave_date <= qToDate);
+            }
+
             return result;
         }
 
@@ -1760,9 +1771,9 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel() { suc = true });
         }
 
-        public JsonResult CheckJQReport(DateTime fromDate, DateTime toDate, string depName = "", string empName = "", string sysNum = "")
+        public JsonResult CheckJQReport(DateTime? fromDate, DateTime? toDate, DateTime? qFromDate, DateTime? qToDate, string depName = "", string empName = "", string sysNum = "")
         {
-            var result = SearchJQData(fromDate,toDate,depName,empName,sysNum)
+            var result = SearchJQData(fromDate, toDate, qFromDate, qToDate, depName, empName, sysNum)
                 .Select(u => new
                 {
                     u.sys_no,
@@ -1781,10 +1792,9 @@ namespace EmpInfo.Controllers
             return Json(result);
         }
 
-        public void BeginExportJQReport(DateTime fromDate, DateTime toDate, string depName = "", string empName = "", string sysNum = "")
-        {
-            toDate = toDate.AddDays(1);
-            var result = SearchJQData(fromDate, toDate, depName, empName, sysNum).OrderBy(s => s.apply_time).ToList();
+        public void BeginExportJQReport(DateTime? fromDate, DateTime? toDate, DateTime? qFromDate, DateTime? qToDate, string depName = "", string empName = "", string sysNum = "")
+        {            
+            var result = SearchJQData(fromDate, toDate, qFromDate, qToDate, depName, empName, sysNum).OrderBy(s => s.apply_time).ToList();
 
             string[] colName = new string[] { "处理结果","申请流水号", "申请人", "申请时间","离职类型", "离职人", "离职人账号", "离职人厂牌", "人事部门","工资类别",
                                               "旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工资发放方式","离职时间","综合表现" };
@@ -2004,7 +2014,6 @@ namespace EmpInfo.Controllers
 
         #endregion
 
-
         #region 部门收件/寄件流程
 
         public ActionResult SPReport()
@@ -2017,7 +2026,7 @@ namespace EmpInfo.Controllers
             toDate = toDate.AddDays(1);
             var result = db.vw_spExcel.Where(u => u.apply_time > fromDate && u.apply_time <= toDate).ToList();
 
-            string[] colName = new string[] { "处理结果", "公司", "部门", "申请人","快递公司","运费","快递单号","快递方式", "收寄类型", "流水号", "申请时间"
+            string[] colName = new string[] { "处理结果", "公司", "部门", "申请人","快递公司","运费","快递单号","快递方式", "收寄类型", "收寄范围", "流水号", "申请时间"
                                             , "联系电话","放行条编号", "收寄内容","产品名称","规格型号","配送数量","件数","总净重","卡板数"
                                             , "卡板尺寸","装箱尺寸","配送时效","寄件地址","收件地址","收件人","收件人电话","申请原因"
             };
@@ -2064,7 +2073,7 @@ namespace EmpInfo.Controllers
             foreach (var d in result) {
                 colIndex = 1;
 
-                //"处理结果", "公司", "部门", "申请人","快递公司","运费","快递单号","快递方式", "收寄类型", "流水号", "申请时间"
+                //"处理结果", "公司", "部门", "申请人","快递公司","运费","快递单号","快递方式", "收寄类型", "收寄范围", "流水号", "申请时间"
                 //, "联系电话","放行条编号", "收寄内容","产品名称","规格型号","配送数量","件数","总净重","卡板数"
                 //, "卡板尺寸","装箱尺寸","配送时效","寄件地址","收件地址","收件人","收件人电话","申请原因"
                 cells.Add(++rowIndex, colIndex, d.audit_result);
@@ -2076,15 +2085,16 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.ex_no);
                 cells.Add(rowIndex, ++colIndex, d.ex_type);
                 cells.Add(rowIndex, ++colIndex, d.send_or_receive);
+                cells.Add(rowIndex, ++colIndex, d.scope);
                 cells.Add(rowIndex, ++colIndex, d.sys_no);
                 cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
 
                 cells.Add(rowIndex, ++colIndex, d.applier_phone);
                 cells.Add(rowIndex, ++colIndex, d.send_no);
                 cells.Add(rowIndex, ++colIndex, d.content_type);
-                cells.Add(rowIndex, ++colIndex, d.content_name);
-                cells.Add(rowIndex, ++colIndex, d.content_modual);
-                cells.Add(rowIndex, ++colIndex, d.item_qty);
+                cells.Add(rowIndex, ++colIndex, d.name);
+                cells.Add(rowIndex, ++colIndex, d.modual);
+                cells.Add(rowIndex, ++colIndex, d.qty);
                 cells.Add(rowIndex, ++colIndex, d.package_num);
                 cells.Add(rowIndex, ++colIndex, d.total_weight);
                 cells.Add(rowIndex, ++colIndex, d.cardboard_num);
@@ -2097,6 +2107,126 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.receiver_name);
                 cells.Add(rowIndex, ++colIndex, d.receiver_phone);
                 cells.Add(rowIndex, ++colIndex, d.apply_reason);
+            }
+
+            xls.Send();
+        }
+
+        public ActionResult PrintSP(string sysNo)
+        {
+            var list = db.vw_SPReport.Where(s => s.sys_no == sysNo).ToList();
+            if (list.Count()==0) {
+                ViewBag.tip = "单据不存在或行政部还未审批";
+                return View("Error");
+            }
+            ViewData["list"] = list;
+            return View();
+        }
+
+        #endregion
+
+        #region 物流车辆放行
+
+        //门卫查看界面
+        public ActionResult TIViewForGuard()
+        {
+            return View();
+        }
+
+        //导出报表界面
+        public ActionResult TIReport()
+        {
+            return View();
+        }
+
+        public IQueryable<vw_TIExcel> GetTIData(DateTime fromDate, DateTime toDate)
+        {
+            return db.vw_TIExcel.Where(t => t.in_day >= fromDate && t.in_day <= toDate);
+        }
+
+        public JsonResult SearchTIDataForGuard(DateTime fromDate, DateTime toDate)
+        {
+            return Json(GetTIData(fromDate, toDate).Where(t => t.audit_result == "通过").ToList());
+        }
+
+        public JsonResult SearchTIDataForReport(DateTime fromDate, DateTime toDate)
+        {
+            return Json(GetTIData(fromDate, toDate).ToList());
+        }
+
+        public JsonResult ChangeTIStatus(int entryId, string status)
+        {
+            try {
+                new TISv().ChangeStatus(entryId,status);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+            return Json(new SimpleResultModel() { suc = true });
+        }
+
+        public void BeginExportTIExcel(DateTime fromDate, DateTime toDate)
+        {
+            var result = GetTIData(fromDate, toDate).ToList();
+            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "申请时间","进厂日期", "进厂时间", "司机姓名", "身份证号","车辆类型", "车牌号码",
+                                              "备注","状态" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "物流车辆放行申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("车辆放行申请详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result) {
+                colIndex = 1;
+
+                //"处理结果","申请流水号", "申请人", "申请时间","进厂日期", "进厂时间", "司机姓名", "身份证号","车辆类型", "车牌号码",
+                //"备注"
+                cells.Add(++rowIndex, colIndex, d.audit_result);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.applier_name);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.in_day).ToString("yyyy-MM-dd"));
+                cells.Add(rowIndex, ++colIndex, d.in_timespan);
+                cells.Add(rowIndex, ++colIndex, d.driver_name);
+                cells.Add(rowIndex, ++colIndex, d.driver_no);
+                cells.Add(rowIndex, ++colIndex, d.car_type);
+                cells.Add(rowIndex, ++colIndex, d.car_no);
+
+                cells.Add(rowIndex, ++colIndex, d.comment);
+                cells.Add(rowIndex, ++colIndex, d.t_status);
             }
 
             xls.Send();

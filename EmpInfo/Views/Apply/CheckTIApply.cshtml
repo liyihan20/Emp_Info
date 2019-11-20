@@ -1,0 +1,147 @@
+﻿@using EmpInfo.Models;
+@{
+    ei_TIApply m = ViewData["am"] as ei_TIApply;
+}
+@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: top;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 8px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        $(function () {
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.sys_no" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+            });
+        })
+
+    </script>    
+}
+<div class="row" style="margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                    <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                    <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                    <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+                    <li><a href="ApplyIndex?billType=TI">物流车辆放行申请</a></li>
+                    <li class="active">查看申请单</li>
+                </ol>
+            </div>
+            <div class="panel-body">
+                <div class="b-div">
+                    <span class="b-label">
+                        流转记录:
+                    </span>
+                    <span class="b-input">
+                        <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        申请流水号:
+                    </span>
+                    <span class="b-input">
+                        @m.sys_no
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        申请人:
+                    </span>
+                    <span class="b-input">
+                        @m.applier_name
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        提交时间:
+                    </span>
+                    <span class="b-input">
+                        @(((DateTime)m.apply_time).ToString("yyyy-MM-dd HH:mm"))
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        货运公司:
+                    </span>
+                    <div class="b-input">
+                        @m.ex_company
+                    </div>
+                </div>                       
+                <div class="b-div">
+                    <span class="b-label">
+                        进厂日期:
+                    </span>
+                    <div class="b-input">
+                        @(((DateTime)m.in_day).ToString("yyyy-MM-dd"))
+                    </div>
+                </div>                        
+                <div class="b-div">
+                    <span class="b-label">
+                        进厂时间:
+                    </span>
+                    <div class="b-input">
+                        @m.in_timespan
+                    </div>
+                </div>                       
+                <div class="b-div">
+                    <span class="b-label">
+                        备注:
+                    </span>
+                    <span class="b-input">
+                        @m.comment
+                    </span>
+                </div>                        
+                <div class="b-div">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">车辆信息</div>
+                        <div class="panel-body" style="padding:0 8px;">
+                            <table class="table table-condensed table-hover" style="margin:10px 0;" id="al_file_tb">
+                                <thead>
+                                    <tr>
+                                        <th style="width:20%;">司机姓名</th>
+                                        <th style="width:35%;">身份证号</th>
+                                        <th style="width:15%;">车辆类型</th>
+                                        <th style="width:30%;">车牌号码</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="al_file_list">
+                                    @foreach (var e in m.ei_TIApplyEntry) {
+                                        <tr>
+                                            <td>@e.driver_name</td>
+                                            <td>@e.driver_no</td>
+                                            <td>@e.car_type</td>
+                                            <td>@e.car_no</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

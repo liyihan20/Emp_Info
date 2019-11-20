@@ -1,0 +1,284 @@
+﻿@using EmpInfo.Models;
+@{
+    string sysNo = ViewData["infoBeforeApply"] as string;
+    //华飞，正信达，百世，恒骏，顺展，荣鑫，捷易，顺丰，跨越，冠粤
+    List<string> exCompanyList = new List<string>() { "华飞","正信达","百世","恒骏","顺展","荣鑫","捷易","顺丰", "跨越","冠粤" };
+    List<string> carTypeList = new List<string>() { "小车","商务车","2.4米", "4.2米", "7.6米", "9.6米", "13.5米", "15.6米", "17.6米", "18.6米" };
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: top;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script>
+        $(function () {
+            $(".datePicker").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd",
+                autoclose: true,
+                startView: 2,
+                minView: 2,
+                initialDate: "@DateTime.Now.ToString("yyyy-MM-dd")"
+            });
+
+            $("#apply_bt").on("click", function () {
+                //验证必填项
+                var r = utils.validateRequiredField($("#fm"));
+                if(!r.suc){
+                    toastr.error(r.msg);
+                    return;
+                }
+
+                var obj = utils.getFormObj($("#fm"));                
+                openConfirmDialog("确定要提交申请吗？", function () {
+                    $("#apply_bt").button("loading");
+                    $.ajax({
+                        type: 'post',
+                        url: 'SaveApply',
+                        data: "sys_no=" + obj.sys_no + "&head=" + JSON.stringify(obj).replace(/\&/g, "%26") + "&entry=" + JSON.stringify(items).replace(/\&/g, "%26"),
+                        cache: false,
+                        dataType: 'json',
+                        success: function (data) {
+                            $("#apply_bt").button("reset");
+                            if (data.suc) {
+                                toastr.success("提交成功:" + data.msg);
+                                setTimeout(function () { window.location.href = "CheckApply?sysNo=" + obj.sys_no; }, 2000);
+                            } else {
+                                toastr.error("提交失败：" + data.msg);
+                                $("#apply_bt").button("reset");
+                            }
+                        }
+                    });
+                });
+            });
+
+        })
+        
+    </script>
+    <script>
+        var items = [];
+        var changeIdx = -1;
+        function openDialog() {
+            changeIdx = -1;
+            $("#itemModal").modal("show");
+            $("#itemFm")[0].reset();            
+        }
+
+        function addChItem() {
+            //验证必填项
+            var r = utils.validateRequiredField($("#itemFm"));
+            if (!r.suc) {
+                toastr.error(r.msg);
+                return;
+            }
+
+            var item = utils.getFormObj($("#itemFm"));
+                        
+            if (changeIdx < 0) {
+                items.push(item);
+
+                var idx = items.length - 1;
+                var tr = "<tr id='tr" + idx + "'>";
+                tr += "<td>" + item.driver_name + "</td>";
+                tr += "<td>" + item.driver_no + "</td>";
+                tr += "<td>" + item.car_type + "</td>";
+                tr += "<td>" + item.car_no + "</td>";
+                tr += "<td>";
+                tr += "<a href='#' title='修改' onclick='changeChItem(" + idx + ")'><i class='text-success fa fa-pencil'></i></a>";
+                tr += " | ";
+                tr += "<a href='#' title='删除' onclick='removeChItem(" + idx + ")'><i class='text-danger fa fa-times'></i></a>";
+                tr += "</td>";
+                tr += "</tr>";
+                $("#tb_content").append(tr);
+            } else {
+                items[changeIdx].driver_name = item.driver_name;
+                items[changeIdx].driver_no = item.driver_no;
+                items[changeIdx].car_type = item.car_type;
+                items[changeIdx].car_no = item.car_no;
+
+                $($("#tr" + changeIdx).find("td")[0]).html(item.driver_name);
+                $($("#tr" + changeIdx).find("td")[1]).html(item.driver_no);
+                $($("#tr" + changeIdx).find("td")[2]).html(item.car_type);
+                $($("#tr" + changeIdx).find("td")[3]).html(item.car_no);
+            }
+            $("#itemModal").modal("hide");
+        }
+
+        function changeChItem(idx) {
+            changeIdx = idx;
+            $("#itemModal").modal("show");
+            utils.loadObjData($("#itemFm"), items[idx]);
+        }
+
+        function removeChItem(idx) {
+            items.splice(idx, 1);
+            $("#tr" + idx).remove();
+        }
+    </script>
+}
+<div class="row" style="margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                    <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                    <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                    <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+                    <li><a href="ApplyIndex?billType=TI">物流车辆放行申请</a></li>
+                    <li class="active">开始申请</li>
+                </ol>
+            </div>
+            <div class="panel-body">
+                <form id="fm">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请流水号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="sys_no" id="sysNum" readonly value="@sysNo" />
+                        </span>
+                    </div>             
+                    <div class="b-div">
+                        <span class="b-label">
+                            货运公司:
+                        </span>
+                        <div class="b-input">
+                            <select class="form-control" name="ex_company" id="ex_company" required>
+                                <option value="">---- 下拉选择货运公司 ----</option>
+                                @foreach (var d in exCompanyList) {
+                                    <option value="@d">@d</option>
+                                }
+                            </select>
+                        </div>
+                    </div>                       
+                    <div class="b-div">
+                        <span class="b-label">
+                            进厂日期:
+                        </span>
+                        <div class="b-input">
+                            <span class="input-group date datePicker">
+                                <input class="form-control" type="text" id="in_day" name="in_day" autocomplete="off" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                            </span>
+                        </div>
+                    </div>                        
+                    <div class="b-div">
+                        <span class="b-label">
+                            进厂时间:
+                        </span>
+                        <div class="b-input">
+                            <select class="form-control" name="in_timespan" id="in_timespan" required>
+                                <option value="">---- 下拉选择进厂时间 ----</option>
+                                <option value="08:00 ~ 19:30">08:00 ~ 19:30</option>
+                                <option value="19:30 ~ 00:00">19:30 ~ 00:00</option>
+                            </select>
+                        </div>
+                    </div>                       
+                    <div class="b-div">
+                        <span class="b-label">
+                            备注:
+                        </span>
+                        <span class="b-input">
+                            <textarea type="text" class="form-control" rows="2" id="comment" name="comment"></textarea>
+                        </span>
+                    </div>                        
+                    <div class="b-div product_extra_info">
+                        <span class="b-label">
+                            车辆信息:
+                        </span>
+                        <div class="b-input">
+                            <button class="btn btn-primary" type="button" onclick="openDialog()"> + </button>
+                        </div>
+                    </div>
+                    <table class="table table-condensed table-hover product_extra_info" style="margin:10px 0 30px 0;">
+                        <thead>
+                            <tr>
+                                <th style="width:15%;">司机姓名</th>
+                                <th style="width:30%;">身份证号</th>
+                                <th style="width:15%;">车辆类型</th>
+                                <th style="width:25%;">车牌号码</th>
+                                <th style="width:15%;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb_content"></tbody>
+                    </table>
+                    <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:12px;"><i class="fa fa-check-circle-o"></i> 提交申请</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+    <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">新增明细</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="itemFm">
+                        <div class="form-group">
+                            <label for="driver_name" class="sr-only">司机姓名:</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">司机姓名:</div>
+                                <input type="text" class="form-control" name="driver_name" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="driver_no" class="sr-only">身份证号:</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">身份证号:</div>
+                                <input type="text" class="form-control" name="driver_no" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="car_type" class="sr-only">车辆类型:</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">车辆类型:</div>
+                                <select class="form-control" name="car_type" required>
+                                    <option value="">---- 下拉选择车辆类型 ----</option>
+                                    @foreach (var d in carTypeList) {
+                                        <option value="@d">@d</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="car_type" class="sr-only">车牌号码:</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">车牌号码:</div>
+                                <input type="text" class="form-control" name="car_no" required />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 取消</button>
+                    <button type="button" class="btn btn-success" onclick="addChItem()"><span class="fa fa-check-circle"></span> 确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

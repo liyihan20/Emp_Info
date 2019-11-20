@@ -96,6 +96,14 @@
                     <p class="text-center">寄/收件流程</p>
                 </a>
             </div>
+            @if (auts.IndexOf("BeginApplyTI") >= 0) {
+                <div class="col-xs-4 col-sm-3 col-md-2">
+                    <a href="@Url.Content("~/Apply/ApplyIndex?billType=TI")">
+                        <img src="@Url.Content("~/Content/images/ti.png")" alt="ti" class="center-block" />
+                        <p class="text-center">物流车辆放行</p>
+                    </a>
+                </div>
+            }
             @if (auts.IndexOf("AssistantEmps") >= 0) {
                 <div class="col-xs-4 col-sm-3 col-md-2">
                     <a href="@Url.Content("~/Report/AssistantEmps")">

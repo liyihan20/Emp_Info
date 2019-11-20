@@ -74,6 +74,9 @@ namespace EmpInfo.Services
             bill = new ei_dormRepair();
             MyUtils.SetFieldValueToModel(fc, bill);
             bill.sys_no = GetNextSysNum(BillType);
+            bill.applier_name = userInfo.name;
+            bill.applier_num = userInfo.cardNo;
+            bill.apply_time = DateTime.Now;
 
             if (!"舍友分摊".Equals(bill.fee_share_type)) {
                 bill.fee_share_peple = null;
@@ -142,6 +145,7 @@ namespace EmpInfo.Services
                 bill.is_accept = isPass;
                 if (isPass) {
                     bill.accepter_name = accepter;
+                    bill.accepter_num = userInfo.cardNo;
                     if (!string.IsNullOrEmpty(confirmTime)) {
                         bill.confirm_repair_time = DateTime.Parse(confirmTime);
                         if (bill.confirm_repair_time < DateTime.Now) {

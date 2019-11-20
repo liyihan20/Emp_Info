@@ -206,9 +206,15 @@
             toastr.error("请假时间不能都是0");
             return false;
         }
-        if ($($("input[name='leave_type']:checked")[0]).val() == "病假" && $("#al_file_list tr").length < 1) {
-            toastr.error("当[请假类型]是病假时，必须上传医院诊断证明等附件");
-            return false;
+        if ($($("input[name='leave_type']:checked")[0]).val() == "病假") {
+            if ($("#al_file_list tr").length < 1) {
+                toastr.error("当[请假类型]是病假时，必须上传医院诊断证明等附件");
+                return false;
+            }
+            if (days < 10) {
+                toastr.error("行政部要求：病假天数少于10天时，请走纸质申请流程或按事假请假");
+                return false;
+            }
         }
         return true;
         
@@ -536,7 +542,7 @@
                             <div id="picker"> + </div>
                         </div>
                     </div>
-                    <p class="small text-danger"><i class="fa fa-info-circle"></i> 病假必须上传诊断报告（图片格式），最多可上传3张</p>
+                    <p class="small text-danger"><i class="fa fa-info-circle"></i> 请病假须上传县级或以上医院疾病证明、病历表、治疗发票、住院相关资料等(图片格式)，至少提供两类，最多可上传3张</p>
                     <div class="panel panel-default" id="al_file_panel">
                         <div class="panel-heading">附件信息</div>
                         <div class="panel-body" style="padding:0 8px;">

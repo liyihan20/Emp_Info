@@ -205,8 +205,18 @@ namespace EmpInfo.Models
 
     public class SPBeforeApplyModel
     {
-        public string sysNum { get; set; }
-        public string applierPhone { get; set; }
+        public string sys_no { get; set; }
+        public string applier_phone { get; set; }
+        public string send_or_receive { get; set; }
+        public string company { get; set; }
+        public string aging { get; set; }
+        public string bus_name { get; set; }
+        public string content_type { get; set; }
+        public string from_addr { get; set; }
+        public string to_addr { get; set; }
+        public string receiver_name { get; set; }
+        public string receiver_phone { get; set; }
+        public string scope { get; set; }
         public List<string> busDepList { get; set; }
     }
 
@@ -217,4 +227,9 @@ namespace EmpInfo.Models
         public decimal FReed { get; set; }
     }
 
+    //public class TIBeforeApplyModel
+    //{
+    //    public string sys_no { get; set; }
+
+    //}
 }

@@ -1,9 +1,13 @@
 ﻿@using EmpInfo.Models;
+@using Newtonsoft.Json;
 @{
     SPBeforeApplyModel m = ViewData["infoBeforeApply"] as SPBeforeApplyModel;
+    var spJson = JsonConvert.SerializeObject(m);
     List<string> accountList = new List<string>() { "光电", "半导体", "电子", "仪器", "工业", "信元" };
 }
 @section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
     <style type="text/css">
         .b-label {
             display: inline-block;
@@ -20,81 +24,164 @@
         .b-div {
             margin: 6px 0;
         }
+
+        #al_file_tb th {
+            font-size: small;
+            text-align: center;
+        }
+
+        #al_file_tb td {
+            font-size: small;
+            text-align: center;
+        }
+
+        #al_file_list i {
+            cursor: pointer;
+        }
     </style>
 }
 @section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
     <script>
+        var ex = {
+            ex_company: "",
+            ex_type: "",
+            ex_price: ""
+        };
+        $("#ex_tb").bootstrapTable({
+            striped: true,
+            pagination: true,
+            pageSize: 5,
+            pageList: [5, 10, 20],
+            clickToSelect: true,
+            columns: [
+                {
+                    radio: true
+                },
+                {
+                    field: "FName",
+                    title: "快递公司"
+                }, {
+                    field: "FDelivery",
+                    title: "快递方式"
+                }, {
+                    field: "FReed",
+                    title: "运费"
+                }
+            ]
+        });
         $(function () {
-            $(".send_extra_info,.product_extra_info").hide(20, function () {
-                $("#fm").css("visibility", "visible");
+            displayExInfo();
+
+            $("#checkExBtn").on("click",function(){
+                var obj = utils.getFormObj($("#fm"));
+                if (obj.from_addr == "") {
+                    toastr.error("寄件地址必须填写");
+                    return;
+                }
+                if (obj.to_addr == "") {
+                    toastr.error("收件地址必须填写");
+                    return;
+                }
+                $.post("@Url.Content("~/Item/GetSPExInfoWithoutBill")", { spJson: JSON.stringify(obj) }, function (data) {
+                    if (data.suc) {                        
+                        var result = JSON.parse(data.extra);
+                        if(result.length == 0){
+                            toastr.error("找不到合适的快递公司，请联系物流部");
+                        }else if(result.length == 1){
+                            ex.ex_company = result[0].FName;
+                            ex.ex_type = result[0].FDelivery;
+                            ex.ex_price = result[0].FReed;
+                            displayExInfo();
+                            toastr.success("快递信息获取成功");
+                        }else{
+                            $("#exModal").modal("show");
+                            $('#ex_tb').bootstrapTable('load', result);
+                        }
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
             });
 
-            $("#send_or_receive").on("change", function () {
-                if ($(this).val() == "寄件") {
-                    if ($("#content_type").val() == "产品") {
-                        $(".send_extra_info").show();
-                    }
-                } else {
-                    $(".send_extra_info").hide();
+            $("#selectExBt").on("click", function () {
+                var rows = $('#ex_tb').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再查询");
+                    return;
                 }
+                ex.ex_company = rows[0].FName;
+                ex.ex_type = rows[0].FDelivery;
+                ex.ex_price = rows[0].FReed;
+                displayExInfo();
+                $("#exModal").modal("hide");
             });
+
 
             $("#content_type").on("change", function () {
                 if ($(this).val() == "产品") {
-                    if ($("#send_or_receive").val() == "寄件") {
-                        $(".send_extra_info").show();
-                    }
                     $(".product_extra_info").show();
                 } else {
-                    $(".send_extra_info").hide();
                     $(".product_extra_info").hide();
                 }
             });
 
+            $("#scope").on("change", function () {
+                if ($(this).val() == "国外") {
+                    $("#internal_div").hide();
+                    $("#foreign_div").show();
+                } else {
+                    $("#internal_div").show();
+                    $("#foreign_div").hide();
+                }
+            });
+
+            //以下信息如有修改，需要重新选择快递公司
+            $.each(["package_num","box_size","cardboard_size","cardboard_num","total_weight","from_addr","to_addr","aging"],function(i,v){
+                $("#fm [name='"+v+"']").on("change",function(){
+                    if(ex.ex_company!=""){
+                        ex.ex_company="";
+                        ex.ex_type="";
+                        ex.ex_price="";
+                        displayExInfo();
+                    }
+                });
+            });
+
             $("#apply_bt").on("click", function () {
+                //验证必填项
+                var r=utils.validateRequiredField($("#fm"));
+                if(!r.suc){
+                    toastr.error(r.msg);
+                    return;
+                }
+
                 var obj = utils.getFormObj($("#fm"));
-                if (obj.applier_phone == "") {
-                    toastr.error("联系电话必须填写");
-                    return;
-                }
-                if (obj.company == "") {
-                    toastr.error("公司必须选择");
-                    return;
-                }
-                if (obj.bus_name == "") {
-                    toastr.error("生产事业部必须选择");
-                    return;
-                }
-                if (obj.send_or_receive == "") {
-                    toastr.error("收寄类型必须选择");
-                    return;
+                if ($("#al_file_list").children().length == 0) {
+                    obj.has_attachment = false;
+                }else{
+                    obj.has_attachment = true;
                 }
                 if (obj.send_or_receive == "寄件") {
-                    if (obj.content_type == "产品" && obj.send_no == "") {
-                        toastr.error("寄产品时，放行条编号必须填写");
-                        return;
-                    }
                     if (obj.from_addr.indexOf("汕尾") < 0) {
                         toastr.error("从外地发往汕尾的，【收寄类型】请选择收件");
                         return;
                     }
+                    if (obj.content_type == "产品" && obj.isReturnBack == "是" && obj.has_attachment == false) {
+                        toastr.error("寄出产品且是退补货时，必须上传附件证明");
+                        return;
+                    }
                 } else {
                     if (obj.to_addr.indexOf("汕尾") < 0) {
-                        toastr.error("从汕尾既往外地的，【收寄类型】请选择寄件");
+                        toastr.error("从汕尾发往外地的，【收寄类型】请选择寄件");
                         return;
                     }
-                }
-                if (obj.content_type == "") {
-                    toastr.error("收寄内容必须选择");
-                    return;
                 }
                 if (obj.content_type == "产品") {
-                    if (obj.content_name == "") {
-                        toastr.error("产品名称必须填写");
-                        return;
-                    }
-                    if (obj.content_modual == "") {
-                        toastr.error("产品型号必须填写");
+                    if(items.length<1){
+                        toastr.error("至少必须录入一行产品");
                         return;
                     }
                     if (obj.package_num == "") {
@@ -105,14 +192,6 @@
                         toastr.error("包装箱尺寸必须填写");
                         return;
                     }
-                    //if (obj.cardboard_size == "") {
-                    //    toastr.error("卡板尺寸必须填写");
-                    //    return;
-                    //}
-                    //if (obj.cardboard_num == "") {
-                    //    toastr.error("卡板数必须填写");
-                    //    return;
-                    //}
                     if (obj.aging == "") {
                         toastr.error("配送时效必须选择");
                         return;
@@ -136,40 +215,27 @@
                         return;
                     }
                 }
-                if (obj.item_qty == "") {
-                    toastr.error("配送数量必须填写");
-                    return;
-                }
-                if (obj.total_weight == "") {
-                    toastr.error("总毛重必须填写");
-                    return;
-                }
                 if (!utils.testIsFloat(obj.total_weight, 1)) {
                     toastr.error("总毛重格式不正确，必须是整数或1位小数");
                     return;
+                }                
+
+                if(obj.scope!="国外"){
+                    obj.ex_company = ex.ex_company;
+                    obj.ex_type = ex.ex_type;
+                    obj.ex_price = ex.ex_price;
                 }
-                if (obj.from_addr == "") {
-                    toastr.error("寄件地址必须填写");
+                if (obj.ex_company == "") {
+                    toastr.error("快递公司不能为空");
                     return;
                 }
-                if (obj.to_addr == "") {
-                    toastr.error("收件地址必须填写");
-                    return;
-                }
-                if (obj.receiver_name == "") {
-                    toastr.error("收件人必须填写");
-                    return;
-                }
-                if (obj.receiver_phone == "") {
-                    toastr.error("收件人电话必须填写");
-                    return;
-                }
+
                 openConfirmDialog("确定要提交申请吗？", function () {
                     $("#apply_bt").button("loading");
                     $.ajax({
                         type: 'post',
                         url: 'SaveApply',
-                        data: "sys_no=" + obj.sys_no + "&sp=" + JSON.stringify(obj).replace(/\&/g, "%26"),
+                        data: "sys_no=" + obj.sys_no + "&sp=" + JSON.stringify(obj).replace(/\&/g, "%26") + "&entry=" + JSON.stringify(items).replace(/\&/g, "%26"),
                         cache: false,
                         dataType: 'json',
                         success: function (data) {
@@ -181,14 +247,197 @@
                                 toastr.error("提交失败：" + data.msg);
                                 $("#apply_bt").button("reset");
                             }
-
                         }
                     });
+                });
+            });
+
+            $(".product_extra_info").hide();
+            $("#internal_div").hide();
+            $("#foreign_div").hide();
+            setTimeout(function(){
+                $("#fm").css("visibility", "visible");
+                utils.loadObjData($("#fm"),@Html.Raw(spJson));
+                if("@m.content_type"!=""){
+                    $("#content_type").trigger("change");
+                    $("#scope").trigger("change");
+                }
+            },100);
+        })
+
+        function displayExInfo() {
+            var info = "快递公司：" + ex.ex_company + "\n快递方式：" + ex.ex_type + "\n运费(元)：" + ex.ex_price;
+            $("#exInfo").html(info);
+        }
+    </script>
+    <script>
+        var items = [];
+        var changeIdx = -1;
+        function openDialog() {
+            changeIdx = -1;
+            $("#itemModal").modal("show");
+            $("#item_name").val("");
+            $("#item_modual").val("");
+            $("#item_qty").val("");
+        }
+
+        function addChItem() {
+            var qty = $("#item_qty").val();
+            var modual = $("#item_modual").val();
+            var name = $("#item_name").val();
+
+            if ($.trim(qty) == "" || isNaN(qty)) {
+                toastr.error("数量必须输入数字");
+                return;
+            }
+            if ($.trim(modual) == "") {
+                toastr.error("规格型号必须填写");
+                return;
+            }
+            if ($.trim(name) == "") {
+                toastr.error("产品名称必须填写");
+                return;
+            }
+            if (changeIdx < 0) {
+                items.push({ name:name, modual: modual, qty: qty });
+
+                var idx = items.length - 1;
+                var tr = "<tr id='tr" + idx + "'>";
+                tr += "<td>" + name + "</td>";
+                tr += "<td>" + modual + "</td>";
+                tr += "<td>" + qty + "</td>";
+                tr += "<td>";
+                tr += "<a href='#' title='修改' onclick='changeChItem(" + idx + ")'><i class='text-success fa fa-pencil'></i></a>";
+                tr += " | ";
+                tr += "<a href='#' title='删除' onclick='removeChItem(" + idx + ")'><i class='text-danger fa fa-times'></i></a>";
+                tr += "</td>";
+                tr += "</tr>";
+                $("#ch_tb_content").append(tr);
+            } else {
+                items[changeIdx].name = name;
+                items[changeIdx].modual = modual;
+                items[changeIdx].qty = qty;
+
+                $($("#tr" + changeIdx).find("td")[0]).html(name);
+                $($("#tr" + changeIdx).find("td")[1]).html(modual);
+                $($("#tr" + changeIdx).find("td")[2]).html(qty);
+            }
+            $("#itemModal").modal("hide");
+        }
+
+        function changeChItem(idx) {
+            changeIdx = idx;
+            $("#itemModal").modal("show");
+            $("#item_name").val(items[idx].name);
+            $("#item_modual").val(items[idx].modual);
+            $("#item_qty").val(items[idx].qty);
+        }
+
+        function removeChItem(idx) {
+            items.splice(idx, 1);
+            $("#tr" + idx).remove();
+        }
+    </script>
+    <script>
+        $(function () {
+
+            $("#al_file_panel").hide();
+            var maxNum = 3; //最多上传3个文件
+            var maxSingleSize = 10 * 1024 * 1024; //单个文件最多10M,会自动压缩的
+            var uploader = WebUploader.create({
+                swf: '@Url.Content("~/Content/webupload/Uploader.swf")',
+                server: '@Url.Content("~/File/BeginUpload")',
+                pick: '#picker',
+                resize: false,
+                auto: true,
+                formData: { sysNum: '@m.sys_no' },
+                fileNumLimit: maxNum,
+                fileSingleSizeLimit: maxSingleSize,
+                accept: {
+                    title: 'Images',
+                    extensions: 'gif,jpg,jpeg,bmp,png',
+                    mimeTypes: 'image/*'
+                }
+            });
+
+            uploader.on('fileQueued', function (file) {
+                var fileName = file.name;
+                if (fileName.length > 20) {
+                    var ext = fileName.substr(fileName.lastIndexOf("."));
+                    fileName = fileName.substr(0, 14) + ".." + ext;
+                }
+                $("#al_file_list").append('<tr><td id="' + file.id + '" data-fd="' + file.name + '" class="item">' +
+                    fileName +
+                '</td><td>' + (file.size / 1000).toFixed(1) + " K</td><td class='state'>上传中...</td></tr>");
+                $("#al_file_panel").show();
+            });
+
+            uploader.on('uploadSuccess', function (file, res) {
+                if (!res.suc) {
+                    $('#' + file.id).parent().find('td.state').addClass("text-danger").html("上传出错");
+                    console.log(res);
+                } else {
+                    $('#' + file.id).parent().find('td.state').addClass("text-success").html("已上传| <i class='fa fa-times-circle-o text-danger' title='移除'></i>");
+                }
+
+            });
+
+            uploader.on('uploadError', function (file) {
+                $('#' + file.id).parent().find('td.state').addClass("text-danger").html('上传出错');
+            });
+
+            uploader.on('uploadComplete', function (file) {
+                //$('#' + file.id).find('.progress').fadeOut();
+            });
+
+            //上传队列出错提示
+            uploader.on("error", function (type) {
+                switch (type) {
+                    case "Q_TYPE_DENIED":
+                        toastr.error("图片格式不正确");
+                        break;
+                    case "F_EXCEED_SIZE":
+                        toastr.error("单个文件大小必须少于10M");
+                        break;
+                    case "F_DUPLICATE":
+                        toastr.error("不能重复上传文件");
+                        break;
+                    case "Q_EXCEED_NUM_LIMIT":
+                        toastr.error("最多上传文件数量是" + maxNum + "个");
+                        break;
+                    default:
+                        toastr.error("上传失败：" + type);
+                        break;
+                }
+            });
+
+            //移除已上传文件
+            $("#al_file_list").on("click", "td i", function () {
+                var fileTD = $(this).parents("tr").find("td")[0];
+                openConfirmDialog("确定要移除此上传的文件吗？", function () {
+                    var fileId = $(fileTD).attr("id");
+                    var fileName = $(fileTD).attr("data-fd");
+
+                    $.post("@Url.Content("~/File/RemoveUploadedFile")", { sysNum: "@m.sys_no", fileName: fileName }, function (data) {
+                        if (data.suc) {
+                            toastr.success("文件移除成功");
+                            uploader.removeFile(fileId,true);
+                            $(fileTD).parent().fadeOut(1000, function () {
+                                $(fileTD).parent().remove();
+                                var st = uploader.getStats();
+                                if (st.successNum == st.cancelNum) {
+                                    $("#al_file_panel").fadeOut(1000);
+                                }
+                            });
+                        } else {
+                            toastr.error("移除失败：" + data.msg);
+                        }
+                    })
                 });
 
             });
 
-        })
+        });
     </script>
 }
 
@@ -211,7 +460,7 @@
                             申请流水号:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="sys_no" id="sysNum" value="@m.sysNum" readonly />
+                            <input type="text" class="form-control" name="sys_no" id="sysNum" readonly />
                         </span>
                     </div>
                 </div>
@@ -221,7 +470,7 @@
                             联系电话:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="applier_phone" value="@m.applierPhone" />
+                            <input type="text" class="form-control" name="applier_phone" required />
                         </span>
                     </div>
                 </div>
@@ -231,9 +480,9 @@
                             公司:
                         </span>
                         <div class="b-input">
-                            <select class="form-control" name="company" id="company">
+                            <select class="form-control" name="company" id="company" required>
                                 <option value="">---- 下拉选择公司 ----</option>
-                                @foreach (var d in accountList) {                                    
+                                @foreach (var d in accountList) {
                                     <option value="@d">@d</option>
                                 }
                             </select>
@@ -246,9 +495,9 @@
                             部门:
                         </span>
                         <div class="b-input">
-                            <select class="form-control" name="bus_name" id="bus_name">
+                            <select class="form-control" name="bus_name" id="bus_name" required>
                                 <option value="">---- 下拉选择事业部 ----</option>
-                                @foreach (var d in m.busDepList) {                                    
+                                @foreach (var d in m.busDepList) {
                                     <option value="@d">@d</option>
                                 }
                             </select>
@@ -261,7 +510,7 @@
                             收寄类型:
                         </span>
                         <div class="b-input">
-                            <select class="form-control" name="send_or_receive" id="send_or_receive">
+                            <select class="form-control" name="send_or_receive" id="send_or_receive" required>
                                 <option value="">---- 下拉选择收寄类型 ----</option>
                                 <optgroup label="从汕尾寄往外地的请选择寄件">
                                     <option value="寄件">寄件</option>
@@ -279,42 +528,26 @@
                             收寄内容:
                         </span>
                         <div class="b-input">
-                            <select class="form-control" name="content_type" id="content_type">
-                                <option value="">---- 下拉选择收寄内容 ----</option>                                
+                            <select class="form-control" name="content_type" id="content_type" required>
+                                <option value="">---- 下拉选择收寄内容 ----</option>
                                 <option value="产品">产品</option>
                                 <option value="文件">文件</option>
                             </select>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-6 col-xs-12 send_extra_info">
+                <div class="col-md-4 col-sm-6 col-xs-12">
                     <div class="b-div">
                         <span class="b-label">
-                            放行条编号:
+                            是否退补货:
                         </span>
-                        <span class="b-input">
-                            <input type="text" class="form-control" name="send_no" />
-                        </span>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 col-xs-12 product_extra_info">
-                    <div class="b-div">
-                        <span class="b-label">
-                            产品名称:
-                        </span>
-                        <span class="b-input">
-                            <input type="text" class="form-control" name="content_name" />
-                        </span>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 col-xs-12 product_extra_info">
-                    <div class="b-div">
-                        <span class="b-label">
-                            产品型号:
-                        </span>
-                        <span class="b-input">
-                            <input type="text" class="form-control" name="content_modual" />
-                        </span>
+                        <div class="b-input">
+                            <select class="form-control" name="isReturnBack" id="isReturnBack" required>
+                                <option value="">---- 下拉选择是否退补货 ----</option>
+                                <option value="是">是</option>
+                                <option value="否">否</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-6 col-xs-12 product_extra_info">
@@ -323,7 +556,7 @@
                             件数:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="package_num" />
+                            <input type="text" class="form-control" name="package_num" placeholder="必填" />
                         </span>
                     </div>
                 </div>
@@ -333,7 +566,7 @@
                             包装箱尺寸:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="box_size" placeholder="长*宽*高（CM），例如：10*20*5" />
+                            <input type="text" class="form-control" name="box_size" placeholder="必填" />
                         </span>
                     </div>
                 </div>
@@ -343,7 +576,7 @@
                             卡板尺寸:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="cardboard_size" placeholder="长*宽*高（CM），例如：10*20*5" />
+                            <input type="text" class="form-control" name="cardboard_size" placeholder="选填" />
                         </span>
                     </div>
                 </div>
@@ -353,7 +586,7 @@
                             卡板数:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="cardboard_num" />
+                            <input type="text" class="form-control" name="cardboard_num" placeholder="选填" />
                         </span>
                     </div>
                 </div>
@@ -375,21 +608,35 @@
                 <div class="col-md-4 col-sm-6 col-xs-12">
                     <div class="b-div">
                         <span class="b-label">
-                            配送数量:
+                            总毛重(KG):
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="item_qty" />
+                            <input type="text" class="form-control" name="total_weight" placeholder="必填：最多可录入1位小数" required />
                         </span>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-6 col-xs-12">
                     <div class="b-div">
                         <span class="b-label">
-                            总毛重(KG):
+                            收寄范围:
                         </span>
-                        <span class="b-input">
-                            <input type="text" class="form-control" name="total_weight" placeholder="最多可录入1位小数" />
-                        </span>
+                        <div class="b-input">
+                            <select class="form-control" name="scope" id="scope" required>
+                                <option value="">---- 下拉选择收寄范围 ----</option>
+                                <optgroup label="寄件/收件地址都为广东省内的">
+                                    <option value="省内">省内</option>
+                                </optgroup>
+                                <optgroup label="寄件/收件地址其中之一是广东省外的">
+                                    <option value="省外">省外</option>
+                                </optgroup>
+                                <optgroup label="寄件/收件地址其中之一是港澳台的">
+                                    <option value="港澳台">港澳台</option>
+                                </optgroup>
+                                <optgroup label="寄件/收件地址其中之一是国外的">
+                                    <option value="国外">国外</option>
+                                </optgroup>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-6 col-xs-12">
@@ -398,7 +645,7 @@
                             寄件地址:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="from_addr" placeholder="至少包含省和市" />
+                            <input type="text" class="form-control" name="from_addr" placeholder="必填：至少包含省和市" required />
                         </span>
                     </div>
                 </div>
@@ -408,7 +655,7 @@
                             收件地址:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="to_addr" placeholder="至少包含省和市" />
+                            <input type="text" class="form-control" name="to_addr" placeholder="必填：至少包含省和市" required />
                         </span>
                     </div>
                 </div>
@@ -418,7 +665,7 @@
                             收件人:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="receiver_name" />
+                            <input type="text" class="form-control" name="receiver_name" placeholder="必填" required />
                         </span>
                     </div>
                 </div>
@@ -428,7 +675,7 @@
                             收件人电话:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="receiver_phone" />
+                            <input type="text" class="form-control" name="receiver_phone" placeholder="必填" required />
                         </span>
                     </div>
                 </div>
@@ -438,17 +685,163 @@
                             申请原因:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="apply_reason" />
+                            <input type="text" class="form-control" name="apply_reason" placeholder="选填" />
                         </span>
                     </div>
                 </div>
             </div>
-            
+            <div class="b-div product_extra_info">
+                <span class="b-label">
+                    产品明细:
+                </span>
+                <div class="b-input">
+                    <button class="btn btn-primary" type="button" onclick="openDialog()"> + </button>
+                </div>
+            </div>
+            <table class="table table-condensed table-hover product_extra_info" style="margin:10px 0 30px 0;">
+                <thead>
+                    <tr>
+                        <th style="width:30%;">产品名称</th>
+                        <th style="width:30%;">规格型号</th>
+                        <th style="width:25%;">数量</th>
+                        <th style="width:15%;">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="ch_tb_content"></tbody>
+            </table>
+
+            <div id="internal_div">
+                <div><button type="button" class="btn btn-primary" id="checkExBtn"><i class="fa fa-search"></i> 获取/选择快递公司</button></div>
+                <textarea class="form-control" id="exInfo" rows="3" readonly style="margin-top:6px;"></textarea>
+            </div>
+            <div id="foreign_div">
+                <div class="b-div">
+                    <span class="b-label">
+                        快递公司:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control" name="ex_company" id="ex_company" />
+                    </span>
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    快递单号:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="ex_no" id="ex_no" required />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label" style="vertical-align:top;">
+                    上传附件:
+                </span>
+                <div style="display:inline-block;width:70%">
+                    <div id="uploader" class="wu-example">
+                        <div id="picker"> + </div>
+                    </div>
+                    <p class="small text-danger"><i class="fa fa-info-circle"></i> 寄出产品需要放行时，必须上传图片附件（最多可上传3张）</p>
+                </div>
+            </div>
+            <div class="panel panel-default" id="al_file_panel">
+                <div class="panel-heading">附件信息</div>
+                <div class="panel-body" style="padding:0 8px;">
+                    <table class="table table-condensed table-hover" id="al_file_tb" style="margin:10px 0;">
+                        <thead>
+                            <tr>
+                                <th style="width:50%;">名称</th>
+                                <th style="width:20%;">大小</th>
+                                <th style="width:30%;">状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="al_file_list"></tbody>
+                    </table>
+                </div>
+            </div>
             <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:12px;"><i class="fa fa-check-circle-o"></i> 提交申请</button>
         </form>
     </div>
 </div>
 
+<div class="panel panel-default" style="margin:16px 0 0 0;">
+    <div class="panel-body">
+        <h4 class="text-danger"><i class="fa fa-info-circle"></i> 操作说明 </h4>
+        <div style="margin-left:18px;padding-top:6px;" class="text-danger">
+            <p>
+                1. 流程步骤：流程开始--->员工提交申请--->部门负责人审批--->行政部审批（如不是寄产品，则跳过此步骤）--->物流部审批（如总毛重小于10KG，则跳过此步骤）--->流程结束。
+            </p>
+            <p>
+                2. 10KG以内的省内件，默认使用顺丰标快；10KG以内的省外件或港澳台件，时效是次日达的，默认使用顺丰标快；
+                10KG以内的省外件或港澳台件，时效是隔日达或其他的，默认使用顺丰特惠；大于10KG的，请先联系物流部周秀花确认后，在系统选择正确的物流公司和快递方式；
+                国外件，系统不计算运费，需要手工填写快递公司；
+            </p>
+            <p>
+                3. 包装箱尺寸和卡板尺寸的格式是长*宽*高，单位是厘米（CM）；如果没有卡板的，可以不需填写卡板数量和卡板尺寸。
+            </p>
+            <p>
+                4. 收寄类型是寄件且收寄内容是产品且是退补货的，必须上传附件（图片格式），行政部审批后即可在查看界面打印放行条，给门卫扫描后放行，不需再走放行条流程。
+            </p>
+            <p>
+                5. 如有问题，请联系物流部周秀花：13543166052（676052），zhouxh.wlb@truly.com.cn
+            </p>
+        </div>
+    </div>
+</div>
+
 @section Modal {
     @Html.Partial("_ConfirmDialog")
+    <div class="modal fade" id="exModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">选择快递公司</h4>
+                </div>
+                <div class="modal-body">
+                    <table id="ex_tb"></table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 关闭</button>
+                    <button type="button" class="btn btn-success" id="selectExBt"><span class="fa fa-check-circle"></span> 确认选择</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">新增明细</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="item_modual" class="sr-only">名称:</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">名称:</div>
+                            <input type="text" class="form-control" id="item_name" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="item_modual" class="sr-only">型号:</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">型号:</div>
+                            <input type="text" class="form-control" id="item_modual" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="item_qty" class="sr-only">数量:</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">数量:</div>
+                            <input type="number" class="form-control" id="item_qty" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 取消</button>
+                    <button type="button" class="btn btn-success" onclick="addChItem()"><span class="fa fa-check-circle"></span> 确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
 }

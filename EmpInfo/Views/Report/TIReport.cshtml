@@ -1,0 +1,201 @@
+﻿@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        .lbText {
+            font-style: italic;
+        }
+    </style>
+}
+@section Scripts {
+    @*加入以下js，使IE8支持datetimepicker组件*@
+    <script>
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function (elt /*, from*/) {
+                var len = this.length >>> 0;
+
+                var from = Number(arguments[1]) || 0;
+                from = (from < 0)
+                     ? Math.ceil(from)
+                     : Math.floor(from);
+                if (from < 0)
+                    from += len;
+
+                for (; from < len; from++) {
+                    if (from in this &&
+                        this[from] === elt)
+                        return from;
+                }
+                return -1;
+            };
+        }
+    </script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+    var currentTr;
+    $(function () {
+        $(".form_date").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            todayBtn: true,
+            startView: 2,
+            minView: 2
+        });
+        //设置日期联动，结束日期不能大于起始日期
+        $("#fromDatePicker1").on("changeDate", function (e) {
+            $('#toDatePicker1').datetimepicker('setStartDate', e.date);
+        });
+        $("#toDatePicker1").on("changeDate", function (e) {
+            $('#fromDatePicker1').datetimepicker('setEndDate', e.date);
+        });
+
+        $("#checkBt").on("click", function () {
+            if ($("#fromDate").val() == "") {
+                toastr.error("请先输入开始日期");
+                return;
+            }
+            if ($("#toDate").val() == "") {
+                toastr.error("请先输入结束日期");
+                return;
+            }
+
+            $.post("SearchTIDataForGuard", {
+                fromDate: $("#fromDate").val(),
+                toDate: $("#toDate").val()
+            }, function (data) {
+                $('#check_tb').bootstrapTable('load', data);
+                if (data.length == 0) {
+                    toastr.error("当前时间段查无车辆放行申请单");
+                }
+            });
+        });
+
+        $("#reportBt").on("click", function () {
+            if ($("#fromDate").val() == "") {
+                toastr.error("请先输入开始日期");
+                return;
+            }
+            if ($("#toDate").val() == "") {
+                toastr.error("请先输入结束日期");
+                return;
+            }
+
+            toastr.info("数据正在导出，请稍等...");
+            window.location.href = "BeginExportTIExcel?"
+                + "fromDate=" + $("#fromDate").val()
+                + "&toDate=" + $("#toDate").val()
+            ;
+        });
+
+    });
+
+        $("#check_tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 20,
+            pageList: [20, 40, 60, 100],
+            search: true,
+            columns: [                
+                {
+                    field: "sys_no",
+                    title: "流水号"
+                }, {
+                    field: "ex_company",
+                    title: "货运公司"
+                }, {
+                    field: "in_day",
+                    title: "进厂日期",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(row.in_day);
+                    }
+                }, {
+                    field: "in_timespan",
+                    title: "进厂时间"
+                }, {
+                    field: "driver_name",
+                    title: "司机姓名"
+                }, {
+                    field: "driver_no",
+                    title: "身份证号"
+                },
+                {
+                    field: "car_type",
+                    title: "车辆类型"
+                }, {
+                    field: "car_no",
+                    title: "车牌号码"
+                }, {
+                    field: "t_status",
+                    title: "状态"
+                }
+                //{
+                //    field: "in_time",
+                //    title: "进厂时间",
+                //    formatter: function (value, row, index, field) {
+                //        return utils.parseTDate(value,true);
+                //    }
+                //},
+                //{
+                //    field: "out_time",
+                //    title: "出厂时间",
+                //    formatter: function (value, row, index, field) {
+                //        return utils.parseTDate(value, true);
+                //    }
+                //}
+            ]
+        });
+
+
+    </script>
+
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Home/NoPaperProcess")">无纸化流程</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=TI")">物流车辆放行</a></li>
+            <li class="active">查询报表</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row" style="margin-bottom:6px;">
+            <div class="col-xs-12 col-sm-6">
+                <div class="lbText">进厂日期从：</div>
+                <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    <input class="form-control" type="text" id="fromDate" name="fromDate" readonly value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <div class="lbText">进厂日期到：</div>
+                <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    <input class="form-control" type="text" id="toDate" name="toDate" readonly value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </div>
+            </div>
+
+        </div>
+        <div class="btn-group btn-group-justified" role="group" style="margin-bottom:20px;">
+            <div class="btn-group" role="group">
+                <button class="btn btn-primary" id="checkBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
+            </div>
+            <div class="btn-group" role="group">
+                <button class="btn btn-success" id="reportBt" data-loading-text="导出中..."><i class="fa fa-file-excel-o"></i> 导出报表</button>
+            </div>
+        </div>
+
+        <table id="check_tb"></table>
+        
+    </div>
+</div>
+

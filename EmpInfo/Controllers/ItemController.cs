@@ -330,6 +330,20 @@ namespace EmpInfo.Controllers
             }
         }
 
+        public JsonResult GetSPExInfoWithoutBill(string spJson)
+        {            
+            try {
+                //WriteEventLog("快递", spJson);
+                ei_spApply sp = JsonConvert.DeserializeObject<ei_spApply>(spJson);
+                var result = new SPSv().GetExInfoWithoutBill(sp);
+                if (result.Count() == 0) return Json(new SimpleResultModel() { suc = false, msg = "查询不到任何快递信息" });
+                return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(result) });
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+        }
+
         public string test()
         {
             //foreach (var l in db.k3_database.Where(d=>!d.account_name.Contains("总部")).ToList()) {

@@ -25,11 +25,8 @@ namespace EmpInfo.Models
         public string bus_name { get; set; }
         public string send_no { get; set; }
         public string content_type { get; set; }
-        public string content_name { get; set; }
-        public string content_modual { get; set; }
         public Nullable<int> package_num { get; set; }
         public Nullable<decimal> total_weight { get; set; }
-        public Nullable<int> item_qty { get; set; }
         public Nullable<int> cardboard_num { get; set; }
         public string cardboard_size { get; set; }
         public string box_size { get; set; }
@@ -43,6 +40,11 @@ namespace EmpInfo.Models
         public Nullable<decimal> ex_price { get; set; }
         public string ex_no { get; set; }
         public string apply_reason { get; set; }
+        public string scope { get; set; }
+        public Nullable<int> entry_id { get; set; }
+        public string name { get; set; }
+        public string modual { get; set; }
+        public Nullable<int> qty { get; set; }
         public string audit_result { get; set; }
     }
 }
