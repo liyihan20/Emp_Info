@@ -71,13 +71,13 @@
 
             $("#salary_clear_way").on("change", function () {
                 if ($(this).val() == "离职当天现金结算") {
-                    alert("请与组长或直接上级确认同意后再选择此项");
+                    alert("请与组长或直接上级确认同意后再选择此项，否则会被审核人拒绝！");
                 }
             });
 
             $(".selectUser").on("click", function () {
                 var self = this;
-                openSelectUserDialog($(self).val(), 3, function (result) {
+                openSelectUserDialog($(self).val(), 1, function (result) {
                     $(self).val(result);
                 });
             });
@@ -500,7 +500,7 @@
                     </span>
                     <span style="display:inline-block;width:70%">
                         <select class="form-control" name="salary_clear_way" id="salary_clear_way">                           
-                            <option value="离职当天现金结算">离职当天现金结算</option>
+                            @*<option value="离职当天现金结算">离职当天现金结算</option>*@
                             <option value="同部门在职员工同步发放工资卡" selected>同部门在职员工同步发放工资卡</option>
                         </select>
                     </span>
@@ -542,7 +542,7 @@
                         </div>
                     </div>*@
                 </div>
-                <p class="small text-danger"><i class="fa fa-info-circle"></i> 只需选择组长处理人</p>
+                <p class="small text-danger"><i class="fa fa-info-circle"></i> 只需选择组长处理人，再由组长审批时选择主管，由主管审批时选择部长</p>
             </div>
             
             @*月薪审核人*@

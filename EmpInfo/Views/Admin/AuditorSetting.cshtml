@@ -75,6 +75,40 @@
             ]
         });
 
+        $("#tb3").bootstrapTable({
+            url: "GetFlowAuthorities",
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 20,
+            pageList: [20, 50, 100, 200],
+            search: true,
+            clickToSelect: true,
+            columns: [
+                {
+                    radio: true
+                }, {
+                    field: "bill_type",
+                    title: "单据类型"
+                }, {
+                    field: "relate_value",
+                    title: "厂牌"
+                }, {
+                    field: "name",
+                    title: "姓名"
+                }, {
+                    field: "relate_type",
+                    title: "关联值"
+                }, {
+                    field: "cond1",
+                    title: "条件1"
+                }, {
+                    field: "cond2",
+                    title: "条件2"
+                }
+            ]
+        });
+
         $(function () {
             $("#tb1AddBt").on("click", function () {
                 $("#tb1Modal .modal-title").html("增加审核人");
@@ -183,6 +217,61 @@
                 });
             });
 
+            $("#tb3AddBt").on("click", function () {
+                $("#tb3Modal .modal-title").html("增加权限人");
+                //utils.resetForm($("#tb1Form"));
+                $("#tb3Form input[name='id']").val("0");
+                $("#tb3Modal").modal("show");
+            });
+
+            $("#tb3ModifyBt").on("click", function () {
+                var rows = $('#tb3').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再查询");
+                    return;
+                }
+                $("#tb3Modal .modal-title").html("修改权限人");
+                rows[0].relate_value = rows[0].name + "(" + rows[0].relate_value + ")";
+                utils.loadObjData($("#tb3Form"), rows[0]);
+                $("#tb3Modal").modal("show");
+            });
+
+            $("#tb3RemoveBt").on("click", function () {
+                var rows = $('#tb3').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                openConfirmDialog("确定要删除选中行吗？", function () {
+                    $.post("RemoveFlowAuthorities", { id: rows[0].id }, function (data) {
+                        if (data.suc) {
+                            toastr.success("删除成功");
+                            $('#tb3').bootstrapTable('refresh');
+                        } else {
+                            toastr.error("删除失败：" + data.msg);
+                        }
+                    });
+                });
+            });
+
+            $("#saveTb3FormBt").on("click", function () {
+                var obj = utils.getFormObj($("#tb3Form"));
+                if (obj.bill_type == "" || obj.relate_type == "" || obj.relate_value == "") {
+                    toastr.error("缺少值");
+                    return;
+                }
+                console.log(obj);
+                $.post("SaveFlowAuthorities", { obj: JSON.stringify(obj) }, function (data) {
+                    if (data.suc) {
+                        $("#tb3Modal").modal("hide");
+                        toastr.success("保存成功");
+                        $('#tb3').bootstrapTable('refresh');
+                    } else {
+                        toastr.error("保存失败：" + data.msg);
+                    }
+                });
+            });
+
             $(".user-select").on("click focus", function () {
                 var self = this;
                 openSelectUserDialog($(self).val(), 100, function (result) {
@@ -207,6 +296,7 @@
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">审核人</a></li>
             <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">通知人</a></li>
+            <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab">权限人</a></li>
         </ul>
 
         <!-- Tab panes -->
@@ -238,6 +328,20 @@
                     </div>
                 </div>
             </div>
+
+            <div role="tabpanel" class="tab-pane fade" id="tab3">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        <div>
+                            <button class="btn btn-success" id="tb3AddBt"><i class="fa fa-plus"></i> 增加</button>
+                            <button class="btn btn-primary" id="tb3ModifyBt"><i class="fa fa-edit"></i> 修改</button>
+                            <button class="btn btn-danger" id="tb3RemoveBt"><i class="fa fa-plus"></i> 删除</button>
+                        </div>
+
+                        <table id="tb3"></table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -266,6 +370,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="tb2Modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="tb2Modal" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -289,6 +394,32 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="tb3Modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="tb3Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> 增加权限人</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="tb3Form">
+                        <input type="hidden" name="id" data-value="0" />
+                        <input type="text" class="form-control" name="bill_type" placeholder="单据类型" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="relate_type" placeholder="关联值" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="cond1" placeholder="条件1" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="cond2" placeholder="条件2" style="margin-top:4px;" />
+                        <input type="text" class="form-control user-select" name="relate_value" placeholder="审核人厂牌" style="margin-top:4px;" />
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-reply"></i> 取消</button>
+                    <button id="saveTb3FormBt" type="button" class="btn btn-success"><i class="fa fa-check"></i> 确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @Html.Partial("_ConfirmDialog")
     @Html.Partial("_SelectUsers")
 }

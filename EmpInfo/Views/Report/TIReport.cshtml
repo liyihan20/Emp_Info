@@ -148,7 +148,15 @@
                 //        return utils.parseTDate(value, true);
                 //    }
                 //}
-            ]
+            ],
+            onClickRow: function (row, $element, field) {
+                if (row.sys_no) {
+                    window.open("@Url.Content("~/Apply/CheckApply?sysNo=")" + row.sys_no);
+                }
+            },
+            rowStyle: function (row, index) {
+                return { css: { cursor: 'pointer' } };
+            }
         });
 
 

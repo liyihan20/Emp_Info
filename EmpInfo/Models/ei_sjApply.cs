@@ -14,6 +14,11 @@ namespace EmpInfo.Models
     
     public partial class ei_sjApply
     {
+        public ei_sjApply()
+        {
+            this.ei_sjApplyEntry = new HashSet<ei_sjApplyEntry>();
+        }
+    
         public int id { get; set; }
         public string sys_no { get; set; }
         public string applier_num { get; set; }
@@ -21,25 +26,12 @@ namespace EmpInfo.Models
         public Nullable<System.DateTime> apply_time { get; set; }
         public string salary_type { get; set; }
         public string switch_type { get; set; }
-        public string card_number { get; set; }
-        public string name { get; set; }
-        public string sex { get; set; }
-        public string education { get; set; }
-        public string account { get; set; }
-        public string out_dep_name { get; set; }
-        public Nullable<int> out_dep_id { get; set; }
-        public string out_dep_position { get; set; }
-        public Nullable<System.DateTime> out_time { get; set; }
         public string out_clerk_name { get; set; }
         public string out_clerk_num { get; set; }
         public string out_manager_name { get; set; }
         public string out_manager_num { get; set; }
         public string out_minister_name { get; set; }
         public string out_minister_num { get; set; }
-        public string in_dep_name { get; set; }
-        public Nullable<int> in_dep_id { get; set; }
-        public string in_dep_position { get; set; }
-        public Nullable<System.DateTime> in_time { get; set; }
         public string in_clerk_name { get; set; }
         public string in_clerk_num { get; set; }
         public string in_manager_name { get; set; }
@@ -47,5 +39,7 @@ namespace EmpInfo.Models
         public string in_minister_name { get; set; }
         public string in_minister_num { get; set; }
         public string comment { get; set; }
+    
+        public virtual ICollection<ei_sjApplyEntry> ei_sjApplyEntry { get; set; }
     }
 }

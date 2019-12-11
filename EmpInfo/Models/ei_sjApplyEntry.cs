@@ -12,16 +12,10 @@ namespace EmpInfo.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class vw_SJExcel
+    public partial class ei_sjApplyEntry
     {
         public int id { get; set; }
-        public int entry_id { get; set; }
-        public string sys_no { get; set; }
-        public string applier_num { get; set; }
-        public string applier_name { get; set; }
-        public Nullable<System.DateTime> apply_time { get; set; }
-        public string salary_type { get; set; }
-        public string switch_type { get; set; }
+        public Nullable<int> sj_id { get; set; }
         public string card_number { get; set; }
         public string name { get; set; }
         public string sex { get; set; }
@@ -31,23 +25,13 @@ namespace EmpInfo.Models
         public Nullable<int> out_dep_id { get; set; }
         public string out_dep_position { get; set; }
         public Nullable<System.DateTime> out_time { get; set; }
-        public string out_clerk_name { get; set; }
-        public string out_clerk_num { get; set; }
-        public string out_manager_name { get; set; }
-        public string out_manager_num { get; set; }
-        public string out_minister_name { get; set; }
-        public string out_minister_num { get; set; }
         public string in_dep_name { get; set; }
         public Nullable<int> in_dep_id { get; set; }
         public string in_dep_position { get; set; }
         public Nullable<System.DateTime> in_time { get; set; }
-        public string in_clerk_name { get; set; }
-        public string in_clerk_num { get; set; }
-        public string in_manager_name { get; set; }
-        public string in_manager_num { get; set; }
-        public string in_minister_name { get; set; }
-        public string in_minister_num { get; set; }
-        public string comment { get; set; }
-        public string audit_result { get; set; }
+        public Nullable<bool> is_agree { get; set; }
+        public string not_agree_name { get; set; }
+    
+        public virtual ei_sjApply ei_sjApply { get; set; }
     }
 }

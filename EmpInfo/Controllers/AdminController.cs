@@ -874,7 +874,7 @@ namespace EmpInfo.Controllers
 
         #endregion
 
-        #region 审核人与通知人设置
+        #region 审核人与通知人与权限人设置
 
         [AuthorityFilter]
         public ActionResult AuditorSetting()
@@ -1013,6 +1013,81 @@ namespace EmpInfo.Controllers
             try {
                 var f = db.flow_notifyUsers.Single(a => a.id == id);
                 db.flow_notifyUsers.Remove(f);
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+
+            return Json(new SimpleResultModel() { suc = true });
+        }
+
+        public JsonResult GetFlowAuthorities()
+        {
+            var result = (from a in db.ei_flowAuthority
+                          join u in db.ei_users on a.relate_value equals u.card_number
+                          orderby a.bill_type, a.relate_type, a.cond1
+                          select new
+                          {
+                              a.id,
+                              a.relate_value,
+                              name = u.name,
+                              a.bill_type,
+                              a.relate_type,
+                              a.cond1,
+                              a.cond2
+                          }).ToList();
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult SaveFlowAuthorities(string obj)
+        {
+            ei_flowAuthority f = JsonConvert.DeserializeObject<ei_flowAuthority>(obj);
+
+            if (f.bill_type == null || f.relate_type == null || f.relate_value == null) {
+                return Json(new SimpleResultModel() { suc = false, msg = "表单值不完整" });
+            }
+
+            f.relate_value = GetUserCardByNameAndCardNum(f.relate_value);
+
+            if (f.id == 0) {
+                if (f.relate_value.Contains(";")) {
+                    foreach (var v in f.relate_value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
+                        ei_flowAuthority ar = new ei_flowAuthority();
+                        MyUtils.CopyPropertyValue(f, ar);
+                        ar.relate_value = v;
+                        db.ei_flowAuthority.Add(ar);
+                    }
+                }
+                else {
+                    db.ei_flowAuthority.Add(f);
+                }
+            }
+            else {
+                if (f.relate_value.Contains(";")) {
+                    return Json(new SimpleResultModel() { suc = false, msg = "修改时不能选择多人" });
+                }
+
+                var currentF = db.ei_flowAuthority.Single(a => a.id == f.id);
+                MyUtils.CopyPropertyValue(f, currentF);
+            }
+
+            try {
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+
+            return Json(new SimpleResultModel() { suc = true });
+
+        }
+
+        public JsonResult RemoveFlowAuthorities(int id)
+        {
+            try {
+                var f = db.ei_flowAuthority.Single(a => a.id == id);
+                db.ei_flowAuthority.Remove(f);
                 db.SaveChanges();
             }
             catch (Exception ex) {

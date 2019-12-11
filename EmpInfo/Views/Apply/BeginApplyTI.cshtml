@@ -2,7 +2,7 @@
 @{
     string sysNo = ViewData["infoBeforeApply"] as string;
     //华飞，正信达，百世，恒骏，顺展，荣鑫，捷易，顺丰，跨越，冠粤
-    List<string> exCompanyList = new List<string>() { "华飞","正信达","百世","恒骏","顺展","荣鑫","捷易","顺丰", "跨越","冠粤" };
+    //List<string> exCompanyList = new List<string>() { "华飞","正信达","百世","恒骏","顺展","荣鑫","捷易","顺丰", "跨越","冠粤" };
     List<string> carTypeList = new List<string>() { "小车","商务车","2.4米", "4.2米", "7.6米", "9.6米", "13.5米", "15.6米", "17.6米", "18.6米" };
 }
 @section CSS{
@@ -161,12 +161,13 @@
                             货运公司:
                         </span>
                         <div class="b-input">
-                            <select class="form-control" name="ex_company" id="ex_company" required>
+                            <input type="text" class="form-control" name="ex_company" id="ex_company" required />
+                            @*<select class="form-control" name="ex_company" id="ex_company" required>
                                 <option value="">---- 下拉选择货运公司 ----</option>
                                 @foreach (var d in exCompanyList) {
                                     <option value="@d">@d</option>
                                 }
-                            </select>
+                            </select>*@
                         </div>
                     </div>                       
                     <div class="b-div">

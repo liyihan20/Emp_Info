@@ -130,7 +130,7 @@ namespace EmpInfo.Services
                         bill.sys_no,
                         BillTypeName + "已" + (isSuc ? "批准" : "被拒绝"),
                         bill.applier_name,
-                        string.Format("你申请的单号为【{0}】的{1}已{2}{3}，请知悉。", bill.sys_no, BillTypeName, (isSuc ? "批准" : "被拒绝")),
+                        string.Format("你申请的单号为【{0}】的{1}已{2}，请知悉。", bill.sys_no, BillTypeName, (isSuc ? "批准" : "被拒绝")),
                         GetUserEmailByCardNum(bill.applier_num),
                         ccEmails
                         );

@@ -15,6 +15,28 @@ namespace EmpInfo.Models
 
     public class SimpleResultModel
     {
+        public SimpleResultModel(){}
+        public SimpleResultModel(bool _suc)
+        {
+            this.suc=_suc;
+        }
+        public SimpleResultModel(bool _suc, string _msg)
+        {
+            this.suc = _suc;
+            this.msg = _msg;
+        }
+        public SimpleResultModel(bool _suc, string _msg,string _extra)
+        {
+            this.suc = _suc;
+            this.msg = _msg;
+            this.extra = _extra;
+        }
+        public SimpleResultModel(Exception ex)
+        {
+            this.suc = false;
+            this.msg = ex.Message;
+        }
+
         public bool suc { get; set; }
         public string msg { get; set; }
         public string extra { get; set; }

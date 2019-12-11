@@ -105,8 +105,6 @@ namespace EmpInfo.Models
         public DbSet<vw_APExcel> vw_APExcel { get; set; }
         public DbSet<ei_jqApply> ei_jqApply { get; set; }
         public DbSet<vw_JQExcel> vw_JQExcel { get; set; }
-        public DbSet<ei_sjApply> ei_sjApply { get; set; }
-        public DbSet<vw_SJExcel> vw_SJExcel { get; set; }
         public DbSet<ei_spApply> ei_spApply { get; set; }
         public DbSet<ei_flowAuthority> ei_flowAuthority { get; set; }
         public DbSet<ei_spApplyEntry> ei_spApplyEntry { get; set; }
@@ -115,8 +113,11 @@ namespace EmpInfo.Models
         public DbSet<ei_ieAuditors> ei_ieAuditors { get; set; }
         public DbSet<ei_TIApply> ei_TIApply { get; set; }
         public DbSet<ei_TIApplyEntry> ei_TIApplyEntry { get; set; }
-        public DbSet<vw_spExcel> vw_spExcel { get; set; }
         public DbSet<vw_TIExcel> vw_TIExcel { get; set; }
+        public DbSet<ei_sjApply> ei_sjApply { get; set; }
+        public DbSet<ei_sjApplyEntry> ei_sjApplyEntry { get; set; }
+        public DbSet<vw_SJExcel> vw_SJExcel { get; set; }
+        public DbSet<vw_spExcel> vw_spExcel { get; set; }
     
         public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
         {

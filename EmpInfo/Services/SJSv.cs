@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace EmpInfo.Services
 {
-    public class SJSv:BillSv
+    public class SJSv:BillSv,IBeginAuditOtherInfo
     {
         ei_sjApply bill;
 
@@ -69,7 +69,7 @@ namespace EmpInfo.Services
 
         public override string AuditViewName()
         {
-            return "BeginAuditApplyW";
+            return "BeginAuditSJApply";
         }
 
         public override object GetInfoBeforeApply(UserInfo userInfo, UserInfoDetail userInfoDetail)
@@ -81,15 +81,31 @@ namespace EmpInfo.Services
         }
 
         public override void SaveApply(System.Web.Mvc.FormCollection fc, UserInfo userInfo)
-        {
-            bill = new ei_sjApply();
-            MyUtils.SetFieldValueToModel(fc, bill);
+        {            
+            bill = JsonConvert.DeserializeObject<ei_sjApply>(fc.Get("head"));
+            var entrys = JsonConvert.DeserializeObject<List<ei_sjApplyEntry>>(fc.Get("entry"));
 
-            if (bill.out_dep_position != null && bill.out_dep_position.Length > 50) throw new Exception("调出部门岗位内容太多，请删减");
-            if (bill.in_dep_position != null && bill.in_dep_position.Length > 50) throw new Exception("调入部门岗位内容太多，请删减");
+            //公司内、跨公司调动判断部门
+            string[] copKeys = new string[] { "信利半导体", "信利光电股份", "信利电子", "信利仪器", "信利工业", "信元光电", "第三方", "光电仁寿" };
+            foreach (var e in entrys) {
+                
+                if (e.out_dep_position != null && e.out_dep_position.Length > 50) throw new Exception(e.name+ ":调出部门岗位内容太多，请删减");
+                if (e.in_dep_position != null && e.in_dep_position.Length > 50) throw new Exception(e.name+":调入部门岗位内容太多，请删减");
+                foreach (var k in copKeys) {
+                    if (bill.switch_type == "公司内") {
+                        if (e.out_dep_name.Contains(k) && !e.in_dep_name.Contains(k)) {
+                            throw new Exception(e.name + ":调入部门和调出部门不属于同一公司，调动类型必须选择跨公司");
+                        }
+                    }
+                    if (bill.switch_type == "跨公司") {
+                        if (e.out_dep_name.Contains(k) && e.in_dep_name.Contains(k)) {
+                            throw new Exception(e.name + ":调入部门和调出部门属于同一公司，调动类型必须选择公司内");
+                        }
+                    }
+                }
 
-            if (bill.out_time == null) throw new Exception("请输入正确的调出时间");
-            if (bill.in_time == null) throw new Exception("请输入正确的到岗时间");
+                e.is_agree = true;
+            }
 
             
             if (string.IsNullOrWhiteSpace(bill.in_clerk_name)) throw new Exception("必须选择调入部门文员");
@@ -108,44 +124,21 @@ namespace EmpInfo.Services
 
                 bill.in_minister_num = GetUserCardByNameAndCardNum(bill.in_minister_name);
                 bill.out_minister_num = GetUserCardByNameAndCardNum(bill.out_minister_name);
-            }
-
-            //公司内、跨公司调动判断部门
-            string[] copKeys = new string[] { "信利半导体", "信利光电股份", "信利电子", "信利仪器", "信利工业", "信元光电", "第三方", "光电仁寿" };
-            foreach (var k in copKeys) {
-                if (bill.switch_type == "公司内") {
-                    if (bill.out_dep_name.Contains(k) && !bill.in_dep_name.Contains(k)) {
-                        throw new Exception("调入部门和调出部门不属于同一公司，调动类型必须选择跨公司");
-                    }
-                }
-                if (bill.switch_type == "跨公司") {
-                    if (bill.out_dep_name.Contains(k) && bill.in_dep_name.Contains(k)) {
-                        throw new Exception("调入部门和调出部门属于同一公司，调动类型必须选择公司内");
-                    }
-                }
-            }
-
-            //审核人一开始没有在权限组里，在这里加入b
-            //var autGroup = db.ei_groups.Where(g => g.name == "员工调动申请组").FirstOrDefault();
-            //if (autGroup != null) {
-            //    if (db.ei_groupUser.Where(gu => gu.group_id == autGroup.id && gu.user_id == userInfo.id).Count() < 1) {
-            //        db.ei_groupUser.Add(new ei_groupUser()
-            //        {
-            //            group_id = autGroup.id,
-            //            user_id = userInfo.id
-            //        });
-            //    }
-            //}
+            }            
 
             bill.applier_name = userInfo.name;
             bill.applier_num = userInfo.cardNo;
             bill.apply_time = DateTime.Now;
 
             FlowSvrSoapClient client = new FlowSvrSoapClient();
-            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.out_dep_name + "-->"+bill.in_dep_name, bill.name + "调动申请");
+            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, entrys.First().out_dep_name + "-->" + entrys.First().in_dep_name, entrys.First().name + "调动申请");
             if (result.suc) {
                 try {
                     db.ei_sjApply.Add(bill);
+                    foreach (var e in entrys) {
+                        e.ei_sjApply = bill;
+                        db.ei_sjApplyEntry.Add(e);
+                    }
                     db.SaveChanges();
                 }
                 catch (Exception ex) {
@@ -174,7 +167,22 @@ namespace EmpInfo.Services
             bool isPass = bool.Parse(fc.Get("isPass"));
             string opinion = fc.Get("opinion");
 
-            string formJson = JsonConvert.SerializeObject(bill);
+            if (!isPass) {
+                //拒绝后，将表体的状态也设置为拒绝
+                foreach (var e in bill.ei_sjApplyEntry.Where(se=>se.is_agree==true).ToList()) {
+                    e.is_agree = false;
+                    e.not_agree_name = userInfo.name;
+                }
+            }
+            else {
+                if (bill.ei_sjApplyEntry.Where(se => se.is_agree == true).Count() == 0) {
+                    throw new Exception("所有员工调动都被拒绝的情况下，不能同意此申请，请拒绝此申请");
+                }
+            }
+
+            JsonSerializerSettings js = new JsonSerializerSettings();
+            js.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            string formJson = JsonConvert.SerializeObject(bill,js);
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
             var result = flow.BeginAudit(bill.sys_no, step, userInfo.cardNo, isPass, opinion, formJson);
             if (result.suc) {
@@ -249,7 +257,7 @@ namespace EmpInfo.Services
                         result.stepName,
                         bill.applier_name,
                         ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
-                        string.Format("{0}的调动申请：{1}--->{2}", bill.name,bill.out_dep_name,bill.in_dep_name),
+                        string.Format("{0}{1}的调动申请", bill.ei_sjApplyEntry.First().name, bill.ei_sjApplyEntry.Count() > 1 ? ("等" + bill.ei_sjApplyEntry.Count() + "人") : ""),
                         db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
                         );
                 }
@@ -259,6 +267,26 @@ namespace EmpInfo.Services
         public void UpdateHREmpDept(string cardNumber, int depId, DateTime inDate, string position)
         {
             db.UpdateHrEmpDept(cardNumber, depId, inDate, position);
+        }
+
+
+        public object GetBeginAuditOtherInfo(string sysNo, int step)
+        {
+            return new SJSv(sysNo).GetBill();
+        }
+
+        public void UpdateIsAgree(int[] entryIds,string opUser)
+        {
+            foreach (var e in db.ei_sjApplyEntry.Where(se => entryIds.Contains(se.id) && se.is_agree == true)) {
+                e.is_agree = false;
+                e.not_agree_name = opUser;
+            }
+            db.SaveChanges();
+        }
+
+        public List<ei_sjApplyEntry> GetEntrys(int sjId)
+        {
+            return db.ei_sjApplyEntry.Where(e => e.sj_id == sjId).ToList();
         }
 
     }

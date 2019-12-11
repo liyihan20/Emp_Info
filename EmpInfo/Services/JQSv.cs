@@ -46,8 +46,8 @@ namespace EmpInfo.Services
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
             var menus = base.GetApplyMenuItems(userInfo);
-            //请假流程的统计员权限就能看离职报表
-            if (db.ei_department.Where(d => d.FReporter.Contains(userInfo.cardNo)).Count() > 0) {
+            //离职报表权限
+            if (db.ei_flowAuthority.Where(f=>f.bill_type==BillType && f.relate_type=="查询报表" && f.relate_value==userInfo.cardNo).Count()>0) {
                 menus.Add(new ApplyMenuItemModel()
                 {
                     text = "查询报表",
@@ -105,6 +105,7 @@ namespace EmpInfo.Services
                 if (bill.absent_from == null) throw new Exception("必须填写正确的旷工开始日期");
                 if (bill.absent_to == null) throw new Exception("必须填写正确的旷工结束日期");
                 if (bill.absent_days == null) throw new Exception("旷工天数必须是数字格式");
+                if (string.IsNullOrWhiteSpace(bill.auto_quit_comment)) throw new Exception("自离补充说明不能为空");
                 if (userInfo.cardNo.Equals(bill.card_number)) throw new Exception("本人申请时离职类型不能选择自离");
             }
             else {
@@ -113,12 +114,14 @@ namespace EmpInfo.Services
 
             if ("计件".Equals(bill.salary_type)) {
                 if (string.IsNullOrWhiteSpace(bill.group_leader_name)) throw new Exception("必须选择组长");
-                //if (string.IsNullOrWhiteSpace(bill.charger_name)) throw new Exception("必须选择主管");
-                //if (string.IsNullOrWhiteSpace(bill.produce_minister_name)) throw new Exception("必须选择生产部长");
-
                 bill.group_leader_num = GetUserCardByNameAndCardNum(bill.group_leader_name);
-                //bill.charger_num = GetUserCardByNameAndCardNum(bill.charger_name);
-                //bill.produce_minister_num = GetUserCardByNameAndCardNum(bill.produce_minister_name);
+
+                //因为有调部门的关系，离职时人事部门还是旧部门，所以提交时更新为组长的人事部门 2019-11-27
+                var leaderDepartment = db.GetHREmpInfoDetail(bill.group_leader_num).FirstOrDefault();
+                if (leaderDepartment == null || leaderDepartment.emp_status == "离职") {
+                    throw new Exception("组长已不存在或已离职");
+                }
+                bill.dep_name = leaderDepartment.dep_name;
             }
             else if ("月薪".Equals(bill.salary_type)) {
                 if (string.IsNullOrWhiteSpace(bill.dep_charger_name)) throw new Exception("必须选择部门负责人");
@@ -182,12 +185,15 @@ namespace EmpInfo.Services
             int step = Int32.Parse(fc.Get("step"));
             string stepName = fc.Get("stepName");
             bool isPass = bool.Parse(fc.Get("isPass"));
+            string opinion = fc.Get("opinion");
 
             MyUtils.SetFieldValueToModel(fc, bill);
 
             string leaveDate = fc.Get("leave_date");
             if (isPass) {
                 if (bill.leave_date == null) return new SimpleResultModel() { suc = false, msg = "离职时间必须填写" };
+                if (string.IsNullOrEmpty(bill.work_evaluation)) return new SimpleResultModel() { suc = false, msg = "工作评价必须选择" };
+                if (string.IsNullOrEmpty(bill.wanna_employ)) return new SimpleResultModel() { suc = false, msg = "是否再录用必须选择" };
                 if (stepName.Contains("组长")) {
                     if (string.IsNullOrEmpty(bill.charger_name)) return new SimpleResultModel() { suc = false, msg = "请选择主管审核人" };
                     if(string.IsNullOrEmpty(bill.charger_num)) bill.charger_num = GetUserCardByNameAndCardNum(bill.charger_name);
@@ -216,7 +222,7 @@ namespace EmpInfo.Services
 
             string formJson = JsonConvert.SerializeObject(bill);
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            var result = flow.BeginAudit(bill.sys_no, step, userInfo.cardNo, isPass, "", formJson);
+            var result = flow.BeginAudit(bill.sys_no, step, userInfo.cardNo, isPass, opinion, formJson);
             if (result.suc) {
                 db.SaveChanges();
                 //发送通知到下一级审核人

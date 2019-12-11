@@ -41,10 +41,7 @@ namespace EmpInfo.Models
         public string ex_no { get; set; }
         public string apply_reason { get; set; }
         public string scope { get; set; }
-        public Nullable<int> entry_id { get; set; }
-        public string name { get; set; }
-        public string modual { get; set; }
-        public Nullable<int> qty { get; set; }
+        public string isReturnBack { get; set; }
         public string audit_result { get; set; }
     }
 }

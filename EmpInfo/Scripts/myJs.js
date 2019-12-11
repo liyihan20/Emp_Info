@@ -113,6 +113,17 @@
         });
         if (!suc) return { suc: suc, msg: msg };
 
+        //3. textarea里面的required属性
+        $fm.find("textarea:required").each(function (i, v) {
+            if (!v.value || $.trim(v.value) == "") {
+                console.log(v.name);
+                msg = "【" + utils.getLabelName($fm, v.name) + "】必须填写";
+                suc = false;
+                return false;
+            }
+        });
+        if (!suc) return { suc: suc, msg: msg };
+
         return { suc: true };
     },
     //获取表单控件对应的标签。必须是b-label和b-input的格式

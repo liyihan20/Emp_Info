@@ -71,6 +71,8 @@
                 $('#check_tb').bootstrapTable('load', data);
                 if (data.length == 0) {
                     toastr.error("当前时间段查无车辆放行申请单");
+                } else {
+                    toastr.success("成功读取" + data.length + "行记录");
                 }
             });
         });
@@ -105,6 +107,10 @@
             changeStatus(entryId,"已出厂");
 
         });
+
+        $("#checkBt").trigger("click");
+        
+        
 
     });
 
@@ -161,7 +167,16 @@
                     title: "车牌号码"
                 }, {
                     field: "t_status",
-                    title: "状态"
+                    title: "状态",
+                    cellStyle: function (value, row, index) {
+                        var textColor = "#333";
+                        if (value == "已进厂") {
+                            textColor = "#5cb85c";
+                        } else if (value == "已出厂") {
+                            textColor = "#d9534f";                            
+                        }
+                        return { css: { color: textColor } };
+                    }
                 }
                 //{
                 //    field: "in_time",
@@ -177,7 +192,10 @@
                 //        return utils.parseTDate(value, true);
                 //    }
                 //}
-            ]
+            ],
+            rowStyle: function (row, index) {
+                return { css: { cursor: 'pointer' } };
+            }
         });
                 
 
@@ -193,7 +211,7 @@
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
             <li><a href="@Url.Content("~/Home/NoPaperProcess")">无纸化流程</a></li>
             <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=TI")">物流车辆放行</a></li>
-            <li class="active">查询报表</li>
+            <li class="active">门卫放行</li>
         </ol>
     </div>
     <div class="panel-body">
@@ -214,7 +232,7 @@
             </div>
             
         </div>
-        <div>                
+        <div>
             <button class="btn btn-block btn-primary" id="checkBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
         </div>
 
@@ -224,7 +242,7 @@
                 <button class="btn btn-lg btn-danger" id="outBt" style="padding:8px 24px;"><i class="fa fa-sign-out"></i> 出厂</button>
             </div>
 
-            <table id="check_tb"></table>
+            <table id="check_tb" style="font-size:16px;"></table>
         </div>
     </div>
 </div>

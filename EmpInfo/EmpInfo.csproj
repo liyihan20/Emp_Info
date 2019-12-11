@@ -352,6 +352,9 @@
     <Compile Include="Models\ei_sjApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_sjApplyEntry.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_spApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -1312,6 +1315,7 @@
     <Content Include="Views\Apply\CheckTIApply.cshtml" />
     <Content Include="Views\Report\TIViewForGuard.cshtml" />
     <Content Include="Views\Report\TIReport.cshtml" />
+    <Content Include="Views\Apply\BeginAuditSJApply.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

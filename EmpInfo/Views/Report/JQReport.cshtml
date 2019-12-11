@@ -121,10 +121,6 @@
                     field: "salary_type",
                     title: "工资类别"
                 },
-                //{
-                //    field: "applier_name",
-                //    title: "申请人"
-                //},
                 {
                     field: "leave_date",
                     title: "离职时间",
@@ -148,11 +144,6 @@
                     checkbox: true
                 }
             ],
-            @*onClickRow: function (row, $element, field) {
-                if (row.sys_no) {
-                    window.open("@Url.Content("~/Apply/CheckApply?sysNo=")" + row.sys_no);
-                }
-            },*@
             onClickCell: function (field, value, row, $element) {
                 if (field != "check1") {
                     if (row.sys_no) {
@@ -161,7 +152,7 @@
                 }
             },
             onCheck: function (row, $element) {
-                toggleCheck1(row.sys_no);                
+                toggleCheck1(row.sys_no);
             },
             onUncheck: function (row, $element) {
                 toggleCheck1(row.sys_no);
@@ -237,7 +228,8 @@
                 <input type="text" class="form-control" name="sysNum" id="sysNum" style="margin:6px 0;" value="@sm.sysNum" />                
             </div>
         </div>
-        <div class="btn-group btn-group-justified" role="group" style="margin-bottom:20px;">
+        <div class="small text-danger"><i class="fa fa-info-circle"></i> 可查询到人事部门名称包含以下关键字的离职申请：@ViewData["canCheckDep"] </div>
+        <div class="btn-group btn-group-justified" role="group" style="margin-bottom:20px;margin-top:4px;">
             <div class="btn-group" role="group">
                 <button class="btn btn-primary" id="checkBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
             </div>

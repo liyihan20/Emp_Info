@@ -115,6 +115,28 @@ namespace EmpInfo.Controllers
 
         #endregion
 
+        #region 调动
+
+        public JsonResult GetSJEntrys(int sjId)            
+        {
+            var entrys = new SJSv().GetEntrys(sjId);
+            entrys.ForEach(e => { e.ei_sjApply = null; e.sj_id = 0; });
+            return Json(entrys, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult UpdateSJAgreeField(string entryIds)
+        {
+            try {
+                int[] ids = JsonConvert.DeserializeObject<int[]>(entryIds);
+                new SJSv().UpdateIsAgree(ids, userInfo.name);
+                return Json(new SimpleResultModel(true));
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+        }
+        #endregion
+
         #region IE立项结项
 
         public ActionResult IEBusAndAuditor()

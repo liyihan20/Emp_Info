@@ -1,8 +1,13 @@
-﻿@using EmpInfo.Models;
+﻿@using EmpInfo.Models
+@using Newtonsoft.Json
 @{
     ei_sjApply m = ViewData["am"] as ei_sjApply;
+    JsonSerializerSettings js = new JsonSerializerSettings();
+    js.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+    string entryJson = JsonConvert.SerializeObject(m.ei_sjApplyEntry.ToList(), js);
 }
 @section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
     <style type="text/css">
         .b-label {
             display: inline-block;
@@ -22,6 +27,9 @@
     </style>
 }
 @section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
 
     <script>
         $(function () {
@@ -33,7 +41,76 @@
 
             });
         });
-
+        $("#tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: false,
+            data:@Html.Raw(entryJson),
+            columns: [{
+                field: "is_agree",
+                title: "是否同意",
+                formatter:function(value,row,index){
+                    if(value){
+                        return "同意调动";
+                    }else{
+                        return "拒绝调动";
+                    }
+                },
+                cellStyle:function(value,row,index){
+                    var color = "green";
+                    if(!value){
+                        color="red";
+                    }
+                    return { css: { color: color } };
+                }
+            },{
+                    field: "card_number",
+                    title: "厂牌"
+                }, {
+                    field: "name",
+                    title: "姓名"
+                }, {
+                    field: "sex",
+                    title: "性别"
+                }, {
+                    field: "education",
+                    title: "学历"
+                }, {
+                    field: "account",
+                    title: "账号"
+                }, {
+                    field: "out_dep_name",
+                    title: "调出部门"
+                }, {
+                    field: "out_dep_id",
+                    visible: false
+                }, {
+                    field: "out_dep_position",
+                    title: "调出岗位"
+                }, {
+                    field: "out_time",
+                    title: "调出日期",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value);
+                    }
+                }, {
+                    field: "in_dep_name",
+                    title: "调入部门"
+                }, {
+                    field: "in_dep_id",
+                    visible: false
+                }, {
+                    field: "in_dep_position",
+                    title: "调入岗位"
+                }, {
+                    field: "in_time",
+                    title: "到岗日期",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value);
+                    }
+                }
+            ]
+        });
     </script>
 }
 
@@ -49,239 +126,144 @@
         </ol>
     </div>
     <div class="panel-body">
-            <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">调动基础信息</h4>
-                <div class="b-div">
-                    <span class="b-label">
-                        流转记录:
-                    </span>
-                    <span class="b-input">
-                        <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
-                    </span>
-                </div>
-            <div class="row">
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                    <div class="b-div">
-                        <span class="b-label">
-                            申请流水号:
-                        </span>
-                        <span class="b-input">
-                            @m.sys_no
-                        </span>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                    <div class="b-div">
-                        <span class="b-label">
-                            调动类型:
-                        </span>
-                        <div class="b-input">
-                            @m.switch_type
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                    <div class="b-div">
-                        <span class="b-label">
-                            工资类型:
-                        </span>
-                        <span class="b-input">
-                            @m.salary_type
-                        </span>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                    <div class="b-div">
-                        <span class="b-label">
-                            厂牌编码:
-                        </span>
-                        <div class="b-input">
-                            @m.card_number
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                    <div class="b-div">
-                        <span class="b-label">
-                            姓名:
-                        </span>
-                        <div class="b-input">
-                            @m.name
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                    <div class="b-div">
-                        <span class="b-label">
-                            性别:
-                        </span>
-                        <span class="b-input">
-                            @m.sex
-                        </span>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                    <div class="b-div">
-                        <span class="b-label">
-                            账号:
-                        </span>
-                        <span class="b-input">
-                            @m.account
-                        </span>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                    <div class="b-div">
-                        <span class="b-label">
-                            学历:
-                        </span>
-                        <span class="b-input">
-                            @m.education
-                        </span>
-                    </div>
-                </div>
-            </div>
             <div class="b-div">
-                <span class="b-label" style="vertical-align:top;">
-                    调动原因:
+                <span class="b-label">
+                    流转记录:
                 </span>
-                <span style="display:inline-block;width:70%">
-                    @m.comment
+                <span class="b-input">
+                    <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
                 </span>
             </div>
-
-            @*调出部门信息*@
-            <div id="outInfo">
-                <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">调出部门信息</h4>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="b-div">
                     <span class="b-label">
-                        名称:
+                        申请流水号:
                     </span>
                     <span class="b-input">
-                        @m.out_dep_name
+                        @m.sys_no
                     </span>
                 </div>
-                <div class="row">
-                    <div class="col-md-4 col-sm-6 col-xs-12">
-                        <div class="b-div">
-                            <span class="b-label">
-                                岗位:
-                            </span>
-                            <span class="b-input">
-                                @m.out_dep_position
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6 col-xs-12">
-                        <div class="b-div">
-                            <span class="b-label">
-                                调出时间:
-                            </span>
-                            <span class="b-input">
-                                @(m.out_time==null?"":((DateTime)m.out_time).ToString("yyyy-MM-dd"))
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6 col-xs-12">
-                        <div class="b-div">
-                            <span class="b-label">
-                                文员:
-                            </span>
-                            <span class="b-input">
-                                @m.out_clerk_name
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6 col-xs-12">
-                        <div class="b-div">
-                            <span class="b-label">
-                                主管/经理:
-                            </span>
-                            <span class="b-input">
-                                @m.out_manager_name
-                            </span>
-                        </div>
-                    </div>
-                    @if (!string.IsNullOrWhiteSpace(m.out_minister_name)) { 
-                    <div class="col-md-4 col-sm-6 col-xs-12">
-                        <div class="b-div">
-                            <span class="b-label">
-                                部长/助理:
-                            </span>
-                            <span class="b-input">
-                                @m.out_minister_name
-                            </span>
-                        </div>
-                    </div>
-                    }
-                </div>
             </div>
-
-            @*调入部门信息*@
-            <div id="inInfo">
-                <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">调入部门信息</h4>
+            <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="b-div">
                     <span class="b-label">
-                        名称:
+                        申请人:
                     </span>
                     <span class="b-input">
-                        @m.in_dep_name
+                        @m.applier_name
                     </span>
                 </div>
-                <div class="row">
-                    <div class="col-md-4 col-sm-6 col-xs-12">
-                        <div class="b-div">
-                            <span class="b-label">
-                                岗位:
-                            </span>
-                            <span class="b-input">
-                                @m.in_dep_position
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6 col-xs-12">
-                        <div class="b-div">
-                            <span class="b-label">
-                                到岗时间：
-                            </span>
-                            <span class="b-input">
-                                @(m.in_time == null ? "" : ((DateTime)m.in_time).ToString("yyyy-MM-dd"))
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6 col-xs-12">
-                        <div class="b-div">
-                            <span class="b-label">
-                                文员:
-                            </span>
-                            <span class="b-input">
-                                @m.in_clerk_name
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6 col-xs-12">
-                        <div class="b-div">
-                            <span class="b-label">
-                                主管/经理:
-                            </span>
-                            <span class="b-input">
-                                @m.in_manager_name
-                            </span>
-                        </div>
-                    </div>
-                    @if (!string.IsNullOrWhiteSpace(m.in_minister_name)) { 
-                    <div class="col-md-4 col-sm-6 col-xs-12">
-                        <div class="b-div">
-                            <span class="b-label">
-                                部长/助理:
-                            </span>
-                            <span class="b-input">
-                                @m.in_minister_name
-                            </span>
-                        </div>
-                    </div>
-                    }
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请时间:
+                    </span>
+                    <span class="b-input">
+                        @(((DateTime)m.apply_time).ToString("yyyy-MM-dd"))
+                    </span>
                 </div>
             </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        调动类型:
+                    </span>
+                    <div class="b-input">
+                        @m.switch_type
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        工资类型:
+                    </span>
+                    <span class="b-input">
+                        @m.salary_type
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        调出部门文员:
+                    </span>
+                    <span class="b-input">
+                        @m.out_clerk_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        调出部门主管/经理:
+                    </span>
+                    <span class="b-input">
+                        @m.out_manager_name
+                    </span>
+                </div>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(m.out_minister_name)) { 
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        调出部门部长/助理:
+                    </span>
+                    <span class="b-input">
+                        @m.out_minister_name
+                    </span>
+                </div>
+            </div>
+            }
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        调入部门文员:
+                    </span>
+                    <span class="b-input">
+                        @m.in_clerk_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        调入部门主管/经理:
+                    </span>
+                    <span class="b-input">
+                        @m.in_manager_name
+                    </span>
+                </div>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(m.in_minister_name)) { 
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        调入部门部长/助理:
+                    </span>
+                    <span class="b-input">
+                        @m.in_minister_name
+                    </span>
+                </div>
+            </div>
+            }
+        </div>
+        <div class="b-div">
+            <span class="b-label" style="vertical-align:top;">
+                调动原因/说明:
+            </span>
+            <span class="b-input">
+                @m.comment
+            </span>
+        </div>
+        <div>调动人员信息：</div>
+        <table data-toggle="table" id="tb"></table>
     </div>
 </div>
 

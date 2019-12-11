@@ -1713,6 +1713,13 @@ namespace EmpInfo.Controllers
                 sm = JsonConvert.DeserializeObject<JQSearchParam>(MyUtils.DecodeToUTF8(cookie.Values.Get("sm")));
             }
 
+            var aut = db.ei_flowAuthority.Where(f => f.bill_type == "JQ" && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).FirstOrDefault();
+            if (aut == null) {
+                ViewBag.tip = "没有报表查询权限";
+                return View("Error");
+            }
+
+            ViewData["canCheckDep"] = string.IsNullOrEmpty(aut.cond1) ? "所有" : aut.cond1;
             ViewData["sm"] = sm;
             return View();
         }
@@ -1750,7 +1757,25 @@ namespace EmpInfo.Controllers
                 result = result.Where(r => r.leave_date <= qToDate);
             }
 
-            return result;
+            //加上部门查询权限
+            IQueryable<vw_JQExcel> datas = null;
+            var depNames = db.ei_flowAuthority.Where(f => f.bill_type == "JQ" && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).Select(f => f.cond1).FirstOrDefault();
+            if (!string.IsNullOrEmpty(depNames)) {
+                var names = depNames.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var name in names) {
+                    if (datas == null) {
+                        datas = result.Where(r => r.dep_name.Contains(name));
+                    }
+                    else {
+                        datas = datas.Union(result.Where(r => r.dep_name.Contains(name)));
+                    }
+                }
+            }
+            else {
+                datas = result;
+            }
+
+            return datas;
         }
 
         public JsonResult ToggleJQCheck1(string sysNo)
@@ -1796,8 +1821,8 @@ namespace EmpInfo.Controllers
         {            
             var result = SearchJQData(fromDate, toDate, qFromDate, qToDate, depName, empName, sysNum).OrderBy(s => s.apply_time).ToList();
 
-            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "申请时间","离职类型", "离职人", "离职人账号", "离职人厂牌", "人事部门","工资类别",
-                                              "旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工资发放方式","离职时间","综合表现" };
+            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "申请时间","完成时间","离职类型", "离职人", "离职人账号", "离职人厂牌", "人事部门","工资类别",
+                                              "旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工资发放方式","离职时间","组长","主管","部长","综合表现" };
             ushort[] colWidth = new ushort[colName.Length];
 
             for (var i = 0; i < colWidth.Length; i++) {
@@ -1840,12 +1865,13 @@ namespace EmpInfo.Controllers
             foreach (var d in result) {
                 colIndex = 1;
 
-                //"处理结果","申请流水号", "申请人", "申请时间","离职类型", "离职人", "离职人账号", "离职人厂牌", "人事部门","工资类别",
-                //"旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工作评价","工作评价描述","原部是否愿意再录用", "是否愿意再录用原因"
+                //"处理结果","申请流水号", "申请人", "申请时间",“完成时间”，"离职类型", "离职人", "离职人账号", "离职人厂牌", "人事部门","工资类别",
+                //"旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工资发放方式","离职时间","组长","主管","部长","综合表现"
                 cells.Add(++rowIndex, colIndex, d.audit_result);
                 cells.Add(rowIndex, ++colIndex, d.sys_no);
                 cells.Add(rowIndex, ++colIndex, d.applier_name);
                 cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.finish_date == null ? "" : ((DateTime)d.finish_date).ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, d.quit_type);
                 cells.Add(rowIndex, ++colIndex, d.name);
                 cells.Add(rowIndex, ++colIndex, d.account);
@@ -1860,6 +1886,9 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.quit_suggestion);
                 cells.Add(rowIndex, ++colIndex, d.salary_clear_way);
                 cells.Add(rowIndex, ++colIndex, d.leave_date == null ? "" : ((DateTime)d.leave_date).ToString("yyyy-MM-dd"));
+                cells.Add(rowIndex, ++colIndex, d.group_leader_name);
+                cells.Add(rowIndex, ++colIndex, d.charger_name??d.dep_charger_name);
+                cells.Add(rowIndex, ++colIndex, d.produce_minister_name??d.highest_charger_name);
                 cells.Add(rowIndex, ++colIndex, string.Format("工作评价:{0},{1};是否再录用：{2},{3}",d.work_evaluation,d.work_comment,d.wanna_employ,d.employ_comment));
             }
 
@@ -2024,11 +2053,20 @@ namespace EmpInfo.Controllers
         public void BeginExportSPReport(DateTime fromDate, DateTime toDate)
         {
             toDate = toDate.AddDays(1);
-            var result = db.vw_spExcel.Where(u => u.apply_time > fromDate && u.apply_time <= toDate).ToList();
+            var result = (from v in db.vw_spExcel
+                          join entry in db.ei_spApplyEntry on v.id equals entry.sp_id into eTemp
+                          from e in eTemp.DefaultIfEmpty()
+                          where v.apply_time >= fromDate
+                          && v.apply_time <= toDate
+                          select new
+                          {
+                              v,
+                              e
+                          }).ToList();
 
             string[] colName = new string[] { "处理结果", "公司", "部门", "申请人","快递公司","运费","快递单号","快递方式", "收寄类型", "收寄范围", "流水号", "申请时间"
                                             , "联系电话","放行条编号", "收寄内容","产品名称","规格型号","配送数量","件数","总净重","卡板数"
-                                            , "卡板尺寸","装箱尺寸","配送时效","寄件地址","收件地址","收件人","收件人电话","申请原因"
+                                            , "卡板尺寸","装箱尺寸","配送时效","寄件地址","收件地址","收件人","收件人电话","申请原因","是否退补货"
             };
             ushort[] colWidth = new ushort[colName.Length];
 
@@ -2063,7 +2101,6 @@ namespace EmpInfo.Controllers
             Cells cells = sheet.Cells;
             int rowIndex = 1;
             int colIndex = 1;
-            var sv = new APSv();
 
             //设置标题
             foreach (var name in colName) {
@@ -2076,37 +2113,38 @@ namespace EmpInfo.Controllers
                 //"处理结果", "公司", "部门", "申请人","快递公司","运费","快递单号","快递方式", "收寄类型", "收寄范围", "流水号", "申请时间"
                 //, "联系电话","放行条编号", "收寄内容","产品名称","规格型号","配送数量","件数","总净重","卡板数"
                 //, "卡板尺寸","装箱尺寸","配送时效","寄件地址","收件地址","收件人","收件人电话","申请原因"
-                cells.Add(++rowIndex, colIndex, d.audit_result);
-                cells.Add(rowIndex, ++colIndex, d.company);
-                cells.Add(rowIndex, ++colIndex, d.bus_name);
-                cells.Add(rowIndex, ++colIndex, d.applier_name);
-                cells.Add(rowIndex, ++colIndex, d.ex_company);
-                cells.Add(rowIndex, ++colIndex, d.ex_price);
-                cells.Add(rowIndex, ++colIndex, d.ex_no);
-                cells.Add(rowIndex, ++colIndex, d.ex_type);
-                cells.Add(rowIndex, ++colIndex, d.send_or_receive);
-                cells.Add(rowIndex, ++colIndex, d.scope);
-                cells.Add(rowIndex, ++colIndex, d.sys_no);
-                cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(++rowIndex, colIndex, d.v.audit_result);
+                cells.Add(rowIndex, ++colIndex, d.v.company);
+                cells.Add(rowIndex, ++colIndex, d.v.bus_name);
+                cells.Add(rowIndex, ++colIndex, d.v.applier_name);
+                cells.Add(rowIndex, ++colIndex, d.v.ex_company);
+                cells.Add(rowIndex, ++colIndex, d.v.ex_price);
+                cells.Add(rowIndex, ++colIndex, d.v.ex_no);
+                cells.Add(rowIndex, ++colIndex, d.v.ex_type);
+                cells.Add(rowIndex, ++colIndex, d.v.send_or_receive);
+                cells.Add(rowIndex, ++colIndex, d.v.scope);
+                cells.Add(rowIndex, ++colIndex, d.v.sys_no);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.v.apply_time).ToString("yyyy-MM-dd HH:mm"));
 
-                cells.Add(rowIndex, ++colIndex, d.applier_phone);
-                cells.Add(rowIndex, ++colIndex, d.send_no);
-                cells.Add(rowIndex, ++colIndex, d.content_type);
-                cells.Add(rowIndex, ++colIndex, d.name);
-                cells.Add(rowIndex, ++colIndex, d.modual);
-                cells.Add(rowIndex, ++colIndex, d.qty);
-                cells.Add(rowIndex, ++colIndex, d.package_num);
-                cells.Add(rowIndex, ++colIndex, d.total_weight);
-                cells.Add(rowIndex, ++colIndex, d.cardboard_num);
+                cells.Add(rowIndex, ++colIndex, d.v.applier_phone);
+                cells.Add(rowIndex, ++colIndex, d.v.send_no);
+                cells.Add(rowIndex, ++colIndex, d.v.content_type);
+                cells.Add(rowIndex, ++colIndex, d.e == null ? "" : d.e.name);
+                cells.Add(rowIndex, ++colIndex, d.e == null ? "" : d.e.modual);
+                cells.Add(rowIndex, ++colIndex, d.e == null ? "" : d.e.qty.ToString());
+                cells.Add(rowIndex, ++colIndex, d.v.package_num);
+                cells.Add(rowIndex, ++colIndex, d.v.total_weight);
+                cells.Add(rowIndex, ++colIndex, d.v.cardboard_num);
 
-                cells.Add(rowIndex, ++colIndex, d.cardboard_size);
-                cells.Add(rowIndex, ++colIndex, d.box_size);
-                cells.Add(rowIndex, ++colIndex, d.aging);
-                cells.Add(rowIndex, ++colIndex, d.from_addr);
-                cells.Add(rowIndex, ++colIndex, d.to_addr);
-                cells.Add(rowIndex, ++colIndex, d.receiver_name);
-                cells.Add(rowIndex, ++colIndex, d.receiver_phone);
-                cells.Add(rowIndex, ++colIndex, d.apply_reason);
+                cells.Add(rowIndex, ++colIndex, d.v.cardboard_size);
+                cells.Add(rowIndex, ++colIndex, d.v.box_size);
+                cells.Add(rowIndex, ++colIndex, d.v.aging);
+                cells.Add(rowIndex, ++colIndex, d.v.from_addr);
+                cells.Add(rowIndex, ++colIndex, d.v.to_addr);
+                cells.Add(rowIndex, ++colIndex, d.v.receiver_name);
+                cells.Add(rowIndex, ++colIndex, d.v.receiver_phone);
+                cells.Add(rowIndex, ++colIndex, d.v.apply_reason);
+                cells.Add(rowIndex, ++colIndex, d.v.isReturnBack);
             }
 
             xls.Send();
