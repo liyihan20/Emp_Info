@@ -611,6 +611,8 @@ namespace EmpInfo.Controllers
         //    db.SaveChanges();
         //    return "suc";
         //}
-        
+
+
+
     }
 }

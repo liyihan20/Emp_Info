@@ -331,7 +331,7 @@ namespace EmpInfo.Controllers
         }
 
         public JsonResult GetSPExInfoWithoutBill(string spJson)
-        {            
+        {
             try {
                 //WriteEventLog("快递", spJson);
                 ei_spApply sp = JsonConvert.DeserializeObject<ei_spApply>(spJson);

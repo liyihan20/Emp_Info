@@ -1259,8 +1259,8 @@
     <Content Include="Views\Report\UCReport.cshtml" />
     <Content Include="Views\Apply\ApplyIndex.cshtml" />
     <Content Include="Views\Apply\BeginApplyAL.cshtml" />
+    <Content Include="Views\Apply\GetMyApplyList.bak.cshtml" />
     <Content Include="Views\Apply\GetMyApplyList.cshtml" />
-    <Content Include="Views\Apply\GetMyALApplyList.cshtml" />
     <Content Include="Views\Apply\CheckALApply.cshtml" />
     <Content Include="Views\Apply\CheckFlowRecord.cshtml" />
     <Content Include="Views\Apply\GetMyAuditedList.cshtml" />

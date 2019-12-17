@@ -1761,7 +1761,7 @@ namespace EmpInfo.Controllers
             IQueryable<vw_JQExcel> datas = null;
             var depNames = db.ei_flowAuthority.Where(f => f.bill_type == "JQ" && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).Select(f => f.cond1).FirstOrDefault();
             if (!string.IsNullOrEmpty(depNames)) {
-                var names = depNames.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                var names = depNames.Split(new char[] { ';','；' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var name in names) {
                     if (datas == null) {
                         datas = result.Where(r => r.dep_name.Contains(name));

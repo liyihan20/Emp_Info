@@ -34,10 +34,10 @@ namespace EmpInfo.Services
         /// 我申请的界面，请假流程因为完成后也可以撤销，所以独立出来
         /// </summary>
         /// <returns></returns>
-        public override string GetMyAppliesViewName()
-        {
-            return "GetMyALApplyList";
-        }
+        //public override string GetMyAppliesViewName()
+        //{
+        //    return "GetMyALApplyList";
+        //}
 
         public override string AuditViewName()
         {
@@ -179,7 +179,7 @@ namespace EmpInfo.Services
             al.apply_time = DateTime.Now;
 
             if (al.to_date == null || al.from_date == null) {
-                throw new Exception("请假日期不合法" );
+                throw new Exception("请假日期不合法");
             }
             else if (al.to_date <= al.from_date) {
                 throw new Exception("请检查请假期间");
@@ -219,7 +219,7 @@ namespace EmpInfo.Services
             }
         }
 
-       
+        
         public override SimpleResultModel AbortApply(UserInfo userInfo, string sysNo, string reason = "")
         {
             FlowSvrSoapClient flow = new FlowSvrSoapClient();

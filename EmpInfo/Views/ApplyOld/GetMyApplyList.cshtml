@@ -20,7 +20,7 @@
         function AbortApply(sysNo, reason) {
             if (!reason) reason = "";
             openConfirmDialog("确认要撤销此申请吗？", function () {
-                $.post("AbortApply", { sysNo: sysNo, reason: reason }, function (data) {
+                $.post("@Url.Content("~/Apply/AbortApply")", { sysNo: sysNo, reason: reason }, function (data) {
                     if (data.suc) {
                         toastr.success(data.msg);
                         setTimeout(function () { location.reload(true); }, 2000);
@@ -43,7 +43,6 @@
                 <li><span class="glyphicon glyphicon-hand-right"></span></li>
                 <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
                 <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-                <li><a href="@string.Concat("ApplyIndex?billType=", ViewData["billType"])">@ViewData["billTypeName"]</a></li>
                 <li class="active">我申请的</li>
             </ol>
         </div>

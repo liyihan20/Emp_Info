@@ -92,11 +92,9 @@ namespace EmpInfo.Services
         }
 
         public override void SaveApply(System.Web.Mvc.FormCollection fc, UserInfo userInfo)
-        {
+        {            
             bill = new ei_jqApply();
             MyUtils.SetFieldValueToModel(fc, bill);
-
-            //if (!bill.dep_name.Contains("CCM")) throw new Exception("当前是测试阶段，只有CCM的才能申请，正式运行后会通知");
 
             if (bill.quit_reason != null && bill.quit_reason.Length > 1000) throw new Exception("离职原因内容太多，请删减");
             if (bill.quit_suggestion != null && bill.quit_suggestion.Length > 1000) throw new Exception("离职建议内容太多，请删减");
@@ -117,18 +115,16 @@ namespace EmpInfo.Services
                 bill.group_leader_num = GetUserCardByNameAndCardNum(bill.group_leader_name);
 
                 //因为有调部门的关系，离职时人事部门还是旧部门，所以提交时更新为组长的人事部门 2019-11-27
-                var leaderDepartment = db.GetHREmpInfoDetail(bill.group_leader_num).FirstOrDefault();
-                if (leaderDepartment == null || leaderDepartment.emp_status == "离职") {
-                    throw new Exception("组长已不存在或已离职");
-                }
-                bill.dep_name = leaderDepartment.dep_name;
+                //var leaderDepartment = db.GetHREmpInfoDetail(bill.group_leader_num).FirstOrDefault();
+                //if (leaderDepartment == null || leaderDepartment.emp_status == "离职") {
+                //    throw new Exception("组长已不存在或已离职");
+                //}
+                //bill.dep_name = leaderDepartment.dep_name;
             }
             else if ("月薪".Equals(bill.salary_type)) {
                 if (string.IsNullOrWhiteSpace(bill.dep_charger_name)) throw new Exception("必须选择部门负责人");
-                //if (string.IsNullOrWhiteSpace(bill.highest_charger_name)) throw new Exception("必须最高负责人");
 
                 bill.dep_charger_num = GetUserCardByNameAndCardNum(bill.dep_charger_name);
-                //bill.highest_charger_num = GetUserCardByNameAndCardNum(bill.highest_charger_name);
             }
             else {
                 throw new Exception("工资类型只有计件或月薪的才能申请此流程");
@@ -346,5 +342,6 @@ namespace EmpInfo.Services
                 }
             }
         }
+                        
     }
 }
