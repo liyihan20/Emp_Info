@@ -342,6 +342,11 @@ namespace EmpInfo.Services
                 }
             }
         }
-                        
+
+        public void UpdateDepName(string newDepName)
+        {
+            bill.dep_name = newDepName;
+            db.SaveChanges();
+        }
     }
 }

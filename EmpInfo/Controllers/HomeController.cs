@@ -154,8 +154,16 @@ namespace EmpInfo.Controllers
                 {
                     return Json(new SimpleResultModel() { suc = false, msg = "邮箱地址不合法" });
                 }
-                if (db.ei_users.Where(u => u.email == email && u.id != userInfo.id && u.name!=userInfo.name).Count() > 0) {
-                    return Json(new SimpleResultModel() { suc = false, msg = "此邮箱已被其他人绑定" });
+                var emailOwner = db.ei_users.Where(u => u.email == email && u.id != userInfo.id && u.name != userInfo.name).FirstOrDefault();
+                
+                if (emailOwner != null) {
+                    if (db.vw_ei_simple_users.Where(s => s.card_number == emailOwner.card_number && s.dep_name != null).Count() > 0) {
+                        return Json(new SimpleResultModel() { suc = false, msg = "此邮箱已被其他人绑定" });
+                    }
+                    else {
+                        //这里的是已绑定了邮箱但是离职了的，将邮箱清空，给新人绑定。多见于车间共用邮箱的组长等
+                        emailOwner.email = null;
+                    }
                 }
                 user.email = email;
             }

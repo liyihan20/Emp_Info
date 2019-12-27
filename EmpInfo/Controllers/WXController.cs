@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using EmpInfo.Models;
+using EmpInfo.Services;
 using EmpInfo.Util;
 using Newtonsoft.Json;
-using EmpInfo.Filter;
-using EmpInfo.Models;
+using System;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace EmpInfo.Controllers
 {
@@ -309,6 +307,27 @@ namespace EmpInfo.Controllers
         public string AESD(string str)
         {
             return MyUtils.AESDecrypt(str);
+        }
+
+
+        public ActionResult GetLocation()
+        {
+            WxSv sv = new WxSv();
+            WxConfigParam p = new WxConfigParam();
+            TimeSpan ts = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            p.timestamp = Convert.ToInt64(ts.TotalSeconds);
+            p.appId = sv.APPID;
+            p.nonceStr = MyUtils.CreateValidateNumber(8);
+            try {
+                p.signature = sv.GetSignature(p.nonceStr, p.timestamp.ToString(), Request.Url.ToString());
+            }
+            catch (Exception ex) {
+                ViewBag.tip = ex.Message;
+                return View("Error");
+            }
+            ViewData["wxConfigParam"] = p;
+
+            return View();
         }
 
     }

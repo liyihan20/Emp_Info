@@ -548,7 +548,7 @@ namespace EmpInfo.Util
             return Path.Combine(
                 ConfigurationManager.AppSettings["AttachmentPath"],
                 sysNum.Substring(0, 2),
-                "20"+sysNum.Substring(2,2),
+                "20" + sysNum.Substring(2, 2),
                 sysNum.Substring(4, 2),
                 sysNum
             );

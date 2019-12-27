@@ -118,6 +118,8 @@
         <AssociationConnector Association="ICAuditModel.FK_ei_sjApplyEntry_ei_sjApply" />
         <EntityTypeShape EntityType="ICAuditModel.vw_SJExcel" Width="1.5" PointX="8.25" PointY="14.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_spExcel" Width="1.5" PointX="8.25" PointY="15.125" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.wx_accessToken" Width="1.5" PointX="10.75" PointY="5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.wx_jsApiTicket" Width="1.5" PointX="10.75" PointY="5.625" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

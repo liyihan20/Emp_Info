@@ -255,7 +255,6 @@ namespace EmpInfo.Controllers
             }else{
                 return false;
             }
-
         }
 
         //注册第三步，根据电话号码后4位或邮箱验证码验证，如通过，进入第四部，输出完整身份证号码

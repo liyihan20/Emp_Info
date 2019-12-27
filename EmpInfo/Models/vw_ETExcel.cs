@@ -46,5 +46,6 @@ namespace EmpInfo.Models
         public string item_modual { get; set; }
         public Nullable<decimal> qty { get; set; }
         public Nullable<System.DateTime> finish_date { get; set; }
+        public string audit_result { get; set; }
     }
 }

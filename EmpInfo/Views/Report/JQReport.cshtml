@@ -86,9 +86,30 @@
                 if (data.length == 0) {
                     toastr.error("当前时间段查无申请");
                 }
-            });
-            
+            });            
         });
+
+        $("#updateDepBt").on("click", function () {
+            var newDepName = $("#m_depName").val();
+            var sysNo = $("#m_sysNo").val();
+            if (newDepName == "") {
+                toastr.error("请输入新部门名称");
+                return;
+            }
+            openConfirmDialog("确定要修改部门吗？", function () {
+                $.post("@Url.Content("~/ApplyExtra/UpdateJQDepName")", { sysNo: sysNo, newDepName: newDepName }, function (data) {
+                    if (data.suc) {
+                        $("#check_tb").bootstrapTable("updateCellById", { id: sysNo, field: "dep_name", value: newDepName });
+                        $("#depModal").modal("hide");
+                        toastr.success("部门修改成功");
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+                
+            });
+        });
+
     });
 
         $("#check_tb").bootstrapTable({
@@ -142,10 +163,16 @@
                     field: "check1",                    
                     title: "标识1",
                     checkbox: true
+                }, {
+                    field: "opButtons",
+                    title: "操作按钮",
+                    formatter: function (value, row, index) {
+                        return '<button class="btn btn-sm btn-primary" style="margin-right:6px;" onclick="OpenUpdateDialog(\'' + row.sys_no +'\',\''+row.dep_name + '\')"><i class="fa fa-edit"></i> 修改部门</button>';
+                    }
                 }
             ],
             onClickCell: function (field, value, row, $element) {
-                if (field != "check1") {
+                if (field != "check1" && field != "opButtons") {
                     if (row.sys_no) {
                         window.open("@Url.Content("~/Apply/CheckApply?sysNo=")" + row.sys_no);
                     }
@@ -169,6 +196,15 @@
                 }
             });
         }
+
+        function OpenUpdateDialog(sysNo, depName,index) {
+            console.log(sysNo + ":" + depName);
+            $("#depModal").modal("show");
+            $("#m_sysNo").val(sysNo);
+            $("#m_depName").val(depName);            
+        }
+
+
 
     </script>
 
@@ -242,4 +278,38 @@
 
     </div>
 </div>
-
+@section Modal {    
+    @Html.Partial("_ConfirmDialog")
+    <div class="modal fade" id="depModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">修改员工部门</h4>
+                </div>
+                <div class="modal-body">
+                    <p class="text-danger"><i class="fa fa-info-circle"></i> 如果离职员工的人事部门有误，可在以下修改为正确的部门：</p>
+                    <div class="b-div">
+                        <span class="b-label">
+                            流水号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" id="m_sysNo" readonly />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            离职人部门:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" id="m_depName" />
+                        </span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="updateDepBt"><span class="fa fa-check-circle"></span> 确认修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

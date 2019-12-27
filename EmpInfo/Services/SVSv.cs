@@ -27,18 +27,18 @@ namespace EmpInfo.Services
             get { return "调休申请单"; }
         }
 
-        public override List<ApplyNavigatorModel> GetApplyNavigatorLinks()
-        {
-            var list = base.GetApplyNavigatorLinks();
-            list.Add(
-                new ApplyNavigatorModel()
-                {
-                    text = "电子公司专用流程",
-                    url = "Home/EleProcess"
-                }
-            );
-            return list;
-        }
+        //public override List<ApplyNavigatorModel> GetApplyNavigatorLinks()
+        //{
+        //    var list = base.GetApplyNavigatorLinks();
+        //    list.Add(
+        //        new ApplyNavigatorModel()
+        //        {
+        //            text = "电子公司专用流程",
+        //            url = "Home/EleProcess"
+        //        }
+        //    );
+        //    return list;
+        //}
 
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
@@ -57,14 +57,23 @@ namespace EmpInfo.Services
 
         public override object GetInfoBeforeApply(UserInfo userInfo, UserInfoDetail userInfoDetail)
         {
-            CRSVBeforeApplyModel m = new CRSVBeforeApplyModel();
-            var appliedBills = db.ei_askLeave.Where(a => a.applier_num == userInfo.cardNo).ToList();
-            if (appliedBills.Count() > 0) {
-                var ab = appliedBills.OrderByDescending(a => a.id).First();
-                if (ab.dep_long_name.Equals(GetDepLongNameByNum(ab.dep_no))) {
-                    m.depName = ab.dep_long_name;
-                    m.depNum = ab.dep_no;
-                    m.depId = ab.dep_id;
+            CRSVBeforeApplyModel m = new CRSVBeforeApplyModel();            
+            var appliedBill = db.ei_SVApply.Where(a => a.applier_num == userInfo.cardNo).OrderByDescending(a => a.id).FirstOrDefault();
+            if (appliedBill == null) {
+                var leavBill = db.ei_askLeave.Where(a => a.applier_num == userInfo.cardNo).OrderByDescending(a => a.id).FirstOrDefault();
+                if (leavBill != null) {
+                    if (leavBill.dep_long_name.Equals(GetDepLongNameByNum(leavBill.dep_no))) {
+                        m.depName = leavBill.dep_long_name;
+                        m.depNum = leavBill.dep_no;
+                        m.depId = leavBill.dep_id;
+                    }
+                }
+            }
+            else {
+                if (appliedBill.dep_long_name.Equals(GetDepLongNameByNum(appliedBill.dep_no))) {
+                    m.depName = appliedBill.dep_long_name;
+                    m.depNum = appliedBill.dep_no;
+                    m.depId = appliedBill.dep_id;
                 }
             }
             m.sysNum = GetNextSysNum(BillType);
@@ -190,9 +199,9 @@ namespace EmpInfo.Services
             bill.applier_num = userInfo.cardNo;
             bill.apply_time = DateTime.Now;
 
-            if (!bill.dep_no.StartsWith("104")) {
-                throw new Exception("此流程的部门只支持选择信利电子子部门");
-            }
+            //if (!bill.dep_no.StartsWith("104")) {
+            //    throw new Exception("此流程的部门只支持选择信利电子子部门");
+            //}
 
             FlowSvrSoapClient client = new FlowSvrSoapClient();
             var result = client.GetFlowQueue(JsonConvert.SerializeObject(bill), BillType);

@@ -1179,6 +1179,22 @@
           <Property Name="code" Type="varchar" MaxLength="50" />
           <Property Name="text" Type="varchar" MaxLength="255" />
         </EntityType>
+        <EntityType Name="wx_accessToken">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FAccessToken" Type="varchar" MaxLength="500" Nullable="false" />
+          <Property Name="FExpireDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="wx_jsApiTicket">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FJsApiTicket" Type="varchar" MaxLength="500" Nullable="false" />
+          <Property Name="FExpireDate" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="wx_pushMsg">
           <Key>
             <PropertyRef Name="id" />
@@ -1415,6 +1431,7 @@
             <PropertyRef Name="out_time" />
             <PropertyRef Name="has_attachment" />
             <PropertyRef Name="entry_id" />
+            <PropertyRef Name="audit_result" />
           </Key>
           <Property Name="id" Type="int" Nullable="false" />
           <Property Name="sys_no" Type="varchar" MaxLength="50" />
@@ -1448,6 +1465,7 @@
           <Property Name="item_modual" Type="varchar" MaxLength="200" />
           <Property Name="qty" Type="decimal" Precision="18" Scale="4" />
           <Property Name="finish_date" Type="datetime" />
+          <Property Name="audit_result" Type="varchar" MaxLength="6" Nullable="false" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_ETReport”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -2284,6 +2302,8 @@
           <EntitySet Name="flow_notifyUsers" EntityType="Self.flow_notifyUsers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="k3_database" EntityType="Self.k3_database" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="public_fund_item" EntityType="Self.public_fund_item" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="wx_accessToken" EntityType="Self.wx_accessToken" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="wx_jsApiTicket" EntityType="Self.wx_jsApiTicket" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="wx_pushMsg" EntityType="Self.wx_pushMsg" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="vw_APExcel" EntityType="Self.vw_APExcel" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
@@ -2491,7 +2511,8 @@ FROM [dbo].[vw_epReport] AS [vw_epReport]</DefiningQuery>
 [vw_ETExcel].[item_name] AS [item_name], 
 [vw_ETExcel].[item_modual] AS [item_modual], 
 [vw_ETExcel].[qty] AS [qty], 
-[vw_ETExcel].[finish_date] AS [finish_date]
+[vw_ETExcel].[finish_date] AS [finish_date], 
+[vw_ETExcel].[audit_result] AS [audit_result]
 FROM [dbo].[vw_ETExcel] AS [vw_ETExcel]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="vw_ETReport" EntityType="Self.vw_ETReport" store:Type="Views" store:Schema="dbo">
@@ -3211,6 +3232,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           </AssociationSet>
           <EntitySet Name="vw_SJExcel" EntityType="ICAuditModel.vw_SJExcel" />
           <EntitySet Name="vw_spExcel" EntityType="ICAuditModel.vw_spExcel" />
+          <EntitySet Name="wx_accessToken" EntityType="ICAuditModel.wx_accessToken" />
+          <EntitySet Name="wx_jsApiTicket" EntityType="ICAuditModel.wx_jsApiTicket" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -4768,6 +4791,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <PropertyRef Name="out_time" />
             <PropertyRef Name="has_attachment" />
             <PropertyRef Name="entry_id" />
+            <PropertyRef Name="audit_result" />
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" />
           <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
@@ -4801,6 +4825,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="item_modual" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="qty" Type="Decimal" Precision="18" Scale="4" />
           <Property Name="finish_date" Type="DateTime" Precision="3" />
+          <Property Name="audit_result" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="vw_ETReport">
           <Key>
@@ -5481,6 +5506,22 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="scope" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
           <Property Name="isReturnBack" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
           <Property Name="audit_result" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="wx_accessToken">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FAccessToken" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="FExpireDate" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="wx_jsApiTicket">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FJsApiTicket" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="FExpireDate" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -6900,6 +6941,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="vw_ETExcel">
             <EntityTypeMapping TypeName="ICAuditModel.vw_ETExcel">
               <MappingFragment StoreEntitySet="vw_ETExcel">
+                <ScalarProperty Name="audit_result" ColumnName="audit_result" />
                 <ScalarProperty Name="finish_date" ColumnName="finish_date" />
                 <ScalarProperty Name="qty" ColumnName="qty" />
                 <ScalarProperty Name="item_modual" ColumnName="item_modual" />
@@ -7591,6 +7633,24 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="applier_name" ColumnName="applier_name" />
                 <ScalarProperty Name="applier_num" ColumnName="applier_num" />
                 <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="wx_accessToken">
+            <EntityTypeMapping TypeName="ICAuditModel.wx_accessToken">
+              <MappingFragment StoreEntitySet="wx_accessToken">
+                <ScalarProperty Name="FExpireDate" ColumnName="FExpireDate" />
+                <ScalarProperty Name="FAccessToken" ColumnName="FAccessToken" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="wx_jsApiTicket">
+            <EntityTypeMapping TypeName="ICAuditModel.wx_jsApiTicket">
+              <MappingFragment StoreEntitySet="wx_jsApiTicket">
+                <ScalarProperty Name="FExpireDate" ColumnName="FExpireDate" />
+                <ScalarProperty Name="FJsApiTicket" ColumnName="FJsApiTicket" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

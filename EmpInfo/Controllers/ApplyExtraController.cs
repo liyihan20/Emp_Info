@@ -113,6 +113,18 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel() { suc = true });
         }
 
+        public JsonResult UpdateJQDepName(string sysNo, string newDepName)
+        {
+            try {
+                new JQSv(sysNo).UpdateDepName(newDepName);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            WriteEventLog("离职流程", "修改部门：" + sysNo + ":" + newDepName);
+            return Json(new SimpleResultModel(true));
+        }
+
         #endregion
 
         #region 调动

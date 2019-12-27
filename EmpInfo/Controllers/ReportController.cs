@@ -1494,7 +1494,7 @@ namespace EmpInfo.Controllers
             toDate = toDate.AddDays(1);
             var result = db.vw_ETExcel.Where(u => u.apply_time > fromDate && u.apply_time <= toDate).ToList();
             
-            string[] colName = new string[] { "序号", "申请流水号", "申请人", "联系电话", "申请时间", "完成申请时间", "市场部", "出货公司",
+            string[] colName = new string[] { "序号", "审核状态", "申请流水号", "申请人", "联系电话", "申请时间", "完成申请时间", "市场部", "出货公司",
                                               "客户", "生产事业部", "出货时间", "运输方式", "总毛重(KG)","件数", "包装箱尺寸", "卡板尺寸",
                                               "送货地址", "出货要求", "申请原因", "责任备注", "货运公司", "正常运费", "申请运费", "运费差额",
                                               "订单单号", "产品名称", "规格型号", "出货数量" };
@@ -1540,16 +1540,17 @@ namespace EmpInfo.Controllers
             foreach (var d in result) {
                 colIndex = 1;
 
-                //"序号", "申请流水号", "申请人", "联系电话", "申请时间", "完成申请时间", "市场部", "出货公司",
+                //"序号", "审核状态", "申请流水号", "申请人", "联系电话", "申请时间", "完成申请时间", "市场部", "出货公司",
                 //"客户", "生产事业部", "出货时间", "运输方式", "总毛重(KG)","件数", "包装箱尺寸", "卡板尺寸",
                 //"送货地址", "出货要求", "申请原因", "责任备注", "货运公司", "正常运费", "申请运费", "运费差额",
                 //"订单单号", "产品名称", "规格型号", "出货数量"
                 cells.Add(++rowIndex, colIndex, rowIndex - 1);
+                cells.Add(rowIndex, ++colIndex, d.audit_result);
                 cells.Add(rowIndex, ++colIndex, d.sys_no);
                 cells.Add(rowIndex, ++colIndex, d.applier_name);
                 cells.Add(rowIndex, ++colIndex, d.applier_phone);
                 cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
-                cells.Add(rowIndex, ++colIndex, ((DateTime)d.finish_date).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.finish_date == null ? "" : ((DateTime)d.finish_date).ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, d.market_name);
                 cells.Add(rowIndex, ++colIndex, d.company);
 
@@ -1822,7 +1823,7 @@ namespace EmpInfo.Controllers
             var result = SearchJQData(fromDate, toDate, qFromDate, qToDate, depName, empName, sysNum).OrderBy(s => s.apply_time).ToList();
 
             string[] colName = new string[] { "处理结果","申请流水号", "申请人", "申请时间","完成时间","离职类型", "离职人", "离职人账号", "离职人厂牌", "人事部门","工资类别",
-                                              "旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工资发放方式","离职时间","组长","主管","部长","综合表现" };
+                                              "旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工资发放方式","离职时间","标识1", "组长","主管","部长","综合表现" };
             ushort[] colWidth = new ushort[colName.Length];
 
             for (var i = 0; i < colWidth.Length; i++) {
@@ -1886,6 +1887,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.quit_suggestion);
                 cells.Add(rowIndex, ++colIndex, d.salary_clear_way);
                 cells.Add(rowIndex, ++colIndex, d.leave_date == null ? "" : ((DateTime)d.leave_date).ToString("yyyy-MM-dd"));
+                cells.Add(rowIndex, ++colIndex, d.check1 == true ? "Y" : "");
                 cells.Add(rowIndex, ++colIndex, d.group_leader_name);
                 cells.Add(rowIndex, ++colIndex, d.charger_name??d.dep_charger_name);
                 cells.Add(rowIndex, ++colIndex, d.produce_minister_name??d.highest_charger_name);
