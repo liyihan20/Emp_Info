@@ -558,5 +558,14 @@ namespace EmpInfo.Models
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("UpdateHrEmpDept", card_numberParameter, dep_idParameter, in_timeParameter, positionParameter);
         }
+    
+        public virtual ObjectResult<GetKQRecord_Result> GetKQRecord(string account_no)
+        {
+            var account_noParameter = account_no != null ?
+                new ObjectParameter("account_no", account_no) :
+                new ObjectParameter("account_no", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetKQRecord_Result>("GetKQRecord", account_noParameter);
+        }
     }
 }

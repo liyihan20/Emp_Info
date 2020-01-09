@@ -2163,6 +2163,9 @@
         <Function Name="GetK3StockAuditor" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="accountName" Type="varchar" Mode="In" />
         </Function>
+        <Function Name="GetKQRecord" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="account_no" Type="varchar" Mode="In" />
+        </Function>
         <Function Name="GetOutStockBillsForAudit1" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="account" Type="varchar" Mode="In" />
           <Parameter Name="fd" Type="smalldatetime" Mode="In" />
@@ -3234,6 +3237,9 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySet Name="vw_spExcel" EntityType="ICAuditModel.vw_spExcel" />
           <EntitySet Name="wx_accessToken" EntityType="ICAuditModel.wx_accessToken" />
           <EntitySet Name="wx_jsApiTicket" EntityType="ICAuditModel.wx_jsApiTicket" />
+          <FunctionImport Name="GetKQRecord" ReturnType="Collection(ICAuditModel.GetKQRecord_Result)">
+            <Parameter Name="account_no" Mode="In" Type="String" />
+          </FunctionImport>
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -5523,6 +5529,22 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="FJsApiTicket" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="FExpireDate" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
+        <ComplexType Name="GetKQRecord_Result">
+          <Property Type="Int32" Name="IDD" Nullable="false" />
+          <Property Type="String" Name="XM" Nullable="true" MaxLength="25" />
+          <Property Type="String" Name="ZH" Nullable="true" MaxLength="6" />
+          <Property Type="DateTime" Name="KDATE" Nullable="true" Precision="23" />
+          <Property Type="String" Name="ZS_C" Nullable="true" MaxLength="5" />
+          <Property Type="String" Name="ZX_C" Nullable="true" MaxLength="5" />
+          <Property Type="String" Name="XS_C" Nullable="true" MaxLength="5" />
+          <Property Type="String" Name="XX_C" Nullable="true" MaxLength="5" />
+          <Property Type="String" Name="WS_C" Nullable="true" MaxLength="5" />
+          <Property Type="String" Name="WX_C" Nullable="true" MaxLength="5" />
+          <Property Type="String" Name="A" Nullable="true" MaxLength="5" />
+          <Property Type="String" Name="B" Nullable="true" MaxLength="5" />
+          <Property Type="String" Name="C" Nullable="true" MaxLength="5" />
+          <Property Type="String" Name="D" Nullable="true" MaxLength="5" />
+        </ComplexType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -7655,6 +7677,26 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetKQRecord" FunctionName="ICAuditModel.Store.GetKQRecord">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetKQRecord_Result">
+                <ScalarProperty Name="IDD" ColumnName="IDD" />
+                <ScalarProperty Name="XM" ColumnName="XM" />
+                <ScalarProperty Name="ZH" ColumnName="ZH" />
+                <ScalarProperty Name="KDATE" ColumnName="KDATE" />
+                <ScalarProperty Name="ZS_C" ColumnName="ZS_C" />
+                <ScalarProperty Name="ZX_C" ColumnName="ZX_C" />
+                <ScalarProperty Name="XS_C" ColumnName="XS_C" />
+                <ScalarProperty Name="XX_C" ColumnName="XX_C" />
+                <ScalarProperty Name="WS_C" ColumnName="WS_C" />
+                <ScalarProperty Name="WX_C" ColumnName="WX_C" />
+                <ScalarProperty Name="A" ColumnName="A" />
+                <ScalarProperty Name="B" ColumnName="B" />
+                <ScalarProperty Name="C" ColumnName="C" />
+                <ScalarProperty Name="D" ColumnName="D" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

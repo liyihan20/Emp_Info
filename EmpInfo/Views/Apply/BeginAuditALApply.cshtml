@@ -81,7 +81,7 @@
             });
 
             function getSendMsgLog() {
-                $.post("@Url.Content("~/ApplyExtra/GetLeaveDaysExceedLog")", { sysNo: "@bam.sysNum" }, function (data) {
+                $.post("@Url.Content("~/ApplyExtra/GetAHPushLog")", { sysNo: "@bam.sysNum" }, function (data) {
                     if (data.suc) {
                         $("#msgLog").html(data.msg);
                     } else {

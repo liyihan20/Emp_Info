@@ -135,6 +135,16 @@ namespace EmpInfo.Controllers
             dep.dep_num = depNum;
             dep.dep_name = depName;
             dep.is_forbit = isForbit == 1 ? true : false;
+            if (dep.is_forbit==true) {
+                foreach (var prDep in dep.ei_epPrDeps.Where(p=>p.is_forbit==false || p.is_forbit==null).ToList()) {
+                    prDep.is_forbit = true;
+                }
+            }
+            else {
+                foreach (var prDep in dep.ei_epPrDeps.Where(p=>p.is_forbit==true).ToList()) {
+                    prDep.is_forbit = false;
+                }
+            }
             try {
                 if (!string.IsNullOrEmpty(charger)) {
                     dep.charger_name = charger.Split(new char[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries)[0];
@@ -147,7 +157,7 @@ namespace EmpInfo.Controllers
             }
             catch (Exception ex) {
                 return Json(new { suc = false, msg = "负责人或分部长出现错误：" + ex.Message });
-            }            
+            }
 
             try {
                 db.SaveChanges();

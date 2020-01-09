@@ -167,7 +167,6 @@ namespace EmpInfo.Services
             }         
         }
 
-
         public List<flow_applyEntryQueue> GetApplyEntryQueue(System.Web.Mvc.FormCollection fc, UserInfo userInfo)
         {
             ei_askLeave al = new ei_askLeave();
@@ -218,8 +217,7 @@ namespace EmpInfo.Services
                 throw new Exception(result.msg);
             }
         }
-
-        
+                
         public override SimpleResultModel AbortApply(UserInfo userInfo, string sysNo, string reason = "")
         {
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
@@ -295,74 +293,7 @@ namespace EmpInfo.Services
             
             return new SimpleResultModel() { suc = result.suc, msg = result.msg };
         }
-
-
-        public void LeaveDayExceedPush(UserInfo userInfo, string bookTime)
-        {
-            DateTime dt;
-            if (!DateTime.TryParse(bookTime, out dt)) {
-                throw new Exception("预约时间不是日期格式" );
-            }
-
-            ei_leaveDayExceedPushLog log = new ei_leaveDayExceedPushLog();
-            log.book_date = dt;
-            log.send_date = DateTime.Now;
-            log.send_user = userInfo.name;
-            log.sys_no = bill.sys_no;
-            db.ei_leaveDayExceedPushLog.Add(log);
-
-            var receviers = bill.applier_num;
-            FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            var step1Auditors = flow.GetCertainStepAuditors(bill.sys_no, 1);
-            if (!string.IsNullOrEmpty(step1Auditors)) {
-                receviers += ";" + step1Auditors;
-            }
-
-            string addr, phone;
-            if (bill.dep_no.StartsWith("106")) {
-                addr = "研发楼一楼行政及人力资源部";
-                phone = "0752-6568888/7888";
-            }
-            else {
-                addr = "写字楼（行政大楼）一楼行政部";
-                phone = "3003";
-            }
-
-            //发微信
-            foreach (var ad in receviers.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
-                var pushUsers = db.vw_push_users.Where(u => u.card_number == ad).ToList();
-                if (pushUsers.Count() == 0) {
-                    continue;
-                }
-                var pushUser = pushUsers.First();
-                wx_pushMsg pm = new wx_pushMsg();
-                pm.FCardNumber = ad;
-                pm.FFirst = string.Format("{0}，请您于下述时间，前往{2}与{1}面谈。", bill.applier_name, userInfo.name, addr);
-                pm.FHasSend = false;
-                pm.FInTime = DateTime.Now;
-                pm.FkeyWord1 = "请假时间超过公司规定天数";
-                pm.FKeyWord2 = dt.ToString("yyyy-MM-dd HH:mm");
-                pm.FOpenId = pushUser.wx_openid;
-                pm.FPushType = "行政面谈";
-                pm.FRemark = "请您准时到达，如有疑问。请致电行政部" + userInfo.name + "，电话：" + phone;
-                db.wx_pushMsg.Add(pm);
-            }
-            db.SaveChanges();
-
-            //发送邮件
-            string subject = "行政部面谈通知";
-            string emailAddrs = GetUserEmailByCardNum(bill.applier_num);
-            string ccEmails = GetUserEmailByCardNum(step1Auditors);
-            string content = "<div>" + string.Format("{0}，你好！", bill.applier_name) + "</div>";
-            content += "<div style='margin-left:30px;'>请您于下述时间，前往" + addr + "与" + userInfo.name + "面谈。<br /> 面谈内容：请假时间超过公司规定天数 <br/> 预约时间：" + dt.ToString("yyyy-MM-dd HH:mm") + "</div>";
-            MyEmail.SendEmail(subject, emailAddrs, content, ccEmails);
-        }
-
-        public ei_leaveDayExceedPushLog GetLeaveDaysExceedLog(string sysNo)
-        {
-            return db.ei_leaveDayExceedPushLog.Where(l => l.sys_no == sysNo).OrderByDescending(l => l.id).FirstOrDefault();
-        }
-
+                        
         public List<ALRecordModel> GetLeaveRecordsInOneYear(string applierNameAndCard)
         {
             DateTime aYearAgo = DateTime.Now.AddYears(-1);
@@ -437,6 +368,11 @@ namespace EmpInfo.Services
 
                 }
             }
+        }
+
+        public ei_askLeave GetALBill()
+        {
+            return bill;
         }
     }
 }

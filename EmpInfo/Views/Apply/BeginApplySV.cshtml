@@ -118,6 +118,10 @@
             toastr.error("调休天数不能为空");
             return false;
         }
+        if ($.trim($("#reason").val()) == "") {
+            toastr.error("调休原因必须填写")
+            return false;
+        }
         return true;
     }
 

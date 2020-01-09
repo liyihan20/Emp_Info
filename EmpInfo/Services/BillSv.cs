@@ -348,7 +348,79 @@ namespace EmpInfo.Services
             db.SaveChanges();
         }
 
+        /// <summary>
+        /// 行政部发送约谈信息
+        /// </summary>
+        /// <param name="sysNo"></param>
+        /// <param name="recevierNum"></param>
+        /// <param name="recevierDepName"></param>
+        /// <param name="senderName"></param>
+        /// <param name="bookTime"></param>
+        public void AHPushMsg(string sysNo,string recevierNum,string recevierName, string recevierDepName, string senderName, string bookTime,string pushMsg)
+        {
+            DateTime dt;
+            if (!DateTime.TryParse(bookTime, out dt)) {
+                throw new Exception("预约时间不是日期格式");
+            }
 
+            ei_leaveDayExceedPushLog log = new ei_leaveDayExceedPushLog();
+            log.book_date = dt;
+            log.send_date = DateTime.Now;
+            log.send_user = senderName;
+            log.sys_no = sysNo;
+            db.ei_leaveDayExceedPushLog.Add(log);
+
+            var receviers = recevierNum;
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            var step1Auditors = flow.GetCertainStepAuditors(sysNo, 1);
+            if (!string.IsNullOrEmpty(step1Auditors)) {
+                receviers += ";" + step1Auditors;
+            }
+
+            string addr, phone;
+            if (recevierDepName.StartsWith("惠州")) {
+                addr = "研发楼一楼行政及人力资源部";
+                phone = "0752-6568888/7888";
+            }
+            else {
+                addr = "写字楼（行政大楼）一楼行政部";
+                phone = "3003";
+            }
+
+            //发微信
+            foreach (var ad in receviers.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
+                var pushUsers = db.vw_push_users.Where(u => u.card_number == ad).ToList();
+                if (pushUsers.Count() == 0) {
+                    continue;
+                }
+                var pushUser = pushUsers.First();
+                wx_pushMsg pm = new wx_pushMsg();
+                pm.FCardNumber = ad;
+                pm.FFirst = string.Format("{0}，请您于下述时间，前往{2}与{1}面谈。", recevierNum, senderName, addr);
+                pm.FHasSend = false;
+                pm.FInTime = DateTime.Now;
+                pm.FkeyWord1 = pushMsg;
+                pm.FKeyWord2 = dt.ToString("yyyy-MM-dd HH:mm");
+                pm.FOpenId = pushUser.wx_openid;
+                pm.FPushType = "行政面谈";
+                pm.FRemark = "请您准时到达，如有疑问。请致电行政部" + senderName + "，电话：" + phone;
+                db.wx_pushMsg.Add(pm);
+            }
+            db.SaveChanges();
+
+            //发送邮件
+            string subject = "行政部面谈通知";
+            string emailAddrs = GetUserEmailByCardNum(recevierNum);
+            string ccEmails = GetUserEmailByCardNum(step1Auditors);
+            string content = string.Format("<div>{0}，你好！</div><div style='margin-left:30px;'>请您于下述时间，前往{1}与{2}面谈。<br /> 面谈内容：{3} <br/> 预约时间：{4:yyyy-MM-dd HH:mm}</div>", recevierName, addr, senderName, pushMsg, dt);
+            //content += "<div style='margin-left:30px;'>请您于下述时间，前往" + addr + "与" + senderName + "面谈。<br /> 面谈内容：" + pushMsg + " <br/> 预约时间：" + dt.ToString("yyyy-MM-dd HH:mm") + "</div>";
+            MyEmail.SendEmail(subject, emailAddrs, content, ccEmails);
+        }
+
+        public ei_leaveDayExceedPushLog GetAHMsgPushLog(string sysNo)
+        {
+            return db.ei_leaveDayExceedPushLog.Where(l => l.sys_no == sysNo).OrderByDescending(l => l.id).FirstOrDefault();
+        }
 
     }
 }

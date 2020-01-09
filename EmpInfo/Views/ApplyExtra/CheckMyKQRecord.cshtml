@@ -1,0 +1,70 @@
+﻿@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+}
+
+@section Scripts{
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+        $("#recordTb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            url: "GetKQRecord",
+            columns: [{
+                field: "KDATE",
+                title: "日期",
+                formatter: function (value, row, index, field) {
+                    return utils.parseTDate(row.KDATE);
+                }
+            }, {
+                field: "ZS_C",
+                title: "早上班"
+            }, {
+                field: "ZX_C",
+                title: "早下班"
+            }, {
+                field: "XS_C",
+                title: "午上班"
+            }, {
+                field: "XX_C",
+                title: "午下班"
+            }, {
+                field: "WS_C",
+                title: "晚上班"
+            }, {
+                field: "WX_C",
+                title: "晚下班"
+            }, {
+                field: "A",
+                title: "附加A"
+            }, {
+                field: "B",
+                title: "附加B"
+            }, {
+                field: "C",
+                title: "附加C"
+            }, {
+                field: "D",
+                title: "附加D"
+            }]
+        });
+    </script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=CR")">考勤补记申请单</a></li>
+            <li class="active">打卡记录</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <h4 class="text-danger"><i>以下可查看<text>@DateTime.Now.AddMonths(-1).ToString("yyyy-MM-01")</text>之后的考勤打卡记录:</i> </h4>
+        <hr />
+        <table id="recordTb"></table>
+    </div>
+</div>

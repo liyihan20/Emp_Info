@@ -215,6 +215,9 @@ namespace EmpInfo.Controllers
                 {
                     return Json(new { suc = false, msg = "姓名不正确" });
                 }
+                if (info.id_code == null) {
+                    return Json(new { suc = false, msg = "身份证号码未在人事系统登记，请联系文员或行政部处理" });
+                }
                 if (info.id_code.EndsWith(id_number.Trim()))
                 {
                     string email = !string.IsNullOrWhiteSpace(info.email) && info.email.Contains(@"@") ? info.email : "";

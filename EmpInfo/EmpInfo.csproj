@@ -444,6 +444,9 @@
     <Compile Include="Models\GetK3StockAuditor_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\GetKQRecord_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\GetOutStockBillsForAudit1To2_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -1326,6 +1329,7 @@
     <Content Include="Views\Report\TIReport.cshtml" />
     <Content Include="Views\Apply\BeginAuditSJApply.cshtml" />
     <Content Include="Views\WX\GetLocation.cshtml" />
+    <Content Include="Views\ApplyExtra\CheckMyKQRecord.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -15,32 +15,39 @@ namespace EmpInfo.Controllers
     /// </summary>
     public class ApplyExtraController : BaseController
     {
+
+        #region 通用模块
+
+        public JsonResult GetAHPushLog(string sysNo)
+        {
+            var log = new ALSv().GetAHMsgPushLog(sysNo);
+            if (log == null) {
+                return Json(new SimpleResultModel() { suc = false });
+            }
+
+            return Json(new SimpleResultModel() { suc = true, msg = string.Format("【发送记录】发送人：{0}；发送时间：{1}；预约时间：{2}", log.send_user, ((DateTime)log.send_date).ToString("yyyy-MM-dd HH:mm"), ((DateTime)log.book_date).ToString("yyyy-MM-dd HH:mm")) });
+        }
+
+        #endregion
+
         #region 请假
 
         //行政部发送约谈信息
         public JsonResult LeaveDayExceedPush(string sysNo, string bookTime)
         {
             try {
-                new ALSv(sysNo).LeaveDayExceedPush(userInfo, bookTime);
+                var sv = new ALSv(sysNo);
+                var bill = sv.GetALBill();
+                sv.AHPushMsg(sysNo, bill.applier_num, bill.applier_name, bill.dep_long_name, userInfo.name, bookTime, "请假时间超过公司规定天数");
             }
             catch (Exception ex) {
                 return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
-            }            
+            }
 
             WriteEventLog("请假条申请", sysNo + ">发送行政面谈通知" + ";bookTime:" + bookTime);
 
             return Json(new SimpleResultModel() { suc = true });
-        }
-
-        public JsonResult GetLeaveDaysExceedLog(string sysNo)
-        {
-            var log = new ALSv().GetLeaveDaysExceedLog(sysNo);
-            if (log == null) {
-                return Json(new SimpleResultModel() { suc = false });
-            }
-            
-            return Json(new SimpleResultModel() { suc = true, msg = string.Format("【发送记录】发送人：{0}；发送时间：{1}；预约时间：{2}", log.send_user, ((DateTime)log.send_date).ToString("yyyy-MM-dd HH:mm"), ((DateTime)log.book_date).ToString("yyyy-MM-dd HH:mm")) });
-        }
+        }        
 
         //查看最近1年内的申请记录
         [SessionTimeOutJsonFilter]
@@ -125,6 +132,23 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel(true));
         }
 
+        //行政部发送约谈信息
+        public JsonResult AHPushJQMsg(string sysNo, string bookTime)
+        {
+            try {
+                var sv = new JQSv(sysNo);
+                var bill = sv.GetBill() as ei_jqApply;
+                sv.AHPushMsg(sysNo, bill.card_number, bill.name, bill.dep_name, userInfo.name, bookTime, "月薪员工离职面谈");
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+
+            WriteEventLog("行政离职面谈", sysNo + ">月薪员工离职面谈" + ";bookTime:" + bookTime);
+
+            return Json(new SimpleResultModel() { suc = true });
+        }        
+
         #endregion
 
         #region 调动
@@ -157,6 +181,21 @@ namespace EmpInfo.Controllers
         }
 
         #endregion        
+
+        #region 漏刷卡
+
+        [SessionTimeOutFilter]
+        public ActionResult CheckMyKQRecord()
+        {
+            return View();
+        }
+
+        public JsonResult GetKQRecord()
+        {
+            return Json(new CRSv().GetKQRecored(userInfoDetail.salaryNo),JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
 
     }
 }

@@ -343,7 +343,7 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
             }
         }
-
+        
         public string test()
         {
             //foreach (var l in db.k3_database.Where(d=>!d.account_name.Contains("总部")).ToList()) {

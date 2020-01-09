@@ -27,21 +27,29 @@ namespace EmpInfo.Services
             get { return "考勤补记申请单"; }
         }
 
-        public override List<ApplyNavigatorModel> GetApplyNavigatorLinks()
-        {
-            var list = base.GetApplyNavigatorLinks();
-            list.Add(
-                new ApplyNavigatorModel(){
-                    text="电子公司专用流程",
-                    url="Home/EleProcess"
-                }
-            );
-            return list;
-        }
+        //public override List<ApplyNavigatorModel> GetApplyNavigatorLinks()
+        //{
+        //    var list = base.GetApplyNavigatorLinks();
+        //    list.Add(
+        //        new ApplyNavigatorModel(){
+        //            text="电子公司专用流程",
+        //            url="Home/EleProcess"
+        //        }
+        //    );
+        //    return list;
+        //}
 
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
             var list = base.GetApplyMenuItems(userInfo);
+
+            list.Insert(0, new ApplyMenuItemModel()
+            {
+                text = "打卡记录查询",
+                iconFont = "fa-search",
+                url = "../ApplyExtra/CheckMyKQRecord",
+            });
+
             if (db.ei_department.Where(d => d.FReporter.Contains(userInfo.cardNo)).Count() > 0) {
                 list.Add(new ApplyMenuItemModel()
                 {
@@ -193,9 +201,9 @@ namespace EmpInfo.Services
             bill.applier_num = userInfo.cardNo;
             bill.apply_time = DateTime.Now;
 
-            if (!bill.dep_no.StartsWith("104")) {
-                throw new Exception("此流程的部门只支持选择信利电子子部门" );
-            }
+            //if (!bill.dep_no.StartsWith("104")) {
+            //    throw new Exception("此流程的部门只支持选择信利电子子部门" );
+            //}
 
             FlowSvrSoapClient client = new FlowSvrSoapClient();
             var result = client.GetFlowQueue(JsonConvert.SerializeObject(bill), BillType);
@@ -210,5 +218,11 @@ namespace EmpInfo.Services
                 throw new Exception(result.msg);
             }
         }
+
+        public List<GetKQRecord_Result> GetKQRecored(string account)
+        {
+            return db.GetKQRecord(account).ToList();
+        }
+
     }
 }
