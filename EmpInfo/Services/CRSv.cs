@@ -27,18 +27,6 @@ namespace EmpInfo.Services
             get { return "考勤补记申请单"; }
         }
 
-        //public override List<ApplyNavigatorModel> GetApplyNavigatorLinks()
-        //{
-        //    var list = base.GetApplyNavigatorLinks();
-        //    list.Add(
-        //        new ApplyNavigatorModel(){
-        //            text="电子公司专用流程",
-        //            url="Home/EleProcess"
-        //        }
-        //    );
-        //    return list;
-        //}
-
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
             var list = base.GetApplyMenuItems(userInfo);
@@ -217,12 +205,7 @@ namespace EmpInfo.Services
             else {
                 throw new Exception(result.msg);
             }
-        }
-
-        public List<GetKQRecord_Result> GetKQRecored(string account)
-        {
-            return db.GetKQRecord(account).ToList();
-        }
+        }               
 
     }
 }

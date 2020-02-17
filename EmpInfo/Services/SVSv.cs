@@ -27,19 +27,6 @@ namespace EmpInfo.Services
             get { return "调休申请单"; }
         }
 
-        //public override List<ApplyNavigatorModel> GetApplyNavigatorLinks()
-        //{
-        //    var list = base.GetApplyNavigatorLinks();
-        //    list.Add(
-        //        new ApplyNavigatorModel()
-        //        {
-        //            text = "电子公司专用流程",
-        //            url = "Home/EleProcess"
-        //        }
-        //    );
-        //    return list;
-        //}
-
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
             var list = base.GetApplyMenuItems(userInfo);
@@ -57,7 +44,15 @@ namespace EmpInfo.Services
 
         public override object GetInfoBeforeApply(UserInfo userInfo, UserInfoDetail userInfoDetail)
         {
-            CRSVBeforeApplyModel m = new CRSVBeforeApplyModel();            
+            try {
+                var hrInfo = new HRDBSv().GetHREmpInfo(userInfo.cardNo);
+                if ("计件".Equals(hrInfo.salary_type)) {
+                    throw new Exception("计件员工不能申请调休");
+                }
+            }
+            catch {}
+
+            CRSVBeforeApplyModel m = new CRSVBeforeApplyModel();
             var appliedBill = db.ei_SVApply.Where(a => a.applier_num == userInfo.cardNo).OrderByDescending(a => a.id).FirstOrDefault();
             if (appliedBill == null) {
                 var leavBill = db.ei_askLeave.Where(a => a.applier_num == userInfo.cardNo).OrderByDescending(a => a.id).FirstOrDefault();
@@ -87,7 +82,7 @@ namespace EmpInfo.Services
             bill.applier_name = userInfo.name;
             bill.applier_num = userInfo.cardNo;
             bill.apply_time = DateTime.Now;
-
+            
             //处理一下审核队列,将姓名（厂牌）格式更换为厂牌
             if (!string.IsNullOrEmpty(bill.auditor_queues)) {
                 var queueList = JsonConvert.DeserializeObject<List<flow_applyEntryQueue>>(bill.auditor_queues);
@@ -97,7 +92,6 @@ namespace EmpInfo.Services
                 }
                 bill.auditor_queues = JsonConvert.SerializeObject(queueList);
             }
-
 
             FlowSvrSoapClient client = new FlowSvrSoapClient();
             var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, string.Format("值班时间：{0:yyyy-MM-dd HH:mm}~{1:yyyy-MM-dd HH:mm}", bill.duty_date_from, bill.duty_date_to), string.Format("调休时间：{0:yyyy-MM-dd HH:mm}~{1:yyyy-MM-dd HH:mm}", bill.vacation_date_from, bill.vacation_date_to));

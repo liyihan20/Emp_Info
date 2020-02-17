@@ -36,7 +36,7 @@ namespace EmpInfo.Controllers
             return View();
         }
 
-        #region 用户管理        
+        #region 用户管理
         [AuthorityFilter]
         public ActionResult UserManagement()
         {
@@ -312,20 +312,25 @@ namespace EmpInfo.Controllers
                           }).ToList();
             return Json(new { suc = true, rows = result });
         }
-
-
+        
         [SessionTimeOutFilter]
         public ActionResult GroupDetail(int id)
         {
-            var group = db.ei_groups.Single(g => g.id == id);
-            ViewData["groupId"] = group.id;
-            ViewData["groupName"] = group.name;
-            ViewData["groupDes"] = group.description;
-            ViewData["groupUsers"] = group.ei_groupUser
-                .Select(u => new GroupUserModel() { id = u.user_id, cardNo = u.ei_users.card_number, userName = u.ei_users.name })
-                .ToList();
-            ViewData["groupAuts"] = group.ei_groupAuthority
-                .Select(a => new GroupAutModel() { id = a.authority_id,autNumber=a.ei_authority.number, autName = a.ei_authority.name, autDes = a.ei_authority.description })
+            var gr = db.ei_groups.Single(g => g.id == id);
+            ViewData["groupId"] = gr.id;
+            ViewData["groupName"] = gr.name;
+            ViewData["groupDes"] = gr.description;
+            ViewData["groupUsers"] = (from u in db.ei_users
+                                      join gu in db.ei_groupUser on u.id equals gu.user_id
+                                      where gu.group_id == gr.id
+                                      select new GroupUserModel()
+                                      {
+                                          id = u.id,
+                                          cardNo = u.card_number,
+                                          userName = u.name
+                                      }).ToList();
+            ViewData["groupAuts"] = gr.ei_groupAuthority
+                .Select(a => new GroupAutModel() { id = a.authority_id, autNumber = a.ei_authority.number, autName = a.ei_authority.name, autDes = a.ei_authority.description })
                 .ToList();
             return View();
         }
@@ -358,8 +363,7 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = "保存失败:"+ex.Message });                
             }
         }
-
-
+        
         [SessionTimeOutFilter]
         public ActionResult RemoveGroup(int id)
         {

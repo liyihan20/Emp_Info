@@ -1,0 +1,366 @@
+﻿@using EmpInfo.Models;
+@using Newtonsoft.Json
+@{
+    BeginAuditModel bam = (BeginAuditModel)ViewData["bam"];
+    ei_sjApply m = (ei_sjApply)bam.otherInfo;
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: middle;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 4px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+
+    <script>
+    $("#tb").bootstrapTable({
+        striped: true,
+        mobileResponsive: true,
+        pagination: false,
+        clickToSelect: true,
+        url:"@Url.Content("~/ApplyExtra/GetSJEntrys?sjId=")" + "@m.id",        
+            columns: [
+                {
+                    checkbox: true,
+                    checkboxEnabled:"@(bam.isPass==null)" == "True"
+                },{
+                    field: "is_agree",
+                    title: "是否同意",
+                    formatter:function(value,row,index){
+                        if(value){
+                            return "同意调动";
+                        }else{
+                            return "拒绝调动";
+                        }
+                    },
+                    cellStyle:function(value,row,index){
+                        var color="green";
+                        if(!value){
+                            color="red";
+                        }
+                        return { css: { color: color } };
+                    }
+                }, {
+                    field: "card_number",
+                    title: "厂牌"
+                }, {
+                    field: "name",
+                    title: "姓名"
+                }, {
+                    field: "sex",
+                    title: "性别"
+                }, {
+                    field: "education",
+                    title: "学历"
+                }, {
+                    field: "account",
+                    title: "账号"
+                }, {
+                    field: "out_dep_name",
+                    title: "调出部门"
+                }, {
+                    field: "out_dep_id",
+                    visible: false
+                }, {
+                    field: "out_dep_position",
+                    title: "调出岗位"
+                }, {
+                    field: "out_time",
+                    title: "调出日期",
+                    formatter:function(value,row,index){
+                        return utils.parseTDate(value);
+                    }
+                }, {
+                    field: "in_dep_name",
+                    title: "调入部门"
+                }, {
+                    field: "in_dep_id",
+                    visible: false
+                }, {
+                    field: "in_dep_position",
+                    title: "调入岗位"
+                }, {
+                    field: "in_time",
+                    title: "到岗日期",
+                    formatter:function(value,row,index){
+                        return utils.parseTDate(value);
+                    }
+                }
+            ]
+        });
+
+        $(function () {
+            $("#rejectBt").on("click", function () {
+                var selected = $("#tb").bootstrapTable("getSelections");
+                if (selected.length == 0) {
+                    toastr.error("请先至少选择1行在操作");
+                    return;
+                }
+                openConfirmDialog("确认要拒绝选中行的调动申请吗？", function () {
+                    var ids = selected.map(function (m) { return m.id });
+                    ids = JSON.stringify(ids);
+                    $.post("@Url.Content("~/ApplyExtra/UpdateSJAgreeField")", { entryIds: ids }, function (data) {
+                        if (data.suc) {
+                            toastr.success("操作成功！");
+                            $("#tb").bootstrapTable("refresh");                            
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                });
+            });
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.sys_no" }, function () {
+                openMessageDialog($(box).html(), "查看流转记录");
+            });
+            $("#opinionOpt").on("change", function () {
+                $("#opinion").val($("#opinionOpt").val());
+            });
+            $("#opinionOpt").val("同意！");
+            $("#opinionOpt").trigger("change");
+
+            
+        })
+    });
+    function audit(isPass) {
+        openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此申请吗？", function () {
+            $.post("HandleApply", {
+                sysNo: "@bam.sysNum",
+                step: "@bam.step",
+                isPass: isPass,
+                opinion: $("#opinion").val()
+            }, function (data) {
+                if (data.suc) {
+                    toastr.success(data.msg);
+                    setTimeout(function () { window.location.href = "GetMyAuditingList?billType=@bam.billType"; }, 2000);
+                } else {
+                    toastr.error(data.msg);
+                    $("#opinion").val(data.msg);
+                }
+            });
+        });
+    }
+    </script>       
+
+    @if (bam.isPass != null) {
+        <script>
+            $(function () {
+                $("#opinion").prop("readonly", "readonly").prop("placeholder", "");
+                $("#opinion").val("@bam.opinion");
+            });
+        </script>
+
+    }
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Home/NoPaperProcess")">无纸化流程</a></li>
+            <li><a href="ApplyIndex?billType=SJ">员工调动申请流程</a></li>
+            <li class="active">开始审核</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="b-div">
+            <span class="b-label">
+                流转记录:
+            </span>
+            <span class="b-input">
+                <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+            </span>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请流水号:
+                    </span>
+                    <span class="b-input">
+                        @m.sys_no
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请人:
+                    </span>
+                    <span class="b-input">
+                        @m.applier_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请时间:
+                    </span>
+                    <span class="b-input">
+                        @(((DateTime)m.apply_time).ToString("yyyy-MM-dd"))
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        调动类型:
+                    </span>
+                    <div class="b-input">
+                        @m.switch_type
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        工资类型:
+                    </span>
+                    <span class="b-input">
+                        @m.salary_type
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        调出部门文员:
+                    </span>
+                    <span class="b-input">
+                        @m.out_clerk_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        调出部门主管/经理:
+                    </span>
+                    <span class="b-input">
+                        @m.out_manager_name
+                    </span>
+                </div>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(m.out_minister_name)) {
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            调出部门部长/助理:
+                        </span>
+                        <span class="b-input">
+                            @m.out_minister_name
+                        </span>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        调入部门文员:
+                    </span>
+                    <span class="b-input">
+                        @m.in_clerk_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        调入部门主管/经理:
+                    </span>
+                    <span class="b-input">
+                        @m.in_manager_name
+                    </span>
+                </div>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(m.in_minister_name)) {
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            调入部门部长/助理:
+                        </span>
+                        <span class="b-input">
+                            @m.in_minister_name
+                        </span>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="b-div">
+            <span class="b-label" style="vertical-align:top;">
+                调动原因/说明:
+            </span>
+            <span class="b-input">
+                @m.comment
+            </span>
+        </div>
+        @if (bam.isPass == null) {
+        <div class="b-div">
+            <span class="b-label">
+                操作按钮:
+            </span>
+            <span class="b-input">
+                <button class="btn btn-danger btn-sm" type="button" id="rejectBt"> <i class="fa fa-reply"></i> 拒绝选中行的人员调动</button>
+            </span>
+        </div>
+        }
+        <table data-toggle="table" id="tb"></table>
+        <div style="margin-bottom:40px;margin-top:6px;" class="text-danger small"><i class="fa fa-info-circle"></i> 如果要拒绝某些员工的调动申请，请选择对应员工后，点击上面的红色按钮拒绝；如果要拒绝所有调动申请，直接点击下方的拒绝按钮即可</div>
+        @if (bam.isPass == null) {
+            <select class="form-control" id="opinionOpt">
+                <option value="">--选择常用处理意见--</option>
+                <option value="同意！">同意！</option>
+                <option value="不同意！">不同意！</option>
+            </select>
+        }
+
+        <textarea class="form-control" rows="2" id="opinion" placeholder="请在此处输入审核意见"></textarea>
+        <div style="margin-top:12px;"></div>
+        @if (bam.isPass == null) {
+            <div class="btn-group btn-group-justified" role="group">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
+                </div>
+            </div>
+        }
+        else if ((bool)bam.isPass) {
+            <button type="button" class="btn btn-block btn-success disabled">已同意此申请</button>
+        }
+        else {
+            <button type="button" class="btn btn-block btn-danger disabled">已拒绝此申请</button>
+        }
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_MessageDialog")
+    @Html.Partial("_ConfirmDialog")
+}

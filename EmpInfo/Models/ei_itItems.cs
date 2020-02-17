@@ -10,16 +10,13 @@
 namespace EmpInfo.Models
 {
     using System;
+    using System.Collections.Generic;
     
-    public partial class GetHREmpInfo_Result
+    public partial class ei_itItems
     {
-        public string sex { get; set; }
-        public string emp_name { get; set; }
-        public string id_code { get; set; }
-        public string email { get; set; }
-        public string tp { get; set; }
-        public string job_level { get; set; }
-        public string txm { get; set; }
-        public string salary_type { get; set; }
+        public int id { get; set; }
+        public string item_type { get; set; }
+        public string item_name { get; set; }
+        public int item_fee { get; set; }
     }
 }

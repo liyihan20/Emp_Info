@@ -27,5 +27,6 @@ namespace EmpInfo.Models
         public string B { get; set; }
         public string C { get; set; }
         public string D { get; set; }
+        public string DW { get; set; }
     }
 }

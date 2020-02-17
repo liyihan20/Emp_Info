@@ -11,12 +11,17 @@
             striped: true,
             mobileResponsive: true,
             url: "GetKQRecord",
+            //showColumns: true,
+            //showColumnsToggleAll:true,
             columns: [{
                 field: "KDATE",
                 title: "日期",
                 formatter: function (value, row, index, field) {
                     return utils.parseTDate(row.KDATE);
                 }
+            }, {
+                field: "DW",
+                title: "周几"
             }, {
                 field: "ZS_C",
                 title: "早上班"
@@ -47,7 +52,15 @@
             }, {
                 field: "D",
                 title: "附加D"
-            }]
+            }],
+            onLoadSuccess: function (data) {
+                var fields = ["WS_C", "WX_C", "A", "B", "C", "D"];
+                for (var i = 0; i < fields.length; i++) {
+                    if (data.every(function (d) { return d[fields[i]] == "-" })) {
+                        $("#recordTb").bootstrapTable("hideColumn", fields[i]);
+                    }
+                }
+            }
         });
     </script>
 }

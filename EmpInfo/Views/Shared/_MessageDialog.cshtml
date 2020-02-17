@@ -21,11 +21,13 @@
 
 <script>
     //打开消息提示框，content是提示内容
-    function openMessageDialog(content,label) {
+    function openMessageDialog(content,label,keepContent) {
         $("#MessageModal").modal("show");
-        if (label) {
-            $("#labelTip").html(label);
+        if (!keepContent) {
+            if (label) {
+                $("#labelTip").html(label);
+            }
+            $("#message_content").html(content);
         }
-        $("#message_content").html(content);
     }
 </script>

@@ -122,7 +122,7 @@ namespace EmpInfo.Controllers
                         msg = "用户已被禁用";
                     }
                     else {
-                        if (db.GetHREmpStatus(cardnumber).Count() == 0) {
+                        if (!new HRDBSv().EmpIsNotQuit(cardnumber)) {
                             msg = "用户已离职，不能使用此系统";
                         }
                         else {

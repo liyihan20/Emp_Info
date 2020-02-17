@@ -383,13 +383,14 @@
                     <h4 class="modal-title">修改个人信息</h4>
                 </div>
                 <div class="modal-body" style="max-height:400px;overflow:auto;">
-                    <form id="personalInfoFm">                        
+                    <form id="personalInfoFm">
                         <div id="personalInfo">
                             <div class="b-div">
                                 <label class="b-label control-label">邮箱地址:</label>
-                                <span style="display:inline-block;width:77%">
+                                <div style="display:inline-block;width:77%">
                                     <input type="email" class="form-control" id="emailAddr" />
-                                </span>
+                                    <div class="text-danger small"><i class="fa fa-info-circle"></i> 请不要登记共用邮箱，支持信利邮箱、QQ邮箱和网易邮箱等</div>
+                                </div>
                             </div>
                             <div class="b-div">
                                 <label class="b-label control-label">手机短号:</label>
@@ -419,25 +420,25 @@
                                 <span style="display:inline-block;width:77%">
                                     <input type="password" class="form-control" id="confirm_password" placeholder="必须与新密码保持一致" />
                                 </span>
-                            </div>          
+                            </div>
                             <div class="panel panel-default" id="wx_setting" style="margin-bottom:0;">
                                 <div class="panel-body">
                                 <label class="control-label">微信公众号设置：</label>
-                                <div class="row">
-                                    <div class="col-xs-6 text-center">
-                                    <input type="checkbox" id="check_salary_info" /> 免密查看工资
+                                    <div class="row">
+                                        <div class="col-xs-6 text-center">
+                                        <input type="checkbox" id="check_salary_info" /> 免密查看工资
+                                        </div>
+                                        <div class="col-xs-6 text-center">
+                                            <input type="checkbox" id="push_salary_info" /> 推送工资信息
+                                        </div>
+                                        <div class="col-xs-6 text-center">
+                                            <input type="checkbox" id="push_consume_info" /> 推送饭卡信息
+                                        </div>
+                                        <div class="col-xs-6 text-center">
+                                            <input type="checkbox" id="push_flow_info" /> 推送流程信息
+                                        </div>                                        
                                     </div>
-                                    <div class="col-xs-6 text-center">
-                                        <input type="checkbox" id="push_salary_info" /> 推送工资信息
-                                    </div>
-                                    <div class="col-xs-6 text-center">
-                                        <input type="checkbox" id="push_consume_info" /> 推送饭卡信息
-                                    </div>
-                                    <div class="col-xs-6 text-center">
-                                        <input type="checkbox" id="push_flow_info" /> 推送流程信息
-                                    </div>                                        
                                 </div>
-                                    </div>
                             </div>
                             
                         </div>

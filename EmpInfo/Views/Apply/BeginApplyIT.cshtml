@@ -1,0 +1,297 @@
+﻿@using EmpInfo.Models;
+@{
+    string jsonStr = ViewData["infoBeforeApply"] as string;
+}
+@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: middle;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 4px 0;
+        }
+
+        .item_header{
+            cursor:pointer;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        var selectedItems = [];
+        var hasFetchItems = false;
+        $(function () {
+            {
+                var obj = @Html.Raw(jsonStr);
+                utils.loadObjData($("#fm"), obj);
+            }
+            $(".selectUser").on("focus", function () {
+                var self = this;
+                openSelectUserDialog($(self).val(), 1, function (result) {
+                    $(self).val(result);
+                });
+            });
+
+            $("#selectBtn").on("click",function(){
+                if(hasFetchItems){
+                    openMessageDialog("","",true);
+                    return;
+                }
+                $.post("@Url.Content("~/ApplyExtra/GetITITems")",{},function(result){
+                    if(result.length<1){
+                        toastr.error("获取IT项目失败，请联系管理员");
+                        return;
+                    }
+
+                    var itemTypes = []; //保存所有项目类型
+                    for(var i in result){
+                        itemTypes.push(result[i].item_type);
+                    }
+                    itemTypes = utils.unique(itemTypes);
+
+                    var html = "";
+                    var tempResult = [];
+                    for(var i in itemTypes){
+                        html+="<div class='text-primary item_header'>" + itemTypes[i] + "</div>";
+                        html+="<div class='text-danger row' style='margin-bottom:12px;'>";
+                        tempResult = result.filter(function(r){return r.item_type==itemTypes[i];});
+                        for(var j in tempResult){
+                            html+="<div class='col-xs-6'><input type='checkbox' name='item' id='"+i+'-'+j+"' data-fee='"+tempResult[j].item_fee+"' value='"+tempResult[j].item_name+"' /> <label for='"+i+'-'+j+"'>"+tempResult[j].item_name+"</label></div>";
+                        }
+                        html+="</div>";
+                    }
+                    openMessageDialog(html,"选择IT项目");
+                    hasFetchItems=true;
+                    $("input[name='item']").iCheck({
+                        checkboxClass: 'icheckbox_minimal-red'                        
+                    });
+                    $("input[name='item']").on("ifChecked",function(event){
+                        var itemName = $(event.target).val();
+                        var itemFee = $(event.target).attr("data-fee");
+                        selectedItems.push({n:itemName,v:itemFee});  
+                        updateItemUI();
+                    });
+                    $("input[name='item']").on("ifUnchecked",function(event){
+                        var itemName = $(event.target).val();
+                        for(var i in selectedItems){
+                            if(selectedItems[i].n == itemName){
+                                selectedItems.splice(i,1);
+                            }
+                        }
+                        updateItemUI();                    
+                    });
+                });
+            });
+            
+            $("#apply_bt").on("click",function(){
+                var obj = utils.getFormObj($("#fm"));
+                if(selectedItems.length<1){
+                    toastr.error("请选择至少一个IT项目");
+                    return;
+                }
+                if(obj.computer_name == "" || obj.ip_addr == ""){
+                    toastr.error("IP地址和计算机名称请至少填写一个");
+                    return;
+                }
+                if(obj.dep_charger_name == ""){
+                    toastr.error("请选择主管/部门经理审核人");
+                    return;
+                }
+                var ipReg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+                if(!ipReg.test(obj.ip_addr)){
+                    toastr.error("IP地址不符合规则，请检查是否正确");
+                    return;
+                }
+
+                obj.faulty_items = JSON.stringify(selectedItems);
+                obj.estimate_it_fee = utils.CalArrSum(selectedItems,"v");
+                
+                openConfirmDialog("确定要提交申请吗？", function () {
+                    $("#apply_bt").button("loading");
+                    $.ajax({
+                        type: 'post',
+                        url: 'SaveApply',
+                        data: "obj=" + JSON.stringify(obj)+"&sys_no="+obj.sys_no,
+                        cache: false,
+                        dataType: 'json',
+                        success: function (data) {
+                            $("#apply_bt").button("reset");
+                            if (data.suc) {
+                                toastr.success("提交成功:" + data.msg);
+                                setTimeout(function () { window.location.href = "CheckApply?sysNo=" + obj.sys_no; }, 2000);
+                            } else {
+                                toastr.error("提交失败：" + data.msg);
+                                $("#apply_bt").button("reset");
+                            }
+
+                        }
+                    });
+                });
+
+            });
+             
+        });
+
+        function updateItemUI(){
+            $("#itemList").empty();
+            var sumFee = 0;
+            for(var i in selectedItems){
+                $("#itemList").append("<li><i class='fa-li fa fa-circle'></i> "+selectedItems[i].n + " : " +selectedItems[i].v + "</li>");
+                sumFee += parseInt(selectedItems[i].v);
+            }
+            $("#itemList").append("<li><i class='fa-li fa fa-cny'></i> 预计产生IT费用" + " : " + sumFee + "</li>");
+        }
+
+    </script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="ApplyIndex?billType=IT">电脑故障报修流程</a></li>
+            <li class="active">开始申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <form id="fm">
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请流水号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="sys_no" readonly />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请人:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="applier_name" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            部门名称:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="dep_name" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            职位级别:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="emp_position" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            联系电话:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="applier_phone" placeholder="请输入信利短号或手机号码" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            电脑编号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="computer_number" placeholder="请填入电脑唯一编号" />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            计算机名:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="computer_name" placeholder="填入计算机名" />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            IP地址:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="ip_addr" placeholder="填入此电脑IP地址" />
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    申请项目:
+                </span>
+                <span>
+                    <button class="btn btn-sm btn-danger" type="button" id="selectBtn"><i class="fa fa-list"></i> 选择IT项目</button>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label"></span>
+                <div class="b-input">
+                    <div>
+                        <ul class="text-danger fa-ul" id="itemList">
+                            @*在此处插入it项目*@
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label" style="vertical-align:top;">
+                    申请备注:
+                </span>
+                <span style="display:inline-block;width:70%">
+                    <textarea type="text" class="form-control" rows="3" id="applier_comment" name="applier_comment" placeholder="可填写具体故障现象或需要安装的其他软件等"></textarea>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    主管/部门经理:
+                </span>
+                <span style="display:inline-block;width:70%">
+                    <input type="text" class="form-control selectUser" name="dep_charger_name" placeholder="点击选择主管/部门经理" />
+                </span>
+            </div>
+
+            <div class="text-danger small" style="margin-top:12px;"><i class="fa fa-info-circle"></i> 注意：请先不要将电脑搬到IT部，等待IT部确认后会通知申请人是远程处理还是需要搬电脑到4栋维修</div>
+            <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:4px;"><i class="fa fa-check-circle-o"></i> 提交申请</button>
+        </form>
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_MessageDialog")
+    @Html.Partial("_SelectUsers")
+
+}

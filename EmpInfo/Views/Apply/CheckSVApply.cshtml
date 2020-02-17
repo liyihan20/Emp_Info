@@ -28,13 +28,14 @@
 @section Scripts {
     <script>
         $(function () {
+            $("#attDiv").load("../Item/PicAttachments", { sysNo: "@sv.sys_no" }, function () { });
             $("#flowRecordBt").on("click", function () {
                 var box = $("<div></div>");
                 $(box).load("CheckFlowRecord .list-group", { sysNo: "@sv.sys_no" }, function () {
                     openMessageDialog($(box).html(), "查看流转记录");
                 });
 
-            });        
+            });
         });
     </script>
 }
@@ -88,21 +89,24 @@
                     </tr>
                     <tr>
                         <th>值班日期</th>
-                        <td>@string.Format("{0:yyyy-MM-dd HH:mm}~{1:yyyy-MM-dd HH:mm}", sv.duty_date_from, sv.duty_date_to) </td>
+                        <td>@string.Format("{0:yyyy-MM-dd HH:mm} ~ {1:yyyy-MM-dd HH:mm}", sv.duty_date_from, sv.duty_date_to) </td>
                     </tr>
                     <tr>
                         <th>调休日期</th>
-                        <td>@string.Format("{0:yyyy-MM-dd HH:mm}~{1:yyyy-MM-dd HH:mm}", sv.vacation_date_from, sv.vacation_date_to) </td>
+                        <td>@string.Format("{0:yyyy-MM-dd HH:mm} ~ {1:yyyy-MM-dd HH:mm}", sv.vacation_date_from, sv.vacation_date_to) </td>
                     </tr>
                     <tr>
                         <th>调休天数</th>
                         <td>@sv.v_days 天</td>
                     </tr>
                     <tr>
-                        <th>原因</th>
+                        <th>值班原因</th>
                         <td>@sv.reason</td>
                     </tr>
-                </table>                
+                </table>    
+                @if (sv.has_attachment == true) {
+                    <div class="b-div" id="attDiv"></div>
+                }            
             </div>
         </div>
     </div>

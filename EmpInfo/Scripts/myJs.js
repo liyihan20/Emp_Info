@@ -93,7 +93,7 @@
         //1. input里面的required属性
         var suc = true;
         var msg = "";
-        $fm.find("input:required").each(function (i, v) {            
+        $fm.find("input:required").each(function (i, v) {
             if (!v.value || $.trim(v.value) == "") {
                 console.log(v.name);
                 msg = "【" + utils.getLabelName($fm, v.name) + "】必须填写";
@@ -104,7 +104,7 @@
         if (!suc) return { suc: suc, msg: msg };
 
         //2. select里面的required属性
-        $fm.find("select:required").each(function (i, v) {            
+        $fm.find("select:required").each(function (i, v) {
             if (!v.value || $.trim(v.value) == "") {
                 msg = "【" + utils.getLabelName($fm, v.name) + "】必须选择";
                 suc = false;
@@ -134,5 +134,22 @@
             labelName = $.trim($fm.find("[name=" + controlName + "]").prev(".input-group-addon").html());
         }
         return labelName;
+    },
+    //计算数字数组的和，或者对象数组中某一个字段的和
+    CalArrSum: function (arr, field) {
+        var sum = 0;
+        if (arr.length < 1) return 0;
+        if (typeof (arr[0]) == "number") {
+            for (var i in arr) {
+                sum += parseFloat(arr[i]);
+            }
+        } else if (typeof (arr[0] == "object")) {
+            for (var i in arr) {
+                if (!isNaN(arr[i][field])) {
+                    sum += parseFloat(arr[i][field]);
+                }
+            }
+        }
+        return sum;
     }
-}  
+}

@@ -328,6 +328,12 @@
     <Compile Include="Models\ei_ieAuditors.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_itApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_itItems.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_jqApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -359,9 +365,6 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_spApplyEntry.cs">
-      <DependentUpon>InfoDB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\ei_specialUsers.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_stockAdminApply.cs">
@@ -609,7 +612,9 @@
     <Compile Include="Services\DPSv.cs" />
     <Compile Include="Services\EPSv.cs" />
     <Compile Include="Services\ETSv.cs" />
+    <Compile Include="Services\HRDBSv.cs" />
     <Compile Include="Services\IESv.cs" />
+    <Compile Include="Services\ITSv.cs" />
     <Compile Include="Services\SJSv.cs" />
     <Compile Include="Services\JQSv.cs" />
     <Compile Include="Services\SASv.cs" />
@@ -828,6 +833,7 @@
     <Content Include="Content\images\ep.png" />
     <Content Include="Content\images\gear.png" />
     <Content Include="Content\images\house.png" />
+    <Content Include="Content\images\it.png" />
     <Content Include="Content\images\leave.png" />
     <Content Include="Content\images\office.png" />
     <Content Include="Content\images\paint.png" />
@@ -872,6 +878,7 @@
     <Content Include="Content\images\user_friend.png" />
     <Content Include="Content\images\user_man.png" />
     <Content Include="Content\images\user_woman.png" />
+    <Content Include="Content\images\warn.png" />
     <Content Include="Content\login.css" />
     <Content Include="Content\select2.min.css" />
     <Content Include="Content\skins\all.css" />
@@ -1122,6 +1129,7 @@
     <Content Include="Scripts\echarts.simple.min.js" />
     <Content Include="Scripts\html5shiv.min.js" />
     <Content Include="Scripts\icheck.js" />
+    <Content Include="Scripts\myUploader.js" />
     <Content Include="Scripts\jquery-1.11.3.min.js" />
     <Content Include="Scripts\jquery-1.8.2.js" />
     <Content Include="Scripts\jquery-1.8.2.min.js" />
@@ -1330,6 +1338,12 @@
     <Content Include="Views\Apply\BeginAuditSJApply.cshtml" />
     <Content Include="Views\WX\GetLocation.cshtml" />
     <Content Include="Views\ApplyExtra\CheckMyKQRecord.cshtml" />
+    <Content Include="Views\Shared\_Uploader.cshtml" />
+    <Content Include="Views\ApplyExtra\ManageITItems.cshtml" />
+    <Content Include="Views\Apply\BeginApplyIT.cshtml" />
+    <Content Include="Views\Apply\CheckITApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditITApply.cshtml" />
+    <Content Include="Views\Shared\Warn.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

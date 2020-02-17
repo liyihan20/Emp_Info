@@ -1,10 +1,4 @@
-﻿@using EmpInfo.Models;
-@{
-    ei_epEqDeps eqDep = ViewData["eqDep"] as ei_epEqDeps;
-    List<PrDepUserModel> userList = ViewData["userList"] as List<PrDepUserModel>;
-    List<ei_epPrDeps> prDepList = ViewData["prDepList"] as List<ei_epPrDeps>;
-}
-@section CSS{
+﻿@section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />    
 }
 @section Scripts{

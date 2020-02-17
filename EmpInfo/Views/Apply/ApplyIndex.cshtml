@@ -19,14 +19,14 @@
     </script>
 }
 
-<div class="panel panel-success">
+<div class="panel panel-danger">
     <div class="panel-heading">
         <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             @foreach (var n in (ViewData["navigatorLinks"] as List<ApplyNavigatorModel>)){
                 <li><a href="@string.Concat(Url.Content("~/"),n.url)">@n.text</a></li>
-            }            
+            }
             <li class="active">@ViewData["billName"]</li>
         </ol>
     </div>

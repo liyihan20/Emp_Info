@@ -28,6 +28,16 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel() { suc = true, msg = string.Format("【发送记录】发送人：{0}；发送时间：{1}；预约时间：{2}", log.send_user, ((DateTime)log.send_date).ToString("yyyy-MM-dd HH:mm"), ((DateTime)log.book_date).ToString("yyyy-MM-dd HH:mm")) });
         }
 
+        public JsonResult GetITPushLog(string sysNo)
+        {
+            var log = new ALSv().GetAHMsgPushLog(sysNo);
+            if (log == null) {
+                return Json(new SimpleResultModel() { suc = false });
+            }
+
+            return Json(new SimpleResultModel() { suc = true, msg = string.Format("【发送记录】发送人：{0}；发送时间：{1}；", log.send_user, ((DateTime)log.send_date).ToString("yyyy-MM-dd HH:mm")) });
+        }
+
         #endregion
 
         #region 请假
@@ -192,10 +202,73 @@ namespace EmpInfo.Controllers
 
         public JsonResult GetKQRecord()
         {
-            return Json(new CRSv().GetKQRecored(userInfoDetail.salaryNo),JsonRequestBehavior.AllowGet);
+            try {
+                return Json(new HRDBSv().GetKQRecored(userInfoDetail.salaryNo), JsonRequestBehavior.AllowGet);
+            }
+            catch {
+                return Json(new GetKQRecord_Result() { KDATE = DateTime.Now, DW = "考勤系统故障，打卡记录获取失败" });
+            }
         }
 
         #endregion
 
+        #region 电脑报修
+
+        public ActionResult ManageITItems()
+        {
+            return View();
+        }
+
+        public JsonResult GetITITems()
+        {
+            try {
+                var list = new ITSv().GetITItems();
+                return Json(list,JsonRequestBehavior.AllowGet);
+            }
+            catch {
+                return Json(new List<ei_itItems>(), JsonRequestBehavior.AllowGet);                
+            }
+        }
+
+        public JsonResult SaveItItem(string jsonStr)
+        {
+            ei_itItems item = JsonConvert.DeserializeObject<ei_itItems>(jsonStr);
+            try {
+                new ITSv().SaveItItem(item);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+        public JsonResult RemoveItItem(int itemId)
+        {
+            try {
+                new ITSv().RemoveItItem(itemId);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+        public JsonResult ITComputerPush(string sysNo)
+        {
+            try {
+                var sv = new ITSv(sysNo);
+                var bill = sv.GetBill() as ei_itApply;
+                sv.ITPushMsg(sysNo, bill.applier_num, bill.applier_name, bill.dep_name, userInfo.name);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+
+            WriteEventLog("IT电脑报修申请", sysNo + ">发送电脑搬动通知");
+
+            return Json(new SimpleResultModel() { suc = true });
+        }
+
+        #endregion
     }
 }

@@ -225,5 +225,11 @@ namespace EmpInfo.Services
                 }
             }
         }
+
+        public override bool CanAccessApply(UserInfo userInfo)
+        {
+            return HasGotPower("UnnormalCH", userInfo.id);
+        }
+
     }
 }

@@ -8,6 +8,7 @@ using EmpInfo.EmpWebSvr;
 using EmpInfo.Util;
 using EmpInfo.FlowSvr;
 using Newtonsoft.Json;
+using System.Configuration;
 
 namespace EmpInfo.Services
 {
@@ -28,20 +29,7 @@ namespace EmpInfo.Services
         public override string BillTypeName
         {
             get { return "员工辞职/自离申请单"; }
-        }
-
-        public override List<ApplyNavigatorModel> GetApplyNavigatorLinks()
-        {
-            var list = base.GetApplyNavigatorLinks();
-            list.Add(
-                new ApplyNavigatorModel()
-                {
-                    text = "无纸化流程",
-                    url = "Home/NoPaperProcess"
-                }
-            );
-            return list;
-        }
+        }        
                 
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
@@ -104,22 +92,15 @@ namespace EmpInfo.Services
                 if (bill.absent_to == null) throw new Exception("必须填写正确的旷工结束日期");
                 if (bill.absent_days == null) throw new Exception("旷工天数必须是数字格式");
                 if (string.IsNullOrWhiteSpace(bill.auto_quit_comment)) throw new Exception("自离补充说明不能为空");
-                if (userInfo.cardNo.Equals(bill.card_number)) throw new Exception("本人申请时离职类型不能选择自离");
+                if (userInfo.cardNo.Trim().Equals(bill.card_number.Trim())) throw new Exception("本人申请时离职类型不能选择自离");
             }
             else {
-                if (!userInfo.cardNo.Equals(bill.card_number)) throw new Exception("离职类型为辞职时，必须是本人申请");
+                if (!userInfo.cardNo.Trim().Equals(bill.card_number.Trim())) throw new Exception("离职类型为辞职时，必须是本人申请");
             }
 
             if ("计件".Equals(bill.salary_type)) {
                 if (string.IsNullOrWhiteSpace(bill.group_leader_name)) throw new Exception("必须选择组长");
-                bill.group_leader_num = GetUserCardByNameAndCardNum(bill.group_leader_name);
-
-                //因为有调部门的关系，离职时人事部门还是旧部门，所以提交时更新为组长的人事部门 2019-11-27
-                //var leaderDepartment = db.GetHREmpInfoDetail(bill.group_leader_num).FirstOrDefault();
-                //if (leaderDepartment == null || leaderDepartment.emp_status == "离职") {
-                //    throw new Exception("组长已不存在或已离职");
-                //}
-                //bill.dep_name = leaderDepartment.dep_name;
+                bill.group_leader_num = GetUserCardByNameAndCardNum(bill.group_leader_name);                                
             }
             else if ("月薪".Equals(bill.salary_type)) {
                 if (string.IsNullOrWhiteSpace(bill.dep_charger_name)) throw new Exception("必须选择部门负责人");
@@ -146,13 +127,11 @@ namespace EmpInfo.Services
                     client.DeleteApplyForFailure(bill.sys_no);
                     throw new Exception("申请提交失败，原因：" + ex.Message);
                 }
-
                 SendNotification(result);
             }
             else {
                 throw new Exception("申请提交失败，原因：" + result.msg);
             }
-
         }
 
         public override object GetBill()
@@ -250,10 +229,12 @@ namespace EmpInfo.Services
         /// </summary>
         /// <param name="newDay"></param>
         public void UpdateLeaveDay(DateTime newDay,string notifyUsers,string cardNumber) {
-            if (bill.charger_num != null && !bill.charger_num.Contains(cardNumber)) {
-                throw new Exception("你没有修改此离职单日期的权限");
+            string adminNumber = ConfigurationManager.AppSettings["adminNumber"];
+            if (!adminNumber.Equals(cardNumber)) {
+                if (bill.charger_num != null && !bill.charger_num.Contains(cardNumber)) {
+                    throw new Exception("你没有修改此离职单日期的权限");
+                }
             }
-
             var leaveDateBefore = bill.leave_date ?? DateTime.Parse("2019-10-1");
             if (leaveDateBefore.Equals(newDay)) return; //需修改的日期和之前日期一样，就不处理直接返回
             

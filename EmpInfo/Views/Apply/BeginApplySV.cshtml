@@ -4,6 +4,7 @@
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
 
     <style type="text/css">
         .b-label {
@@ -36,10 +37,15 @@
 @section Scripts {
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUploader.js")"></script>
 
     <script>
     var queue;
     $(function () {
+        
+        $("#myUploader").myUploader({ sysNum: "@m.sysNum" });
+
         $(".datePicker").datetimepicker({
             language: 'zh-CN',
             format: "yyyy-mm-dd hh:ii",
@@ -47,7 +53,7 @@
             startView: 2,
             maxView: 2,
             minuteStep: 5
-        });        
+        });
 
         //选择部门
         $("#eDepName").on("click", function () {
@@ -137,6 +143,7 @@
 
     function BeginApply() {
         $(this).button("loading");
+        $("#hasAttachment").val($("#myUploader").getMyUploaderFilesNum() > 0);
         var formParam = $("#alForm").serialize();
         $.ajax({
             type: 'post',
@@ -274,12 +281,25 @@
                     </div>
                     <div class="b-div">
                         <span class="b-label">
-                            <button class="btn btn-block btn-default" disabled>原因</button>
+                            <button class="btn btn-block btn-default" disabled>值班原因</button>
                         </span>
                         <span style="display:inline-block;width:70%">
                             <textarea type="text" class="form-control" rows="2" id="reason" name="reason"></textarea>
                         </span>
                     </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>附件</button>
+                        </span>
+                        <div style="display:inline-block;width:70%">
+                            <div id="uploader" class="wu-example">
+                                <div id="picker"> + </div>
+                            </div>
+                        </div>
+                        <p class="small text-danger"><i class="fa fa-info-circle"></i> 因出差调休的，请上传出差证明图片</p>
+                    </div>
+                    <div id="myUploader"></div>
+                    <input type="hidden" name="has_attachment" id="hasAttachment" />
                 </form>
                 <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..."><i class="fa fa-check-circle-o"></i> 提交调休申请</button>
             </div>

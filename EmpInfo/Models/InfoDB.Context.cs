@@ -47,7 +47,6 @@ namespace EmpInfo.Models
         public DbSet<dn_pointsForDish> dn_pointsForDish { get; set; }
         public DbSet<dn_pointsRecord> dn_pointsRecord { get; set; }
         public DbSet<dn_birthdayMealLog> dn_birthdayMealLog { get; set; }
-        public DbSet<ei_specialUsers> ei_specialUsers { get; set; }
         public DbSet<dn_items> dn_items { get; set; }
         public DbSet<dn_Restaurent> dn_Restaurent { get; set; }
         public DbSet<ei_resVisitLog> ei_resVisitLog { get; set; }
@@ -120,15 +119,8 @@ namespace EmpInfo.Models
         public DbSet<vw_spExcel> vw_spExcel { get; set; }
         public DbSet<wx_accessToken> wx_accessToken { get; set; }
         public DbSet<wx_jsApiTicket> wx_jsApiTicket { get; set; }
-    
-        public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
-        {
-            var card_noParameter = card_no != null ?
-                new ObjectParameter("card_no", card_no) :
-                new ObjectParameter("card_no", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetHREmpInfo_Result>("GetHREmpInfo", card_noParameter);
-        }
+        public DbSet<ei_itApply> ei_itApply { get; set; }
+        public DbSet<ei_itItems> ei_itItems { get; set; }
     
         public virtual ObjectResult<string> GetDormChargeMonth()
         {
@@ -164,15 +156,6 @@ namespace EmpInfo.Models
                 new ObjectParameter("account", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<ValidateDormStatus_Result>("ValidateDormStatus", accountParameter);
-        }
-    
-        public virtual ObjectResult<string> GetHREmpStatus(string card_no)
-        {
-            var card_noParameter = card_no != null ?
-                new ObjectParameter("card_no", card_no) :
-                new ObjectParameter("card_no", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("GetHREmpStatus", card_noParameter);
         }
     
         public virtual ObjectResult<GetPOAccount_Result> GetPOAccount(string po_number)
@@ -566,6 +549,24 @@ namespace EmpInfo.Models
                 new ObjectParameter("account_no", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetKQRecord_Result>("GetKQRecord", account_noParameter);
+        }
+    
+        public virtual ObjectResult<byte[]> GetHREmpPortrait(string card_no)
+        {
+            var card_noParameter = card_no != null ?
+                new ObjectParameter("card_no", card_no) :
+                new ObjectParameter("card_no", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<byte[]>("GetHREmpPortrait", card_noParameter);
+        }
+    
+        public virtual ObjectResult<GetHREmpInfo_Result> GetHREmpInfo(string card_no)
+        {
+            var card_noParameter = card_no != null ?
+                new ObjectParameter("card_no", card_no) :
+                new ObjectParameter("card_no", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetHREmpInfo_Result>("GetHREmpInfo", card_noParameter);
         }
     }
 }

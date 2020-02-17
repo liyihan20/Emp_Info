@@ -216,7 +216,7 @@ namespace EmpInfo.Controllers
         public void BeginExportALAuditingExcel()
         {
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { "AL" }, 100).ToList();
+            var list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { "AL" }, 600).ToList();
             var myData = (from l in list
                           join a in db.ei_askLeave on l.sysNo equals a.sys_no
                           join i in db.ei_leaveDayExceedPushLog on l.sysNo equals i.sys_no into ipl
@@ -271,11 +271,11 @@ namespace EmpInfo.Controllers
             }
 
             foreach (var d in myData) {
-                colIndex = 1;                
+                colIndex = 1;
 
                 //"申请人", "申请时间", "部门", "职位级别", "开始时间", "结束时间", 
                 //"天数", "小时数", "类型", "事由", "流水号","面谈通知","预约时间","发送时间"
-                cells.Add(++rowIndex, colIndex, d.al.applier_name + "(" + d.al.applier_num + ")");                
+                cells.Add(++rowIndex, colIndex, d.al.applier_name + "(" + d.al.applier_num + ")");
                 cells.Add(rowIndex, ++colIndex, ((DateTime)d.al.apply_time).ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, d.al.dep_long_name);
                 cells.Add(rowIndex, ++colIndex, d.empLevelName);
@@ -543,7 +543,7 @@ namespace EmpInfo.Controllers
 
         [AuthorityFilter]
         public ActionResult AssistantEmps()
-        {
+        {            
             return View();
         }               
 
@@ -739,7 +739,7 @@ namespace EmpInfo.Controllers
         public ActionResult CheckSVDatas(int depId, DateTime vFromDate, DateTime vToDate, DateTime dFromDate, DateTime dToDate, string auditStatus, string empName = "", string salaryNo = "", int currentPage = 1)
         {
             int pageSize = 100;
-            var datas = GetSVDatas(depId, vFromDate, vToDate,dFromDate,dToDate, auditStatus, empName, salaryNo);
+            var datas = GetSVDatas(depId, vFromDate, vToDate,dFromDate,dToDate, auditStatus, empName, salaryNo).ToList();
             int totalRecord = datas.Count();
             var totalPage = Math.Ceiling((totalRecord * 1.0) / pageSize);
             
@@ -939,7 +939,7 @@ namespace EmpInfo.Controllers
         public ActionResult CheckCRDatas(int depId, DateTime fromDate, DateTime toDate, string auditStatus, string empName = "", string salaryNo = "", int currentPage = 1)
         {
             int pageSize = 100;
-            var datas = GetCRDatas(depId, fromDate, toDate, auditStatus, empName, salaryNo);
+            var datas = GetCRDatas(depId, fromDate, toDate, auditStatus, empName, salaryNo).ToList();
             int totalRecord = datas.Count();
             var totalPage = Math.Ceiling((totalRecord * 1.0) / pageSize);
 
@@ -968,7 +968,7 @@ namespace EmpInfo.Controllers
         [SessionTimeOutFilter]
         public void BeginExportCRExcel(int depId, DateTime fromDate, DateTime toDate, string auditStatus, string empName = "", string salaryNo = "")
         {
-            var myData = GetCRDatas(depId, fromDate, toDate, auditStatus, empName, salaryNo).OrderBy(m => m.apply_time).ToList();
+            var myData = GetCRDatas(depId, fromDate, toDate, auditStatus, empName, salaryNo).ToList().OrderBy(m => m.apply_time).ToList();
             var dep = db.ei_department.Single(d => d.id == depId);
 
             ushort[] colWidth = new ushort[] { 10, 20, 12, 16, 60, 12, 18,

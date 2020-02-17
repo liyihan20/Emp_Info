@@ -104,7 +104,7 @@
                 }
 
                 if (obj.quit_type == "辞职") {
-                    if (obj.card_number != "@m.applierNum") {
+                    if ($.trim(obj.card_number) != $.trim("@m.applierNum")) {
                         toastr.error("辞职的必须由本人填写申请");
                         return;
                     }
@@ -245,7 +245,6 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-            <li><a href="@Url.Content("~/Home/NoPaperProcess")">无纸化流程</a></li>
             <li><a href="ApplyIndex?billType=JQ">员工辞职/自离流程</a></li>
             <li class="active">开始申请</li>
         </ol>
@@ -529,7 +528,7 @@
                     <span class="b-label" style="vertical-align:top;">
                         工资发放要求:
                     </span>
-                    <span style="display:inline-block;width:70%">
+                    <span style="display:inline-block;width:70%">                   
                         <select class="form-control" name="salary_clear_way" id="salary_clear_way">                           
                             @*<option value="离职当天现金结算">离职当天现金结算</option>*@
                             <option value="同部门在职员工同步发放工资卡" selected>同部门在职员工同步发放工资卡</option>

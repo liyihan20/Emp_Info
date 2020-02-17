@@ -7,6 +7,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using EmpInfo.EmpWebSvr;
+using EmpInfo.Services;
 
 namespace EmpInfo.Controllers
 {
@@ -15,7 +16,7 @@ namespace EmpInfo.Controllers
         public ActionResult NoPowerToVisit(string controlerName, string actionName)
         {
             WriteEventLog("不能访问", controlerName + "/" + actionName, 1000);
-            return View();
+            return View("Warn");
         }
 
         [AllowAnonymous]
@@ -78,7 +79,7 @@ namespace EmpInfo.Controllers
             {
                 msg = "用户名已被禁用，登陆失败！可点击密码输入框右边的【禁用/忘记密码】链接自行处理。";
             }
-            else if (db.GetHREmpStatus(model.UserName).Count() == 0 || (db.GetHREmpStatus(model.UserName).Count()>0 && db.GetHREmpStatus(model.UserName).ToList().First() != "在职"))
+            else if (!new HRDBSv().EmpIsNotQuit(model.UserName))
             {
                 thisUser = user.First();
                 thisUser.forbit_flag = true;
@@ -160,10 +161,6 @@ namespace EmpInfo.Controllers
 
         public ActionResult LogOut()
         {
-            //var cookie = new HttpCookie(ConfigurationManager.AppSettings["cookieName"]);
-            //cookie.Expires = DateTime.Now.AddDays(-1);
-            //Response.AppendCookie(cookie);
-            //Session.Clear();
             MyUtils.ClearCookie(this.Response, this.Session);
             return RedirectToAction("Login");
         }
@@ -175,14 +172,15 @@ namespace EmpInfo.Controllers
             {
                 return Json(new SimpleResultModel() { suc = false, msg = "该用户已经注册，不能重复注册！" });
             }
-            //判断是否特殊用户
-            if (db.ei_specialUsers.Where(s => s.card_no == card_no).Count() > 0) {
-                return Json(new SimpleResultModel() { suc = false, msg = "此厂牌处于特殊保护状态，要注册请与管理员联系。谢谢！" });
-            }
 
-            var info = db.GetHREmpInfo(card_no).FirstOrDefault();
-            if (info==null)
-            {
+            GetHREmpInfo_Result info;
+            try {
+                info = new HRDBSv().GetHREmpInfo(card_no);
+            }
+            catch {
+                return Json(new SimpleResultModel(false, "人事系统连接异常，请稍后再注册"));
+            }
+            if (info == null) {
                 WriteEventLogWithoutLogin(card_no, "用户注册[第一步]:厂牌编号不存在");
                 return Json(new { suc = false, msg = "厂牌编号不存在" });
             }
@@ -193,8 +191,8 @@ namespace EmpInfo.Controllers
             else if (string.IsNullOrEmpty(info.email) && string.IsNullOrEmpty(info.tp)) {
                 return Json(new { suc = false, msg = "手机号码在人事系统中未登记，请联系文员或行政部处理后再注册" });
             }
-            else
-            {
+            else {
+                Session["empInfo"] = info; //缓存到session，避免在后续注册步骤重复查询数据库
                 WriteEventLogWithoutLogin(card_no, "用户注册[第一步]:通过");
                 return Json(new { suc = true });
             }
@@ -203,34 +201,34 @@ namespace EmpInfo.Controllers
         //注册模块，第二步，输入姓名和身份证号码后6位进行验证，获取邮箱地址和电话号码前7位
         public JsonResult ValidateIDNumber(string card_no, string id_number,string name)
         {
-            var infos = db.GetHREmpInfo(card_no).ToList();
-            if (infos.Count() < 1)
+            GetHREmpInfo_Result info;
+            try {
+                info = Session["empInfo"] as GetHREmpInfo_Result;
+            }
+            catch {
+                return Json(new SimpleResultModel(false, "操作超时，请重新注册"));
+            }
+                
+            if (!info.emp_name.Equals(name))
             {
-                return Json(new { suc = false, msg = "厂牌编号不存在" });
+                return Json(new { suc = false, msg = "姓名不正确" });
+            }
+            if (info.id_code == null) {
+                return Json(new { suc = false, msg = "身份证号码未在人事系统登记，请联系文员或行政部处理" });
+            }
+            if (info.id_code.EndsWith(id_number.Trim()))
+            {
+                string email = !string.IsNullOrWhiteSpace(info.email) && info.email.Contains(@"@") ? info.email : "";
+                string phone = !string.IsNullOrWhiteSpace(info.tp) && info.tp.Length == 11 ? info.tp.Substring(0, 3) + " " + info.tp.Substring(3, 4) : "";
+                WriteEventLogWithoutLogin(card_no, "用户注册[第二步]：通过");
+                return Json(new { suc = true, email = email, phone = phone });
             }
             else
             {
-                var info = infos.First();
-                if (!info.emp_name.Equals(name))
-                {
-                    return Json(new { suc = false, msg = "姓名不正确" });
-                }
-                if (info.id_code == null) {
-                    return Json(new { suc = false, msg = "身份证号码未在人事系统登记，请联系文员或行政部处理" });
-                }
-                if (info.id_code.EndsWith(id_number.Trim()))
-                {
-                    string email = !string.IsNullOrWhiteSpace(info.email) && info.email.Contains(@"@") ? info.email : "";
-                    string phone = !string.IsNullOrWhiteSpace(info.tp) && info.tp.Length == 11 ? info.tp.Substring(0, 3) + " " + info.tp.Substring(3, 4) : "";
-                    WriteEventLogWithoutLogin(card_no, "用户注册[第二步]：通过");
-                    return Json(new { suc = true, email = email, phone = phone });
-                }
-                else
-                {
-                    WriteEventLogWithoutLogin(card_no, "用户注册[第二步]:身份证后6位验证出错");
-                    return Json(new { suc = false, msg = "身份证后6位验证出错" });
-                }
+                WriteEventLogWithoutLogin(card_no, "用户注册[第二步]:身份证后6位验证出错");
+                return Json(new { suc = false, msg = "身份证后6位验证出错" });
             }
+            
         }
 
         //发送邮箱验证邮件
@@ -265,14 +263,17 @@ namespace EmpInfo.Controllers
         {
             bool pass = false;
             string msg = "";
-            var infos = db.GetHREmpInfo(card_no).ToList();
-            if (infos.Count() < 1)
-            {
-                return Json(new { suc = false, msg = "厂牌编号不存在" });
+            GetHREmpInfo_Result info;
+            try {
+                info = Session["empInfo"] as GetHREmpInfo_Result;
             }
-            var info = infos.First();
+            catch {
+                return Json(new SimpleResultModel(false, "操作超时，请重新注册"));
+            }
+
             if (!string.IsNullOrWhiteSpace(phone_number))
             {
+                
                 if (!string.IsNullOrWhiteSpace(info.tp) && info.tp.EndsWith(phone_number))
                 {
                     pass = true;
@@ -327,17 +328,17 @@ namespace EmpInfo.Controllers
             }
             try
             {
-                var empInfo = db.GetHREmpInfo(card_no).First();
+                var empInfo = Session["empInfo"] as GetHREmpInfo_Result;
                 ei_users user = new ei_users()
                 {
-                    card_number = card_no,
+                    card_number = card_no.Trim(),
                     name = empInfo.emp_name,
                     email = empInfo.email,
                     id_number = empInfo.id_code,
                     sex = empInfo.sex,
                     phone = empInfo.tp,
                     //portrait = empInfo.zp,
-                    short_portrait = empInfo.zp == null ? null : MyUtils.MakeThumbnail(MyUtils.BytesToImage(empInfo.zp)),
+                    short_portrait = new HRDBSv().GetHREmpPortrait(card_no),
                     salary_no = empInfo.txm,
                     create_date = DateTime.Now,
                     fail_times = 0,
@@ -352,6 +353,9 @@ namespace EmpInfo.Controllers
                 WriteEventLogWithoutLogin("注册", "发生错误：" + ex.Message, -1000);
                 return Json(new SimpleResultModel() { suc = false, msg = "系统发生错误，请联系管理员处理" });
             }
+
+            Session.Remove("empInfo");
+
             WriteEventLogWithoutLogin("注册", "自助注册成功");
             return Json(new SimpleResultModel() { suc = true, msg = "注册成功，请登录系统" });            
         }
@@ -394,11 +398,8 @@ namespace EmpInfo.Controllers
             }
             else {
                 var user = users.First();
-                //if (!ValidateEmailCode(email_code)) {
-                //    WriteEventLogWithoutLogin(card_no, "重置密码-邮箱验证失败", -1);
-                //    return Json(new SimpleResultModel() { suc = false, msg = "邮箱验证失败，请重试" });
-                //}
-                if (!user.id_number.Equals(idNumber)) {
+
+                if (!user.id_number.ToUpper().Equals(idNumber.ToUpper())) {
                     WriteEventLogWithoutLogin(card_no, "重置密码-身份证验证失败", -1);
                     return Json(new SimpleResultModel() { suc = false, msg = "身份证错误，验证失败" });
                 }
@@ -408,13 +409,15 @@ namespace EmpInfo.Controllers
                 }
 
                 //第三方员工或新员工没有工资卡号的，不需要再验证 2019-04-08
-                var bankCards = db.GetSalaryBankCard(user.salary_no).ToList();
-                if (bankCards.Count() > 0) {
-                    if (!string.IsNullOrEmpty(bankCards.First())) {
-                        if (!bankCardNumber.Equals(bankCards.First())) {
-                            return Json(new SimpleResultModel() { suc = false, msg = "工资银行卡号错误，验证失败" });
-                        }
-                    }
+                string bankcard;
+                try {
+                    bankcard = db.GetSalaryBankCard(user.salary_no).FirstOrDefault();
+                }
+                catch {
+                    return Json(new SimpleResultModel(false, "工资系统连接失败，请稍后再试"));
+                }
+                if (!string.IsNullOrEmpty(bankcard) && !bankcard.Equals(bankCardNumber)) {
+                    return Json(new SimpleResultModel() { suc = false, msg = "工资银行卡号错误，验证失败" });
                 }
                 
                 //验证成功

@@ -725,6 +725,46 @@
           <Property Name="ie_leader_name" Type="nvarchar" MaxLength="50" />
           <Property Name="is_forbit" Type="bit" />
         </EntityType>
+        <EntityType Name="ei_itApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="apply_time" Type="datetime" />
+          <Property Name="dep_name" Type="nvarchar" MaxLength="500" />
+          <Property Name="emp_position" Type="nvarchar" MaxLength="50" />
+          <Property Name="priority" Type="int" />
+          <Property Name="computer_number" Type="varchar" MaxLength="50" />
+          <Property Name="ip_addr" Type="varchar" MaxLength="50" />
+          <Property Name="computer_name" Type="varchar" MaxLength="100" />
+          <Property Name="faulty_items" Type="nvarchar" MaxLength="1000" />
+          <Property Name="applier_comment" Type="nvarchar" MaxLength="1000" />
+          <Property Name="estimate_it_fee" Type="int" />
+          <Property Name="fixed_items" Type="nvarchar" MaxLength="1000" />
+          <Property Name="real_it_fee" Type="int" />
+          <Property Name="it_comment" Type="nvarchar" MaxLength="1000" />
+          <Property Name="repair_way" Type="nvarchar" MaxLength="50" />
+          <Property Name="evaluation_score" Type="int" />
+          <Property Name="evaluation_comment" Type="nvarchar" MaxLength="1000" />
+          <Property Name="repair_man" Type="nvarchar" MaxLength="50" />
+          <Property Name="repair_time" Type="datetime" />
+          <Property Name="applier_phone" Type="varchar" MaxLength="50" />
+          <Property Name="dep_charger_no" Type="varchar" MaxLength="50" />
+          <Property Name="dep_charger_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="evaluation_time" Type="datetime" />
+        </EntityType>
+        <EntityType Name="ei_itItems">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="item_type" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="item_name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="item_fee" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="ei_jqApply">
           <Key>
             <PropertyRef Name="id" />
@@ -974,13 +1014,6 @@
           <Property Name="modual" Type="nvarchar" MaxLength="500" />
           <Property Name="qty" Type="int" />
         </EntityType>
-        <EntityType Name="ei_specialUsers">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="card_no" Type="varchar" MaxLength="50" />
-        </EntityType>
         <EntityType Name="ei_stockAdminApply">
           <Key>
             <PropertyRef Name="id" />
@@ -1013,13 +1046,14 @@
           <Property Name="duty_date_to" Type="datetime" />
           <Property Name="vacation_date_from" Type="datetime" />
           <Property Name="vacation_date_to" Type="datetime" />
-          <Property Name="reason" Type="varchar" MaxLength="50" />
+          <Property Name="reason" Type="nvarchar" MaxLength="500" />
           <Property Name="apply_time" Type="datetime" />
           <Property Name="auditor_queues" Type="varchar(max)" />
           <Property Name="check1" Type="bit" />
           <Property Name="check2" Type="bit" />
           <Property Name="v_days" Type="decimal" Precision="4" Scale="1" />
           <Property Name="is_direct_charge" Type="bit" />
+          <Property Name="has_attachment" Type="bit" />
         </EntityType>
         <EntityType Name="ei_TIApply">
           <Key>
@@ -1742,7 +1776,7 @@
           <Property Name="vacation_date_from" Type="datetime" />
           <Property Name="vacation_date_to" Type="datetime" />
           <Property Name="v_days" Type="decimal" Precision="4" Scale="1" />
-          <Property Name="reason" Type="varchar" MaxLength="50" />
+          <Property Name="reason" Type="nvarchar" MaxLength="500" />
           <Property Name="apply_time" Type="datetime" />
           <Property Name="salary_no" Type="varchar" MaxLength="20" />
           <Property Name="current_auditors" Type="varchar" MaxLength="500" Nullable="false" />
@@ -2144,7 +2178,7 @@
         <Function Name="GetHREmpInfoDetail" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="card_no" Type="varchar" Mode="In" />
         </Function>
-        <Function Name="GetHREmpStatus" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+        <Function Name="GetHREmpPortrait" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="card_no" Type="varchar" Mode="In" />
         </Function>
         <Function Name="GetItemStockQtyFromK3" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
@@ -2279,6 +2313,8 @@
           <EntitySet Name="ei_groupUser" EntityType="Self.ei_groupUser" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_ieApply" EntityType="Self.ei_ieApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_ieAuditors" EntityType="Self.ei_ieAuditors" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_itApply" EntityType="Self.ei_itApply" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_itItems" EntityType="Self.ei_itItems" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_jqApply" EntityType="Self.ei_jqApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_k3RestLog" EntityType="Self.ei_k3RestLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_leaveDayExceedPushLog" EntityType="Self.ei_leaveDayExceedPushLog" Schema="dbo" store:Type="Tables" />
@@ -2290,7 +2326,6 @@
           <EntitySet Name="ei_sjApplyEntry" EntityType="Self.ei_sjApplyEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_spApply" EntityType="Self.ei_spApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_spApplyEntry" EntityType="Self.ei_spApplyEntry" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="ei_specialUsers" EntityType="Self.ei_specialUsers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_stockAdminApply" EntityType="Self.ei_stockAdminApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_SVApply" EntityType="Self.ei_SVApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_TIApply" EntityType="Self.ei_TIApply" Schema="dbo" store:Type="Tables" />
@@ -2923,9 +2958,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
         <EntityContainer Name="ICAuditEntities" annotation:LazyLoadingEnabled="true" >
           <EntitySet Name="ei_users" EntityType="ICAuditModel.ei_users" />
           <EntitySet Name="ei_event_log" EntityType="ICAuditModel.ei_event_log" />
-          <FunctionImport Name="GetHREmpInfo" ReturnType="Collection(ICAuditModel.GetHREmpInfo_Result)">
-          <Parameter Name="card_no" Mode="In" Type="String" />
-          </FunctionImport>
           <FunctionImport Name="GetDormChargeMonth" ReturnType="Collection(String)" />
           <FunctionImport Name="GetEmpDormInfo" ReturnType="Collection(ICAuditModel.GetEmpDormInfo_Result)">
           <Parameter Name="card_no" Mode="In" Type="String" />
@@ -2936,9 +2968,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           </FunctionImport>
           <FunctionImport Name="ValidateDormStatus" ReturnType="Collection(ICAuditModel.ValidateDormStatus_Result)">
           <Parameter Name="account" Mode="In" Type="String" />
-          </FunctionImport>
-          <FunctionImport Name="GetHREmpStatus" ReturnType="Collection(String)">
-          <Parameter Name="card_no" Mode="In" Type="String" />
           </FunctionImport>
           <EntitySet Name="vw_ei_users" EntityType="ICAuditModel.vw_ei_users" />
           <EntitySet Name="ei_authority" EntityType="ICAuditModel.ei_authority" />
@@ -3000,7 +3029,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <End Role="dn_pointsForDish" EntitySet="dn_pointsForDish" />
           </AssociationSet>
           <EntitySet Name="dn_birthdayMealLog" EntityType="ICAuditModel.dn_birthdayMealLog" />
-          <EntitySet Name="ei_specialUsers" EntityType="ICAuditModel.ei_specialUsers" />
           <EntitySet Name="dn_items" EntityType="ICAuditModel.dn_items" />
           <EntitySet Name="dn_Restaurent" EntityType="ICAuditModel.dn_Restaurent" />
           <EntitySet Name="ei_resVisitLog" EntityType="ICAuditModel.ei_resVisitLog" />
@@ -3238,8 +3266,16 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySet Name="wx_accessToken" EntityType="ICAuditModel.wx_accessToken" />
           <EntitySet Name="wx_jsApiTicket" EntityType="ICAuditModel.wx_jsApiTicket" />
           <FunctionImport Name="GetKQRecord" ReturnType="Collection(ICAuditModel.GetKQRecord_Result)">
-            <Parameter Name="account_no" Mode="In" Type="String" />
+          <Parameter Name="account_no" Mode="In" Type="String" />
           </FunctionImport>
+          <FunctionImport Name="GetHREmpPortrait" ReturnType="Collection(Binary)">
+          <Parameter Name="card_no" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="GetHREmpInfo" ReturnType="Collection(ICAuditModel.GetHREmpInfo_Result)">
+          <Parameter Name="card_no" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="ei_itApply" EntityType="ICAuditModel.ei_itApply" />
+          <EntitySet Name="ei_itItems" EntityType="ICAuditModel.ei_itItems" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -3288,15 +3324,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="op_date" Type="DateTime" Precision="0" />
           <Property Name="ip" Type="String" MaxLength="64" FixedLength="false" Unicode="false" />
         </EntityType>
-        <ComplexType Name="GetHREmpInfo_Result">
-          <Property Type="String" Name="sex" Nullable="true" MaxLength="2" />
-          <Property Type="String" Name="emp_name" Nullable="false" MaxLength="50" />
-          <Property Type="String" Name="id_code" Nullable="true" MaxLength="50" />
-          <Property Type="String" Name="email" Nullable="true" MaxLength="30" />
-          <Property Type="String" Name="tp" Nullable="true" MaxLength="50" />
-          <Property Type="Binary" Name="zp" Nullable="true" MaxLength="Max" />
-          <Property Type="String" Name="txm" Nullable="true" MaxLength="10" />
-        </ComplexType>
         <ComplexType Name="GetEmpDormInfo_Result">
           <Property Type="String" Name="area" Nullable="true" MaxLength="20" />
           <Property Type="String" Name="dorm_number" Nullable="true" MaxLength="50" />
@@ -3724,13 +3751,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="op_date" Type="DateTime" Precision="0" />
           <Property Name="is_cancelled" Type="Boolean" />
           <Property Name="dish_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-        </EntityType>
-        <EntityType Name="ei_specialUsers">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="card_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="dn_items">
           <Key>
@@ -4370,13 +4390,14 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="duty_date_to" Type="DateTime" Precision="3" />
           <Property Name="vacation_date_from" Type="DateTime" Precision="3" />
           <Property Name="vacation_date_to" Type="DateTime" Precision="3" />
-          <Property Name="reason" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="reason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="apply_time" Type="DateTime" Precision="3" />
           <Property Name="auditor_queues" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="check1" Type="Boolean" />
           <Property Name="check2" Type="Boolean" />
           <Property Name="v_days" Type="Decimal" Precision="4" Scale="1" />
           <Property Name="is_direct_charge" Type="Boolean" />
+          <Property Name="has_attachment" Type="Boolean" />
         </EntityType>
         <EntityType Name="vw_crReport">
           <Key>
@@ -4421,7 +4442,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="vacation_date_from" Type="DateTime" Precision="3" />
           <Property Name="vacation_date_to" Type="DateTime" Precision="3" />
           <Property Name="v_days" Type="Decimal" Precision="4" Scale="1" />
-          <Property Name="reason" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="reason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="apply_time" Type="DateTime" Precision="3" />
           <Property Name="salary_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="current_auditors" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
@@ -5544,7 +5565,58 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Type="String" Name="B" Nullable="true" MaxLength="5" />
           <Property Type="String" Name="C" Nullable="true" MaxLength="5" />
           <Property Type="String" Name="D" Nullable="true" MaxLength="5" />
+          <Property Type="String" Name="DW" Nullable="true" MaxLength="4" />
         </ComplexType>
+        <ComplexType Name="GetHREmpInfo_Result">
+          <Property Type="String" Name="sex" Nullable="true" MaxLength="2" />
+          <Property Type="String" Name="emp_name" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="id_code" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="email" Nullable="true" MaxLength="30" />
+          <Property Type="String" Name="tp" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="job_level" Nullable="true" MaxLength="16" />
+          <Property Type="String" Name="txm" Nullable="true" MaxLength="10" />
+          <Property Type="String" Name="salary_type" Nullable="true" MaxLength="50" />
+        </ComplexType>
+        <EntityType Name="ei_itApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="dep_name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="emp_position" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="priority" Type="Int32" />
+          <Property Name="computer_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ip_addr" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="computer_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="faulty_items" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="applier_comment" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="estimate_it_fee" Type="Int32" />
+          <Property Name="fixed_items" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="real_it_fee" Type="Int32" />
+          <Property Name="it_comment" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="repair_way" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="evaluation_score" Type="Int32" />
+          <Property Name="evaluation_comment" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="repair_man" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="repair_time" Type="DateTime" Precision="3" />
+          <Property Name="applier_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="dep_charger_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="dep_charger_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="evaluation_time" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="ei_itItems">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="item_type" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="item_name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="item_fee" Type="Int32" Nullable="false" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -5597,19 +5669,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="GetHREmpInfo" FunctionName="ICAuditModel.Store.GetHREmpInfo">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ICAuditModel.GetHREmpInfo_Result">
-                <ScalarProperty Name="sex" ColumnName="sex" />
-                <ScalarProperty Name="emp_name" ColumnName="emp_name" />
-                <ScalarProperty Name="id_code" ColumnName="id_code" />
-                <ScalarProperty Name="email" ColumnName="email" />
-                <ScalarProperty Name="tp" ColumnName="tp" />
-                <ScalarProperty Name="zp" ColumnName="zp" />
-                <ScalarProperty Name="txm" ColumnName="txm" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="GetDormChargeMonth" FunctionName="ICAuditModel.Store.GetDormChargeMonth" />
           <FunctionImportMapping FunctionImportName="GetEmpDormInfo" FunctionName="ICAuditModel.Store.GetEmpDormInfo">
             <ResultMapping>
@@ -5644,7 +5703,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="GetHREmpStatus" FunctionName="ICAuditModel.Store.GetHREmpStatus" />
           <EntitySetMapping Name="vw_ei_users">
             <EntityTypeMapping TypeName="ICAuditModel.vw_ei_users">
               <MappingFragment StoreEntitySet="vw_ei_users">
@@ -5930,14 +5988,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="birthday" ColumnName="birthday" />
                 <ScalarProperty Name="user_no" ColumnName="user_no" />
                 <ScalarProperty Name="year" ColumnName="year" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="ei_specialUsers">
-            <EntityTypeMapping TypeName="ICAuditModel.ei_specialUsers">
-              <MappingFragment StoreEntitySet="ei_specialUsers">
-                <ScalarProperty Name="card_no" ColumnName="card_no" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -6574,6 +6624,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_SVApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_SVApply">
               <MappingFragment StoreEntitySet="ei_SVApply">
+                <ScalarProperty Name="has_attachment" ColumnName="has_attachment" />
                 <ScalarProperty Name="is_direct_charge" ColumnName="is_direct_charge" />
                 <ScalarProperty Name="v_days" ColumnName="v_days" />
                 <ScalarProperty Name="check2" ColumnName="check2" />
@@ -7694,9 +7745,67 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="B" ColumnName="B" />
                 <ScalarProperty Name="C" ColumnName="C" />
                 <ScalarProperty Name="D" ColumnName="D" />
+                <ScalarProperty Name="DW" ColumnName="DW" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetHREmpPortrait" FunctionName="ICAuditModel.Store.GetHREmpPortrait" />
+          <FunctionImportMapping FunctionImportName="GetHREmpInfo" FunctionName="ICAuditModel.Store.GetHREmpInfo">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetHREmpInfo_Result">
+                <ScalarProperty Name="sex" ColumnName="sex" />
+                <ScalarProperty Name="emp_name" ColumnName="emp_name" />
+                <ScalarProperty Name="id_code" ColumnName="id_code" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="tp" ColumnName="tp" />
+                <ScalarProperty Name="job_level" ColumnName="job_level" />
+                <ScalarProperty Name="txm" ColumnName="txm" />
+                <ScalarProperty Name="salary_type" ColumnName="salary_type" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="ei_itApply">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_itApply">
+              <MappingFragment StoreEntitySet="ei_itApply">
+                <ScalarProperty Name="evaluation_time" ColumnName="evaluation_time" />
+                <ScalarProperty Name="dep_charger_name" ColumnName="dep_charger_name" />
+                <ScalarProperty Name="dep_charger_no" ColumnName="dep_charger_no" />
+                <ScalarProperty Name="applier_phone" ColumnName="applier_phone" />
+                <ScalarProperty Name="repair_time" ColumnName="repair_time" />
+                <ScalarProperty Name="repair_man" ColumnName="repair_man" />
+                <ScalarProperty Name="evaluation_comment" ColumnName="evaluation_comment" />
+                <ScalarProperty Name="evaluation_score" ColumnName="evaluation_score" />
+                <ScalarProperty Name="repair_way" ColumnName="repair_way" />
+                <ScalarProperty Name="it_comment" ColumnName="it_comment" />
+                <ScalarProperty Name="real_it_fee" ColumnName="real_it_fee" />
+                <ScalarProperty Name="fixed_items" ColumnName="fixed_items" />
+                <ScalarProperty Name="estimate_it_fee" ColumnName="estimate_it_fee" />
+                <ScalarProperty Name="applier_comment" ColumnName="applier_comment" />
+                <ScalarProperty Name="faulty_items" ColumnName="faulty_items" />
+                <ScalarProperty Name="computer_name" ColumnName="computer_name" />
+                <ScalarProperty Name="ip_addr" ColumnName="ip_addr" />
+                <ScalarProperty Name="computer_number" ColumnName="computer_number" />
+                <ScalarProperty Name="priority" ColumnName="priority" />
+                <ScalarProperty Name="emp_position" ColumnName="emp_position" />
+                <ScalarProperty Name="dep_name" ColumnName="dep_name" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_itItems">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_itItems">
+              <MappingFragment StoreEntitySet="ei_itItems">
+                <ScalarProperty Name="item_fee" ColumnName="item_fee" />
+                <ScalarProperty Name="item_name" ColumnName="item_name" />
+                <ScalarProperty Name="item_type" ColumnName="item_type" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

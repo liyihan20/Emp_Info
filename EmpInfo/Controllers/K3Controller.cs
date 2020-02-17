@@ -76,9 +76,14 @@ namespace EmpInfo.Controllers
 
         #region 光电/半导体/电子 销售出库单一审和生成送货单
 
-        [SessionTimeOutFilter]
+        [AuthorityFilter]
         public ActionResult StockBillAudit()
         {
+            if (!HasGotPower("StockBillAudit1")) {
+                ViewBag.tip = "抱歉，你没有权限访问此功能";
+                return View("Error");
+            }
+
             StBillSearchParamModel spm;
             var cookie = Request.Cookies["stBillAcc"];
             if (cookie == null) {

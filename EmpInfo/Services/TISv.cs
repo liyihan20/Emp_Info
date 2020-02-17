@@ -183,5 +183,10 @@ namespace EmpInfo.Services
             db.SaveChanges();
         }
 
+        public override bool CanAccessApply(UserInfo userInfo)
+        {
+            return HasGotPower("BeginApplyTI", userInfo.id);
+        }
+
     }
 }

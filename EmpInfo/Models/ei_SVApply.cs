@@ -32,5 +32,6 @@ namespace EmpInfo.Models
         public Nullable<bool> check2 { get; set; }
         public Nullable<decimal> v_days { get; set; }
         public Nullable<bool> is_direct_charge { get; set; }
+        public Nullable<bool> has_attachment { get; set; }
     }
 }

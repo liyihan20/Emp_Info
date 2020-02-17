@@ -26,7 +26,12 @@ namespace EmpInfo.Controllers
                 ViewBag.tip = "流程不存在";
                 return View("Error");
             }
-            
+
+            //看是否有权限访问此申请            
+            if (!bill.CanAccessApply(userInfo)) {
+                return View("Warn");
+            }
+
             ViewData["billName"] = bill.BillTypeName;
             ViewData["menuItems"] = bill.GetApplyMenuItems(userInfo);
             ViewData["navigatorLinks"] = bill.GetApplyNavigatorLinks();
@@ -43,13 +48,16 @@ namespace EmpInfo.Controllers
         [SessionTimeOutFilter]
         public ActionResult BeginApply(string billType)
         {
-            if (db.vw_push_users.Where(v => v.card_number == userInfo.cardNo).Count() < 1) {
-                ViewBag.tip = "必须绑定【信利e家】微信公众号之后才能进行申请";
-                return View("Error");
+            try {
+                if (db.vw_push_users.Where(v => v.card_number == userInfo.cardNo).Count() < 1) {
+                    ViewBag.tip = "必须绑定【信利e家】微信公众号之后才能进行申请";
+                    return View("Error");
+                }
             }
+            catch { }
 
             try {
-                SetBillByType(billType);
+                SetBillByType(billType); 
                 ViewData["infoBeforeApply"] = bill.GetInfoBeforeApply(userInfo, userInfoDetail);
             }
             catch (Exception ex) {
@@ -174,9 +182,10 @@ namespace EmpInfo.Controllers
         public ActionResult GetMyAuditingList(string billType)
         {
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            List<FlowAuditListModel> list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { billType }, 400).ToList();
+            List<FlowAuditListModel> list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { billType }, 600).ToList();
             list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
             SetBillByType(billType);
+            list.Sort(bill.GetAuditListComparer());
             ViewData["list"] = list;
             ViewData["billType"] = billType;
             ViewData["billTypeName"] = bill.BillTypeName;

@@ -1,0 +1,312 @@
+﻿@using EmpInfo.Models;
+@{
+    ei_itApply m = ViewData["am"] as ei_itApply;
+}
+@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: top;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+    $(function () {
+        $("#flowRecordBt").on("click", function () {
+            var box = $("<div></div>");
+            $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.sys_no" }, function () {
+                openMessageDialog($(box).html(), "查看流转记录");
+            });
+        });
+
+        updateItemUI();
+
+    });
+
+    function updateItemUI() {
+        var selectedItems = @Html.Raw(m.faulty_items);
+
+        $("#itemList").empty();
+        var sumFee = 0;
+        for (var i in selectedItems) {
+            $("#itemList").append("<li><i class='fa-li fa fa-circle'></i> " + selectedItems[i].n + " : " + selectedItems[i].v + "</li>");
+            sumFee += parseInt(selectedItems[i].v);
+        }
+        $("#itemList").append("<li><i class='fa-li fa fa-cny'></i> 预计产生IT费用" + " : " + sumFee + "</li>");
+
+        
+        var fixedItems = @Html.Raw(m.fixed_items);
+        if(fixedItems && fixedItems.length>0){
+        $("#fixedItemList").empty();
+        var sumFixedFee = 0;
+        for (var i in fixedItems) {
+            $("#fixedItemList").append("<li><i class='fa-li fa fa-check-square'></i> " + fixedItems[i].n + " : " + fixedItems[i].v + "</li>");
+            sumFixedFee += parseInt(fixedItems[i].v);
+        }
+        $("#fixedItemList").append("<li><i class='fa-li fa fa-cny'></i> 实际产生IT费用" + " : " + sumFixedFee + "</li>");
+
+    }
+
+    }
+    </script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="ApplyIndex?billType=IT">电脑故障报修申请</a></li>
+            <li class="active">查看申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div>
+            <div class="b-div">
+                <span class="b-label">
+                    流转记录:
+                </span>
+                <span class="b-input">
+                    <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        审核状态:
+                    </span>
+                    <span class="b-input">
+                        @ViewData["auditStatus"]
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请流水号:
+                    </span>
+                    <span class="b-input">
+                        @m.sys_no
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请时间:
+                    </span>
+                    <span class="b-input">
+                        @(((DateTime)m.apply_time).ToString("yyyy-MM-dd HH:mm"))
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请人:
+                    </span>
+                    <span class="b-input">
+                        @m.applier_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        联系电话:
+                    </span>
+                    <div class="b-input">
+                        @m.applier_phone
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        职位级别:
+                    </span>
+                    <div class="b-input">
+                        @m.emp_position
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        部门名称:
+                    </span>
+                    <div class="b-input">
+                        @m.dep_name
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        电脑编号:
+                    </span>
+                    <span class="b-input">
+                        @m.computer_number
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        计算机名:
+                    </span>
+                    <span class="b-input">
+                        @m.computer_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        IP地址:
+                    </span>
+                    <span class="b-input">
+                        @m.ip_addr
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请项目:
+            </span>
+            <div class="b-input">
+                <div>
+                    <ul class="text-danger fa-ul" id="itemList">
+                        @*在此处插入it项目*@
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label" style="vertical-align:top;">
+                申请备注:
+            </span>
+            <span class="b-input">
+                @m.applier_comment
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                主管/部门经理:
+            </span>
+            <span class="b-input">
+                @string.Format("{0}({1})", m.dep_charger_name, m.dep_charger_no)
+            </span>
+        </div>
+
+        @if (m.repair_time != null) {
+            <h4 style="border-bottom:1px solid #337ab7;font-style:italic;margin-top:24px;" class="text-primary">IT部维修过程</h4>
+            <div class="b-div">
+                <span class="b-label">
+                    处理人:
+                </span>
+                <span class="b-input">
+                    @m.repair_man
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    处理时间:
+                </span>
+                <span class="b-input">
+                    @(((DateTime)m.repair_time).ToString("yyyy-MM-dd HH:mm"))
+                </span>
+            </div>
+            if (m.real_it_fee > 0) {
+                <div class="b-div">
+                    <span class="b-label">
+                        维修途径:
+                    </span>
+                    <span class="b-input">
+                        @m.repair_way
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        处理项目:
+                    </span>
+                    <div class="b-input">
+                        <div>
+                            <ul class="text-success fa-ul" id="fixedItemList">
+                                @*在此处插入it项目*@
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="b-div">
+                <span class="b-label">
+                    IT部备注:
+                </span>
+                <span class="b-input">
+                    @m.it_comment
+                </span>
+            </div>
+        }
+        @if (m.evaluation_time != null) {
+            <h4 style="border-bottom:1px solid #337ab7;font-style:italic;margin-top:24px;" class="text-primary">服务评价</h4>
+            <div class="b-div">
+                <span class="b-label">
+                    评价时间:
+                </span>
+                <span class="b-input">
+                    @(((DateTime)m.evaluation_time).ToString("yyyy-MM-dd HH:mm"))
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    评价人:
+                </span>
+                <span class="b-input">
+                    @m.applier_name
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    服务打分:
+                </span>
+                <span class="b-input" style="color:gold;font-size:16px;">
+                    @for (var i = 0; i < m.evaluation_score; i++) {
+                        <i class="fa fa-star"></i>
+                    }
+                    @for (var i = 0; i < 5 - m.evaluation_score; i++) {
+                        <i class="fa fa-star-o"></i>
+                    }
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    评价意见:
+                </span>
+                <span class="b-input">
+                    @m.evaluation_comment
+        </span>
+    </div>
+        }
+
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

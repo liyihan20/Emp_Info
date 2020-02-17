@@ -7,6 +7,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using EmpInfo.Services;
 
 
 namespace EmpInfo.Controllers
@@ -29,9 +30,12 @@ namespace EmpInfo.Controllers
             bool fromWx = Session["fromwx"] == null ? false : (bool)Session["fromwx"];//是否从微信过来
             ViewData["fromWx"] = fromWx; //是否从微信端访问
 
-            var pushUsers = db.vw_push_users.Where(v => v.id == userInfo.id).ToList();
+            List<vw_push_users> pushUsers = new List<vw_push_users>();
+            try {
+                pushUsers = db.vw_push_users.Where(v => v.id == userInfo.id).ToList();                
+            }
+            catch {}
             ViewData["wxSetting"] = pushUsers.Count() > 0 ? "1" : "0"; //是否可以看到微信公众号的有关设置
-            
             //查看工资是否需要再次确认密码
             bool checkSalaryNeedPassword = false;
             if (fromWx) {
@@ -55,18 +59,11 @@ namespace EmpInfo.Controllers
             if (portrait == null) {
                 //无照片的，先看看人事系统有没有 2017-9-5
                 string picUrl;
-                var emp = db.GetHREmpInfo(card_no).ToList();
-                if (emp.Count() > 0) {
-                    if (emp.First().zp != null) {
-                        portrait = MyUtils.MakeThumbnail(MyUtils.BytesToImage(emp.First().zp));
-                        if (user != null) {
-                            user.short_portrait = portrait;
-                            db.SaveChanges();
-                        }
-                    }
-                    else {
-                        picUrl = Server.MapPath("~/Content/images/") + (user.sex.Equals("男") ? "user_man.png" : "user_woman.png");
-                        portrait = MyUtils.GetServerImage(picUrl);
+                portrait = new HRDBSv().GetHREmpPortrait(card_no);
+                if (portrait != null) {
+                    if (user != null) {
+                        user.short_portrait = portrait;
+                        db.SaveChanges();
                     }
                 }
                 else {
@@ -167,6 +164,9 @@ namespace EmpInfo.Controllers
                 }
                 user.email = email;
             }
+            else {
+                user.email = "";
+            }
             if (!string.IsNullOrEmpty(phone))
             {
                 var phoneR = new Regex(@"^\d{11}$");
@@ -179,6 +179,9 @@ namespace EmpInfo.Controllers
                     return Json(new SimpleResultModel() { suc = false, msg = "此手机长号已被其他人绑定" });
                 }
                 user.phone = phone;
+            }
+            else {
+                user.phone = "";
             }
             user.short_phone = shortPhone;
             if (!string.IsNullOrEmpty(new_pass))
@@ -594,22 +597,22 @@ namespace EmpInfo.Controllers
         [SessionTimeOutFilter]
         public ActionResult WorkGroupIndex()
         {            
-            ViewData["autStr"] = MyPowers();
+            //ViewData["autStr"] = MyPowers();
             return View();
         }
 
-        [SessionTimeOutFilter]
-        public ActionResult EleProcess()
-        {            
-            return View();
-        }
+        //[SessionTimeOutFilter]
+        //public ActionResult EleProcess()
+        //{            
+        //    return View();
+        //}
 
-        [SessionTimeOutFilter]
-        public ActionResult NoPaperProcess()
-        {
-            ViewData["autStr"] = MyPowers();
-            return View();
-        }
+        //[SessionTimeOutFilter]
+        //public ActionResult NoPaperProcess()
+        //{
+        //    ViewData["autStr"] = MyPowers();
+        //    return View();
+        //}
 
         //public string img()
         //{

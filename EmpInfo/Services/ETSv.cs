@@ -183,7 +183,7 @@ namespace EmpInfo.Services
 
         public override void SendNotification(FlowResultModel model)
         {
-            if (model.suc) {
+            if (model.suc) {                
                 if (model.msg.Contains("完成") || model.msg.Contains("NG")) {
                     bool isSuc = model.msg.Contains("NG") ? false : true;
                     string ccEmails = "";
@@ -255,6 +255,11 @@ namespace EmpInfo.Services
         {
             var et = db.ei_etApply.Where(e => e.customer_number == customerNumber && (company == "all" || e.company == company)).OrderByDescending(e => e.id).Select(e => e.addr).FirstOrDefault();
             return et ?? "";
+        }
+
+        public override bool CanAccessApply(UserInfo userInfo)
+        {
+            return HasGotPower("UnnormalCH", userInfo.id);
         }
 
     }

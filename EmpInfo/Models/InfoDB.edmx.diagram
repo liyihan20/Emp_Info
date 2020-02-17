@@ -5,7 +5,7 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="31485ad8413145feadb8e14bbd6e0c54" Name="Diagram1" ShowGrid="false" ZoomLevel="99" >
-        <EntityTypeShape EntityType="ICAuditModel.ei_users" Width="1.5" PointX="5.375" PointY="1.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_users" Width="1.5" PointX="5.375" PointY="1.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_event_log" Width="1.5" PointX="5.375" PointY="5.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_ei_users" Width="1.5" PointX="10.75" PointY="2" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_authority" Width="1.5" PointX="5.375" PointY="3.625" IsExpanded="false" />
@@ -34,7 +34,6 @@
         <AssociationConnector Association="ICAuditModel.FK_dn_discountInfoUsers_dn_discountInfo" />
         <AssociationConnector Association="ICAuditModel.FK_dn_pointsForDish_dn_dishes" />
         <EntityTypeShape EntityType="ICAuditModel.dn_birthdayMealLog" Width="1.5" PointX="2.875" PointY="6" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_specialUsers" Width="1.5" PointX="8.125" PointY="0.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.dn_items" Width="1.5" PointX="0.5" PointY="2.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.dn_Restaurent" Width="1.5" PointX="0.5" PointY="6.75" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_resVisitLog" Width="1.5" PointX="2.875" PointY="6.75" IsExpanded="false" />
@@ -99,7 +98,7 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_apApply" Width="1.5" PointX="0.5" PointY="13.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_apApplyEntry" Width="1.5" PointX="0.5" PointY="14.375" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_apApplyEntry_ei_apApply" />
-        <EntityTypeShape EntityType="ICAuditModel.vw_APExcel" Width="1.5" PointX="2.375" PointY="14.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_APExcel" Width="1.5" PointX="8.25" PointY="17" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_jqApply" Width="1.5" PointX="4.25" PointY="15" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_JQExcel" Width="1.5" PointX="8.25" PointY="13.75" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_spApply" Width="1.5" PointX="6" PointY="14.375" IsExpanded="false" />
@@ -113,13 +112,15 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_TIApplyEntry" Width="1.5" PointX="0.5" PointY="15.75" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_TIApplyEntry_ei_TIApply" />
         <EntityTypeShape EntityType="ICAuditModel.vw_TIExcel" Width="1.5" PointX="8.25" PointY="16.375" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_sjApply" Width="1.5" PointX="2.375" PointY="15" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_sjApplyEntry" Width="1.5" PointX="2.375" PointY="15.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_sjApply" Width="1.5" PointX="2.375" PointY="14.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_sjApplyEntry" Width="1.5" PointX="2.375" PointY="15" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_sjApplyEntry_ei_sjApply" />
         <EntityTypeShape EntityType="ICAuditModel.vw_SJExcel" Width="1.5" PointX="8.25" PointY="14.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_spExcel" Width="1.5" PointX="8.25" PointY="15.125" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.wx_accessToken" Width="1.5" PointX="10.75" PointY="5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.wx_jsApiTicket" Width="1.5" PointX="10.75" PointY="5.625" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_itApply" Width="1.5" PointX="2.375" PointY="15.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_itItems" Width="1.5" PointX="4.25" PointY="15.75" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
