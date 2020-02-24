@@ -47,325 +47,285 @@
         </script>
 
     }
-    @if (bam.isPass == null && bam.stepName == "IT部维修处理") {
-        <script>
-            var fixedItems = @Html.Raw(faultyItems);
-            var hasFetchItems = false;
+    else
+        if (bam.stepName == "IT部接单") {
+            <script>
+                function itAccept(isPass){
+                    var repair_way = $("#repair_way").val();
+                    var opinion = $("#opinion").val();
 
-            $(function () {
-                getSendMsgLog();
-                updateFixedItemUI();
-
-                $("#sendMsgBt").on("click", function () {
-                    $.post("@Url.Content("~/ApplyExtra/ITComputerPush")", { sysNo: "@bam.sysNum"}, function (data) {
-                        if (data.suc) {
-                            toastr.success("已成功发送电脑搬动通知");
-                            setTimeout(getSendMsgLog, 1000);
-                        } else {
-                            toastr.error(data.msg);
-                        }
-                    });
-                });
-
-                $("#selectBtn").on("click",function(){
-                    if(hasFetchItems){
-                        openMessageDialog("","",true);
-                        return;
-                    }
-                    $.post("@Url.Content("~/ApplyExtra/GetITITems")",{},function(result){
-                        if(result.length<1){
-                            toastr.error("获取IT项目失败，请联系管理员");
+                    if(isPass){
+                        if(repair_way == ""){
+                            toastr.error("维修途径必须选择");
                             return;
                         }
-
-                        var itemTypes = []; //保存所有项目类型
-                        for(var i in result){
-                            itemTypes.push(result[i].item_type);
+                    }else{
+                        if(opinion == ""){
+                            toastr.error("拒绝接单时必须填写意见");
+                            return;
                         }
-                        itemTypes = utils.unique(itemTypes);
+                    }
 
-                        var html = "";
-                        var tempResult = [];
-                        var checkedAttr = "";
-                        for(var i in itemTypes){
-                            html+="<div class='text-primary item_header'>" + itemTypes[i] + "</div>";
-                            html+="<div class='text-danger row' style='margin-bottom:12px;'>";
-                            tempResult = result.filter(function(r){return r.item_type==itemTypes[i];});
-                            for(var j in tempResult){
-                                checkedAttr = "";
-                                for(var k in fixedItems){
-                                    if(fixedItems[k].n == tempResult[j].item_name){
-                                        checkedAttr = " checked='checked' ";
-                                        break;
-                                    }
+                    openConfirmDialog("确认" + (isPass ? "承接" : "拒绝") + "此维修申请单吗？", function () {
+                        $.post("HandleApply", {
+                            sysNo: "@bam.sysNum",
+                            step: "@bam.step",
+                            stepName: "@bam.stepName",
+                            isPass: isPass,
+                            opinion: opinion,
+                            repair_way:repair_way
+                        }, function (data) {
+                            if (data.suc) {
+                                toastr.success(data.msg);
+                                if(isPass && repair_way == "远程维修"){
+                                    setTimeout(function () { window.location.href = "@string.Concat("BeginAuditApply?sysNo=", bam.sysNum +"&step=20")"; }, 1000);
+                                }else{
+                                    setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 1000);
                                 }
-                                html+="<div class='col-xs-6'><input type='checkbox' name='item' id='"+i+'-'+j+"' "+checkedAttr+" data-fee='"+tempResult[j].item_fee+"' value='"+tempResult[j].item_name+"' /> <label for='"+i+'-'+j+"'>"+tempResult[j].item_name+"</label></div>";
+
+                            } else {
+                                toastr.error(data.msg);
                             }
-                            html+="</div>";
-                        }
-                        openMessageDialog(html,"选择IT项目");
-                        hasFetchItems=true;
-                        $("input[name='item']").iCheck({
-                            checkboxClass: 'icheckbox_minimal-red'
-                        });
-                        $("input[name='item']").on("ifChecked",function(event){
-                            var itemName = $(event.target).val();
-                            var itemFee = $(event.target).attr("data-fee");
-                            fixedItems.push({n:itemName,v:itemFee});
-                            updateFixedItemUI();
-                        });
-                        $("input[name='item']").on("ifUnchecked",function(event){
-                            var itemName = $(event.target).val();
-                            for(var i in fixedItems){
-                                if(fixedItems[i].n == itemName){
-                                    fixedItems.splice(i,1);
-                                }
-                            }
-                            updateFixedItemUI();
                         });
                     });
-                });
-
-            });
-
-            function getSendMsgLog() {
-                $.post("@Url.Content("~/ApplyExtra/GetITPushLog")", { sysNo: "@bam.sysNum" }, function (data) {
-                    if (data.suc) {
-                        $("#msgLog").html(data.msg);
-                    } else {
-                        $("#msgLog").html("此维修单未发送过通知电脑搬动信息");
-                    }
-                });
-            }
-
-            function updateFixedItemUI() {
-                $("#fixItemList").empty();
-                var sumFee = 0;
-                for (var i in fixedItems) {
-                    $("#fixItemList").append("<li><i class='fa-li fa fa-check-square'></i> " + fixedItems[i].n + " : " + fixedItems[i].v + "</li>");
-                    sumFee += parseInt(fixedItems[i].v);
                 }
-                $("#fixItemList").append("<li><i class='fa-li fa fa-cny'></i> 实际产生IT费用" + " : " + sumFee + "</li>");
-            }
-
-            function itAudit(isPass) {
-                var fixed_items = "",
-                    real_it_fee = 0,
-                    it_comment = $.trim($("#it_comment").val()),
-                    repair_way = "";
-                if(isPass){
-                    if(fixedItems.length < 1){
-                        toastr.error("请最少选择一行维修项目");
-                        return;
-                    }
-                    repair_way = $("#repair_way").val();
-                    if(repair_way == ""){
-                        toastr.error("维修途径必须选择");
-                        return;
-                    }
-
-                    fixed_items=JSON.stringify(fixedItems);
-                    real_it_fee = utils.CalArrSum(fixedItems,"v");
-
-                }else{
-                    if(it_comment == ""){
-                        toastr.error("拒绝维修的必须在[IT部备注]中填写原因");
-                        return;
-                    }
-                }
-                openConfirmDialog("确认" + (isPass ? "维修完成" : "拒绝处理") + "此维修申请单吗？", function () {
-                    $.post("HandleApply", {
-                        sysNo: "@bam.sysNum",
-                        step: "@bam.step",
-                        stepName: "@bam.stepName",
-                        isPass: isPass,
-                        opinion: "",
-                        fixed_items:fixed_items,
-                        real_it_fee:real_it_fee,
-                        it_comment:it_comment,
-                        repair_way:repair_way
-                    }, function (data) {
-                        if (data.suc) {
-                            toastr.success(data.msg);
-                            setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
-                        } else {
-                            toastr.error(data.msg);
-                        }
-                    });
-                });
-            }
-
-        </script>
-    }
-    else if (bam.isPass == null && bam.stepName == "服务评价") {
-        <script src="@Url.Content("~/Scripts/star-rating.min.js")"></script>
-        <script>
-            $(function(){
-                $("#rateScore").rating({
-                    clearCaption: '未评分',
-                    starCaptions: {
-                        1: '1分(非常不满意)',
-                        2: '2分(不满意)',
-                        3: '3分(一般)',
-                        4: '4分(满意)',
-                        5: '5分(非常满意)'
-                    }
-                });
-
-            });
-
-            function applierAudit(isPass) {
-                var evaluation_score = $("#rateScore").val();
-                var evaluation_comment = $.trim($("#rateOpinion").val());
-
-                if (evaluation_score == "") {
-                    toastr.error("请点击星星对服务进行评分");
-                    return;
-                }
-                if (isNaN(evaluation_score)) {
-                    toastr.error("评分必须是正整数");
-                    return;
-                }
-                if (evaluation_score < 1) {
-                    toastr.error("评分至少必须打一星");
-                    return;
-                }
-                if (evaluation_score <= 2 && evaluation_comment == "") {
-                    toastr.error("少于或等于二星的评分必须填写原因");
-                    return;
-                }
-
-                openConfirmDialog("确认评价此维修申请单吗？", function () {
-                    $.post("HandleApply",
-                        {
+            </script>
+        }
+        else if (bam.stepName == "搬电脑到IT部") {
+            <script>
+                function applierMoveComputer(isPass){
+                    openConfirmDialog("确认" + (isPass ? "电脑已搬动到IT部" : "不需要再维修") + "吗？", function () {
+                        $.post("HandleApply", {
                             sysNo: "@bam.sysNum",
                             step: "@bam.step",
                             stepName: "@bam.stepName",
                             isPass: isPass,
                             opinion: "",
-                            evaluation_score: evaluation_score,
-                            evaluation_comment: evaluation_comment
-                        },
-                                function (data) {
+                        }, function (data) {
+                            if (data.suc) {
+                                toastr.success(data.msg);
+                                setTimeout(function () { window.location.href = "@string.Concat("CheckApply?sysNo=", bam.sysNum)"; }, 1000);
+                            } else {
+                                toastr.error(data.msg);
+                            }
+                        });
+                    });
+                }
+            </script>
+        }
+        else if (bam.stepName == "IT部维修处理") {
+            <script>
+                var fixedItems = @Html.Raw(faultyItems);
+                var hasFetchItems = false;
+
+                $(function () {
+                    //getSendMsgLog();
+                    updateFixedItemUI();
+
+                    @*$("#sendMsgBt").on("click", function () {
+                                $.post("@Url.Content("~/ApplyExtra/ITComputerPush")", { sysNo: "@bam.sysNum"}, function (data) {
                                     if (data.suc) {
-                                        toastr.success(data.msg + ",请等待页面跳转...");
-                                        setTimeout(function () { window.location.href = "CheckApply?sysNo=" + "@bam.sysNum"; }, 1000);
+                                        toastr.success("已成功发送电脑搬动通知");
+                                        setTimeout(getSendMsgLog, 1000);
                                     } else {
                                         toastr.error(data.msg);
                                     }
-
                                 });
+                            });*@
+
+                    $("#selectBtn").on("click",function(){
+                        if(hasFetchItems){
+                            openMessageDialog("","",true);
+                            return;
+                        }
+                        $.post("@Url.Content("~/ApplyExtra/GetITITems")",{},function(result){
+                            if(result.length<1){
+                                toastr.error("获取IT项目失败，请联系管理员");
+                                return;
+                            }
+
+                            var itemTypes = []; //保存所有项目类型
+                            for(var i in result){
+                                itemTypes.push(result[i].item_type);
+                            }
+                            itemTypes = utils.unique(itemTypes);
+
+                            var html = "";
+                            var tempResult = [];
+                            var checkedAttr = "";
+                            for(var i in itemTypes){
+                                html+="<div class='text-primary item_header'>" + itemTypes[i] + "</div>";
+                                html+="<div class='text-danger row' style='margin-bottom:12px;'>";
+                                tempResult = result.filter(function(r){return r.item_type==itemTypes[i];});
+                                for(var j in tempResult){
+                                    checkedAttr = "";
+                                    for(var k in fixedItems){
+                                        if(fixedItems[k].n == tempResult[j].item_name){
+                                            checkedAttr = " checked='checked' ";
+                                            break;
+                                        }
+                                    }
+                                    html+="<div class='col-xs-6'><input type='checkbox' name='item' id='"+i+'-'+j+"' "+checkedAttr+" data-fee='"+tempResult[j].item_fee+"' value='"+tempResult[j].item_name+"' /> <label for='"+i+'-'+j+"'>"+tempResult[j].item_name+"</label></div>";
+                                }
+                                html+="</div>";
+                            }
+                            openMessageDialog(html,"选择IT项目");
+                            hasFetchItems=true;
+                            $("input[name='item']").iCheck({
+                                checkboxClass: 'icheckbox_minimal-red'
+                            });
+                            $("input[name='item']").on("ifChecked",function(event){
+                                var itemName = $(event.target).val();
+                                var itemFee = $(event.target).attr("data-fee");
+                                fixedItems.push({n:itemName,v:itemFee});
+                                updateFixedItemUI();
+                            });
+                            $("input[name='item']").on("ifUnchecked",function(event){
+                                var itemName = $(event.target).val();
+                                for(var i in fixedItems){
+                                    if(fixedItems[i].n == itemName){
+                                        fixedItems.splice(i,1);
+                                    }
+                                }
+                                updateFixedItemUI();
+                            });
+                        });
+                    });
+
                 });
-            }
-        </script>
-    }
 
+                @*function getSendMsgLog() {
+                            $.post("@Url.Content("~/ApplyExtra/GetITPushLog")", { sysNo: "@bam.sysNum" }, function (data) {
+                                if (data.suc) {
+                                    $("#msgLog").html(data.msg);
+                                } else {
+                                    $("#msgLog").html("此维修单未发送过通知电脑搬动信息");
+                                }
+                            });
+                        }*@
 
+                function updateFixedItemUI() {
+                    $("#fixItemList").empty();
+                    var sumFee = 0;
+                    for (var i in fixedItems) {
+                        $("#fixItemList").append("<li><i class='fa-li fa fa-check-square'></i> " + fixedItems[i].n + " : " + fixedItems[i].v + "</li>");
+                        sumFee += parseInt(fixedItems[i].v);
+                    }
+                    $("#fixItemList").append("<li><i class='fa-li fa fa-cny'></i> 实际产生IT费用" + " : " + sumFee + "</li>");
+                }
+
+                function itAudit(isPass) {
+                    var fixed_items = "",
+                        real_it_fee = 0,
+                        it_comment = $.trim($("#it_comment").val());
+                    if(isPass){
+                        if(fixedItems.length < 1){
+                            toastr.error("请最少选择一行维修项目");
+                            return;
+                        }                        
+
+                        fixed_items=JSON.stringify(fixedItems);
+                        real_it_fee = utils.CalArrSum(fixedItems,"v");
+
+                    }else{
+                        if(it_comment == ""){
+                            toastr.error("拒绝维修的必须在[IT部备注]中填写原因");
+                            return;
+                        }
+                    }
+                    openConfirmDialog("确认" + (isPass ? "维修完成" : "拒绝处理") + "此维修申请单吗？", function () {
+                        $.post("HandleApply", {
+                            sysNo: "@bam.sysNum",
+                            step: "@bam.step",
+                            stepName: "@bam.stepName",
+                            isPass: isPass,
+                            opinion: "",
+                            fixed_items:fixed_items,
+                            real_it_fee:real_it_fee,
+                            it_comment:it_comment
+                        }, function (data) {
+                            if (data.suc) {
+                                toastr.success(data.msg);
+                                setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
+                            } else {
+                                toastr.error(data.msg);
+                            }
+                        });
+                    });
+                }
+
+            </script>
+        }
+        else if (bam.stepName == "服务评价") {
+            <script src="@Url.Content("~/Scripts/star-rating.min.js")"></script>
+            <script>
+                $(function(){
+                    $("#rateScore").rating({
+                        clearCaption: '未评分',
+                        starCaptions: {
+                            1: '1分(非常不满意)',
+                            2: '2分(不满意)',
+                            3: '3分(一般)',
+                            4: '4分(满意)',
+                            5: '5分(非常满意)'
+                        }
+                    });
+
+                });
+
+                function applierAudit(isPass) {
+                    var evaluation_score = $("#rateScore").val();
+                    var evaluation_comment = $.trim($("#rateOpinion").val());
+
+                    if (evaluation_score == "") {
+                        toastr.error("请点击星星对服务进行评分");
+                        return;
+                    }
+                    if (isNaN(evaluation_score)) {
+                        toastr.error("评分必须是正整数");
+                        return;
+                    }
+                    if (evaluation_score < 1) {
+                        toastr.error("评分至少必须打一星");
+                        return;
+                    }
+                    if (evaluation_score <= 2 && evaluation_comment == "") {
+                        toastr.error("少于或等于二星的评分必须填写原因");
+                        return;
+                    }
+
+                    openConfirmDialog("确认评价此维修申请单吗？", function () {
+                        $.post("HandleApply",
+                            {
+                                sysNo: "@bam.sysNum",
+                                step: "@bam.step",
+                                stepName: "@bam.stepName",
+                                isPass: isPass,
+                                opinion: "",
+                                evaluation_score: evaluation_score,
+                                evaluation_comment: evaluation_comment
+                            },
+                                    function (data) {
+                                        if (data.suc) {
+                                            toastr.success(data.msg + ",请等待页面跳转...");
+                                            setTimeout(function () { window.location.href = "CheckApply?sysNo=" + "@bam.sysNum"; }, 1000);
+                                        } else {
+                                            toastr.error(data.msg);
+                                        }
+
+                                    });
+                    });
+                }
+            </script>
+        }
 }
+
 
 @*通过load获取申请单内容*@
 <div class="text-center text-danger" id="waiting"><i class="fa fa-3x fa-spinner fa-pulse"></i></div>
 <div id="applyContent"></div>
 
-@*IT处理，需发送信息*@
-@if (bam.isPass == null && bam.stepName == "IT部维修处理") {
-    <div class="auditContent" style="visibility:hidden;margin-bottom:60px;">
-        <div class="panel panel-primary">
-            <div class="panel-heading" id="auditHead">
-                <i class='fa fa-wrench fa-fw'></i> IT部处理
-            </div>
-            <div class="panel-body">
-                <div class="b-div">
-                    <span class="b-label" style="vertical-align:middle;">
-                        发送通知:
-                    </span>
-                    <div class="b-input">
-                        <button type="button" class="btn btn-sm btn-success" style="margin:6px 0;" id="sendMsgBt">发送电脑/设备搬动通知</button>
-                        <span class="small text-danger" style="margin-left:8px;"><i class="fa fa-info-circle"></i> <span id="msgLog"></span> </span>
-                    </div>
-                </div>
-                <div class="b-div">
-                    <span class="b-label">
-                        维修途径:
-                    </span>
-                    <div class="b-input">
-                        <select class="form-control" id="repair_way">
-                            <option value="">---- 下拉维修途径 ----</option>
-                            @foreach (var d in new string[] { "现场维修", "远程维修" }) {
-                            <option value="@d">@d</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="b-div">
-                    <span class="b-label">
-                        维修项目:
-                    </span>
-                    <span>
-                        <button class="btn btn-sm btn-danger" type="button" id="selectBtn"><i class="fa fa-list"></i> 选择IT项目</button>
-                    </span>
-                </div>
-                <div class="b-div">
-                    <span class="b-label"></span>
-                    <div class="b-input">
-                        <div>
-                            <ul class="text-success fa-ul" id="fixItemList">
-                                @*在此处插入it项目*@
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="b-div">
-                    <span class="b-label">
-                        IT部备注:
-                    </span>
-                    <span class="b-input">
-                        <textarea class="form-control" rows="2" id="it_comment" placeholder="可在此填写维修详情或其它说明事项"></textarea>
-                    </span>
-                </div>
-                <div class="btn-group btn-group-justified" role="group">
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-success" onclick="itAudit(true)">维修完成</button>
-                    </div>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-danger" onclick="itAudit(false)">无法处理</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-else if (bam.isPass == null && bam.stepName == "服务评价") {
-    <div class="auditContent" style="visibility:hidden;margin-bottom:60px;">
-        <div class="panel panel-primary">
-            <div class="panel-heading" id="auditHead">
-                <i class='fa fa-thumbs-o-up fa-fw'></i> 对维修服务评价
-            </div>
-            <div class="panel-body">
-                <div class="b-div">
-                    <span class="b-label" style="padding-top:12px;">
-                        服务打分:
-                    </span>
-                    <span class="b-input">
-                        <input type="text" id="rateScore" data-min="0" data-max="5" data-step="1" data-show-clear="false" data-size="xs" />
-                    </span>
-                </div>
-                <div class="b-div">
-                    <span class="b-label">评价意见:</span>
-                    <span class="b-input">
-                        <input type="text" class="form-control" id="rateOpinion" />
-                    </span>
-                    <p class="small text-danger"><i class="fa fa-info-circle"></i> 如分数低于或等于2星，必须填写评价意见</p>
-                </div>
-
-                <div class="b-div">
-                    <button class="btn btn-primary btn-block" onclick="applierAudit(true)">确认评价</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-else {
+@if (bam.isPass != null) {
     @*审批信息*@
     <div class="auditContent" style="visibility:hidden;">
         <div class="panel panel-primary">
@@ -375,25 +335,172 @@ else {
             <div class="panel-body">
                 <textarea class="form-control" rows="2" id="opinion" placeholder="请在此处输入审核意见"></textarea>
                 <div style="margin-top:12px;"></div>
-                @if (bam.isPass == null) {
-                <div class="btn-group btn-group-justified" role="group">
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
-                    </div>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
-                    </div>
-                </div>
-                }
-                else if ((bool)bam.isPass) {
-                <button type="button" class="btn btn-block btn-success disabled">已同意此申请</button>
+                @if ((bool)bam.isPass) {
+                    <button type="button" class="btn btn-block btn-success disabled">
+                        @if (bam.stepName == "搬电脑到IT部") {
+                            <text>电脑已搬至IT部并打印</text>
+                        }
+                        else if (bam.stepName == "IT部维修处理") {
+                            <text>已维修处理完成</text>
+                        }
+                        else {
+                            <text>已同意此申请</text>
+                        }
+                    </button>
                 }
                 else {
-                <button type="button" class="btn btn-block btn-danger disabled">已拒绝此申请</button>
+                    <button type="button" class="btn btn-block btn-danger disabled">已拒绝此申请</button>
                 }
             </div>
         </div>
     </div>
+}
+else {
+    if (bam.stepName == "IT部接单") {
+        <div class="auditContent" style="visibility:hidden;margin-bottom:60px;">
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="auditHead">
+                    <i class='fa fa-wrench fa-fw'></i> IT部接单
+                </div>
+                <div class="panel-body">
+                    <div class="b-div">
+                        <span class="b-label">
+                            维修途径:
+                        </span>
+                        <div class="b-input">
+                            <select class="form-control" id="repair_way">
+                                <option value="">---- 下拉维修途径 ----</option>
+                                @foreach (var d in new string[] { "现场维修", "远程维修" }) {
+                                    <option value="@d">@d</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <textarea class="form-control" rows="2" id="opinion" placeholder="请在此处输入审核意见"></textarea>
+                    <div style="margin-top:12px;"></div>
+                    <div class="btn-group btn-group-justified" role="group">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-success" onclick="itAccept(true)">确认接单</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-danger" onclick="itAccept(false)">拒绝接单</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (bam.stepName == "搬电脑到IT部") {
+        <div class="auditContent" style="visibility:hidden;margin-bottom:60px;">
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="auditHead">
+                    <i class='fa fa-wrench fa-fw'></i> 搬电脑到IT部
+                </div>
+                <div class="panel-body">
+                    <button type="button" class="btn btn-block btn-success" style="margin:12px;" onclick="applierMoveComputer(true)"><i class="fa fa-check"></i> 已将电脑搬到IT部并打印标签</button>
+                    <button type="button" class="btn btn-block btn-danger" style="margin:12px;" onclick="applierMoveComputer(false)"><i class="fa fa-reply"></i> 电脑已正常不需修理</button>                                        
+                </div>
+            </div>
+        </div>
+    }
+    else if (bam.stepName == "IT部维修处理") {
+        <div class="auditContent" style="visibility:hidden;margin-bottom:60px;">
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="auditHead">
+                    <i class='fa fa-wrench fa-fw'></i> IT部处理
+                </div>
+                <div class="panel-body">
+                    <div class="b-div">
+                        <span class="b-label">
+                            维修项目:
+                        </span>
+                        <span>
+                            <button class="btn btn-sm btn-danger" type="button" id="selectBtn"><i class="fa fa-list"></i> 选择IT项目</button>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label"></span>
+                        <div class="b-input">
+                            <div>
+                                <ul class="text-success fa-ul" id="fixItemList">
+                                    @*在此处插入it项目*@
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            IT部备注:
+                        </span>
+                        <span class="b-input">
+                            <textarea class="form-control" rows="2" id="it_comment" placeholder="可在此填写维修详情或其它说明事项"></textarea>
+                        </span>
+                    </div>
+                    <div class="btn-group btn-group-justified" role="group">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-success" onclick="itAudit(true)"><i class="fa fa-check"></i> 维修完成</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-danger" onclick="itAudit(false)"><i class="fa fa-times"></i> 无法处理</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (bam.stepName == "服务评价") {
+        <div class="auditContent" style="visibility:hidden;margin-bottom:60px;">
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="auditHead">
+                    <i class='fa fa-thumbs-o-up fa-fw'></i> 对维修服务评价
+                </div>
+                <div class="panel-body">
+                    <div class="b-div">
+                        <span class="b-label" style="padding-top:12px;">
+                            服务打分:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" id="rateScore" data-min="0" data-max="5" data-step="1" data-show-clear="false" data-size="xs" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">评价意见:</span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" id="rateOpinion" />
+                        </span>
+                        <p class="small text-danger"><i class="fa fa-info-circle"></i> 如分数低于或等于2星，必须填写评价意见</p>
+                    </div>
+
+                    <div class="b-div">
+                        <button class="btn btn-primary btn-block" onclick="applierAudit(true)"><i class="fa fa-check"></i> 确认评价</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else {
+        <div class="auditContent" style="visibility:hidden;">
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="auditHead">
+                    <i class='fa fa-pencil'></i> 开始处理
+                </div>
+                <div class="panel-body">
+                    <textarea class="form-control" rows="2" id="opinion" placeholder="请在此处输入审核意见"></textarea>
+                    <div style="margin-top:12px;"></div>
+                    <div class="btn-group btn-group-justified" role="group">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+
 }
 @section Modal {
     @Html.Partial("_ConfirmDialog")

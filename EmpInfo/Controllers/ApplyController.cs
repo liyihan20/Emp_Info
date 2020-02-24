@@ -155,16 +155,20 @@ namespace EmpInfo.Controllers
             if (string.IsNullOrEmpty(sysNo) & !string.IsNullOrEmpty(param)) {
                 sysNo = param;
             }
+            try {
+                SetBillBySysNo(sysNo);
+                var m = bill.GetBill();
+                ViewData["am"] = m;
+                ViewData["auditStatus"] = bill.GetAuditStatus(sysNo);
 
-            SetBillBySysNo(sysNo);
-            var m = bill.GetBill();
-            ViewData["am"] = m;
-            ViewData["auditStatus"] = bill.GetAuditStatus(sysNo);
+                WriteEventLog(bill.BillTypeName, "查看申请单：" + sysNo);
 
-            WriteEventLog(bill.BillTypeName, "查看申请单：" + sysNo); 
-
-            return View(bill.CheckViewName());
-
+                return View(bill.CheckViewName());
+            }
+            catch {
+                ViewBag.tip = "此申请单不存在";
+                return View("Error");
+            }
         }
 
         //查看流转记录

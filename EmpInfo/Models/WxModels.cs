@@ -25,6 +25,9 @@ namespace EmpInfo.Models
         public long timestamp { get; set; }
         public string nonceStr { get; set; }
         public string signature { get; set; }
+        public string debug { get; set; }
+        public string actionType { get; set; }
     }
+
 
 }

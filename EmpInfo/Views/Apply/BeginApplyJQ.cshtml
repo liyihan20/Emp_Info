@@ -183,6 +183,10 @@
 
             $("#selectDepBt").on("click", function () {
                 var realDep = $("input[name='real_dep']:checked").val();
+                if (!realDep) {
+                    toastr.error("请选择一个部门再提交！");
+                    return;
+                }
                 $("#dep_name").val(realDep);
                 $("#depModal").modal("hide");
                 beginApply();

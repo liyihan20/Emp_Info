@@ -251,10 +251,15 @@ namespace EmpInfo.Services
             }
         }
 
+        /// <summary>
+        /// 能否访问这个功能
+        /// </summary>
+        /// <param name="userInfo"></param>
+        /// <returns></returns>
         public virtual bool CanAccessApply(UserInfo userInfo)
         {
             return true;
-        }
+        }        
 
         /// <summary>
         /// 流程完结的邮件通知

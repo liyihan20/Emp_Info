@@ -215,8 +215,46 @@
             </span>
         </div>
 
+        @if (m.accept_time != null) {
+            <h4 style="border-bottom:1px solid #337ab7;font-style:italic;margin-top:24px;" class="text-primary">IT部接单</h4>
+            <div class="b-div">
+                <span class="b-label">
+                    接单人:
+                </span>
+                <span class="b-input">
+                    @m.accept_man_name
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    接单时间:
+                </span>
+                <span class="b-input">
+                    @(((DateTime)m.accept_time).ToString("yyyy-MM-dd HH:mm"))
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    维修途径:
+                </span>
+                <span class="b-input">
+                    @m.repair_way
+                </span>
+            </div>
+            if (m.print_time != null) {
+                <div class="b-div">
+                    <span class="b-label">
+                        标签打印时间:
+                    </span>
+                    <span class="b-input">
+                        @(((DateTime)m.print_time).ToString("yyyy-MM-dd HH:mm"))
+                    </span>
+                </div>
+            }
+        }
+
         @if (m.repair_time != null) {
-            <h4 style="border-bottom:1px solid #337ab7;font-style:italic;margin-top:24px;" class="text-primary">IT部维修过程</h4>
+            <h4 style="border-bottom:1px solid #337ab7;font-style:italic;margin-top:24px;" class="text-primary">IT部维修处理</h4>
             <div class="b-div">
                 <span class="b-label">
                     处理人:
@@ -234,14 +272,6 @@
                 </span>
             </div>
             if (m.real_it_fee > 0) {
-                <div class="b-div">
-                    <span class="b-label">
-                        维修途径:
-                    </span>
-                    <span class="b-input">
-                        @m.repair_way
-                    </span>
-                </div>
                 <div class="b-div">
                     <span class="b-label">
                         处理项目:

@@ -263,7 +263,8 @@ namespace EmpInfo.Services
             am.agentMan = GetUserNameAndCardByCardNum(bill.agent_man);
             am.informMan = GetUserNameAndCardByCardNum(bill.inform_man);
             am.empLevel = db.ei_empLevel.Single(e => e.level_no == bill.emp_level).level_name;
-            
+            am.account = db.ei_users.Where(u => u.card_number == bill.applier_num).FirstOrDefault().salary_no;
+
             return am;
         }
 

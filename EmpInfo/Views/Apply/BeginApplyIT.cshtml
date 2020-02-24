@@ -107,7 +107,7 @@
                     return;
                 }
                 var ipReg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
-                if(!ipReg.test(obj.ip_addr)){
+                if(obj.ip_addr!="" && !ipReg.test(obj.ip_addr)){
                     toastr.error("IP地址不符合规则，请检查是否正确");
                     return;
                 }

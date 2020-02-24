@@ -151,5 +151,25 @@
             }
         }
         return sum;
+    },
+    //节流，将高频率的相同操作当做一个操作，delay为毫秒数
+    Debounce: function(fn, delay) {
+        var timer = null;
+
+        return function () {
+            var args = arguments;
+            var context = this;
+
+            if (timer) {
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                    fn.apply(context, args);
+                }, delay);
+            } else {
+                timer = setTimeout(function () {
+                    fn.apply(context, args);
+                }, delay);
+            }
+        }
     }
 }

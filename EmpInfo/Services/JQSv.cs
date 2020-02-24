@@ -86,6 +86,7 @@ namespace EmpInfo.Services
 
             if (bill.quit_reason != null && bill.quit_reason.Length > 1000) throw new Exception("离职原因内容太多，请删减");
             if (bill.quit_suggestion != null && bill.quit_suggestion.Length > 1000) throw new Exception("离职建议内容太多，请删减");
+            if (bill.dep_name == null) throw new Exception("离职人的部门不能为空");
 
             if ("自离".Equals(bill.quit_type)) {
                 if (bill.absent_from == null) throw new Exception("必须填写正确的旷工开始日期");

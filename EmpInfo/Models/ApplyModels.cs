@@ -43,6 +43,7 @@ namespace EmpInfo.Models
         public string agentMan { get; set; }
         public string informMan { get; set; }
         public bool hasAttachment { get; set; }
+        public string account { get; set; }
     }
 
     public class AttachmentModel

@@ -755,6 +755,10 @@
           <Property Name="dep_charger_no" Type="varchar" MaxLength="50" />
           <Property Name="dep_charger_name" Type="nvarchar" MaxLength="50" />
           <Property Name="evaluation_time" Type="datetime" />
+          <Property Name="accept_man_number" Type="varchar" MaxLength="20" />
+          <Property Name="accept_man_name" Type="nvarchar" MaxLength="20" />
+          <Property Name="accept_time" Type="datetime" />
+          <Property Name="print_time" Type="datetime" />
         </EntityType>
         <EntityType Name="ei_itItems">
           <Key>
@@ -5607,6 +5611,10 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="dep_charger_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="dep_charger_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="evaluation_time" Type="DateTime" Precision="3" />
+          <Property Name="accept_man_number" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="accept_man_name" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="accept_time" Type="DateTime" Precision="3" />
+          <Property Name="print_time" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="ei_itItems">
           <Key>
@@ -7767,6 +7775,10 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_itApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_itApply">
               <MappingFragment StoreEntitySet="ei_itApply">
+                <ScalarProperty Name="print_time" ColumnName="print_time" />
+                <ScalarProperty Name="accept_time" ColumnName="accept_time" />
+                <ScalarProperty Name="accept_man_name" ColumnName="accept_man_name" />
+                <ScalarProperty Name="accept_man_number" ColumnName="accept_man_number" />
                 <ScalarProperty Name="evaluation_time" ColumnName="evaluation_time" />
                 <ScalarProperty Name="dep_charger_name" ColumnName="dep_charger_name" />
                 <ScalarProperty Name="dep_charger_no" ColumnName="dep_charger_no" />

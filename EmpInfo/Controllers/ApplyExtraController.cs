@@ -57,12 +57,12 @@ namespace EmpInfo.Controllers
             WriteEventLog("请假条申请", sysNo + ">发送行政面谈通知" + ";bookTime:" + bookTime);
 
             return Json(new SimpleResultModel() { suc = true });
-        }        
+        }
 
         //查看最近1年内的申请记录
         [SessionTimeOutJsonFilter]
         public JsonResult GetLeaveRecordsInOneYear(string applierNameAndCard)
-        { 
+        {
             return Json(new { suc = true, list = new ALSv().GetLeaveRecordsInOneYear(applierNameAndCard) });
         }
 
@@ -72,7 +72,7 @@ namespace EmpInfo.Controllers
 
         [SessionTimeOutJsonFilter]
         public JsonResult GetStockAndAdminByAccount(string accName)
-        {            
+        {
             return Json(new { suc = true, result = new SASv().GetK3StockAuditor(accName) });
         }
 
@@ -88,12 +88,12 @@ namespace EmpInfo.Controllers
         public JsonResult GetJQApply(string searchContent)
         {
             var jq = new JQSv().GetJQApply(searchContent);
-            if (jq == null) return Json(new SimpleResultModel() { suc = false, msg = "查询不到离职申请单" });            
+            if (jq == null) return Json(new SimpleResultModel() { suc = false, msg = "查询不到离职申请单" });
 
             return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(jq) });
         }
 
-        public JsonResult UpdateLeaveDay(string sysNo,string newDay,string notifiers)
+        public JsonResult UpdateLeaveDay(string sysNo, string newDay, string notifiers)
         {
             DateTime newDayDt;
             if (!DateTime.TryParse(newDay, out newDayDt)) {
@@ -103,10 +103,10 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = "请先选择需通知的文员" });
             }
             try {
-                new JQSv(sysNo).UpdateLeaveDay(newDayDt, notifiers,userInfo.cardNo);
+                new JQSv(sysNo).UpdateLeaveDay(newDayDt, notifiers, userInfo.cardNo);
             }
             catch (Exception ex) {
-                return Json(new SimpleResultModel() { suc = false,msg = ex.Message });
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
             }
             WriteEventLog("修改离职日期", sysNo + ":" + newDay + ";" + notifiers);
             return Json(new SimpleResultModel() { suc = true });
@@ -157,13 +157,13 @@ namespace EmpInfo.Controllers
             WriteEventLog("行政离职面谈", sysNo + ">月薪员工离职面谈" + ";bookTime:" + bookTime);
 
             return Json(new SimpleResultModel() { suc = true });
-        }        
+        }
 
         #endregion
 
         #region 调动
 
-        public JsonResult GetSJEntrys(int sjId)            
+        public JsonResult GetSJEntrys(int sjId)
         {
             var entrys = new SJSv().GetEntrys(sjId);
             entrys.ForEach(e => { e.ei_sjApply = null; e.sj_id = 0; });
@@ -190,7 +190,7 @@ namespace EmpInfo.Controllers
             return View();
         }
 
-        #endregion        
+        #endregion
 
         #region 漏刷卡
 
@@ -214,6 +214,7 @@ namespace EmpInfo.Controllers
 
         #region 电脑报修
 
+        [SessionTimeOutFilter]
         public ActionResult ManageITItems()
         {
             return View();
@@ -223,10 +224,10 @@ namespace EmpInfo.Controllers
         {
             try {
                 var list = new ITSv().GetITItems();
-                return Json(list,JsonRequestBehavior.AllowGet);
+                return Json(list, JsonRequestBehavior.AllowGet);
             }
             catch {
-                return Json(new List<ei_itItems>(), JsonRequestBehavior.AllowGet);                
+                return Json(new List<ei_itItems>(), JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -267,6 +268,48 @@ namespace EmpInfo.Controllers
             WriteEventLog("IT电脑报修申请", sysNo + ">发送电脑搬动通知");
 
             return Json(new SimpleResultModel() { suc = true });
+        }
+
+        public ActionResult PrintITCode()
+        {
+            return View();
+        }
+
+        public JsonResult GetITBillForPrint(string sysNo, string applierNumber)
+        {
+            try {
+                var sv = new ITSv(sysNo);
+                var bill = sv.GetBill() as ei_itApply;
+                if (!applierNumber.Equals(bill.applier_num)) {
+                    return Json(new SimpleResultModel(false, "申请流水号与厂牌号不匹配，请确认"));
+                }
+                if (bill.accept_man_name == null) {
+                    return Json(new SimpleResultModel(false, "此维修单还未接单，不能打印"));
+                }
+                if (!"现场维修".Equals(bill.repair_way)) {
+                    return Json(new SimpleResultModel(false, "不是现场维修的不能打印"));
+                }
+                if (bill.repair_time != null) {
+                    return Json(new SimpleResultModel(false, "已维修完成的不能打印"));
+                }
+
+                sv.UpdatePrintTime();
+                return Json(new SimpleResultModel(true, "获取信息成功", JsonConvert.SerializeObject(
+                    new
+                    {
+                        bill.sys_no,
+                        bill.applier_num,
+                        bill.applier_name,
+                        apply_time = ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                        bill.dep_name,
+                        bill.accept_man_name,
+                        print_time = DateTime.Now.ToString("yyyy-MM-dd HH:mm")
+                    }
+            )));
+            }
+            catch {
+                return Json(new SimpleResultModel(false, "申请流水号不存在，请确认"));
+            }
         }
 
         #endregion

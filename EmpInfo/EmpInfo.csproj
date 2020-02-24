@@ -181,6 +181,7 @@
     </Compile>
     <Compile Include="Interfaces\IApplyEntryQueue.cs" />
     <Compile Include="Interfaces\IBeginAuditOtherInfo.cs" />
+    <Compile Include="Interfaces\IJsInterface.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AdminModels.cs" />
     <Compile Include="Models\all_maxNum.cs">
@@ -1336,7 +1337,7 @@
     <Content Include="Views\Report\TIViewForGuard.cshtml" />
     <Content Include="Views\Report\TIReport.cshtml" />
     <Content Include="Views\Apply\BeginAuditSJApply.cshtml" />
-    <Content Include="Views\WX\GetLocation.cshtml" />
+    <Content Include="Views\WX\JsInterface.cshtml" />
     <Content Include="Views\ApplyExtra\CheckMyKQRecord.cshtml" />
     <Content Include="Views\Shared\_Uploader.cshtml" />
     <Content Include="Views\ApplyExtra\ManageITItems.cshtml" />
@@ -1344,6 +1345,7 @@
     <Content Include="Views\Apply\CheckITApply.cshtml" />
     <Content Include="Views\Apply\BeginAuditITApply.cshtml" />
     <Content Include="Views\Shared\Warn.cshtml" />
+    <Content Include="Views\ApplyExtra\PrintITCode.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

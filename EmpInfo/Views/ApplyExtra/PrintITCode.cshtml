@@ -1,0 +1,150 @@
+﻿@section CSS{
+    <style type="text/css">
+        #wrapDiv {
+            margin-left: 0.2cm;
+            font-size: 10px;
+        }
+
+        table {
+            border-top: 1px solid #666;
+            border-right: 1px solid #666;
+        }
+
+        td {
+            padding: 2px;
+            ;
+            border-left: 1px solid #666;
+            border-bottom: 1px solid #666;
+            word-break: break-all;
+            overflow: hidden;
+        }
+
+        img {
+            margin: 0 auto;
+        }
+
+        .pageNext {
+            clear: both;
+            page-break-after: always;
+        }
+    </style>
+    <style type="text/css" media="print">
+        .noPrint {
+            display: none;
+        }
+    </style>
+}
+@section Scripts {
+    <script type="text/javascript" src="@Url.Content("~/Scripts/qrcode.js")"></script>
+    <script>
+        document.onkeydown = function (event) {
+            var e = event || window.event || arguments.callee.caller.arguments[0];
+            if (e && e.keyCode == 13) { // enter 键
+                $("#printCode").click();
+            }
+        };
+        $(function () {            
+
+            $("#printCode").on("click", function () {
+                var sysNo = $.trim($("#sysNo").val());
+                var applierNum = $.trim($("#applierNum").val());
+
+                if (sysNo == "") {
+                    toastr.error("请先输入申请流水号");
+                    return;
+                }
+                if (applierNum == "") {
+                    toastr.error("请先输入厂牌号码");
+                    return;
+                }
+
+                $.post("@Url.Content("~/ApplyExtra/GetITBillForPrint")", { sysNo: sysNo, applierNumber: applierNum }, function (data) {
+                    if (!data.suc) {
+                        toastr.error(data.msg);
+                        return;
+                    }
+                    var bill = JSON.parse(data.extra);
+                    var html = '<div style="float:right;height:1.2cm;padding:18px 22px 0 0;">打印时间：'+bill.print_time+'</div>\
+                        <div style="clear:both;"></div>\
+                        <table style="width:100%;height:3.8cm;border-spacing:2px;">\
+                            <tr>\
+                                <td style="width:2.6cm" rowspan="4"><div id="code"></div></td>\
+                                <td style="width:1.6cm">申请人:</td>\
+                                <td style="width:3.4cm">' + bill.applier_name + '(' + bill.applier_num + ')' + '</td>\
+                            </tr>\
+                            <tr>\
+                                <td>申请时间:</td>\
+                                <td>' + bill.apply_time + '</td>\
+                            </tr>\
+                            <tr>\
+                                <td>流水号:</td>\
+                                <td>' + bill.sys_no + '</td>\
+                            </tr>\
+                            <tr>\
+                                <td>处理人:</td>\
+                                <td>' + bill.accept_man_name + '</td>\
+                            </tr>\
+                            <tr>\
+                                <td style="text-align:center;">申请人部门:</td>\
+                                <td colspan="2">' + bill.dep_name + '</td>\
+                            </tr>\
+                        </table>';
+                    $("#wrapDiv").append(html);
+                    new QRCode(document.getElementById("code"), {
+                        text: "IT:" + bill.sys_no,
+                        width: 72,
+                        height: 72,
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                    setTimeout(function () { window.print(); }, 200);
+                    setTimeout(function () { $("#wrapDiv").empty(); }, 1000);
+                });
+
+            });
+
+        })
+    </script>
+}
+<div class="panel panel-success noPrint">
+    <div class="panel-heading"><i class="fa fa-print"></i> 维修标签打印</div>
+    <div class="panel-body">
+        <div class="row text-success">
+            <div class="col-xs-12 col-sm-6">
+                申请流水号:
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                申请人厂牌:
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <input type="text" class="form-control" id="sysNo" autocomplete="off" />
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <input type="text" class="form-control" id="applierNum" autocomplete="off" />
+            </div>
+        </div>
+        <div style="margin:12px 0;">
+            <button type="button" class="btn btn-block btn-success" id="printCode"><i class="fa fa-qrcode"></i> 开始打印</button>
+        </div>
+
+        <div class="panel panel-default noPrint" style="margin:16px 0 0 0;">
+            <div class="panel-body">
+                <h4 class="text-danger"><i class="fa fa-info-circle"></i> 操作说明 </h4>
+                <div style="margin-left:18px;padding-top:6px;font-size:16px;" class="text-danger">
+                    <p>
+                        1. 电脑搬到IT部之后，在此界面输入申请流水号和申请人厂牌，然后点击【开始打印】按钮，即可打印维修标签。打印后将维修标签粘贴于机箱上。
+                    </p>
+                    <p>
+                        2. 打印成功后，进入信利E家，在此流程中点击【已将电脑搬到IT部并打印标签】按钮，流程将会流转到IT部接单人，等待排队处理。
+                    </p>
+                    <p>
+                        3. 维修标签尺寸是8cm*5cm（宽*高），只有IT部已接单并需要现场维修的申请单才可以打印。
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div id="wrapDiv" style="width:7.6cm;">
+    
+</div>

@@ -39,22 +39,18 @@
                 });
             });
 
-            $("#filterText").on("keyup", function () {
-                var text = $.trim($(this).val());
-                var ps = $("#workGroup div div a p");
-                for (var i = 0; i < ps.length; i++) {
-                    var div = $(ps[i]).parents("div")[0];
-                    if ($(ps[i]).html().indexOf(text) >= 0 || ($(ps[i]).attr("data-key") && $(ps[i]).attr("data-key").indexOf(text) >= 0)) {
-                        //$(div).fadeIn(500);
-                        $(div).animate({ opacity: 1 }, "fast");
-                    } else {
-                        //$(div).fadeOut(500);
-                        $(div).animate({ opacity: 0.3 }, "fast");
-                    }
-                }
-
-
-            });
+            $("#filterText").on("keyup", utils.Debounce(function () {                
+                    var text = $.trim($(this).val());                    
+                    var ps = $("#workGroup div div a p");
+                    for (var i = 0; i < ps.length; i++) {
+                        var div = $(ps[i]).parents("div")[0];
+                        if ($(ps[i]).html().indexOf(text) >= 0 || ($(ps[i]).attr("data-key") && $(ps[i]).attr("data-key").indexOf(text) >= 0)) {                            
+                            $(div).animate({ opacity: 1 }, "fast");
+                        } else {
+                            $(div).animate({ opacity: 0.3 }, "fast");
+                        }
+                    }                
+            },500));
 
         });
     </script>

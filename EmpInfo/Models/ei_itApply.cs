@@ -40,5 +40,9 @@ namespace EmpInfo.Models
         public string dep_charger_no { get; set; }
         public string dep_charger_name { get; set; }
         public Nullable<System.DateTime> evaluation_time { get; set; }
+        public string accept_man_number { get; set; }
+        public string accept_man_name { get; set; }
+        public Nullable<System.DateTime> accept_time { get; set; }
+        public Nullable<System.DateTime> print_time { get; set; }
     }
 }

@@ -1,16 +1,15 @@
-﻿using System;
+﻿using EmpInfo.FlowSvr;
+using EmpInfo.Interfaces;
+using EmpInfo.Models;
+using EmpInfo.Util;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using EmpInfo.Models;
-using EmpInfo.FlowSvr;
-using Newtonsoft.Json;
-using EmpInfo.Util;
-using EmpInfo.Interfaces;
 
 namespace EmpInfo.Services
 {
-    public class ITSv:BillSv,IBeginAuditOtherInfo
+    public class ITSv:BillSv,IBeginAuditOtherInfo,IJsInterface
     {
         ei_itApply bill;
 
@@ -53,7 +52,19 @@ namespace EmpInfo.Services
                     iconFont = "fa-list",
                     url = "../ApplyExtra/ManageITItems"
                 });
+                menus.Add(new ApplyMenuItemModel()
+                {
+                    text = "维修标签打印",
+                    iconFont = "fa-print",
+                    url = "../ApplyExtra/PrintITCode"
+                });
             }
+            menus.Add(new ApplyMenuItemModel()
+            {
+                text = "维修标签扫描",
+                iconFont = "fa-barcode 扫描维修标签",
+                url = "../WX/JsInterface?actionType=scanQRCode"
+            });
             return menus;
         }
 
@@ -128,7 +139,21 @@ namespace EmpInfo.Services
             bool isPass = bool.Parse(fc.Get("isPass"));
             string opinion = fc.Get("opinion");
 
-            if (stepName.Equals("IT部维修处理")) {
+            if (stepName.Equals("IT部接单")) {
+                MyUtils.SetFieldValueToModel(fc, bill);
+                bill.accept_man_name = userInfo.name;
+                bill.accept_man_number = userInfo.cardNo;
+                bill.accept_time = DateTime.Now;
+            }
+            else if (stepName.Equals("搬电脑到IT部")) {
+                if (isPass && bill.print_time == null) {
+                    return new SimpleResultModel(false, "请在IT部打印维修标签后再操作");
+                }
+                if (!isPass && bill.print_time != null) {
+                    return new SimpleResultModel(false, "已在IT部打印维修标签后不能再收回");
+                }
+            }
+            else if (stepName.Equals("IT部维修处理")) {
                 MyUtils.SetFieldValueToModel(fc, bill);
                 bill.repair_man = userInfo.name;
                 bill.repair_time = DateTime.Now;
@@ -175,16 +200,30 @@ namespace EmpInfo.Services
                     FlowSvrSoapClient flow = new FlowSvrSoapClient();
                     var result = flow.GetCurrentStep(bill.sys_no);
 
+                    if (result.step == 20 && bill.repair_way == "远程维修") {
+                        return;
+                    }
+
                     SendEmailToNextAuditor(
                         bill.sys_no,
                         result.step,
                         string.Format("你有一张待审批的{0}", BillTypeName),
                         GetUserNameByCardNum(model.nextAuditors),
-                        string.Format("你有一张待处理的单号为【{0}】的{1}，请尽快登陆系统处理。", bill.sys_no, BillTypeName),
+                        string.Format("你有一张待处理的单号为【{0}】的{1},处理步骤是【{2}】，请尽快登陆系统处理。", bill.sys_no, BillTypeName,result.stepName),
                         GetUserEmailByCardNum(model.nextAuditors)
                         );
 
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    string wxPushContent = "";
+                    if (result.stepName == "搬电脑到IT部") {
+                        wxPushContent = "请将故障电脑搬到IT部（地址：4栋2楼），并在IT部打印维修标签粘贴在机箱上，等待维修人员" + bill.accept_man_name + "处理";
+                    }
+                    else if (result.stepName == "服务评价") {
+                        wxPushContent = "电脑维修单已完成，请对此次维修服务进行评价";
+                    }
+                    else {
+                        wxPushContent = string.Format("所在部门：{0}；计算机名/IP地址：{1}/{2}", bill.dep_name, bill.computer_name ?? "", bill.ip_addr ?? "");
+                    }
                     SendWxMessageToNextAuditor(
                         BillTypeName,
                         bill.sys_no,
@@ -192,7 +231,7 @@ namespace EmpInfo.Services
                         result.stepName,
                         bill.applier_name,
                         ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
-                        string.Format("所在部门：{0};计算机名/IP地址：{1}/{2}", bill.dep_name, bill.computer_name ?? "", bill.ip_addr ?? ""),
+                        wxPushContent,
                         db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
                         );
                 }
@@ -253,6 +292,30 @@ namespace EmpInfo.Services
         public object GetBeginAuditOtherInfo(string sysNo, int step)
         {
             return db.ei_itApply.Single(i => i.sys_no == sysNo).faulty_items;
+        }
+
+        public void UpdatePrintTime()
+        {
+            bill.print_time = DateTime.Now;
+            db.SaveChanges();
+        }
+
+        /// <summary>
+        /// 扫码之后如何处理
+        /// </summary>
+        /// <param name="result">二维码内容</param>
+        /// <param name="userInfo"></param>
+        /// <returns></returns>
+        public RedirectModel HandleJsInterface(string result,UserInfo userInfo)
+        {
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            var currentStep = flow.GetCurrentStep(result);
+            if (currentStep.auditors.Contains(userInfo.cardNo)) {
+                return new RedirectModel() { controllerName = "Apply", actionName = "BeginAuditApply", routetValues = new { sysNo = result, step = currentStep.step } };
+            }
+            else {
+                return new RedirectModel() { controllerName = "Apply", actionName = "CheckApply", routetValues = new { sysNo = result } };
+            }
         }
     }
 }

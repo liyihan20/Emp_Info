@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Web.Mvc;
+using EmpInfo.Interfaces;
 
 namespace EmpInfo.Controllers
 {
@@ -164,7 +165,6 @@ namespace EmpInfo.Controllers
         //开始绑定
         public JsonResult BindOpenId(string cardNumber, string password, string openid, bool checkSalaryInfo, bool pushSalaryInfo, bool pushConsumeInfo, bool pushFlowInfo)
         {
-            
             string msg = "";
             bool suc = false;
             if (string.IsNullOrEmpty(cardNumber)) {
@@ -329,6 +329,60 @@ namespace EmpInfo.Controllers
 
             return View();
         }
+
+        #region js接口
+
+        public ActionResult JsInterface(string actionType, string debug = "false")
+        {
+            WxSv sv = new WxSv();
+            WxConfigParam p = new WxConfigParam();
+            TimeSpan ts = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            p.timestamp = Convert.ToInt64(ts.TotalSeconds);
+            p.appId = sv.APPID;
+            p.nonceStr = MyUtils.CreateValidateNumber(8);
+            p.debug = debug;
+            p.actionType = actionType;
+            
+            try {
+                p.signature = sv.GetSignature(p.nonceStr, p.timestamp.ToString(), Request.Url.ToString());
+            }
+            catch (Exception ex) {
+                ViewBag.tip = ex.Message;
+                return View("Error");
+            }
+            ViewData["wxConfigParam"] = p;
+
+            return View();
+        }
+
+        /// <summary>
+        /// 处理从微信JS接口返回的结果
+        /// </summary>
+        /// <param name="actionType">js接口类型，例如scanQRCode为扫一扫</param>
+        /// <param name="result">格式是单据类型:扫描结果，例如IT:IT200222001</param>
+        /// <returns></returns>
+        public ActionResult HandleJsResult(string actionType, string result)
+        {
+            try {
+                switch (actionType) {
+                    case "scanQRCode":
+                        var resultArr = result.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+                        SetBillByType(resultArr[0]);
+                        var iJs = bill as IJsInterface;
+                        if (iJs != null) {
+                            var iJsResult = iJs.HandleJsInterface(resultArr[1], userInfo);
+                            return RedirectToAction(iJsResult.actionName, iJsResult.controllerName, iJsResult.routetValues);
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex) {
+                return Content("二维码内容:" + result + ";提示信息:" + ex.Message);
+            }
+            return Content(result);
+        }
+
+        #endregion
 
     }
 }
