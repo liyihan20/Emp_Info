@@ -1,7 +1,7 @@
 ﻿@using EmpInfo.Models;
 @{
     BeginAuditModel bam = (BeginAuditModel)ViewData["bam"];
-    string faultyItems = bam.otherInfo as string;
+    var other = bam.otherInfo as ITAuditOtherInfoModel;
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/star-rating.min.css")" />
@@ -9,7 +9,6 @@
 @section Scripts {
     <script>
         $(function () {
-
             $("#applyContent").load("CheckApply", { sysNo: "@bam.sysNum" }, function () {
                 $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> 申请单详情");
                 $("#waiting").remove();
@@ -37,7 +36,7 @@
                 });
             });
         }
-    </script>
+</script>
     @if (bam.isPass != null) {
         <script>
             $(function () {
@@ -78,7 +77,7 @@
                             if (data.suc) {
                                 toastr.success(data.msg);
                                 if(isPass && repair_way == "远程维修"){
-                                    setTimeout(function () { window.location.href = "@string.Concat("BeginAuditApply?sysNo=", bam.sysNum +"&step=20")"; }, 1000);
+                                    setTimeout(function () { window.location.href = "@Html.Raw(string.Concat("BeginAuditApply?sysNo=", bam.sysNum +"&step=20"))"; }, 1000);
                                 }else{
                                     setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 1000);
                                 }
@@ -115,7 +114,7 @@
         }
         else if (bam.stepName == "IT部维修处理") {
             <script>
-                var fixedItems = @Html.Raw(faultyItems);
+                var fixedItems = @Html.Raw(other.faultyItems);
                 var hasFetchItems = false;
 
                 $(function () {
@@ -380,10 +379,10 @@ else {
                     <div style="margin-top:12px;"></div>
                     <div class="btn-group btn-group-justified" role="group">
                         <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-success" onclick="itAccept(true)">确认接单</button>
+                            <button type="button" class="btn btn-danger" onclick="itAccept(false)">拒绝接单</button>
                         </div>
                         <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-danger" onclick="itAccept(false)">拒绝接单</button>
+                            <button type="button" class="btn btn-success" onclick="itAccept(true)">确认接单</button>
                         </div>
                     </div>
                 </div>
@@ -397,8 +396,8 @@ else {
                     <i class='fa fa-wrench fa-fw'></i> 搬电脑到IT部
                 </div>
                 <div class="panel-body">
-                    <button type="button" class="btn btn-block btn-success" style="margin:12px;" onclick="applierMoveComputer(true)"><i class="fa fa-check"></i> 已将电脑搬到IT部并打印标签</button>
-                    <button type="button" class="btn btn-block btn-danger" style="margin:12px;" onclick="applierMoveComputer(false)"><i class="fa fa-reply"></i> 电脑已正常不需修理</button>                                        
+                    <button type="button" class="btn btn-block btn-danger" style="margin:12px;" onclick="applierMoveComputer(false)"><i class="fa fa-reply"></i> 电脑已正常不需修理</button>         
+                    <button type="button" class="btn btn-block btn-success" style="margin:12px;" onclick="applierMoveComputer(true)"><i class="fa fa-check"></i> 已将电脑搬到IT部并打印标签</button>                               
                 </div>
             </div>
         </div>
@@ -410,6 +409,22 @@ else {
                     <i class='fa fa-wrench fa-fw'></i> IT部处理
                 </div>
                 <div class="panel-body">
+                    <div class="b-div">
+                        <span class="b-label">
+                            登录用户名:
+                        </span>
+                        <span>
+                            <input type="text" class="form-control" readonly value="@other.loginName" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            登录密码:
+                        </span>
+                        <span>
+                            <input type="text" class="form-control" readonly value="@other.loginPassword" />
+                        </span>
+                    </div>
                     <div class="b-div">
                         <span class="b-label">
                             维修项目:
@@ -438,10 +453,10 @@ else {
                     </div>
                     <div class="btn-group btn-group-justified" role="group">
                         <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-success" onclick="itAudit(true)"><i class="fa fa-check"></i> 维修完成</button>
+                            <button type="button" class="btn btn-danger" onclick="itAudit(false)"><i class="fa fa-times"></i> 无法处理</button>
                         </div>
                         <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-danger" onclick="itAudit(false)"><i class="fa fa-times"></i> 无法处理</button>
+                            <button type="button" class="btn btn-success" onclick="itAudit(true)"><i class="fa fa-check"></i> 维修完成</button>
                         </div>
                     </div>
                 </div>
@@ -489,10 +504,10 @@ else {
                     <div style="margin-top:12px;"></div>
                     <div class="btn-group btn-group-justified" role="group">
                         <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
+                            <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
                         </div>
                         <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
+                            <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
                         </div>
                     </div>
                 </div>

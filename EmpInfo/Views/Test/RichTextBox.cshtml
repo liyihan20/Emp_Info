@@ -1,0 +1,43 @@
+﻿
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/textboxio/resources/css/textboxio.css")" />
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Content/textboxio/textboxio.js")"></script>
+    <script src="@Url.Content("~/Content/textboxio/resources/i18n/tbio_en.js")"></script>
+    <script src="@Url.Content("~/Content/textboxio/resources/i18n/tbio_zh.js")"></script>
+    <script>
+        $(function () {
+            var configBuiltIn = {
+                ui: {
+                    toolbar: {
+                        items: [
+                            {
+                                label: 'group.undo',
+                                // Built-in Command ids: 'undo', 'redo'
+                                items: ['undo', 'redo']
+                            },
+                            {
+                                label: 'group.insert',
+                                items: [
+                                    {
+                                        // Built-in menu id: 'insert'
+                                        id: 'insert',
+                                        label: 'menu.insert',
+                                        // Built-in command ids: 'link', 'fileupload', 'table'
+                                        items: ['link', 'fileupload', 'table']
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            };
+
+            var editor = textboxio.replace('#targetId', configBuiltIn);
+        });
+    </script>
+}
+
+<textarea id="targetId" class="form-control" rows="20"></textarea>

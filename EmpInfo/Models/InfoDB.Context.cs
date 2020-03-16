@@ -121,6 +121,8 @@ namespace EmpInfo.Models
         public DbSet<wx_jsApiTicket> wx_jsApiTicket { get; set; }
         public DbSet<ei_itApply> ei_itApply { get; set; }
         public DbSet<ei_itItems> ei_itItems { get; set; }
+        public DbSet<vw_dormEmptyRoom> vw_dormEmptyRoom { get; set; }
+        public DbSet<vw_ITExcel> vw_ITExcel { get; set; }
     
         public virtual ObjectResult<string> GetDormChargeMonth()
         {
@@ -567,6 +569,24 @@ namespace EmpInfo.Models
                 new ObjectParameter("card_no", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetHREmpInfo_Result>("GetHREmpInfo", card_noParameter);
+        }
+    
+        public virtual ObjectResult<GetDormEmpByGuard_Result> GetDormEmpByGuard(string empInfo)
+        {
+            var empInfoParameter = empInfo != null ?
+                new ObjectParameter("empInfo", empInfo) :
+                new ObjectParameter("empInfo", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetDormEmpByGuard_Result>("GetDormEmpByGuard", empInfoParameter);
+        }
+    
+        public virtual ObjectResult<GetDormInfoByGuard_Result> GetDormInfoByGuard(string dormNumber)
+        {
+            var dormNumberParameter = dormNumber != null ?
+                new ObjectParameter("dormNumber", dormNumber) :
+                new ObjectParameter("dormNumber", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetDormInfoByGuard_Result>("GetDormInfoByGuard", dormNumberParameter);
         }
     }
 }

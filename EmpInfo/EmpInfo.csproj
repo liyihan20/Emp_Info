@@ -167,6 +167,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
     <Compile Include="Controllers\K3Controller.cs" />
+    <Compile Include="Controllers\OthersController.cs" />
     <Compile Include="Controllers\PackageController.cs" />
     <Compile Include="Controllers\PushController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
@@ -418,7 +419,13 @@
     <Compile Include="Models\GetAPPriceHistory_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\GetDormEmpByGuard_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\GetDormFeeByMonth_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GetDormInfoByGuard_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetDormRoomMate_Result.cs">
@@ -506,6 +513,7 @@
     <Compile Include="Models\ljq20160323_003_Result.cs">
       <DependentUpon>Canteen.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\OthersModel.cs" />
     <Compile Include="Models\PublicFundModel.cs" />
     <Compile Include="Models\public_fund_item.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
@@ -533,6 +541,9 @@
     <Compile Include="Models\vw_crReport.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\vw_dormEmptyRoom.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\vw_ei_simple_users.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -552,6 +563,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_hr_department.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\vw_ITExcel.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_JQExcel.cs">
@@ -830,6 +844,7 @@
     <Content Include="Content\images\cargo.png" />
     <Content Include="Content\images\computer.png" />
     <Content Include="Content\images\dep.png" />
+    <Content Include="Content\images\dorm_users.png" />
     <Content Include="Content\images\elepr.png" />
     <Content Include="Content\images\ep.png" />
     <Content Include="Content\images\gear.png" />
@@ -997,6 +1012,80 @@
     <Content Include="Content\skins\square\_all.css" />
     <Content Include="Content\star-rating.min.css" />
     <Content Include="Content\particles.css" />
+    <Content Include="Content\textboxio\resources\css\codemirror.css" />
+    <Content Include="Content\textboxio\resources\css\content.css" />
+    <Content Include="Content\textboxio\resources\css\textboxio.css" />
+    <Content Include="Content\textboxio\resources\flash\textboxpaste.swf" />
+    <Content Include="Content\textboxio\resources\html\help_ar.js" />
+    <Content Include="Content\textboxio\resources\html\help_ca.js" />
+    <Content Include="Content\textboxio\resources\html\help_cs.js" />
+    <Content Include="Content\textboxio\resources\html\help_da.js" />
+    <Content Include="Content\textboxio\resources\html\help_de.js" />
+    <Content Include="Content\textboxio\resources\html\help_el.js" />
+    <Content Include="Content\textboxio\resources\html\help_en.js" />
+    <Content Include="Content\textboxio\resources\html\help_es.js" />
+    <Content Include="Content\textboxio\resources\html\help_fa.js" />
+    <Content Include="Content\textboxio\resources\html\help_fi.js" />
+    <Content Include="Content\textboxio\resources\html\help_fr.js" />
+    <Content Include="Content\textboxio\resources\html\help_he.js" />
+    <Content Include="Content\textboxio\resources\html\help_hr.js" />
+    <Content Include="Content\textboxio\resources\html\help_hu.js" />
+    <Content Include="Content\textboxio\resources\html\help_it.js" />
+    <Content Include="Content\textboxio\resources\html\help_ja.js" />
+    <Content Include="Content\textboxio\resources\html\help_kk.js" />
+    <Content Include="Content\textboxio\resources\html\help_ko.js" />
+    <Content Include="Content\textboxio\resources\html\help_nb.js" />
+    <Content Include="Content\textboxio\resources\html\help_nl.js" />
+    <Content Include="Content\textboxio\resources\html\help_pl.js" />
+    <Content Include="Content\textboxio\resources\html\help_pt.js" />
+    <Content Include="Content\textboxio\resources\html\help_pt_pt.js" />
+    <Content Include="Content\textboxio\resources\html\help_ro.js" />
+    <Content Include="Content\textboxio\resources\html\help_ru.js" />
+    <Content Include="Content\textboxio\resources\html\help_sk.js" />
+    <Content Include="Content\textboxio\resources\html\help_sl.js" />
+    <Content Include="Content\textboxio\resources\html\help_sv.js" />
+    <Content Include="Content\textboxio\resources\html\help_th.js" />
+    <Content Include="Content\textboxio\resources\html\help_tr.js" />
+    <Content Include="Content\textboxio\resources\html\help_uk.js" />
+    <Content Include="Content\textboxio\resources\html\help_zh.js" />
+    <Content Include="Content\textboxio\resources\html\help_zh_tw.js" />
+    <Content Include="Content\textboxio\resources\html\textbox-licenses.html" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_ar.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_ca.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_cs.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_da.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_de.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_el.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_en.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_es.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_fa.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_fi.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_fr.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_he.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_hr.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_hu.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_it.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_ja.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_kk.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_ko.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_nb.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_nl.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_pl.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_pt.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_pt_pt.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_ro.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_ru.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_sk.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_sl.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_sv.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_th.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_tr.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_uk.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_zh.js" />
+    <Content Include="Content\textboxio\resources\i18n\tbio_zh_tw.js" />
+    <Content Include="Content\textboxio\resources\js\codeview.js" />
+    <Content Include="Content\textboxio\resources\js\wordimport.js" />
+    <Content Include="Content\textboxio\textboxio.js" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -1268,8 +1357,8 @@
     <Content Include="Views\Report\ALReport.cshtml" />
     <Content Include="Views\Report\PrintUC.cshtml" />
     <Content Include="Views\Shared\Close.cshtml" />
-    <Content Include="Views\Report\AssistantEmps.cshtml" />
-    <Content Include="Views\Report\CheckAssistantEmp.cshtml" />
+    <Content Include="Views\Others\AssistantEmps.cshtml" />
+    <Content Include="Views\Others\CheckAssistantEmp.cshtml" />
     <Content Include="Views\Home\EleProcess.cshtml" />
     <Content Include="Views\Report\CRReport.cshtml" />
     <Content Include="Views\Report\SVReport.cshtml" />
@@ -1346,6 +1435,9 @@
     <Content Include="Views\Apply\BeginAuditITApply.cshtml" />
     <Content Include="Views\Shared\Warn.cshtml" />
     <Content Include="Views\ApplyExtra\PrintITCode.cshtml" />
+    <Content Include="Views\Test\RichTextBox.cshtml" />
+    <Content Include="Views\Others\DormAndEmps.cshtml" />
+    <Content Include="Views\Report\ITReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

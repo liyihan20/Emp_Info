@@ -98,6 +98,11 @@ namespace EmpInfo.Services
             return "BeginAuditApply";
         }
 
+        public virtual string MyAuditingViewName()
+        {
+            return "GetMyAuditingList";
+        }
+
         /// <summary>
         /// 菜单项
         /// </summary>

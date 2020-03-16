@@ -53,6 +53,12 @@ namespace EmpInfo.Controllers
             
             return JsonConvert.SerializeObject(rows.FirstOrDefault().Keys.ToList());
         }
+
+        public ActionResult RichTextBox()
+        {
+            return View();
+        }
+
     }
 
     public class sqlResult

@@ -82,7 +82,13 @@ namespace EmpInfo.Services
             bill.applier_name = userInfo.name;
             bill.applier_num = userInfo.cardNo;
             bill.apply_time = DateTime.Now;
-            
+
+            if (!string.IsNullOrEmpty(bill.reason)) {
+                if (bill.reason.Length > 200) {
+                    throw new Exception("值班原因长度不能大于200字");
+                }
+            }
+
             //处理一下审核队列,将姓名（厂牌）格式更换为厂牌
             if (!string.IsNullOrEmpty(bill.auditor_queues)) {
                 var queueList = JsonConvert.DeserializeObject<List<flow_applyEntryQueue>>(bill.auditor_queues);
@@ -94,7 +100,7 @@ namespace EmpInfo.Services
             }
 
             FlowSvrSoapClient client = new FlowSvrSoapClient();
-            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, string.Format("值班时间：{0:yyyy-MM-dd HH:mm}~{1:yyyy-MM-dd HH:mm}", bill.duty_date_from, bill.duty_date_to), string.Format("调休时间：{0:yyyy-MM-dd HH:mm}~{1:yyyy-MM-dd HH:mm}", bill.vacation_date_from, bill.vacation_date_to));
+            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, string.Format("值班时间：{0:yyyy-MM-dd HH:mm}~{1:yyyy-MM-dd HH:mm}", bill.duty_date_from, bill.duty_date_to), string.Format("调休时间：{0:yyyy-MM-dd HH:mm}~{1:yyyy-MM-dd HH:mm};值班原因：{2}", bill.vacation_date_from, bill.vacation_date_to, bill.reason ?? ""));
             if (result.suc) {
                 try {
                     db.ei_SVApply.Add(bill);

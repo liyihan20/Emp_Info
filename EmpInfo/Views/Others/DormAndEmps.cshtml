@@ -1,0 +1,323 @@
+﻿@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />   
+    <style type="text/css">
+        .b-label {
+            color: gray;
+        }
+
+        .b-div {
+            margin-bottom:12px;
+        }
+    </style> 
+}
+@section Scripts{
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    
+    <script>
+        $("#tb1").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            clickToSelect: true,
+            columns: [
+                {
+                    field: "area_number",
+                    title: "宿舍区"
+                },{
+                    field: "dorm_type",
+                    title: "宿舍类型"
+                },{
+                    field: "dorm_number",
+                    title: "宿舍号"
+                },  {
+                    field: "in_date",
+                    title: "入住日期",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value);
+                    }
+                }, {
+                    field: "out_date",
+                    title: "退宿日期",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value);
+                    }
+                }
+            ]
+        });
+
+        $("#tb2").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 20,
+            pageList: [20, 50, 100, 200],
+            clickToSelect: true,
+            columns: [
+                {
+                    field: "emp_name",
+                    title: "姓名"
+                }, {
+                    field: "card_number",
+                    title: "厂牌"
+                }, {
+                    field: "id_number",
+                    title: "身份证"
+                }, {
+                    field: "dep_name",
+                    title: "部门"
+                }, {
+                    field: "phone",
+                    title: "电话"
+                }, {
+                    field: "family_address",
+                    title: "家庭住址"
+                }, {
+                    field: "family_card_info",
+                    title: "家属办证信息"
+                }, {
+                    field: "in_date",
+                    title: "入住日期",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value);
+                    }
+                }, {
+                    field: "out_date",
+                    title: "退宿日期",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value);
+                    }
+                }
+            ]
+        });
+
+        $("#tb3").bootstrapTable({
+            striped: true,
+            search: true,
+            mobileResponsive: true,
+            clickToSelect: true,
+            columns: [
+                {
+                    field: "area_name",
+                    title: "宿舍区"
+                }, {
+                    field: "dorm_type",
+                    title: "房间类型"
+                }, {
+                    field: "room_num",
+                    title: "床位总数"
+                }, {
+                    field: "living_room_num",
+                    title: "在住床位"
+                }, {
+                    field: "left_room_num",
+                    title: "剩余床位",
+                    formatter: function (value, row, index, field) {
+                        return row.room_num - row.living_room_num;
+                    }
+                }
+            ]
+        });
+
+        $(function () {
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                if ($(e.target).html() == "空房统计") {
+                    //打开这个标签才去加载空房统计数据，如果已经加载过，不再重复加载
+                    if ($("#tb3").bootstrapTable("getData").length == 0) {
+                        $.post("GetDormEmptyRoom", {}, function (data) {
+                            if (data.suc) {
+                                var result = JSON.parse(data.extra);
+                                $("#tb3").bootstrapTable("load", result);
+                            } else {
+                                toastr.error(data.msg);
+                            }
+                        });
+                    }
+                }
+            });
+            
+            $("#searchEmpBt").on("click", function () {
+                var text = $.trim($("#empInfo").val());
+                if (text.length < 2) {
+                    toastr.error("至少输入2个字符才能搜索");
+                    return;
+                }
+                $.post("GetDormEmp", { empInfo: text }, function (data) {
+                    if (data.suc) {
+                        var info = JSON.parse(data.extra);
+                        utils.loadObjData($("#fm1"), info[0]);
+                        $("#tb1").bootstrapTable("load", info);
+                        toastr.success("信息加载成功");
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+
+            $("#searchDormBt").on("click", function () {
+                var text = $.trim($("#dormInfo").val());
+                if (text.length < 4) {
+                    toastr.error("至少输入4个字符才能搜索");
+                    return;
+                }
+                $.post("GetDormInfo", { dormNumber: text }, function (data) {
+                    if (data.suc) {
+                        var info = JSON.parse(data.extra);
+                        utils.loadObjData($("#fm2"), info[0]);
+                        $("#tb2").bootstrapTable("load", info);
+                        toastr.success("信息加载成功");
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            })
+        });
+    </script>
+}
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li class="active">宿舍员工查询</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">员工查询</a></li>
+            <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">宿舍查询</a></li>
+            <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab">空房统计</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active" id="tab1">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        <div class="input-group" style="margin:12px 0;">
+                            <input type="text" class="form-control" id="empInfo" placeholder="可输入厂牌、姓名或身份证号查询">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="button" id="searchEmpBt"><span class="fa fa-search"></span> 查询职员住宿信息</button>
+                            </span>
+                        </div>
+                        <form id="fm1">
+                            <div class="row">
+                                <div class="col-xl-12 col-sm-6 col-md-4">
+                                    <div class="b-label">
+                                        姓名：
+                                    </div>
+                                    <div class="b-div">
+                                        <input type="text" class="form-control" name="emp_name" readonly />
+                                    </div>
+                                </div>                                
+                                <div class="col-xl-12 col-sm-6 col-md-4">
+                                    <div class="b-label">
+                                        厂牌：
+                                    </div>
+                                    <div class="b-div">
+                                        <input type="text" class="form-control" name="card_number" readonly />
+                                    </div>
+                                </div>                          
+                                <div class="col-xl-12 col-sm-6 col-md-4">
+                                    <div class="b-label">
+                                        身份证：
+                                    </div>
+                                    <div class="b-div">
+                                        <input type="text" class="form-control" name="id_number" readonly />
+                                    </div>
+                                </div>                       
+                                <div class="col-xl-12 col-sm-6 col-md-4">
+                                    <div class="b-label">
+                                        电话：
+                                    </div>
+                                    <div class="b-div">
+                                        <input type="text" class="form-control" name="phone" readonly />
+                                    </div>
+                                </div>                    
+                                <div class="col-xl-12 col-sm-6 col-md-4">
+                                    <div class="b-label">
+                                        部门：
+                                    </div>
+                                    <div class="b-div">
+                                        <input type="text" class="form-control" name="dep_name" readonly />
+                                    </div>
+                                </div>       
+                                <div class="col-xl-12 col-sm-6 col-md-4">
+                                    <div class="b-label">
+                                        家庭地址：
+                                    </div>
+                                    <div class="b-div">
+                                        <input type="text" class="form-control" name="family_address" readonly />
+                                    </div>
+                                </div>    
+                                <div class="col-xl-12 col-sm-6 col-md-4">
+                                    <div class="b-label">
+                                        家属办证信息：
+                                    </div>
+                                    <div class="b-div">
+                                        <input type="text" class="form-control" name="family_card_info" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <table id="tb1"></table>
+                    </div>                    
+                </div>
+            </div>
+            
+            <div role="tabpanel" class="tab-pane fade" id="tab2">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        <div class="input-group" style="margin:12px 0;">
+                            <input type="text" class="form-control" id="dormInfo" placeholder="输入宿舍号码查询">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="button" id="searchDormBt"><span class="fa fa-search"></span> 查询宿舍信息</button>
+                            </span>
+                        </div>
+                        <form id="fm2">
+                            <div class="row">
+                                <div class="col-xl-12 col-sm-6 col-md-4">
+                                    <div class="b-label">
+                                        宿舍号：
+                                    </div>
+                                    <div class="b-div">
+                                        <input type="text" class="form-control" name="dorm_number" readonly />
+                                    </div>
+                                </div>                                
+                                <div class="col-xl-12 col-sm-6 col-md-4">
+                                    <div class="b-label">
+                                        宿舍区：
+                                    </div>
+                                    <div class="b-div">
+                                        <input type="text" class="form-control" name="area_number" readonly />
+                                    </div>
+                                </div>                          
+                                <div class="col-xl-12 col-sm-6 col-md-4">
+                                    <div class="b-label">
+                                        宿舍类型：
+                                    </div>
+                                    <div class="b-div">
+                                        <input type="text" class="form-control" name="dorm_type" readonly />
+                                    </div>
+                                </div> 
+                            </div>
+                        </form>
+
+                        <table id="tb2"></table>
+                    </div>
+                </div>
+            </div>
+
+            <div role="tabpanel" class="tab-pane fade" id="tab3">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        <table id="tb3"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

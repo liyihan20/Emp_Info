@@ -69,7 +69,7 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-            <li><a href="ApplyIndex?billType=IT">电脑故障报修申请</a></li>
+            <li><a href="ApplyIndex?billType=IT">电脑维修申请</a></li>
             <li class="active">查看申请</li>
         </ol>
     </div>
@@ -294,6 +294,36 @@
                 </span>
             </div>
         }
+        
+        @if (m.fetch_time != null) {
+            <h4 style="border-bottom:1px solid #337ab7;font-style:italic;margin-top:24px;" class="text-primary">电脑取回</h4>
+            <div class="b-div">
+                <span class="b-label">
+                    取回时间:
+                </span>
+                <span class="b-input">
+                    @(((DateTime)m.fetch_time).ToString("yyyy-MM-dd HH:mm"))
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    取走人:
+                </span>
+                <span class="b-input">
+                    @m.fetcher_name
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    取走人电话:
+                </span>
+                <span class="b-input">
+                    @m.fetcher_phone
+                </span>
+            </div>
+
+        }
+
         @if (m.evaluation_time != null) {
             <h4 style="border-bottom:1px solid #337ab7;font-style:italic;margin-top:24px;" class="text-primary">服务评价</h4>
             <div class="b-div">

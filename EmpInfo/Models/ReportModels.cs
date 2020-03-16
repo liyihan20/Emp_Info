@@ -50,15 +50,7 @@ namespace EmpInfo.Models
         public string sysNum { get; set; }
         public string salaryNo { get; set; }
     }
-
-    public class AssistantEmpModel
-    {
-        public string cardNumber { get; set; }
-        public string empName { get; set; }
-        public string empType { get; set; }
-        public string depName { get; set; }
-    }
-
+    
     public class EPSearchParam{
         public string fromDate { get; set; }
         public string toDate { get; set; }
@@ -87,6 +79,12 @@ namespace EmpInfo.Models
         public string outDepName { get; set; }
         public string empName { get; set; }
         public string sysNum { get; set; }
+    }
+
+    public class ItItem
+    {
+        public string n { get; set; }
+        public string v { get; set; }
     }
 
 }

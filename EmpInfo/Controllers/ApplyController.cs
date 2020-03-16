@@ -196,7 +196,7 @@ namespace EmpInfo.Controllers
             ViewData["navigatorLinks"] = bill.GetApplyNavigatorLinks();
             //WriteEventLog(billType, "打开我的待办界面");
 
-            return View();
+            return View(bill.MyAuditingViewName());
         }
 
         //我的已办

@@ -97,15 +97,15 @@
             }
             tb += "</table>";
 
-            var needToGenDeliveryBill = "@spm.account" == "电子" ? false : true;
+            var needToGenDeliveryBill = ("@spm.account" == "电子" || "@spm.account" == "仪器") ? false : true;
 
             openConfirmDialog(tb, function () {
-                $.post("@Url.Content("~/K3/BeginAuditStockBill")", {account:"@spm.account",interid:h.stId}, function (data) {
+                $.post("@Url.Content("~/K3/BeginAuditStockBill")", { account: "@spm.account", interid: h.stId }, function (data) {
                     if (data.suc) {
                         toastr.success("一审成功！");
                         if (needToGenDeliveryBill) {
                             toastr.info("开始生成送货单...");
-                            $.post("@Url.Content("~/K3/GenTrulyDelivery")", {account:"@spm.account",billNo:h.stNumber,srNo:h.srNumber}, function (res) {
+                            $.post("@Url.Content("~/K3/GenTrulyDelivery")", { account: "@spm.account", billNo: h.stNumber, srNo: h.srNumber }, function (res) {
                                 if (res.suc) {
                                     toastr.success("送货单已成功生成！");
                                     $(self).fadeOut(1000);
@@ -120,7 +120,7 @@
                         toastr.error("一审失败：" + data.msg);
                     }
                 });
-            }, "操作确认", "取消", needToGenDeliveryBill?"一审并生成送货单":"开始一审");
+            }, "操作确认", "取消", needToGenDeliveryBill ? "一审并生成送货单" : "开始一审");
 
         });
 
@@ -129,7 +129,7 @@
             $.post("@Url.Content("~/K3/GetStockBillForReject")", { account: $("#account").val() }, function (data) {
                 if (data.suc) {
 
-                    if(data.list.length==0){
+                    if (data.list.length == 0) {
                         toastr.info("查询不到24小时内已一审未二审的销售出库单");
                         return;
                     }
@@ -167,7 +167,7 @@
     });
 
     function reject(id) {
-        $.post("@Url.Content("~/K3/BeginAuditStockBill")", { account: $("#account").val(), interid: id,isReject:true }, function (data) {
+        $.post("@Url.Content("~/K3/BeginAuditStockBill")", { account: $("#account").val(), interid: id, isReject: true }, function (data) {
             if (data.suc) {
                 toastr.success("反审核成功！");
                 $("#MessageModal").modal("hide");
@@ -200,6 +200,7 @@
                         <option value="半导体">半导体</option>
                         <option value="光电">光电</option>
                         <option value="电子">电子</option>
+                        <option value="仪器">仪器</option>
                 </select>
             </div>
             <div class="col-xs-12 col-md-4">

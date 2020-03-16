@@ -94,7 +94,7 @@
             
             $("#apply_bt").on("click",function(){
                 var obj = utils.getFormObj($("#fm"));
-                if(selectedItems.length<1){
+                if(selectedItems.length < 1){
                     toastr.error("请选择至少一个IT项目");
                     return;
                 }
@@ -106,6 +106,14 @@
                     toastr.error("请选择主管/部门经理审核人");
                     return;
                 }
+                if(obj.login_name == ""){
+                    toastr.error("请填写电脑登录用户名");
+                    return;
+                }
+                if(obj.login_password == ""){
+                    toastr.error("请填写电脑登录密码");
+                    return;
+                }
                 var ipReg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
                 if(obj.ip_addr!="" && !ipReg.test(obj.ip_addr)){
                     toastr.error("IP地址不符合规则，请检查是否正确");
@@ -115,12 +123,13 @@
                 obj.faulty_items = JSON.stringify(selectedItems);
                 obj.estimate_it_fee = utils.CalArrSum(selectedItems,"v");
                 
+                var jsonObj=JSON.stringify(obj).replace(/\&/g, "%26").replace(/\+/g, "%2b").replace(/\=/g, "%3d");
                 openConfirmDialog("确定要提交申请吗？", function () {
                     $("#apply_bt").button("loading");
                     $.ajax({
                         type: 'post',
                         url: 'SaveApply',
-                        data: "obj=" + JSON.stringify(obj)+"&sys_no="+obj.sys_no,
+                        data: "obj=" + jsonObj+"&sys_no="+obj.sys_no,
                         cache: false,
                         dataType: 'json',
                         success: function (data) {
@@ -160,7 +169,7 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-            <li><a href="ApplyIndex?billType=IT">电脑故障报修流程</a></li>
+            <li><a href="ApplyIndex?billType=IT">电脑维修流程</a></li>
             <li class="active">开始申请</li>
         </ol>
     </div>
@@ -244,6 +253,26 @@
                         </span>
                         <span class="b-input">
                             <input type="text" class="form-control" name="ip_addr" placeholder="填入此电脑IP地址" />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            用户名:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="login_name" placeholder="填入登录此电脑的用户名" />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            密码:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="login_password" placeholder="填入登录此电脑的密码" />
                         </span>
                     </div>
                 </div>

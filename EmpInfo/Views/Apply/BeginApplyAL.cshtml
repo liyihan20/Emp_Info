@@ -455,9 +455,9 @@
                         <div style="display:inline-block;width:70%">
                             <span style="display:block;margin:0;" class="row">
                                 @{
-                                    string[] types = new string[] { "事假", "病假", "年假", "探亲", "婚假", "产假", "工伤", "丧假", "产假延期" };
+                                    string[] types = new string[] { "事假", "病假", "年假", "探亲", "婚假", "产假", "工伤", "丧假", "产假延期","疫情隔离" };
                                     foreach (var ty in types) {
-                                        if (ty == "产假延期") {
+                                        if (ty.Length > 2) {
                                             <span class="col-xs-6" style="padding:0 4px;">
                                                 <input type="radio" name="leave_type" value="@ty" /> @ty
                                             </span>

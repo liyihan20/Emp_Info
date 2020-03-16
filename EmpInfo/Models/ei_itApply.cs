@@ -44,5 +44,11 @@ namespace EmpInfo.Models
         public string accept_man_name { get; set; }
         public Nullable<System.DateTime> accept_time { get; set; }
         public Nullable<System.DateTime> print_time { get; set; }
+        public string login_name { get; set; }
+        public string login_password { get; set; }
+        public string fetcher_no { get; set; }
+        public string fetcher_name { get; set; }
+        public string fetcher_phone { get; set; }
+        public Nullable<System.DateTime> fetch_time { get; set; }
     }
 }

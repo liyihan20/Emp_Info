@@ -25,7 +25,7 @@ namespace EmpInfo.Services
 
         public override string BillTypeName
         {
-            get { return "电脑故障报修申请"; }
+            get { return "电脑维修申请"; }
         }
 
         public override string AuditViewName()
@@ -35,15 +35,7 @@ namespace EmpInfo.Services
 
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
-            var menus = base.GetApplyMenuItems(userInfo);
-            //if (HasGotPower("APReport", userInfo.id)) {
-            //    menus.Add(new ApplyMenuItemModel()
-            //    {
-            //        text = "查询报表",
-            //        iconFont = "fa-file-text-o",
-            //        url = "../Report/APReport"
-            //    });
-            //}
+            var menus = base.GetApplyMenuItems(userInfo);            
 
             if (db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "维修项目" && f.relate_value == userInfo.cardNo).Count() > 0) {
                 menus.Add(new ApplyMenuItemModel()
@@ -54,7 +46,13 @@ namespace EmpInfo.Services
                 });
                 menus.Add(new ApplyMenuItemModel()
                 {
-                    text = "维修标签打印",
+                    text = "查询报表",
+                    iconFont = "fa-file-text-o",
+                    url = "../Report/ITReport"
+                });
+                menus.Add(new ApplyMenuItemModel()
+                {
+                    text = "标签打印 & 电脑取回",
                     iconFont = "fa-print",
                     url = "../ApplyExtra/PrintITCode"
                 });
@@ -291,12 +289,27 @@ namespace EmpInfo.Services
 
         public object GetBeginAuditOtherInfo(string sysNo, int step)
         {
-            return db.ei_itApply.Single(i => i.sys_no == sysNo).faulty_items;
+            bill = db.ei_itApply.Single(i => i.sys_no == sysNo);
+            return new ITAuditOtherInfoModel()
+            {
+                faultyItems = bill.faulty_items,
+                loginName = bill.login_name,
+                loginPassword = bill.login_password
+            };            
         }
 
         public void UpdatePrintTime()
         {
             bill.print_time = DateTime.Now;
+            db.SaveChanges();
+        }
+
+        public void FetchComputer(string cardNumber, string name, string phone)
+        {
+            bill.fetch_time = DateTime.Now;
+            bill.fetcher_name = name;
+            bill.fetcher_no = cardNumber;
+            bill.fetcher_phone = phone;
             db.SaveChanges();
         }
 

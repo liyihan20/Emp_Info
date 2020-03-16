@@ -21,6 +21,9 @@ namespace EmpInfo.Services
         //是否在职
         public bool EmpIsNotQuit(string cardNumber)
         {
+            if (cardNumber.ToUpper().StartsWith("GN")) {
+                return true; //光能办
+            }
             try {
                 if (db.GetHREmpInfo(cardNumber).Count() > 0) {
                     return true;

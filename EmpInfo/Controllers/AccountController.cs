@@ -216,7 +216,7 @@ namespace EmpInfo.Controllers
             if (info.id_code == null) {
                 return Json(new { suc = false, msg = "身份证号码未在人事系统登记，请联系文员或行政部处理" });
             }
-            if (info.id_code.EndsWith(id_number.Trim()))
+            if (info.id_code.ToUpper().EndsWith(id_number.Trim().ToUpper()))
             {
                 string email = !string.IsNullOrWhiteSpace(info.email) && info.email.Contains(@"@") ? info.email : "";
                 string phone = !string.IsNullOrWhiteSpace(info.tp) && info.tp.Length == 11 ? info.tp.Substring(0, 3) + " " + info.tp.Substring(3, 4) : "";

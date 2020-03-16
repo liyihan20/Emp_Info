@@ -228,6 +228,13 @@ namespace EmpInfo.Models
         public decimal FReed { get; set; }
     }
 
+    public class ITAuditOtherInfoModel
+    {
+        public string faultyItems { get; set; }
+        public string loginName { get; set; }
+        public string loginPassword { get; set; }
+    }
+
     //public class TIBeforeApplyModel
     //{
     //    public string sys_no { get; set; }

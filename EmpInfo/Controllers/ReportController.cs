@@ -537,46 +537,7 @@ namespace EmpInfo.Controllers
             xls.Send();
         }
 
-        #endregion
-
-        #region 辅助、基干人员查询
-
-        [AuthorityFilter]
-        public ActionResult AssistantEmps()
-        {            
-            return View();
-        }               
-
-        public JsonResult GetAssistantEmps(string search="", int offset = 0, int limit = 10)
-        {            
-            var result = (from v in db.vw_assistantEmps
-                          where v.emp_name.Contains(search) || v.emp_no1.Contains(search)
-                          orderby v.dept_name
-                          select new AssistantEmpModel()
-                          {
-                              depName = v.dept_name,
-                              cardNumber = v.emp_no1,
-                              empName = v.emp_name,
-                              empType = v.emp_type
-                          });
-            int total = result.Count();
-            result = result.Skip(offset).Take(limit);
-
-            return Json(new { total = total, rows = result.ToList() },JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult CheckAssistantEmp(string empType, string cardNumber)
-        {
-            var emp = db.vw_assistantEmps.Where(v => v.emp_type == empType && v.emp_no1 == cardNumber).FirstOrDefault();
-            if (emp == null) {
-                ViewBag.tip = "不存在";
-                return View("Error");
-            }
-            ViewData["emp"] = emp;
-            return View();
-        }
-
-        #endregion
+        #endregion                
 
         #region 导出出货系统审批记录
 
@@ -1823,7 +1784,7 @@ namespace EmpInfo.Controllers
             var result = SearchJQData(fromDate, toDate, qFromDate, qToDate, depName, empName, sysNum).OrderBy(s => s.apply_time).ToList();
 
             string[] colName = new string[] { "处理结果","申请流水号", "申请人", "申请时间","完成时间","离职类型", "离职人", "离职人账号", "离职人厂牌", "人事部门","工资类别",
-                                              "旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工资发放方式","离职时间","标识1", "组长","主管","部长","综合表现" };
+                                              "旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工资发放方式","入职时间","离职时间","标识1", "组长","主管","部长","综合表现" };
             ushort[] colWidth = new ushort[colName.Length];
 
             for (var i = 0; i < colWidth.Length; i++) {
@@ -1865,6 +1826,20 @@ namespace EmpInfo.Controllers
 
             foreach (var d in result) {
                 colIndex = 1;
+                string inDate = ""; //入职日期
+                if (d.card_number != null && d.card_number.Length > 6) {
+                    var yearSpan = d.card_number.Substring(0, 2);
+                    int year;
+                    if (Int32.TryParse(yearSpan, out year)) {
+                        if (year < 80) {
+                            inDate = "20" + yearSpan + "-" + d.card_number.Substring(2, 2) + "-" + d.card_number.Substring(4, 2);
+                        }
+                        else {
+                            inDate = "19" + yearSpan + "-" + d.card_number.Substring(2, 2) + "-" + d.card_number.Substring(4, 2);
+                        }
+                    }
+                    
+                }
 
                 //"处理结果","申请流水号", "申请人", "申请时间",“完成时间”，"离职类型", "离职人", "离职人账号", "离职人厂牌", "人事部门","工资类别",
                 //"旷工开始日期", "旷工结束日期", "旷工天数", "离职原因","离职建议","工资发放方式","离职时间","组长","主管","部长","综合表现"
@@ -1886,6 +1861,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.quit_reason);
                 cells.Add(rowIndex, ++colIndex, d.quit_suggestion);
                 cells.Add(rowIndex, ++colIndex, d.salary_clear_way);
+                cells.Add(rowIndex, ++colIndex, inDate);
                 cells.Add(rowIndex, ++colIndex, d.leave_date == null ? "" : ((DateTime)d.leave_date).ToString("yyyy-MM-dd"));
                 cells.Add(rowIndex, ++colIndex, d.check1 == true ? "Y" : "");
                 cells.Add(rowIndex, ++colIndex, d.group_leader_name);
@@ -2273,6 +2249,152 @@ namespace EmpInfo.Controllers
         }
 
         #endregion
+
+        #region 电脑维修
+
+        [SessionTimeOutFilter]
+        public ActionResult ITReport()
+        {
+            return View();
+        }
+
+        public IQueryable<vw_ITExcel> SearchITDatas(DateTime fromDate, DateTime toDate, string depName, string accepterName, string applierName,string sysNo)
+        {
+            toDate = toDate.AddDays(1);
+            var result = from v in db.vw_ITExcel
+                         where v.apply_time >= fromDate
+                         && v.apply_time < toDate
+                         select v;
+            if (!string.IsNullOrWhiteSpace(depName)) {
+                result = result.Where(r => r.dep_name.Contains(depName));
+            }
+            if (!string.IsNullOrWhiteSpace(accepterName)) {
+                result = result.Where(r => r.accept_man_name.Contains(accepterName));
+            }
+            if (!string.IsNullOrWhiteSpace(applierName)) {
+                result = result.Where(r => r.applier_name.Contains(applierName));
+            }
+            if (!string.IsNullOrWhiteSpace(sysNo)) {
+                result = result.Where(r => r.sys_no.Contains(sysNo));
+            }
+
+            return result;
+        }
+
+        public JsonResult GetITDatas(DateTime fromDate, DateTime toDate, string depName, string accepterName, string applierName, string sysNo)
+        {
+            var result = SearchITDatas(fromDate, toDate, depName, accepterName, applierName, sysNo).Select(r => new
+            {
+                r.applier_name,
+                r.apply_time,
+                r.dep_name,
+                r.accept_man_name,
+                r.audit_result,
+                r.repair_way,
+                r.sys_no
+            }).OrderBy(r => r.apply_time).ToList();
+
+            return Json(result);
+        }
+
+        public void ExportITExcel(DateTime fromDate, DateTime toDate, string depName, string accepterName, string applierName, string sysNo)
+        {
+            var result = SearchITDatas(fromDate, toDate, depName, accepterName, applierName, sysNo).OrderBy(r => r.apply_time).ToList();
+            string[] colName = new string[] { "处理进度","申请流水号", "申请人", "申请时间", "联系电话", "职位级别","部门", "电脑编号","计算机名", "IP地址",
+                                              "申请项目", "申请备注", "主管/部门经理", "接单人","接单时间","维修途径", "标签打印时间", "处理人", "处理时间","处理项目","实际产生IT费用",
+                                              "IT部备注","取回时间", "取走人", "取走人电话", "评价时间", "服务打分", "评价意见" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 24;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "电脑维修申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("电脑维修申请详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result) {
+                colIndex = 1;
+
+                //"处理进度","申请流水号", "申请人", "申请时间", "联系电话", "职位级别","部门", "电脑编号","计算机名", "IP地址",
+                //"申请项目", "申请备注", "主管/部门经理", "接单人","接单时间","维修途径", "标签打印时间", "处理人", "处理时间","处理项目","实际产生IT费用",
+                //"IT部备注","取回时间", "取走人", "取走人电话", "评价时间", "服务打分", "评价意见"
+                cells.Add(++rowIndex, colIndex, d.audit_result);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.applier_name);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.applier_phone);
+                cells.Add(rowIndex, ++colIndex, d.emp_position);
+                cells.Add(rowIndex, ++colIndex, d.dep_name);
+                cells.Add(rowIndex, ++colIndex, d.computer_number);
+                cells.Add(rowIndex, ++colIndex, d.computer_name);
+                cells.Add(rowIndex, ++colIndex, d.ip_addr);
+
+                cells.Add(rowIndex, ++colIndex, ParseItItems(d.faulty_items));
+                cells.Add(rowIndex, ++colIndex, d.applier_comment);
+                cells.Add(rowIndex, ++colIndex, d.dep_charger_name);
+                cells.Add(rowIndex, ++colIndex, d.accept_man_name);
+                cells.Add(rowIndex, ++colIndex, d.accept_time == null ? "" : ((DateTime)d.accept_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.repair_way);
+                cells.Add(rowIndex, ++colIndex, d.print_time == null ? "" : ((DateTime)d.print_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.repair_man);
+                cells.Add(rowIndex, ++colIndex, d.repair_time == null ? "" : ((DateTime)d.repair_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, ParseItItems(d.fixed_items));
+                cells.Add(rowIndex, ++colIndex, d.real_it_fee);
+
+                cells.Add(rowIndex, ++colIndex, d.it_comment);
+                cells.Add(rowIndex, ++colIndex, d.fetch_time == null ? "" : ((DateTime)d.fetch_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.fetcher_name);
+                cells.Add(rowIndex, ++colIndex, d.fetcher_phone);
+                cells.Add(rowIndex, ++colIndex, d.evaluation_time == null ? "" : ((DateTime)d.evaluation_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.evaluation_score);
+                cells.Add(rowIndex, ++colIndex, d.evaluation_comment);
+            }
+
+            xls.Send();
+        }
+
+        private string ParseItItems(string items)
+        {
+            var list = JsonConvert.DeserializeObject<List<ItItem>>(items);
+            string result = "";
+            foreach (var i in list) {
+                result += i.n + ":" + i.v + ";";
+            }
+            return result;
+        }
+
+        #endregion
+
 
     }
 }

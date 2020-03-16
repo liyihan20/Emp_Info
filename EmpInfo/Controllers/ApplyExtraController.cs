@@ -270,6 +270,7 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel() { suc = true });
         }
 
+        //打印维修二维码、取回电脑
         public ActionResult PrintITCode()
         {
             return View();
@@ -310,6 +311,67 @@ namespace EmpInfo.Controllers
             catch {
                 return Json(new SimpleResultModel(false, "申请流水号不存在，请确认"));
             }
+        }
+
+        public JsonResult GetITCodeInfo(string codeContent)
+        {
+            if (!codeContent.StartsWith("IT:") && !codeContent.StartsWith("IT：")) {
+                return Json(new SimpleResultModel(false, "二维码格式不正确"));
+            }
+            var sysNo = codeContent.Substring(3);
+            ITSv sv;
+            try {
+                sv = new ITSv(sysNo);
+            }
+            catch {
+                return Json(new SimpleResultModel(false, "此流水号不存在"));
+            }
+
+            var bill = sv.GetBill() as ei_itApply;
+            return Json(new SimpleResultModel(true, "信息获取成功", JsonConvert.SerializeObject(new
+            {
+                applier = bill.applier_name + "(" + bill.applier_num + ")",
+                applierDep = bill.dep_name
+            })));
+        }
+
+        public JsonResult ITFetchComputer(string codeContent, string cardNumber, string name, string phone)
+        {
+            if (!codeContent.StartsWith("IT:") && !codeContent.StartsWith("IT：")) {
+                return Json(new SimpleResultModel(false, "二维码格式不正确"));
+            }
+            var sysNo = codeContent.Substring(3);
+            ITSv sv;
+            try {
+                sv = new ITSv(sysNo);
+            }
+            catch {
+                return Json(new SimpleResultModel(false, "此流水号不存在"));
+            }
+
+            var bill = sv.GetBill() as ei_itApply;
+            if (bill.repair_time == null) {
+                return Json(new SimpleResultModel(false, "此维修单还未处理完成，不能取回，请联系IT部处理人"));
+            }
+            if (bill.fetch_time != null) {
+                return Json(new SimpleResultModel(false, "此电脑已被取回，请不要重复操作"));
+            }
+            HRDBSv dbSv = new HRDBSv();
+            var emp = dbSv.GetHREmpInfo(cardNumber);
+            if (emp == null) {
+                return Json(new SimpleResultModel(false, "取回人厂牌在人事系统中不存在，请确认"));
+            }
+            if (!emp.emp_name.Equals(name)) {
+                return Json(new SimpleResultModel(false, "取回人厂牌和姓名不匹配，请确认"));
+            }
+            try {
+                sv.FetchComputer(cardNumber, name, phone);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(false, "申请单更新失败，请联系管理员。错误信息：" + ex.Message));
+            }
+
+            return Json(new SimpleResultModel(true));
         }
 
         #endregion
