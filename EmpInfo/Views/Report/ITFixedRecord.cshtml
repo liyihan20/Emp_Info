@@ -3,8 +3,8 @@
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
     <style type="text/css">
-        .lbText{
-            font-style:italic;
+        .lbText {
+            font-style: italic;
         }
     </style>
 }
@@ -52,27 +52,7 @@
         });
         $("#toDatePicker1").on("changeDate", function (e) {
             $('#fromDatePicker1').datetimepicker('setEndDate', e.date);
-        });
-
-        $("#reportBt").on("click", function () {
-            if ($("#fromDate").val() == "") {
-                toastr.error("请先输入开始日期");
-                return;
-            }
-            if ($("#toDate").val() == "") {
-                toastr.error("请先输入结束日期");
-                return;
-            }
-            toastr.info("数据正在导出，请稍等...");
-            window.location.href = "@Url.Content("~/Report/ExportITExcel?")"
-                + "fromDate=" + $("#fromDate").val()
-                + "&toDate=" + $("#toDate").val()
-                + "&depName=" + $("#depName").val()
-                + "&accepterName=" + $("#accepterName").val()
-                + "&applierName=" + $("#applierName").val()
-                + "&sysNo=" + $("#sysNo").val()
-            ;
-            });
+        });        
 
         $("#checkBt").on("click", function () {
             if ($("#fromDate").val() == "") {
@@ -83,14 +63,11 @@
                 toastr.error("请先输入结束日期");
                 return;
             }
-            
-            $.post("@Url.Content("~/Report/GetITDatas")", {
+
+            $.post("@Url.Content("~/Report/GetITFixedDatas")", {
                 fromDate: $("#fromDate").val(),
                 toDate: $("#toDate").val(),
-                depName: $("#depName").val(),
-                accepterName: $("#accepterName").val(),
-                applierName: $("#applierName").val(),
-                sysNo: $("#sysNo").val()
+                hasFetched: $("#hasFetched").val()
             }, function (data) {
                 $('#check_tb').bootstrapTable('load', data);
                 if (data.length == 0) {
@@ -99,7 +76,7 @@
                     toastr.success("已成功加载申请行数：" + data.length);
                 }
             });
-            
+
         });
     });
 
@@ -110,22 +87,7 @@
             pageSize: 40,
             pageList:[20,40,60,100],
             search:true,
-            columns: [
-                 {
-                     field: "audit_result",
-                     title: "处理进度",
-                     cellStyle: function (value, row, index, field) {
-                         if (value == "完成维修") {
-                             return { css: { color: 'green' }};
-                         }
-                         else if (value == "被拒绝") {
-                             return { css: { color: 'red' } };
-                         }
-                         else {
-                             return { css: { color: '#333' } };
-                         }
-                     }
-                },
+            columns: [                 
                 {
                     field: "sys_no",
                     title: "流水号"
@@ -133,24 +95,21 @@
                     field: "applier_name",
                     title: "申请人"
                 }, {
-                    field: "apply_time",
-                    title: "申请时间",
-                    formatter: function (value, row, index, field) {
-                        return utils.parseTDate(value, true);
-                    }
-                }, {
                     field: "dep_name",
                     title: "部门"
                 }, {
                     field: "accept_man_name",
                     title: "接单人"
                 }, {
-                    field: "repair_way",
-                    title: "维修方式"
+                    field: "repair_time",
+                    title: "维修时间",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value, true);
+                    }
                 }, {
                     field: "fetch_time",
                     title: "取走时间",
-                    formatter: function (value, row, index, field) {                        
+                    formatter: function (value, row, index, field) {
                         return utils.parseTDate(row.fetch_time, true);
                     }
                 }
@@ -176,50 +135,35 @@
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
             <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=IT")">电脑维修申请流程</a></li>
-            <li class="active">查询报表</li>
+            <li class="active">现场已维修报表</li>
         </ol>
     </div>
     <div class="panel-body">
         <div class="row" style="margin-bottom:6px;">
             <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="lbText">提交日期从：</div>
+                <div class="lbText">维修日期从：</div>
                 <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                     <input class="form-control" type="text" id="fromDate" name="fromDate" readonly value="@DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd")" />
                 </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="lbText">提交日期到：</div>
+                <div class="lbText">维修日期到：</div>
                 <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                     <input class="form-control" type="text" id="toDate" name="toDate" readonly value="@DateTime.Now.ToString("yyyy-MM-dd")" />
                 </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="lbText">申请人：</div>
-                <input type="text" class="form-control" name="applierName" id="applierName" style="margin:6px 0;" />
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="lbText">部门名称：</div>
-                <input type="text" class="form-control" name="depName" id="depName" style="margin:6px 0;" />
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="lbText">接单人：</div>
-                <input type="text" class="form-control" name="accepterName" id="accepterName" style="margin:6px 0;" />                
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="lbText">流水号：</div>
-                <input type="text" class="form-control" name="sysNo" id="sysNo" style="margin:6px 0;" />                
+                <div class="lbText">取走状态：</div>
+                <select class="form-control" name="hasFetched" id="hasFetched" style="margin:6px 0;">
+                    <option value="false">未取走</option>
+                    <option value="true">已取走</option>
+                </select>
             </div>
         </div>
-        <div class="btn-group btn-group-justified" role="group" style="margin-bottom:20px;">
-            <div class="btn-group" role="group">
-                <button class="btn btn-primary" id="checkBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
-            </div>
-            <div class="btn-group" role="group">
-                <button class="btn btn-success" id="reportBt" data-loading-text="导出中..."><i class="fa fa-file-excel-o"></i> 导出报表</button>
-            </div>
-        </div>
+
+        <button class="btn btn-primary btn-block" id="checkBt" data-loading-text="搜索中..." style="margin-top:16px;"><i class="fa fa-search"></i> 搜索</button>        
 
         <table id="check_tb"></table>
 

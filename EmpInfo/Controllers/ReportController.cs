@@ -2291,7 +2291,8 @@ namespace EmpInfo.Controllers
                 r.accept_man_name,
                 r.audit_result,
                 r.repair_way,
-                r.sys_no
+                r.sys_no,
+                r.fetch_time
             }).OrderBy(r => r.apply_time).ToList();
 
             return Json(result);
@@ -2391,6 +2392,34 @@ namespace EmpInfo.Controllers
                 result += i.n + ":" + i.v + ";";
             }
             return result;
+        }
+
+        // 已维修完成的数据
+        public ActionResult ITFixedRecord()
+        {
+            return View();
+        }
+
+        public JsonResult GetITFixedDatas(DateTime fromDate, DateTime toDate, bool hasFetched)
+        {
+
+            toDate = toDate.AddDays(1);
+            var result = (from i in db.ei_itApply
+                          where i.repair_time != null
+                          && i.repair_way == "现场维修"
+                          && i.repair_time >= fromDate && i.repair_time < toDate
+                          && ((hasFetched && i.fetch_time != null) || (!hasFetched && i.fetch_time == null))
+                          orderby i.repair_time
+                          select new
+                          {
+                              i.applier_name,
+                              i.repair_time,
+                              i.dep_name,
+                              i.accept_man_name,
+                              i.sys_no,
+                              i.fetch_time
+                          }).ToList();
+            return Json(result);
         }
 
         #endregion
