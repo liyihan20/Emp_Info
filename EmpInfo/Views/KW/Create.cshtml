@@ -24,7 +24,16 @@
     <script src="@Url.Content("~/Scripts/myUploaderPro.js")"></script>
     <script>
         $(function () {
-            var editor = textboxio.replace('#targetId');
+            var config = {
+                images: {
+                    editing: {
+                        preferredWidth: 800,
+                        preferredHeight: 800
+                    }
+                }
+            };
+            var editor = textboxio.replace('#targetId',config);
+
             $("#myUploader").myUploader({
                 sysNum: "@item.item_no",
                 fileNumLimit: 10,
@@ -112,7 +121,7 @@
                     <input type="text" class="form-control" name="item_keys" placeholder="除标题外的查询关键字，多个用空格隔开" value="@item.item_keys" />
                 </div>
             </div>
-            <textarea id="targetId" class="form-control" rows="24" name="text_content">@item.text_content</textarea>
+            <textarea id="targetId" class="form-control" rows="30" name="text_content">@item.text_content</textarea>
             <div style="margin-top:8px;">
                 <div style="display:inline-block;">
                     <div id="picker"> <i class="fa fa-upload"></i> 上传附件 </div>
