@@ -20,12 +20,13 @@
             margin: 4px 0;
         }
 
-        .item_header{
-            cursor:pointer;
+        .item_header {
+            cursor: pointer;
         }
     </style>
 }
 @section Scripts {
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js?v=" + new Random().Next())"></script>
     <script>
         var selectedItems = [];
         var hasFetchItems = false;
@@ -36,10 +37,13 @@
             }
             $(".selectUser").on("focus", function () {
                 var self = this;
-                openSelectUserDialog($(self).val(), 1, function (result) {
-                    $(self).val(result);
+                $.selectUsers({
+                    userHasSelected:$(self).val(),
+                    callback:function(result){
+                        $(self).val(result);
+                    }
                 });
-            });
+            });            
 
             $("#selectBtn").on("click",function(){
                 if(hasFetchItems){
@@ -72,12 +76,12 @@
                     openMessageDialog(html,"选择IT项目");
                     hasFetchItems=true;
                     $("input[name='item']").iCheck({
-                        checkboxClass: 'icheckbox_minimal-red'                        
+                        checkboxClass: 'icheckbox_minimal-red'
                     });
                     $("input[name='item']").on("ifChecked",function(event){
                         var itemName = $(event.target).val();
                         var itemFee = $(event.target).attr("data-fee");
-                        selectedItems.push({n:itemName,v:itemFee});  
+                        selectedItems.push({n:itemName,v:itemFee});
                         updateItemUI();
                     });
                     $("input[name='item']").on("ifUnchecked",function(event){
@@ -87,23 +91,27 @@
                                 selectedItems.splice(i,1);
                             }
                         }
-                        updateItemUI();                    
+                        updateItemUI();
                     });
                 });
             });
-            
+
             $("#apply_bt").on("click",function(){
                 var obj = utils.getFormObj($("#fm"));
                 if(selectedItems.length < 1){
                     toastr.error("请选择至少一个IT项目");
                     return;
                 }
-                if(obj.computer_name == "" || obj.ip_addr == ""){
+                if(obj.computer_name == "" && obj.ip_addr == ""){
                     toastr.error("IP地址和计算机名称请至少填写一个");
                     return;
                 }
                 if(obj.dep_charger_name == ""){
                     toastr.error("请选择主管/部门经理审核人");
+                    return;
+                }
+                if(obj.equitment_type==""){
+                    toastr.error("请选择设备类别");
                     return;
                 }
                 if(obj.login_name == ""){
@@ -122,7 +130,7 @@
 
                 obj.faulty_items = JSON.stringify(selectedItems);
                 obj.estimate_it_fee = utils.CalArrSum(selectedItems,"v");
-                
+
                 var jsonObj=JSON.stringify(obj).replace(/\&/g, "%26").replace(/\+/g, "%2b").replace(/\=/g, "%3d");
                 openConfirmDialog("确定要提交申请吗？", function () {
                     $("#apply_bt").button("loading");
@@ -147,7 +155,7 @@
                 });
 
             });
-             
+
         });
 
         function updateItemUI(){
@@ -223,6 +231,21 @@
                         </span>
                         <div class="b-input">
                             <input type="text" class="form-control" name="applier_phone" placeholder="请输入信利短号或手机号码" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            设备类别:
+                        </span>
+                        <div class="b-input">
+                            <select class="form-control" name="equitment_type">
+                                <option value="">---- 下拉选择设备类别 ----</option>
+                                @foreach (var d in new string[] { "台式机", "笔记本","工业电脑","平板电脑","其它设备" }) {
+                                <option value="@d">@d</option>
+                                }
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -321,6 +344,5 @@
 @section Modal {
     @Html.Partial("_ConfirmDialog")
     @Html.Partial("_MessageDialog")
-    @Html.Partial("_SelectUsers")
 
 }

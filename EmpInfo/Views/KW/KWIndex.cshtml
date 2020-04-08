@@ -1,0 +1,137 @@
+﻿@{
+    List<string> catalogs = ViewData["catalogs"] as List<string>;
+    bool isAdmin = (bool)ViewData["isAdmin"];
+}
+
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+        $(function () {
+            $("#catalog_group").on("click", "li a", function () {
+                $("#catalog_selected").html($(this).html());
+            });
+
+            $("#check_btn").on("click", function () {
+                var catalog = $("#catalog_selected").html();
+                var content = $.trim($("#search_content").val());
+                $.post("Search", {
+                    catalog: catalog,
+                    content:content
+                }, function (data) {
+                    $('#tb').bootstrapTable('load', data);
+                    if (data.length == 0) {
+                        toastr.error("当前查询条件查无记录");
+                    } else {
+                        toastr.success("已成功加载记录数：" + data.length);
+                    }
+                });
+            });
+
+        });
+
+        $("#tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 20,
+            pageList:[10,20,50],
+            search: true,
+            columns: [
+                {
+                    field: "item_no",
+                    title: "流水号",
+                    visible:false
+                }, {
+                    field: "caption",
+                    title: "标题",
+                    sortable: true,
+                    formatter: function (value, row, index, field) {                        
+                        var text = value;
+                        if (row.has_attachment) {
+                            text = "<i class='fa fa-fw fa-paperclip'></i> " + value;
+                        }
+                        return text;
+                    }
+                }, {
+                    field: "catalog",
+                    title: "分类",
+                    sortable: true
+                }, {
+                    field: "creater_name",
+                    title: "作者",
+                    sortable: true
+                }, {
+                    field: "create_time",
+                    title: "创建日期",
+                    sortable: true,
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value, true);
+                    }
+                }, {
+                    field: "last_update_time",
+                    title: "更新日期",
+                    sortable: true,
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value, true);
+                    }
+                }
+            ],
+            onClickRow: function (row, $element, field) {
+                if (row.item_no) {
+                    window.open("Check?itemNo=" + row.item_no);
+                }
+            },
+            rowStyle: function (row, index) {
+                return { css: { cursor: 'pointer' } };
+            }
+        });
+
+    </script>
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li class="active">知识库</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        @if (isAdmin) {
+            <div class="text-right" style="margin-bottom:12px;">
+                <a href="MyList"><i class="fa fa-user-circle"></i> 管理员入口 <i class="fa fa-angle-double-right"></i></a>
+            </div>
+            
+        }
+
+        <div class="row" style="margin-bottom:24px;">
+            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+                <div class="input-group">
+                    <div class="input-group-btn" id="catalog_group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span id="catalog_selected">所有</span> <span class="caret"></span></button>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li><a href="#">所有</a></li>
+                            @foreach (var ca in catalogs) {
+                                <li><a href="#">@ca</a></li>
+                            }
+                        </ul>
+                    </div>
+                    <input type="text" class="form-control" id="search_content" placeholder="可以输入标题或关键字进行搜索" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-success" id="check_btn"><i class="fa fa-search"></i> 搜索</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <table id="tb"></table>
+
+    </div>
+</div>

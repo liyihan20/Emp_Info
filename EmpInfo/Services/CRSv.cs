@@ -88,6 +88,9 @@ namespace EmpInfo.Services
                 bill.auditor_queues = JsonConvert.SerializeObject(queueList);
             }
 
+            if (!bill.dep_long_name.Contains(@"/")) {
+                throw new Exception("请点击文件夹图标展开子部门，选择到具体部门再提交！");
+            }
 
             FlowSvrSoapClient client = new FlowSvrSoapClient();
             var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, ((DateTime)bill.forgot_date).ToString("yyyy-MM-dd"), bill.time1 ?? "" + " " + bill.time2 ?? "" + " " + bill.time3 ?? "" + " " + bill.time4 ?? "");

@@ -49,7 +49,8 @@ namespace EmpInfo.Models
     public class AttachmentModel
     {
         public string fileName { get; set; }
-        public string fileSize { get; set; }
+        public long fileSize { get; set; }
+        public string ext { get; set; }
     }
 
     public class FlowQueueModel

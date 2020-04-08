@@ -34,6 +34,7 @@
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
     <script src="@Url.Content("~/Scripts/jquery.cookie.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
     <script>
     $(function () {
         $(".datePicker").datetimepicker({
@@ -44,10 +45,14 @@
             minView: 2,
             initialDate: "@DateTime.Now.ToString("yyyy-MM-dd")"
         });
-        $(".selectUser").on("click", function () {
+        $(".selectUser").on("focus", function () {
             var self = this;
-            openSelectUserDialog($(self).val(), 3, function (result) {
-                $(self).val(result);
+            $.selectUsers({
+                userLimit:3,
+                userHasSelected: $(self).val(),
+                callback: function (result) {
+                    $(self).val(result);
+                }
             });
         });
         $("#applyContent").load("CheckApply #topContainer", { sysNo: "@bam.sysNum" }, function () {
@@ -317,5 +322,4 @@
 @section Modal {
     @Html.Partial("_MessageDialog")
     @Html.Partial("_ConfirmDialog")
-    @Html.Partial("_SelectUsers")
 }

@@ -31,6 +31,7 @@
 @section Scripts {
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
     <script>
     $(function () {
         $("#confirmTimePicker").datetimepicker({
@@ -51,8 +52,12 @@
         $("#other_repairers,#transfer_to_other").on("focus", function () {
             var self = this;
             var maxSelectPeople = $(this).attr("data-pn");
-            openSelectUserDialog($(self).val(), maxSelectPeople, function (result) {
-                $(self).val(result);
+            $.selectUsers({
+                userLimit: maxSelectPeople,
+                userHasSelected: $(self).val(),
+                callback: function (result) {
+                    $(self).val(result);
+                }
             });
         });
 
@@ -445,5 +450,4 @@
     </div>
     @section Modal {
         @Html.Partial("_ConfirmDialog")
-        @Html.Partial("_SelectUsers")
     }

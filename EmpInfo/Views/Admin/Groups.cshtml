@@ -42,7 +42,7 @@
             //加载数据
             for (var i = 0; i < rows.length; i++) {
                 var row = rows[i];
-                var item = "<a class='list-group-item' href='@Url.Content("~/Admin/GroupDetail/")"+row.id+"'><div class='media'><div class='media-left media-middle'>";
+                var item = "<a class='list-group-item' href='@Url.Content("~/Admin/GroupDetail?id=")"+row.id+"'><div class='media'><div class='media-left media-middle'>";
                 item += "<img class='media-object' src='@Url.Content("~/Content/images/group_item.png")' alt='group'></div><div class='media-body'><h4 class='media-heading'>";
                 item += row.name
                 item += "</h4><div style='color:gray'>";

@@ -31,5 +31,6 @@ namespace EmpInfo.Models
         public Nullable<bool> check1 { get; set; }
         public Nullable<bool> check2 { get; set; }
         public string status { get; set; }
+        public Nullable<System.DateTime> finish_date { get; set; }
     }
 }

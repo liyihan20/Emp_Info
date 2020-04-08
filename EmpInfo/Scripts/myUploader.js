@@ -38,9 +38,10 @@
                 </div>';
         target.append(html);
         var filePanelEle = target.find("#al_file_panel");
-        var fileListEle = target.find("#al_file_list");
+        var fileListEle = target.find("#al_file_list");               
 
         uploader.on('fileQueued', function (file) {
+            console.log(file);
             file.name = file.name.replace(/&/g, "_");
             var fileName = file.name;
             if (fileName.length > 20) {
@@ -58,7 +59,7 @@
                 $('#' + file.id).parent().find('td.state').addClass("text-danger").html("上传出错");
                 console.log(res);
             } else {
-                $('#' + file.id).parent().find('td.state').addClass("text-success").html("已上传| <i class='fa fa-times-circle-o text-danger' title='移除'></i>");
+                $('#' + file.id).parent().find('td.state').addClass("text-success").html("已上传| <i class='fa fa-times-circle-o text-danger' style='cursor:pointer;' title='移除'></i>");
             }
         });
 

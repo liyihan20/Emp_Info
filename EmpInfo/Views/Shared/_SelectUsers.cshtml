@@ -101,7 +101,7 @@
         });
     });
 </script>
-<div class="modal fade" id="userSelModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="userSelLabel" aria-hidden="true">
+<div class="modal fade" id="userSelModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="userSelLabel" aria-hidden="true" style="z-index:2000;">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -109,7 +109,6 @@
                 <h4 class="modal-title">选择员工(人数限制：<span id="u_sel_num_limit"></span> )</h4>
             </div>
             <div class="modal-body" style="min-height:280px;max-height:400px;overflow:auto;">
-
                 <div class="input-group">
                     <input type="text" class="form-control" id="u_sel_query_str" placeholder="输入厂牌或姓名搜索">
                     <span class="input-group-btn">
@@ -129,7 +128,6 @@
                         @*搜索到的用户列表*@                        
                     </tbody>
                 </table>
-
             </div>
             <div class="modal-footer">
                 <div class="text-left" id="u_sel_selected_users">

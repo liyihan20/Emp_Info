@@ -1,0 +1,87 @@
+﻿@using EmpInfo.Models
+@{
+    kw_items item = ViewData["item"] as kw_items;
+}
+
+@section Scripts{
+    <script>
+        $(function () {
+            if ($("#attList")) {
+                $.post("../Item/GetAttachments", { sysNo: "@item.item_no" }, function (data) {
+                    if (data.length > 0) {
+                        for (var i = 0; i < data.length; i++) {
+                            var shortName = data[i].fileName;
+                            if (shortName.length > 25) {
+                                var ext = shortName.substr(shortName.lastIndexOf("."));
+                                shortName = shortName.substr(0, 20) + ".." + ext;
+                            }
+                            $(attList).append('<li class="list-group-item">\
+                                    <a href="#" data-fd="' + data[i].fileName + '"><i class="fa fa-download"></i> ' + shortName + '(' + (data[i].fileSize / 1000).toFixed(1) + 'K)</a>\
+                                    </li>');
+                        }
+                    }
+                });
+            }
+
+            $("#attList").on("click", "a", function () {
+                var fileName = $(this).attr("data-fd");
+                var url = utils.GetDownloadRoute("@item.item_no") + fileName;
+                window.open(url);
+            });
+
+        });
+    </script>
+}
+
+@section CSS{
+    <style type="text/css">
+        .caption {
+            text-align: center;
+            font-size: 24px;
+            margin: 6px 0;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 8px;
+            margin-bottom: 12px;
+            background-color: #f5f5f5;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .info {
+            font-style: italic;
+            color: #333;
+            float: right;
+        }
+    </style>
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <div class="panel-title"><i class="fa fa-file"></i> 查看文档 </div>
+    </div>
+    <div class="panel-body" style="padding-bottom:30px;">
+
+        <div class="caption">
+            @item.caption
+        </div>
+
+        <div class="info">
+            <div>类别：@item.catalog</div>
+            <div>作者：@item.creater_name</div>
+            <div>创建时间：@(((DateTime)item.create_time).ToString("yyyy-MM-dd HH:mm"))</div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="content">
+            @Html.Raw(item.text_content)
+        </div>
+        @if (item.has_attachment == true) {
+            <div>
+                <div style="margin-bottom:6px;">附件：</div>
+                <ul class="list-group" id="attList"></ul>
+            </div>
+        }
+    </div>
+</div>

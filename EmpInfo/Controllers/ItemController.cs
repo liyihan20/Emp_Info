@@ -170,6 +170,17 @@ namespace EmpInfo.Controllers
         }
 
         /// <summary>
+        /// 获取附件信息
+        /// </summary>
+        /// <param name="sysNo"></param>
+        /// <returns></returns>
+        public JsonResult GetAttachments(string sysNo)
+        {
+            var result = MyUtils.GetAttachmentInfo(sysNo);
+            return Json(result);
+        }
+
+        /// <summary>
         /// 获取紧急出货运输申请中客户对应的地址
         /// </summary>
         /// <param name="customerNumber"></param>
@@ -346,7 +357,17 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
             }
         }
-        
+
+        public JsonResult GetEmpNameByNumber(string cardNumber)
+        {
+            var empName = db.ei_users.Where(u => u.card_number == cardNumber).Select(u=>u.name).FirstOrDefault();
+            if (empName == null) {
+                return Json(new SimpleResultModel(false, "此厂牌不存在或未在此系统注册"));
+            }
+            return Json(new SimpleResultModel(true, "", empName));
+        }
+                
+
         public string test()
         {
             //foreach (var l in db.k3_database.Where(d=>!d.account_name.Contains("总部")).ToList()) {

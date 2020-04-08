@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
+using EmpInfo.Util;
 
 namespace EmpInfo.Controllers
 {
@@ -24,7 +25,7 @@ namespace EmpInfo.Controllers
 
         public string SqlExec()
         {
-            string conString = "Data Source=192.168.100.205;Initial Catalog=ICAudit;Persist Security Info=True;User ID=ICEmp;Password=ICEmp12345";
+            string conString = "Data Source = 192.168.100.205;Initial Catalog = ICAudit;Persist Security Info = True;User ID = ICEmp;Password = ICEmp12345";
             var sql = "select number,name,en_name,(case when number > 4 then 'b' else 's' end) as c from dbo.dn_authority where number > {0}";
             DataSet ds = null;
             SqlConnection conn = null;
@@ -54,10 +55,7 @@ namespace EmpInfo.Controllers
             return JsonConvert.SerializeObject(rows.FirstOrDefault().Keys.ToList());
         }
 
-        public ActionResult RichTextBox()
-        {
-            return View();
-        }
+
 
     }
 

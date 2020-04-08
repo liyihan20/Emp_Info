@@ -167,6 +167,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
     <Compile Include="Controllers\K3Controller.cs" />
+    <Compile Include="Controllers\KWController.cs" />
     <Compile Include="Controllers\OthersController.cs" />
     <Compile Include="Controllers\PackageController.cs" />
     <Compile Include="Controllers\PushController.cs" />
@@ -496,6 +497,19 @@
     </Compile>
     <Compile Include="Models\K3Models.cs" />
     <Compile Include="Models\k3_database.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\KWModels.cs" />
+    <Compile Include="Models\kw_catalogs.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\kw_itemKey.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\kw_items.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\kw_updateLog.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\laijq20161105_001_Result.cs">
@@ -1219,6 +1233,8 @@
     <Content Include="Scripts\echarts.simple.min.js" />
     <Content Include="Scripts\html5shiv.min.js" />
     <Content Include="Scripts\icheck.js" />
+    <Content Include="Scripts\myUserSelecter.js" />
+    <Content Include="Scripts\myUploaderPro.js" />
     <Content Include="Scripts\myUploader.js" />
     <Content Include="Scripts\jquery-1.11.3.min.js" />
     <Content Include="Scripts\jquery-1.8.2.js" />
@@ -1435,9 +1451,13 @@
     <Content Include="Views\Apply\BeginAuditITApply.cshtml" />
     <Content Include="Views\Shared\Warn.cshtml" />
     <Content Include="Views\ApplyExtra\PrintITCode.cshtml" />
-    <Content Include="Views\Test\RichTextBox.cshtml" />
+    <Content Include="Views\KW\Create.cshtml" />
     <Content Include="Views\Others\DormAndEmps.cshtml" />
     <Content Include="Views\Report\ITReport.cshtml" />
+    <Content Include="Views\Report\ITFixedRecord.cshtml" />
+    <Content Include="Views\KW\Check.cshtml" />
+    <Content Include="Views\KW\KWIndex.cshtml" />
+    <Content Include="Views\KW\MyList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

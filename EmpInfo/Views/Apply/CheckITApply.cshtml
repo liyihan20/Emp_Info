@@ -121,7 +121,7 @@
                         申请人:
                     </span>
                     <span class="b-input">
-                        @m.applier_name
+                        @string.Format("{0}({1})",m.applier_name,m.applier_num)
                     </span>
                 </div>
             </div>
@@ -153,6 +153,16 @@
                     <div class="b-input">
                         @m.dep_name
                     </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        设备类别:
+                    </span>
+                    <span class="b-input">
+                        @m.equitment_type
+                    </span>
                 </div>
             </div>
             <div class="col-md-4 col-sm-6 col-xs-12">

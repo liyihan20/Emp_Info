@@ -476,22 +476,26 @@ namespace EmpInfo.Controllers
         public ActionResult CheckSalary()
         {
             //2018-10-11起，不再提供查询工资服务
-            ViewBag.tip = "接上级通知，不再提供工资查询服务";
-            return View("Error");
+            //ViewBag.tip = "接上级通知，不再提供工资查询服务";
+            //return View("Error");
 
-            //string salaryNo = userInfoDetail.salaryNo;
-            //if(string.IsNullOrEmpty(salaryNo))
-            //{
-            //    ViewBag.tip = "你的工资账号不存在";
-            //    return View("Error");
-            //}
+            //2020-3-30 行政部要求重新开放
+            string salaryNo = userInfoDetail.salaryNo;
+            if (string.IsNullOrEmpty(salaryNo)) {
+                ViewBag.tip = "你的工资账号不存在";
+                return View("Error");
+            }
+            var info = db.GetSalaryInfo_new(salaryNo).ToList();
+            if (info.First().salaryType.Equals("月薪")) {
+                ViewBag.tip = "此功能仅限计件人员查询，如有疑问，请联系行政部";
+                return View("Error");
+            }
 
-            //ViewData["salaryNo"] = salaryNo;
-            //var info = db.GetSalaryInfo_new(salaryNo).ToList();
-            //ViewData["months"] = db.GetSalaryMonths(salaryNo).ToList();
-            //ViewData["info"] = info;
-            //WriteEventLog("工资查询", "进入工资查询页面");
-            //return View();
+            ViewData["salaryNo"] = salaryNo;            
+            ViewData["months"] = db.GetSalaryMonths(salaryNo).ToList();
+            ViewData["info"] = info;
+            WriteEventLog("工资查询", "进入工资查询页面");
+            return View();
         }
 
         public JsonResult CheckSalarySummary(string yearMonth)

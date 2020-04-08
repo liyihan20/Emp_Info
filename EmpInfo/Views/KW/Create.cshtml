@@ -1,0 +1,137 @@
+﻿@using EmpInfo.Models
+@{
+    kw_items item = ViewData["item"] as kw_items;
+    List<string> catalogs = ViewData["catalogs"] as List<string>;
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/textboxio/resources/css/textboxio.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
+    <style type="text/css">
+        .lb {
+            display: inline-block;
+            font-style: italic;
+        }
+
+        input, select {
+            margin-bottom: 8px;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Content/textboxio/textboxio.js")"></script>
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUploaderPro.js")"></script>
+    <script>
+        $(function () {
+            var editor = textboxio.replace('#targetId');
+            $("#myUploader").myUploader({
+                sysNum: "@item.item_no",
+                fileNumLimit: 10,
+                accept: {
+                    title: '*',
+                    extensions: '*',
+                    mimeTypes: '*'
+                }
+            });
+
+            $(".selectUser").on("focus", function () {
+                var self = this;
+                openSelectUserDialog($(self).val(), 10, function (result) {
+                    $(self).val(result);
+                });
+            });
+
+            $(".lb").on("click", function () {
+                toastr.success(parseInt($("#myUploader").getMyUploaderFilesNum()));
+            })
+
+            $("#saveBtn").on("click", function () {
+                var obj = utils.getFormObj($("#fm"));
+                if (obj.caption == "") {
+                    toastr.error("标题不能为空");
+                    return;
+                }
+                if (obj.catalog == "") {
+                    toastr.error("分类必须选择");
+                    return;
+                }
+
+                $("#has_attachment").val(parseInt($("#myUploader").getMyUploaderFilesNum()) > 0);                
+                $("#targetId").val(editor.content.get());
+                $("#saveBtn").button("loading");                                
+                
+                $.ajax({
+                    type: 'post',
+                    url: 'Save',
+                    data: $("#fm").serialize(),
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.suc) {
+                            toastr.success("已保存成功");
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                        $("#saveBtn").button("reset");
+                    }
+                });
+            });
+
+            $("#catalog").val("@item.catalog");
+        });
+    </script>
+}
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <div class="panel-title"><i class="fa fa-file"></i> @(item.create_time == null ? "新建文档" : "修改文档") </div>
+    </div>
+    <div class="panel-body" style="padding-bottom:30px;">
+        <form id="fm">
+            <input type="hidden" name="item_no" value="@item.item_no" />
+            <div class="row">
+                <div class="col-xs-12">
+                    <span class="lb">标题:</span>
+                    <input type="text" class="form-control" name="caption" id="caption" placeholder="填入此文档的标题" value="@item.caption" required />
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <span class="lb">分类:</span>
+                    <select class="form-control" name="catalog" id="catalog" required>
+                        <option value="">--- 请下拉选择分类 ---</option>
+                        @foreach (var c in catalogs) {
+                            <option value="@c">@c</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <span class="lb">有权修改人:</span>
+                    <input type="text" class="form-control selectUser" name="users_can_update" placeholder="除自己外可选择其他有权修改此文档的人" value="@item.users_can_update" />
+                </div>
+                <div class="col-xs-12">
+                    <span class="lb">查询关键字:</span>
+                    <input type="text" class="form-control" name="item_keys" placeholder="除标题外的查询关键字，多个用空格隔开" value="@item.item_keys" />
+                </div>
+            </div>
+            <textarea id="targetId" class="form-control" rows="24" name="text_content">@item.text_content</textarea>
+            <div style="margin-top:8px;">
+                <div style="display:inline-block;">
+                    <div id="picker"> <i class="fa fa-upload"></i> 上传附件 </div>
+                </div>
+            </div>
+            <div id="myUploader">
+                @*这里生成上传文件插件*@
+            </div>
+            <input type="hidden" id="has_attachment" name="has_attachment" />
+        </form>
+        <div>
+              <button class="btn btn-success btn-block" data-loading-text="保存中..." id="saveBtn" style="margin-top:12px;"><i class="fa fa-save"></i> 保存文档</button>
+        </div>
+    </div>
+</div>
+
+
+
+@section Modal {
+    @Html.Partial("_SelectUsers")
+    @Html.Partial("_ConfirmDialog")
+}

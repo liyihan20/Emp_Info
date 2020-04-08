@@ -825,7 +825,7 @@ namespace EmpInfo.Controllers
 
         #endregion
 
-        #region 电子漏刷卡流程
+        #region 漏刷卡流程
 
         [SessionTimeOutFilter]
         public ActionResult CRReport()
@@ -932,10 +932,10 @@ namespace EmpInfo.Controllers
             var myData = GetCRDatas(depId, fromDate, toDate, auditStatus, empName, salaryNo).ToList().OrderBy(m => m.apply_time).ToList();
             var dep = db.ei_department.Single(d => d.id == depId);
 
-            ushort[] colWidth = new ushort[] { 10, 20, 12, 16, 60, 12, 18,
+            ushort[] colWidth = new ushort[] { 10, 20, 12, 16,16, 60, 12, 18,
                                                14, 24, 20, 24,10,10 };
 
-            string[] colName = new string[] { "状态", "申请人", "条形码", "申请时间", "部门",  "漏刷日期", "漏刷时间", 
+            string[] colName = new string[] { "状态", "申请人", "条形码", "申请时间","审批完成时间", "部门",  "漏刷日期", "漏刷时间", 
                                               "原因", "备注", "流水号","当前审核人","标志1","标志2" };
 
             //設置excel文件名和sheet名
@@ -980,6 +980,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.applier_name + "(" + d.applier_num + ")");
                 cells.Add(rowIndex, ++colIndex, d.salary_no);
                 cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, (d.finish_date == null ? "" : ((DateTime)d.finish_date).ToString("yyyy-MM-dd HH:mm")));
                 cells.Add(rowIndex, ++colIndex, d.dep_long_name);
                 cells.Add(rowIndex, ++colIndex, ((DateTime)d.forgot_date).ToString("yyyy-MM-dd"));
                 cells.Add(rowIndex, ++colIndex, d.forgot_time);
@@ -2301,7 +2302,7 @@ namespace EmpInfo.Controllers
         public void ExportITExcel(DateTime fromDate, DateTime toDate, string depName, string accepterName, string applierName, string sysNo)
         {
             var result = SearchITDatas(fromDate, toDate, depName, accepterName, applierName, sysNo).OrderBy(r => r.apply_time).ToList();
-            string[] colName = new string[] { "处理进度","申请流水号", "申请人", "申请时间", "联系电话", "职位级别","部门", "电脑编号","计算机名", "IP地址",
+            string[] colName = new string[] { "处理进度","申请流水号", "申请人", "申请时间", "联系电话", "职位级别","部门", "设备类别", "电脑编号","计算机名", "IP地址",
                                               "申请项目", "申请备注", "主管/部门经理", "接单人","接单时间","维修途径", "标签打印时间", "处理人", "处理时间","处理项目","实际产生IT费用",
                                               "IT部备注","取回时间", "取走人", "取走人电话", "评价时间", "服务打分", "评价意见" };
             ushort[] colWidth = new ushort[colName.Length];
@@ -2356,6 +2357,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.applier_phone);
                 cells.Add(rowIndex, ++colIndex, d.emp_position);
                 cells.Add(rowIndex, ++colIndex, d.dep_name);
+                cells.Add(rowIndex, ++colIndex, d.equitment_type);
                 cells.Add(rowIndex, ++colIndex, d.computer_number);
                 cells.Add(rowIndex, ++colIndex, d.computer_name);
                 cells.Add(rowIndex, ++colIndex, d.ip_addr);

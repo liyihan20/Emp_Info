@@ -24,11 +24,11 @@
 </style>
 
 
-<script>    
+<script>
     function showPic(fileName){
         var sn = "@sysNo";
-        var path = sn.substr(0, 2) + "/20" + sn.substr(2, 2) + "/" + sn.substr(4, 2) + "/" + sn + "/" + fileName;
-        window.location.href = "@Url.Content("~/Att/")" + path;
+        var path = utils.GetDownloadRoute(sn) + fileName;
+        window.location.href = path;
     }
 </script>
 
@@ -56,7 +56,7 @@
                                     <span>@file.fileName</span>
                                 }
                             </td>
-                            <td>@file.fileSize</td>
+                            <td>@(file.fileSize/1000 + " K")</td>
                             <td><i class="fa fa-file-picture-o text-success" onclick="showPic('@file.fileName')"></i></td>
                         </tr>
                     }

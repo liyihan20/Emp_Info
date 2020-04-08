@@ -290,7 +290,7 @@
                         <span class="b-input">
                             <select class="form-control" name="market_name">
                                 <option value="">---- 下拉选择市场部 ----</option>
-                                @foreach (var ml in m.marketList) {                                    
+                                @foreach (var ml in m.marketList) { 
                                     <option value="@ml">@ml</option>
                                 }
                             </select>
@@ -314,7 +314,7 @@
                             客户代码:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" id="customerNumber" name="customer_number" />
+                            <input type="text" class="form-control" id="customerNumber" name="customer_number" placeholder="输入正确的代码后会跳出客户名称" />
                             <input type="hidden" id="customerName" name="customer_name" />
                             <span id="customerNameSpan" class="text-danger small"></span>
                         </span>
@@ -351,7 +351,15 @@
                             货运公司:
                         </span>
                         <div class="b-input">
-                            <input type="text" class="form-control" name="delivery_company" />
+                            <input type="text" class="form-control" name="delivery_company" placeholder="输入货运公司" />
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            送货地址:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="delivery_addr" placeholder="请至少填写省和市" />
                         </div>
                     </div>
                     <div class="b-div">

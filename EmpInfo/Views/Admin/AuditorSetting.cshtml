@@ -5,6 +5,7 @@
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
     
     <script>
         $("#tb1").bootstrapTable({
@@ -266,10 +267,14 @@
                 });
             });
 
-            $(".user-select").on("click focus", function () {
+            $(".user-select").on("focus", function () {
                 var self = this;
-                openSelectUserDialog($(self).val(), 100, function (result) {
-                    $(self).val(result);
+                $.selectUsers({
+                    userLimit: 100,
+                    userHasSelected: $(self).val(),
+                    callback: function (result) {
+                        $(self).val(result);
+                    }
                 });
             });
             
@@ -415,5 +420,4 @@
     </div>
 
     @Html.Partial("_ConfirmDialog")
-    @Html.Partial("_SelectUsers")
 }

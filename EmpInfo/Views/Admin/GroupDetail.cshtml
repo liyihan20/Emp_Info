@@ -4,7 +4,6 @@
     List<GroupAutModel> autList = (List<GroupAutModel>)ViewData["groupAuts"];
 }
 @section CSS{
-    @*<link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-select.min.css")" />*@
     <style>
         .badge {
             color: #337ab7;
@@ -12,90 +11,112 @@
         }
     </style>
 }
-@section Scripts{
-    @*<script src="@Url.Content("~/Scripts/bootstrap-select.min.js")"></script>*@
+@section Scripts{    
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
     <script>
-    $(function () {
-                
+        $(function () {
 
-        //列表的点击激活事件
-        $("#userList,#autList").on("click", "a", function () {
-            if ($(this).hasClass("active")) {
-                $(this).removeClass("active");
-                $(this).find(".badge").addClass("hidden");
-            } else {
-                $(this).addClass("active");
-                $(this).find(".badge").removeClass("hidden");
-            }
-        });
-        //用户搜索
-        $("#searchUserText").keyup(function () {
-            if (event.keyCode == 13) {
-                $("#searchUserBt").click();
-            }
-        });
-        $("#searchUserBt").click(function () {
-            var str = $("#searchUserText").val();
-            $("#userList a").each(function () {
-                var name = $(this).find(".u_name").html();
-                var no = $(this).find(".u_no").html();
-                if (name.indexOf(str) < 0 && no.indexOf(str) < 0) {
-                    $(this).hide();
-                    if ($(this).hasClass("active")) {
-                        $(this).removeClass("active");
-                        $(this).find(".badge").addClass("hidden");
+
+            //列表的点击激活事件
+            $("#userList,#autList").on("click", "a", function () {
+                if ($(this).hasClass("active")) {
+                    $(this).removeClass("active");
+                    $(this).find(".badge").addClass("hidden");
+                } else {
+                    $(this).addClass("active");
+                    $(this).find(".badge").removeClass("hidden");
+                }
+            });
+            //用户搜索
+            $("#searchUserText").keyup(function () {
+                if (event.keyCode == 13) {
+                    $("#searchUserBt").click();
+                }
+            });
+            $("#searchUserBt").click(function () {
+                var str = $("#searchUserText").val();
+                $("#userList a").each(function () {
+                    var name = $(this).find(".u_name").html();
+                    var no = $(this).find(".u_no").html();
+                    if (name.indexOf(str) < 0 && no.indexOf(str) < 0) {
+                        $(this).hide();
+                        if ($(this).hasClass("active")) {
+                            $(this).removeClass("active");
+                            $(this).find(".badge").addClass("hidden");
+                        }
+                    } else {
+                        $(this).show();
                     }
-                } else {
-                    $(this).show();
+                });
+            });
+            //权限搜索
+            $("#searchAutText").keyup(function () {
+                if (event.keyCode == 13) {
+                    $("#searchAutBt").click();
                 }
             });
-        });
-        //权限搜索
-        $("#searchAutText").keyup(function () {
-            if (event.keyCode == 13) {
-                $("#searchAutBt").click();
-            }
-        });
-        $("#searchAutBt").click(function () {
-            var str = $("#searchAutText").val();
-            $("#autList a").each(function () {
-                var name = $(this).find(".a_name").html();
-                var des = $(this).find(".a_des").html();
-                if (name.indexOf(str) < 0 && des.indexOf(str) < 0) {
-                    $(this).hide();
-                    if ($(this).hasClass("active")) {
-                        $(this).removeClass("active");
-                        $(this).find(".badge").addClass("hidden");
+            $("#searchAutBt").click(function () {
+                var str = $("#searchAutText").val();
+                $("#autList a").each(function () {
+                    var name = $(this).find(".a_name").html();
+                    var des = $(this).find(".a_des").html();
+                    if (name.indexOf(str) < 0 && des.indexOf(str) < 0) {
+                        $(this).hide();
+                        if ($(this).hasClass("active")) {
+                            $(this).removeClass("active");
+                            $(this).find(".badge").addClass("hidden");
+                        }
+                    } else {
+                        $(this).show();
                     }
-                } else {
-                    $(this).show();
-                }
+                });
             });
-        });
 
-        //更新组
-        $("#group_save_bt").click(function () {
-            var name = $("#groupName").val();
-            var des = $("#groupDes").val();
-            $.post("@Url.Content("~/Admin/UpdateGroup")", { id: "@ViewData["groupId"]", name: name, des: des }, function (data) {
-                if (data.suc) {
-                    toastr.success(data.msg);
-                } else {
-                    toastr.error(data.msg);
-                }
+            //更新组
+            $("#group_save_bt").click(function () {
+                var name = $("#groupName").val();
+                var des = $("#groupDes").val();
+                $.post("@Url.Content("~/Admin/UpdateGroup")", { id: "@ViewData["groupId"]", name: name, des: des }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
             });
-        });
 
-        //删除组
-        $("#group_remove_bt").click(function () {
-            openConfirmDialog("确定要删除本分组吗？组内用户和权限也会一并删除！", function () {
-                window.location.href = "@string.Concat(Url.Content("~/Admin/RemoveGroup/"),ViewData["groupId"])";
+            //删除组
+            $("#group_remove_bt").click(function () {
+                openConfirmDialog("确定要删除本分组吗？组内用户和权限也会一并删除！", function () {
+                    window.location.href = "@string.Concat(Url.Content("~/Admin/RemoveGroup/"),ViewData["groupId"])";
+                });
             });
-        });
 
-        //添加用户到组
-        $("#addUserBt").click(function () {
-            openSelectUserDialog("", 100, function (data) {
+            //添加用户到组
+            $("#addUserBt").click(function () {
+                $.selectUsers({
+                    userLimit: 100,
+                    callback: function (result) {
+                        var arr = result.split(";");
+                        for (var i = 0; i < arr.length; i++) {
+                            $.post("@Url.Content("~/Admin/AddUserToGroup")", { group_id: "@ViewData["groupId"]", user_name_no: arr[i] }, function (data) {
+                                if (data.result.suc) {
+                                    var node = "<a class='list-group-item'><div class='media'><div class='media-left media-middle'><img class='media-object' src='@Url.Content("~/Content/images/user_blue_48.png")' alt='user_blue_48'></div><div class='media-body'><h4 class='media-heading'><span class='u_name'>";
+                                    node += data.groupUser.userName;
+                                    node += "</span></h4><div><span class='u_no'>";
+                                    node += data.groupUser.cardNo;
+                                    node += "</span><input type='hidden' class='u_id' value='";
+                                    node += data.groupUser.id;
+                                    node += "' /></div></div><div class='media-right'><span class='badge hidden'><i class='glyphicon glyphicon-ok'></i></span></div></div></a>";
+                                    $("#userList").append(node);
+                                }
+                            });
+                        }
+                        toastr.success("已处理");
+                    }
+                });
+            });
+            @*openSelectUserDialog("", 100, function (data) {
                 var arr = data.split(";");
                 for (var i = 0; i < arr.length; i++) {
                     $.post("@Url.Content("~/Admin/AddUserToGroup")", { group_id: "@ViewData["groupId"]", user_name_no: arr[i] }, function (data) {
@@ -107,80 +128,52 @@
                             node += "</span><input type='hidden' class='u_id' value='";
                             node += data.groupUser.id;
                             node += "' /></div></div><div class='media-right'><span class='badge hidden'><i class='glyphicon glyphicon-ok'></i></span></div></div></a>";
-                            $("#userList").append(node);                            
-                        } 
+                            $("#userList").append(node);
+                        }
                     });
                 }
                 toastr.success("已处理");
-            });
-            @*$("#groupUserModal").modal("show");
-            if ($("#userSelect option").length < 1) {
-                $.post("@Url.Content("~/Item/GetUserBySelect")", {}, function (data) {
-                    for (var i = 0; i < data.length; i++) {
-                        var userOpt = "<option value='" + data[i].intValue + "'>" + data[i].text + "</option>";
-                        $("#userSelect").append(userOpt);
-                    }
-                    $('#userSelect').selectpicker({ liveSearch: 'true' });
+            });*@
+
+
+            //移除组内用户
+            $("#removeUserBt").click(function () {
+                if ($("#userList a.active").length < 1) {
+                    toastr.error("请先选择需要移除的用户");
+                    return;
+                }
+                var user_ids = "";
+                $("#userList a.active").each(function () {
+                    var user_id = $(this).find(".u_id").val();
+                    if (user_ids != "") user_ids += ",";
+                    user_ids += user_id;
                 });
-            }*@
-        });
-        @*$("#bt_groupUser").click(function () {
-            var id = $("#userSelect").val();
-            $.post("@Url.Content("~/Admin/AddUserToGroup")", { group_id: "@ViewData["groupId"]", user_id: id }, function (data) {
-                if (data.result.suc) {
-                    var node = "<a class='list-group-item'><div class='media'><div class='media-left media-middle'><img class='media-object' src='@Url.Content("~/Content/images/user_blue_48.png")' alt='user_blue_48'></div><div class='media-body'><h4 class='media-heading'><span class='u_name'>";
-                    node += data.groupUser.userName;
-                    node += "</span></h4><div><span class='u_no'>";
-                    node += data.groupUser.cardNo;
-                    node += "</span><input type='hidden' class='u_id' value='";
-                    node += data.groupUser.id;
-                    node += "' /></div></div><div class='media-right'><span class='badge hidden'><i class='glyphicon glyphicon-ok'></i></span></div></div></a>";
-                    $("#userList").append(node);
-                    toastr.success(data.result.msg);
-                } else {
-                    toastr.error(data.result.msg);
+                $.post("@Url.Content("~/Admin/RemoveUserInGroup")", { group_id: "@ViewData["groupId"]", user_ids: user_ids }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        $("#userList a.active").remove();
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+
+            //添加权限到组
+            $("#addAutBt").click(function () {
+                $("#groupAutModal").modal("show");
+                if ($("#autSelect option").length < 1) {
+                    $.post("@Url.Content("~/Item/GetAutBySelect")", {}, function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            var autOpt = "<option value='" + data[i].intValue + "'>" + data[i].text + "</option>";
+                            $("#autSelect").append(autOpt);
+                        }
+                        $('#autSelect').selectpicker({ liveSearch: 'true' });
+                    });
                 }
             });
-        });*@
-
-        //移除组内用户
-        $("#removeUserBt").click(function () {
-            if ($("#userList a.active").length < 1) {
-                toastr.error("请先选择需要移除的用户");
-                return;
-            }
-            var user_ids = "";
-            $("#userList a.active").each(function () {
-                var user_id = $(this).find(".u_id").val();
-                if (user_ids != "") user_ids += ",";
-                user_ids += user_id;
-            });
-            $.post("@Url.Content("~/Admin/RemoveUserInGroup")", { group_id: "@ViewData["groupId"]", user_ids: user_ids }, function (data) {
-                if (data.suc) {
-                    toastr.success(data.msg);
-                    $("#userList a.active").remove();
-                } else {
-                    toastr.error(data.msg);
-                }
-            });
-        });
-
-        //添加权限到组
-        $("#addAutBt").click(function () {
-            $("#groupAutModal").modal("show");
-            if ($("#autSelect option").length < 1) {
-                $.post("@Url.Content("~/Item/GetAutBySelect")", {}, function (data) {
-                    for (var i = 0; i < data.length; i++) {
-                        var autOpt = "<option value='" + data[i].intValue + "'>" + data[i].text + "</option>";
-                        $("#autSelect").append(autOpt);
-                    }
-                    $('#autSelect').selectpicker({ liveSearch: 'true' });
-                });
-            }
-        });
-        $("#bt_groupAut").click(function () {
-            var id = $("#autSelect").val();
-            $.post("@Url.Content("~/Admin/AddAutToGroup")", { group_id: "@ViewData["groupId"]", aut_id: id }, function (data) {
+            $("#bt_groupAut").click(function () {
+                var id = $("#autSelect").val();
+                $.post("@Url.Content("~/Admin/AddAutToGroup")", { group_id: "@ViewData["groupId"]", aut_id: id }, function (data) {
                     if (data.result.suc) {
                         var node = "<a class='list-group-item'><div class='media'><div class='media-left media-middle'><img class='media-object' src='@Url.Content("~/Content/images/athority_48.png")' alt='athority_48'></div><div class='media-body'><h4 class='media-heading'>";
                         node += data.groupAut.autNumber + "&nbsp;<span class='a_name'>" + data.groupAut.autName;
@@ -195,29 +188,29 @@
                         toastr.error(data.result.msg);
                     }
                 });
-        });
+            });
 
-        //移除组内权限
-        $("#removeAutBt").click(function () {
-            if ($("#autList a.active").length < 1) {
-                toastr.error("请先选择需要移除的权限");
-                return;
-            }
-            var aut_ids = "";
-            $("#autList a.active").each(function () {
-                var aut_id = $(this).find(".a_id").val();
-                if (aut_ids != "") aut_ids += ",";
-                aut_ids += aut_id;
-            });
-            $.post("@Url.Content("~/Admin/RemoveAutInGroup")", { group_id: "@ViewData["groupId"]", aut_ids: aut_ids }, function (data) {
-                if (data.suc) {
-                    toastr.success(data.msg);
-                    $("#autList a.active").remove();
-                } else {
-                    toastr.error(data.msg);
+            //移除组内权限
+            $("#removeAutBt").click(function () {
+                if ($("#autList a.active").length < 1) {
+                    toastr.error("请先选择需要移除的权限");
+                    return;
                 }
+                var aut_ids = "";
+                $("#autList a.active").each(function () {
+                    var aut_id = $(this).find(".a_id").val();
+                    if (aut_ids != "") aut_ids += ",";
+                    aut_ids += aut_id;
+                });
+                $.post("@Url.Content("~/Admin/RemoveAutInGroup")", { group_id: "@ViewData["groupId"]", aut_ids: aut_ids }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        $("#autList a.active").remove();
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
             });
-    });
 
         });
 
@@ -306,8 +299,7 @@
                         </div>
                     </div>
                     <div class="list-group" id="userList">
-                        @foreach (var u in userList)
-                        {
+                        @foreach (var u in userList) {
                             <a class="list-group-item">
                                 <div class="media">
                                     <div class="media-left media-middle">
@@ -355,8 +347,7 @@
                         </div>
                     </div>
                     <div class="list-group" id="autList">
-                        @foreach (var a in autList)
-                        {
+                        @foreach (var a in autList) {
                             <a class="list-group-item">
                                 <div class="media">
                                     <div class="media-left media-middle">
@@ -381,26 +372,7 @@
         </div>
     </div>
 </div>
-@section Modal{
-    @*<div class="modal fade" id="groupUserModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupUserModal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">添加组内用户</h4>
-            </div>
-            <div class="modal-body">
-                <select class="form-control" id="userSelect">
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button id="bt_groupUser" type="button" class="btn btn-success">确定</button>
-            </div>
-        </div>
-    </div>
-</div>*@
-    
+@section Modal {
 <div class="modal fade" id="groupAutModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupAutModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -418,6 +390,6 @@
         </div>
     </div>
 </div>
-    @Html.Partial("_ConfirmDialog");
-    @Html.Partial("_SelectUsers")
+
+@Html.Partial("_ConfirmDialog")
 }

@@ -522,17 +522,18 @@ namespace EmpInfo.Util
         }
 
         /// <summary>
-        /// 将指定对象的属性值设置到目标对象，名称形同有效
+        /// 将指定对象的属性值设置到目标对象，名称相同有效
         /// </summary>
         /// <param name="fromObj"></param>
         /// <param name="toObj"></param>
         public static void CopyPropertyValue(object fromObj, object toObj)
         {
             foreach (var p in fromObj.GetType().GetProperties()) {
+                if (p.Name.ToUpper().Equals("ID")) continue; //ID不复制，因为是主键
                 var tp = toObj.GetType().GetProperties().Where(t => t.Name == p.Name).FirstOrDefault();
                 if (tp != null) {
-                    if (tp.PropertyType.Equals(p.PropertyType)) {
-                        tp.SetValue(toObj, p.GetValue(fromObj,null), null);
+                    if (tp.PropertyType.Equals(p.PropertyType) && p.GetValue(fromObj, null) != null) {
+                        tp.SetValue(toObj, p.GetValue(fromObj, null), null);
                     }
                 }
             }
@@ -573,8 +574,10 @@ namespace EmpInfo.Util
                     list.Add(new AttachmentModel()
                     {
                         fileName = fi.Name,
-                        fileSize = fi.Length / 1024 + " K"
+                        fileSize = fi.Length,
+                        ext = fi.Extension
                     });
+                    
                 }
             }
             return list;

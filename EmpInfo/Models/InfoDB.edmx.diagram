@@ -123,6 +123,10 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_itItems" Width="1.5" PointX="4.25" PointY="15.75" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_dormEmptyRoom" Width="1.5" PointX="10.75" PointY="6.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_ITExcel" Width="1.5" PointX="10.75" PointY="7" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.kw_catalogs" Width="1.5" PointX="10" PointY="8" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.kw_itemKey" Width="1.5" PointX="10" PointY="8.625" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.kw_items" Width="1.5" PointX="12.125" PointY="8.625" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.kw_updateLog" Width="1.5" PointX="12.125" PointY="8" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

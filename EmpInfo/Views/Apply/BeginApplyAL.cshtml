@@ -40,8 +40,8 @@
 @section Scripts {
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
-    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
-
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>    
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
     <script>
     var queue;
     $(function () {
@@ -80,16 +80,25 @@
         });
 
         //选择代理人
-        $("#agentMan").on("click focus", function () {
-            openSelectUserDialog($("#agentMan").val(), 1, function (result) {
-                $("#agentMan").val(result);
+        $("#agentMan").on("focus", function () {
+            var self = this;
+            $.selectUsers({
+                userHasSelected: $(self).val(),
+                callback: function (result) {
+                    $(self).val(result);
+                }
             });
         });
 
         //选择知会人
-        $("#informMan").on("click focus", function () {
-            openSelectUserDialog($("#informMan").val(), 10, function (result) {
-                $("#informMan").val(result);
+        $("#informMan").on("focus", function () {
+            var self = this;
+            $.selectUsers({
+                userLimit:10,
+                userHasSelected: $(self).val(),
+                callback: function (result) {
+                    $(self).val(result);
+                }
             });
         });
 
@@ -568,7 +577,6 @@
 </div>
 @section Modal {
     @Html.Partial("_SelectDep")
-    @Html.Partial("_SelectUsers")
     @Html.Partial("_SelectItems")
     @Html.Partial("_ConfirmDialog")
     @Html.Partial("_MessageDialog")

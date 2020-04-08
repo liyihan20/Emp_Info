@@ -25,7 +25,8 @@
 }
 @section Scripts {
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
-    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script> 
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
 
     <script>
         $(function () {
@@ -73,12 +74,15 @@
                 if ($(this).val() == "离职当天现金结算") {
                     alert("请与组长或直接上级确认同意后再选择此项，否则会被审核人拒绝！");
                 }
-            });
+            });            
 
-            $(".selectUser").on("click", function () {
+            $(".selectUser").on("focus", function () {
                 var self = this;
-                openSelectUserDialog($(self).val(), 1, function (result) {
-                    $(self).val(result);
+                $.selectUsers({
+                    userHasSelected: $(self).val(),
+                    callback: function (result) {
+                        $(self).val(result);
+                    }
                 });
             });
 
@@ -594,7 +598,6 @@
 
 @section Modal {
     @Html.Partial("_ConfirmDialog")
-    @Html.Partial("_SelectUsers")
 
     <div class="modal fade" id="depModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
         <div class="modal-dialog">

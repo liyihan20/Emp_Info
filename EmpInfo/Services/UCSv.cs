@@ -92,6 +92,10 @@ namespace EmpInfo.Services
                 throw new Exception("请填写货运公司！" );
             }
 
+            if (string.IsNullOrEmpty(bill.delivery_addr)) {
+                throw new Exception("请填写送货地址！");
+            }
+
             if (entrys.Count() < 1) {
                 throw new Exception("出货明细必须至少一条！" );
             }

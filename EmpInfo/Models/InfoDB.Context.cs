@@ -123,6 +123,10 @@ namespace EmpInfo.Models
         public DbSet<ei_itItems> ei_itItems { get; set; }
         public DbSet<vw_dormEmptyRoom> vw_dormEmptyRoom { get; set; }
         public DbSet<vw_ITExcel> vw_ITExcel { get; set; }
+        public DbSet<kw_catalogs> kw_catalogs { get; set; }
+        public DbSet<kw_itemKey> kw_itemKey { get; set; }
+        public DbSet<kw_items> kw_items { get; set; }
+        public DbSet<kw_updateLog> kw_updateLog { get; set; }
     
         public virtual ObjectResult<string> GetDormChargeMonth()
         {

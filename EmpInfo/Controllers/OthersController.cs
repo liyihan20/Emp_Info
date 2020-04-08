@@ -147,6 +147,7 @@ namespace EmpInfo.Controllers
 
                 decimal xn = 0, yn = 0;
                 if (!x.area_name.Equals(y.area_name)) {
+                    //不同宿舍区按照字典的value升序排序
                     foreach (var num in nums) {
                         if (x.area_name.StartsWith(num.Key)) {
                             xn = num.Value;
@@ -157,6 +158,7 @@ namespace EmpInfo.Controllers
                     }
                 }
                 else {
+                    //同一宿舍区的按照管理费排序，管理费越高表示面积越大
                     xn = x.manage_cost;
                     yn = y.manage_cost;
                 }

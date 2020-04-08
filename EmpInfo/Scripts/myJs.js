@@ -171,5 +171,9 @@
                 }, delay);
             }
         }
+    },
+    //获取下载路径
+    GetDownloadRoute: function (sysNum) {
+        return "../Att/" + sysNum.substr(0, 2) + "/20" + sysNum.substr(2, 2) + "/" + sysNum.substr(4, 2) + "/" + sysNum + "/";
     }
 }

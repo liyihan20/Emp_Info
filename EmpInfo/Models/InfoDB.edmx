@@ -765,6 +765,7 @@
           <Property Name="fetcher_name" Type="nvarchar" MaxLength="50" />
           <Property Name="fetcher_phone" Type="varchar" MaxLength="50" />
           <Property Name="fetch_time" Type="datetime" />
+          <Property Name="equitment_type" Type="nvarchar" MaxLength="20" />
         </EntityType>
         <EntityType Name="ei_itItems">
           <Key>
@@ -1111,6 +1112,7 @@
           <Property Name="reason" Type="varchar" MaxLength="1000" />
           <Property Name="delivery_company" Type="varchar" MaxLength="500" />
           <Property Name="has_attachment" Type="bit" />
+          <Property Name="delivery_addr" Type="nvarchar" MaxLength="500" />
         </EntityType>
         <EntityType Name="ei_ucApplyEntry">
           <Key>
@@ -1213,6 +1215,48 @@
           <Property Name="server_ip" Type="varchar" MaxLength="50" />
           <Property Name="database_name" Type="varchar" MaxLength="50" />
           <Property Name="po_brand" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="kw_catalogs">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="kw_itemKey">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="item_key" Type="nvarchar" MaxLength="10" />
+          <Property Name="item_no" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="kw_items">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="caption" Type="nvarchar" MaxLength="100" />
+          <Property Name="text_content" Type="ntext" />
+          <Property Name="catalog" Type="nvarchar" MaxLength="50" />
+          <Property Name="creater_no" Type="varchar" MaxLength="50" />
+          <Property Name="creater_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="create_time" Type="datetime" />
+          <Property Name="last_update_time" Type="datetime" />
+          <Property Name="users_can_update" Type="nvarchar" MaxLength="200" />
+          <Property Name="open_flag" Type="bit" Nullable="false" />
+          <Property Name="has_attachment" Type="bit" />
+          <Property Name="item_no" Type="varchar" MaxLength="20" />
+          <Property Name="item_keys" Type="varchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="kw_updateLog">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="update_user" Type="nvarchar" MaxLength="50" />
+          <Property Name="update_time" Type="datetime" />
+          <Property Name="item_no" Type="varchar" MaxLength="20" />
         </EntityType>
         <EntityType Name="public_fund_item">
           <Key>
@@ -1382,6 +1426,7 @@
           <Property Name="check1" Type="bit" />
           <Property Name="check2" Type="bit" />
           <Property Name="status" Type="varchar" MaxLength="6" Nullable="false" />
+          <Property Name="finish_date" Type="datetime" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_dormEmptyRoom”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -1640,6 +1685,7 @@
           <Property Name="fetcher_name" Type="nvarchar" MaxLength="50" />
           <Property Name="fetcher_phone" Type="varchar" MaxLength="50" />
           <Property Name="fetch_time" Type="datetime" />
+          <Property Name="equitment_type" Type="nvarchar" MaxLength="20" />
           <Property Name="audit_result" Type="varchar" MaxLength="50" />
         </EntityType>
         <!--生成过程中发现错误:
@@ -2414,6 +2460,10 @@
           <EntitySet Name="flow_auditorRelation" EntityType="Self.flow_auditorRelation" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="flow_notifyUsers" EntityType="Self.flow_notifyUsers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="k3_database" EntityType="Self.k3_database" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="kw_catalogs" EntityType="Self.kw_catalogs" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="kw_itemKey" EntityType="Self.kw_itemKey" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="kw_items" EntityType="Self.kw_items" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="kw_updateLog" EntityType="Self.kw_updateLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="public_fund_item" EntityType="Self.public_fund_item" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="wx_accessToken" EntityType="Self.wx_accessToken" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="wx_jsApiTicket" EntityType="Self.wx_jsApiTicket" Schema="dbo" store:Type="Tables" />
@@ -2514,7 +2564,8 @@ FROM [dbo].[vw_assistantEmps] AS [vw_assistantEmps]</DefiningQuery>
 [vw_crReport].[current_auditors] AS [current_auditors], 
 [vw_crReport].[check1] AS [check1], 
 [vw_crReport].[check2] AS [check2], 
-[vw_crReport].[status] AS [status]
+[vw_crReport].[status] AS [status], 
+[vw_crReport].[finish_date] AS [finish_date]
 FROM [dbo].[vw_crReport] AS [vw_crReport]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="vw_dormEmptyRoom" EntityType="Self.vw_dormEmptyRoom" store:Type="Views" store:Schema="dbo">
@@ -2731,6 +2782,7 @@ FROM [dbo].[vw_hr_department] AS [vw_hr_department]</DefiningQuery>
 [vw_ITExcel].[fetcher_name] AS [fetcher_name], 
 [vw_ITExcel].[fetcher_phone] AS [fetcher_phone], 
 [vw_ITExcel].[fetch_time] AS [fetch_time], 
+[vw_ITExcel].[equitment_type] AS [equitment_type], 
 [vw_ITExcel].[audit_result] AS [audit_result]
 FROM [dbo].[vw_ITExcel] AS [vw_ITExcel]</DefiningQuery>
           </EntitySet>
@@ -3409,6 +3461,10 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           </FunctionImport>
           <EntitySet Name="vw_dormEmptyRoom" EntityType="ICAuditModel.vw_dormEmptyRoom" />
           <EntitySet Name="vw_ITExcel" EntityType="ICAuditModel.vw_ITExcel" />
+          <EntitySet Name="kw_catalogs" EntityType="ICAuditModel.kw_catalogs" />
+          <EntitySet Name="kw_itemKey" EntityType="ICAuditModel.kw_itemKey" />
+          <EntitySet Name="kw_items" EntityType="ICAuditModel.kw_items" />
+          <EntitySet Name="kw_updateLog" EntityType="ICAuditModel.kw_updateLog" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -4306,6 +4362,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <NavigationProperty Name="ei_ucApplyEntry" Relationship="ICAuditModel.FK_ei_ucApplyEntry_ei_ucApply" FromRole="ei_ucApply" ToRole="ei_ucApplyEntry" />
           <Property Name="delivery_company" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="has_attachment" Type="Boolean" />
+          <Property Name="delivery_addr" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ei_ucApplyEntry">
           <Key>
@@ -4556,6 +4613,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="check1" Type="Boolean" />
           <Property Name="check2" Type="Boolean" />
           <Property Name="status" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="finish_date" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="vw_svReport">
           <Key>
@@ -5750,6 +5808,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="fetcher_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="fetcher_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="fetch_time" Type="DateTime" Precision="3" />
+          <Property Name="equitment_type" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ei_itItems">
           <Key>
@@ -5841,6 +5900,49 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="fetcher_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="fetch_time" Type="DateTime" Precision="3" />
           <Property Name="audit_result" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="equitment_type" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="kw_catalogs">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="kw_itemKey">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="item_key" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="item_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="kw_items">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="caption" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="text_content" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="catalog" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="creater_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="creater_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="create_time" Type="DateTime" Precision="3" />
+          <Property Name="last_update_time" Type="DateTime" Precision="3" />
+          <Property Name="users_can_update" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="open_flag" Type="Boolean" Nullable="false" />
+          <Property Name="has_attachment" Type="Boolean" />
+          <Property Name="item_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="item_keys" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="kw_updateLog">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="update_user" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="update_time" Type="DateTime" Precision="3" />
+          <Property Name="item_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -6609,6 +6711,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_ucApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_ucApply">
               <MappingFragment StoreEntitySet="ei_ucApply">
+                <ScalarProperty Name="delivery_addr" ColumnName="delivery_addr" />
                 <ScalarProperty Name="has_attachment" ColumnName="has_attachment" />
                 <ScalarProperty Name="delivery_company" ColumnName="delivery_company" />
                 <ScalarProperty Name="reason" ColumnName="reason" />
@@ -6874,6 +6977,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="vw_crReport">
             <EntityTypeMapping TypeName="ICAuditModel.vw_crReport">
               <MappingFragment StoreEntitySet="vw_crReport">
+                <ScalarProperty Name="finish_date" ColumnName="finish_date" />
                 <ScalarProperty Name="status" ColumnName="status" />
                 <ScalarProperty Name="check2" ColumnName="check2" />
                 <ScalarProperty Name="check1" ColumnName="check1" />
@@ -7992,6 +8096,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_itApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_itApply">
               <MappingFragment StoreEntitySet="ei_itApply">
+                <ScalarProperty Name="equitment_type" ColumnName="equitment_type" />
                 <ScalarProperty Name="fetch_time" ColumnName="fetch_time" />
                 <ScalarProperty Name="fetcher_phone" ColumnName="fetcher_phone" />
                 <ScalarProperty Name="fetcher_name" ColumnName="fetcher_name" />
@@ -8091,6 +8196,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="vw_ITExcel">
             <EntityTypeMapping TypeName="ICAuditModel.vw_ITExcel">
               <MappingFragment StoreEntitySet="vw_ITExcel">
+                <ScalarProperty Name="equitment_type" ColumnName="equitment_type" />
                 <ScalarProperty Name="audit_result" ColumnName="audit_result" />
                 <ScalarProperty Name="fetch_time" ColumnName="fetch_time" />
                 <ScalarProperty Name="fetcher_phone" ColumnName="fetcher_phone" />
@@ -8131,7 +8237,53 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-        </EntityContainerMapping>
+          <EntitySetMapping Name="kw_catalogs">
+            <EntityTypeMapping TypeName="ICAuditModel.kw_catalogs">
+              <MappingFragment StoreEntitySet="kw_catalogs">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="kw_itemKey">
+            <EntityTypeMapping TypeName="ICAuditModel.kw_itemKey">
+              <MappingFragment StoreEntitySet="kw_itemKey">
+                <ScalarProperty Name="item_no" ColumnName="item_no" />
+                <ScalarProperty Name="item_key" ColumnName="item_key" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="kw_items">
+            <EntityTypeMapping TypeName="ICAuditModel.kw_items">
+              <MappingFragment StoreEntitySet="kw_items">
+                <ScalarProperty Name="item_keys" ColumnName="item_keys" />
+                <ScalarProperty Name="item_no" ColumnName="item_no" />
+                <ScalarProperty Name="has_attachment" ColumnName="has_attachment" />
+                <ScalarProperty Name="open_flag" ColumnName="open_flag" />
+                <ScalarProperty Name="users_can_update" ColumnName="users_can_update" />
+                <ScalarProperty Name="last_update_time" ColumnName="last_update_time" />
+                <ScalarProperty Name="create_time" ColumnName="create_time" />
+                <ScalarProperty Name="creater_name" ColumnName="creater_name" />
+                <ScalarProperty Name="creater_no" ColumnName="creater_no" />
+                <ScalarProperty Name="catalog" ColumnName="catalog" />
+                <ScalarProperty Name="text_content" ColumnName="text_content" />
+                <ScalarProperty Name="caption" ColumnName="caption" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="kw_updateLog">
+            <EntityTypeMapping TypeName="ICAuditModel.kw_updateLog">
+              <MappingFragment StoreEntitySet="kw_updateLog">
+                <ScalarProperty Name="item_no" ColumnName="item_no" />
+                <ScalarProperty Name="update_time" ColumnName="update_time" />
+                <ScalarProperty Name="update_user" ColumnName="update_user" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
   </edmx:Runtime>

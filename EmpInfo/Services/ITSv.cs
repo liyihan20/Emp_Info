@@ -35,26 +35,33 @@ namespace EmpInfo.Services
 
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
-            var menus = base.GetApplyMenuItems(userInfo);            
+            var menus = base.GetApplyMenuItems(userInfo);
 
             if (db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "维修项目" && f.relate_value == userInfo.cardNo).Count() > 0) {
-                menus.Add(new ApplyMenuItemModel()
-                {
-                    text = "维修项目管理",
-                    iconFont = "fa-list",
-                    url = "../ApplyExtra/ManageITItems"
-                });
-                menus.Add(new ApplyMenuItemModel()
-                {
-                    text = "查询报表",
-                    iconFont = "fa-file-text-o",
-                    url = "../Report/ITReport"
-                });
-                menus.Add(new ApplyMenuItemModel()
-                {
-                    text = "标签打印 & 电脑取回",
-                    iconFont = "fa-print",
-                    url = "../ApplyExtra/PrintITCode"
+                menus.AddRange(new List<ApplyMenuItemModel>() { 
+                    new ApplyMenuItemModel()
+                    {
+                        text = "维修项目管理",
+                        iconFont = "fa-list",
+                        url = "../ApplyExtra/ManageITItems"
+                    },
+                    new ApplyMenuItemModel()
+                    {
+                        text = "查询报表",
+                        iconFont = "fa-file-text-o",
+                        url = "../Report/ITReport"
+                    },
+                    new ApplyMenuItemModel(){
+                        text = "现场已维修报表",
+                        iconFont = "fa-file-text-o",
+                        url = "../Report/ITFixedRecord"
+                    },
+                    new ApplyMenuItemModel()
+                    {
+                        text = "标签打印 & 电脑取回",
+                        iconFont = "fa-print",
+                        url = "../ApplyExtra/PrintITCode"
+                    }
                 });
             }
             menus.Add(new ApplyMenuItemModel()
@@ -101,6 +108,18 @@ namespace EmpInfo.Services
             }
             else {
                 bill.priority = 1;
+
+                // 如果故障项目中包含新设备申请这个大类的项目，那么优先级设置为2，会经过信息管理部经理审批环节
+                var fItems = JsonConvert.DeserializeObject<List<ItItem>>(bill.faulty_items);
+                var newEqType = db.ei_itItems.Where(i => i.item_type == "新设备申请").ToList();
+                if (newEqType.Count() > 0) {
+                    foreach (var f in fItems) {
+                        if (newEqType.Where(n => n.item_name == f.n).Count() > 0) {
+                            bill.priority = 2;
+                            break;
+                        }
+                    }
+                }
             }
 
             FlowSvrSoapClient client = new FlowSvrSoapClient();
@@ -108,7 +127,6 @@ namespace EmpInfo.Services
             if (result.suc) {
                 try {
                     db.ei_itApply.Add(bill);
-
                     db.SaveChanges();
                 }
                 catch (Exception ex) {
@@ -177,7 +195,6 @@ namespace EmpInfo.Services
                 if (model.msg.Contains("完成") || model.msg.Contains("NG")) {
                     bool isSuc = model.msg.Contains("NG") ? false : true;
                     List<vw_push_users> pushUsers = db.vw_push_users.Where(v => v.card_number == bill.applier_num).ToList();
-                                        
 
                     SendEmailForCompleted(
                         bill.sys_no,
@@ -214,7 +231,7 @@ namespace EmpInfo.Services
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     string wxPushContent = "";
                     if (result.stepName == "搬电脑到IT部") {
-                        wxPushContent = "请将故障电脑搬到IT部（地址：4栋2楼），并在IT部打印维修标签粘贴在机箱上，等待维修人员" + bill.accept_man_name + "处理";
+                        wxPushContent = "请在3天内将故障电脑搬到IT部（地址：4栋2楼），并在IT部打印维修标签粘贴在机箱上，等待维修人员" + bill.accept_man_name + "处理，如超时未处理将会被自动NG。";
                     }
                     else if (result.stepName == "服务评价") {
                         wxPushContent = "电脑维修单已完成，请对此次维修服务进行评价";

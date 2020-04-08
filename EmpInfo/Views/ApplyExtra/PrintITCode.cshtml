@@ -118,6 +118,17 @@
                 getITCodeInfo();
             })
 
+            $("#fetcherCard").on("blur", function () {
+                $.post("../Item/GetEmpNameByNumber", { cardNumber: $("#fetcherCard").val() }, function (data) {
+                    if (data.suc) {
+                        $("#fetcherName").val(data.extra);
+                    } else {
+                        toastr.error(data.msg);
+                        $("#fetcherName").val("");
+                    }
+                });
+            });
+
             $("#fetchBtn").on("click", function () {
                 var codeContent = $("#codeArea").val();
                 var obj = utils.getFormObj($("#form2"));
@@ -140,7 +151,7 @@
 
                 $.post("ITFetchComputer", { codeContent: codeContent, cardNumber: obj.fetcherCard, name: obj.fetcherName, phone: obj.fetcherPhone }, function (data) {
                     if (data.suc) {
-                        alert("操作成功，现在可以取走电脑");
+                        alert("操作成功，取走电脑后请到信利E家中对此次维修服务进行评价");
                         utils.resetForm($("#form2"));
                         $("#codeArea").focus();
                     } else {
@@ -234,7 +245,7 @@
                         取走人厂牌:
                     </div>
                     <div class="col-xs-12 col-sm-6">
-                        <input type="text" class="form-control" id="codeArea" autocomplete="off" placeholder="光标点此文本框，然后扫机箱二维码" />
+                        <input type="text" class="form-control" id="codeArea" autocomplete="off" placeholder="光标点此文本框，然后扫标签二维码" />
                     </div>
                     <div class="col-xs-12 col-sm-6">
                         <input type="text" class="form-control" name="fetcherCard" id="fetcherCard" autocomplete="off" placeholder="填写取走人厂牌" />
@@ -249,7 +260,7 @@
                         <input type="text" class="form-control" id="applier" name="applier" disabled placeholder="扫码后自动在此带出申请人信息" />
                     </div>
                     <div class="col-xs-12 col-sm-6">
-                        <input type="text" class="form-control" name="fetcherName"autocomplete="off" placeholder="填写取走人姓名" />
+                        <input type="text" class="form-control" id="fetcherName" name="fetcherName" placeholder="填写取走人姓名" />
                     </div>                  
                     <div class="col-xs-12 col-sm-6">
                         申请人部门:
