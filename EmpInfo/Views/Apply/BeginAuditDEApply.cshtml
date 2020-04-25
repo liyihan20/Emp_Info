@@ -1,0 +1,436 @@
+﻿@using EmpInfo.Models;
+@{
+    BeginAuditModel bam = ViewData["bam"] as BeginAuditModel;
+    DEAuditOtherInfoModel info = bam.otherInfo as DEAuditOtherInfoModel;
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: top;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 4px 0;
+        }
+
+        .item_header {
+            cursor: pointer;
+        }
+    </style>
+}
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script>
+        $(function () {
+
+            {
+                utils.loadObjData($("#fm"),@Html.Raw(info.billJson));
+                $("#bill_date").val(utils.parseTDate($("#bill_date").val()));
+                $("#clear_date").val(utils.parseTDate($("#clear_date").val()));
+            }
+
+            $(".form_date").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd",
+                autoclose: true,
+                todayBtn: true,
+                startView: 2,
+                minView: 2
+            });
+
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@bam.sysNum" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+            });
+            $("#excelBt").on("click", function () {
+                window.location.href = "@Url.Content("~/Report/ExportDEExcel?sysNo=")"+"@m.sys_no";
+            });
+
+            $("#submit_bt").on("click",function(){
+                BeginAudit(true,false,$("#submit_bt"));
+            });
+
+            $("#reject_bt").on("click",function(){
+                BeginAudit(false,false,$("#reject_bt"));
+            });
+
+            $("#back_bt").on("click",function(){
+                BeginAudit(false,true,$("#back_bt"));
+            });
+
+        });
+
+        function BeginAudit(isPass,isBack, $btn){
+            if(isPass){
+                var obj = utils.getFormObj($("#fm"));
+                var result = utils.validateRequiredField($("#fm"));
+                if (!result.suc) {
+                    toastr.error(result.msg);
+                    return;
+                }
+                if($("#stepName").val().indexOf("申请人")>=0){
+                    if (!utils.testIsFloat(obj.qty, 4)) {
+                        toastr.error("数量必须是数字，并且小数位数最多4位");
+                        return;
+                    }
+
+                    if (!utils.testIsFloat(obj.unit_price, 4)) {
+                        toastr.error("单价必须是数字，并且小数位数最多4位");
+                        return;
+                    }
+
+                    if (!utils.testIsFloat(obj.tax_rate, 2)) {
+                        toastr.error("税率必须是数字，并且小数位数最多2位");
+                        return;
+                    }
+                }
+            }
+            $("#isPass").val(isPass);
+            $("#isBack").val(isBack);
+            openConfirmDialog("确定要"+(isPass?"流转到下一步吗？":(isBack?"退回上一步吗？": "拒绝此申请单吗？")), function () {
+                $btn.button("loading");
+                $.ajax({
+                    type: 'post',
+                    url: 'HandleApply',
+                    data: $("#fm").serialize(),
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.suc) {
+                            toastr.success("处理成功:" + data.msg);
+                            setTimeout(function () { window.location.href = "GetMyAuditingList?billType=DE" }, 2000);
+                        } else {
+                            toastr.error("处理失败：" + data.msg);
+                        }
+                        $btn.button("reset");
+                    }
+                });
+            });
+        }
+
+    </script>
+
+    @if (bam.isPass == true) {
+        <script>
+            $(function(){
+                $("#fm").find("button").hide();
+                $("#fm").find("input").attr("readonly","readonly");
+                $("#fm").find("select").attr("disabled","disabled");
+                $("#fm").find("textarea").attr("readonly","readonly");
+            });
+        </script>
+    }
+    else {
+        if (bam.stepName.Contains("经理")) {
+            <script>
+                $(function(){
+                    $("#fm").find("input").attr("readonly","readonly");
+                    $("#fm").find("select").attr("disabled","disabled");
+                    $("#fm").find("textarea").attr("readonly","readonly");
+                });
+            </script>
+        }
+        else {
+            <script>
+                $(function(){
+                    $("#back_bt").hide();
+                    $("#reject_bt").hide();
+
+                    $("#catalog").on("change", function () {
+                        $("#subject").val("");
+                        var v = $(this).val();
+                        $("#subject").find("option").each(function (i, e) {
+                            var cat = $(e).attr("data-cat");
+                            if (cat) {
+                                if (cat == v) {
+                                    $(e).show();
+                                } else {
+                                    $(e).hide();
+                                }
+                            }
+                        });
+                    });
+
+                    $("#subject").on("change", function () {
+                        $("#name").val("");
+                        var v = $(this).val();
+                        $("#name").find("option").each(function (i, e) {
+                            var cat = $(e).attr("data-sub");
+                            if (cat) {
+                                if (cat == v) {
+                                    $(e).show();
+                                } else {
+                                    $(e).hide();
+                                }
+                            }
+                        });
+                    });
+
+                    $("#qty,#unit_price").on("change",function(){
+                        var qty = $.trim($("#qty").val());
+                        var unit_price = $.trim($("#unit_price").val());
+                        var tax_rate = $.trim($("#tax_rate").val());
+
+                        if(qty && unit_price){
+                            $("#total").val((parseFloat(qty) * parseFloat(unit_price)).toFixed(2));
+
+                            if(tax_rate){
+                                $("#total_with_tax").val((parseFloat(qty) * parseFloat(unit_price)*(1+(parseFloat(tax_rate)/100))).toFixed(2));
+                            }
+                        }
+
+                    });
+
+                });
+            </script>
+        }
+    }
+
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="ApplyIndex?billType=DE">后勤工程支出申请单</a></li>
+            <li class="active">开始申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        流转记录:
+                    </span>
+                    <span class="b-input">
+                        <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+                    </span>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <span class="b-label">
+                    Excel导出:
+                </span>
+                <span class="b-input">
+                    <button type="button" class="btn btn-default btn-sm" id="excelBt"><i class="fa fa-file-excel-o"></i> 开始导出</button>
+                </span>
+            </div>
+        </div>
+        <form id="fm">
+            <input type="hidden" name="stepName" id="stepName" value="@bam.stepName" />
+            <input type="hidden" name="step" value="@bam.step" />
+            <input type="hidden" name="sysNo" value="@bam.sysNum" />
+            <input type="hidden" name="isPass" id="isPass" />
+            <input type="hidden" name="isBack" id="isBack" value="false" />
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请流水号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="sys_no" readonly />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请人:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="applier_name" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            制单日期:
+                        </span>
+                        <div class="b-input">
+                            <div class="input-group date form_date" id="fromDatePicker1">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                                <input class="form-control" type="text" id="bill_date" name="bill_date" readonly />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            类别:
+                        </span>
+                        <div class="b-input">
+                            <select class="form-control" name="catalog" id="catalog" required>
+                                <option value="">---- 下拉选择类别 ----</option>
+                                @foreach (var d in info.subjects.Select(s => s.catalog_name).Distinct()) {
+                                    <option value="@d">@d</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            项目:
+                        </span>
+                        <span class="b-input">
+                            <select class="form-control" name="subject" id="subject" required>
+                                <option value="">---- 下拉选择项目 ----</option>
+                                @foreach (var d in info.subjects) {
+                                    <option value="@d.name" data-cat="@d.catalog_name">@d.name</option>
+                                }
+                            </select>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            名称:
+                        </span>
+                        <span class="b-input">
+                            <select class="form-control" name="name" id="name" required>
+                                <option value="">---- 下拉选择名称 ----</option>
+                                @foreach (var d in info.names) {
+                                    <option value="@d.name" data-sub="@d.subject_name">@d.name</option>
+                                }
+                            </select>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            单位:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="unit_name" />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            数量:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="qty" id="qty" required />
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label" style="vertical-align:top;">
+                    摘要:
+                </span>
+                <span class="b-input">
+                    <textarea type="text" class="form-control" rows="3" name="summary" placeholder="填写具体位置等信息" required></textarea>
+                </span>
+            </div>
+
+            @if (bam.step >= 200) {
+                <h4 style="border-bottom:1px solid #337ab7;font-style:italic;margin-top:24px;" class="text-primary">补充信息</h4>
+                <div class="row">
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                供应商:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="supplier_name" required />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                单价:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="unit_price" id="unit_price" required />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                金额:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="total" id="total" readonly />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                税率%:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="tax_rate" id="tax_rate" required placeholder="不用写%" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                价税合计:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="total_with_tax" id="total_with_tax" readonly />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                结算日期:
+                            </span>
+                            <div class="b-input">
+                                <div class="input-group date form_date" id="fromDatePicker2">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                                    <input class="form-control" type="text" id="clear_date" name="clear_date" readonly />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        备注:
+                    </span>
+                    <span class="b-input">
+                        <textarea type="text" class="form-control" rows="3" name="comment"></textarea>
+                    </span>
+                </div>
+            }
+            <button class="btn btn-primary btn-block" type="button" id="submit_bt" data-loading-text="正在处理..." style="margin-top:4px;"><i class="fa fa-forward"></i> 下一步</button>
+            <button class="btn btn-warning btn-block" type="button" id="back_bt" style="margin-top:4px;"><i class="fa fa-backward"></i> 退回上一步</button>
+            <button class="btn btn-danger btn-block" type="button" id="reject_bt" style="margin-top:4px;"><i class="fa fa-stop"></i> 拒绝</button>
+        </form>
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_MessageDialog")
+    @Html.Partial("_ConfirmDialog")
+}

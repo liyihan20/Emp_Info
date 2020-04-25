@@ -2,9 +2,7 @@
 @{
     UCBeforeApplyModel m = ViewData["infoBeforeApply"] as UCBeforeApplyModel;    
 }
-@section CSS{
-    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
-
+@section CSS{    
     <style type="text/css">
         .b-label {
             display: inline-block;            
@@ -22,25 +20,9 @@
             margin: 10px 0;
         }
 
-        #al_file_tb th {
-            font-size: small;
-            text-align: center;
-        }
-
-        #al_file_tb td {
-            font-size: small;
-            text-align: center;
-        }
-
-        #al_file_list i {
-            cursor: pointer;
-        }
-
     </style>
 }
 @section Scripts {
-    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
-
     <script>
         var items = [];
         var changeIdx = -1;
@@ -73,11 +55,11 @@
                     toastr.error("必须录入出货明细才能提交");
                     return;
                 }
-                if ($("#al_file_list").children().length == 0) {
-                    toastr.error("必须要上传图片附件才能提交");
-                    return;
-                }
-                $("#hasAttachment").val(true);
+                //if ($("#al_file_list").children().length == 0) {
+                //    toastr.error("必须要上传图片附件才能提交");
+                //    return;
+                //}
+                $("#hasAttachment").val(false);
                 openConfirmDialog("确定要提交申请吗？", function () {
                     $("#apply_bt").button("loading");
                     $.ajax({
@@ -159,107 +141,6 @@
             $("#tr" + idx).remove();
         }
     </script>
-    <script>
-        $(function () {
-
-            $("#al_file_panel").hide();
-            var maxNum = 3; //最多上传3个文件
-            var maxSingleSize = 10 * 1024 * 1024; //单个文件最多10M,会自动压缩的
-            var uploader = WebUploader.create({
-                swf: '@Url.Content("~/Content/webupload/Uploader.swf")',
-                server: '@Url.Content("~/File/BeginUpload")',
-                pick: '#picker',
-                resize: false,
-                auto: true,
-                formData: { sysNum: '@m.sysNum' },
-                fileNumLimit: maxNum,
-                fileSingleSizeLimit: maxSingleSize,
-                accept: {
-                    title: 'Images',
-                    extensions: 'gif,jpg,jpeg,bmp,png',
-                    mimeTypes: 'image/*'
-                }
-            });
-
-            uploader.on('fileQueued', function (file) {
-                var fileName = file.name;
-                if (fileName.length > 20) {
-                    var ext = fileName.substr(fileName.lastIndexOf("."));
-                    fileName = fileName.substr(0, 14) + ".." + ext;
-                }
-                $("#al_file_list").append('<tr><td id="' + file.id + '" data-fd="' + file.name + '" class="item">' +
-                    fileName +
-                '</td><td>' + (file.size / 1000).toFixed(1) + " K</td><td class='state'>上传中...</td></tr>");
-                $("#al_file_panel").show();
-            });
-
-            uploader.on('uploadSuccess', function (file, res) {
-                if (!res.suc) {
-                    $('#' + file.id).parent().find('td.state').addClass("text-danger").html("上传出错");
-                    console.log(res);
-                } else {
-                    $('#' + file.id).parent().find('td.state').addClass("text-success").html("已上传| <i class='fa fa-times-circle-o text-danger' title='移除'></i>");
-                }
-
-            });
-
-            uploader.on('uploadError', function (file) {
-                $('#' + file.id).parent().find('td.state').addClass("text-danger").html('上传出错');
-            });
-
-            uploader.on('uploadComplete', function (file) {
-                //$('#' + file.id).find('.progress').fadeOut();
-            });
-
-            //上传队列出错提示
-            uploader.on("error", function (type) {
-                switch (type) {
-                    case "Q_TYPE_DENIED":
-                        toastr.error("图片格式不正确");
-                        break;
-                    case "F_EXCEED_SIZE":
-                        toastr.error("单个文件大小必须少于10M");
-                        break;
-                    case "F_DUPLICATE":
-                        toastr.error("不能重复上传文件");
-                        break;
-                    case "Q_EXCEED_NUM_LIMIT":
-                        toastr.error("最多上传文件数量是" + maxNum + "个");
-                        break;
-                    default:
-                        console.error("上传失败：" + type);
-                        break;
-                }
-            });
-
-            //移除已上传文件
-            $("#al_file_list").on("click", "td i", function () {
-                var fileTD = $(this).parents("tr").find("td")[0];
-                openConfirmDialog("确定要移除此上传的文件吗？", function () {
-                    var fileId = $(fileTD).attr("id");
-                    var fileName = $(fileTD).attr("data-fd");
-
-                    $.post("@Url.Content("~/File/RemoveUploadedFile")", { sysNum: "@m.sysNum", fileName: fileName }, function (data) {
-                        if (data.suc) {
-                            toastr.success("文件移除成功");
-                            uploader.removeFile(fileId,true);
-                            $(fileTD).parent().fadeOut(1000, function () {
-                                $(fileTD).parent().remove();
-                                var st = uploader.getStats();
-                                if (st.successNum == st.cancelNum) {
-                                    $("#al_file_panel").fadeOut(1000);
-                                }
-                            });
-                        } else {
-                            toastr.error("移除失败：" + data.msg);
-                        }
-                    })
-                });
-
-            });
-
-        });
-    </script>
 }
 <div class="row" style="margin-left:0;margin-right:0;">
     <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
@@ -319,7 +200,7 @@
                             <span id="customerNameSpan" class="text-danger small"></span>
                         </span>
                     </div>
-                    <div class="b-div">
+                    @*<div class="b-div">
                         <span class="b-label">
                             生产事业部:
                         </span>
@@ -331,7 +212,7 @@
                                 }
                             </select>
                         </span>
-                    </div>
+                    </div>*@
                     <div class="b-div">
                         <span class="b-label">
                             到达时间:
@@ -346,14 +227,14 @@
                             <div class="text-danger small"><i class="fa fa-info-circle"></i> 指预计实物及数据到达物流中心的时间</div>
                         </div>
                     </div>
-                    <div class="b-div">
+                    @*<div class="b-div">
                         <span class="b-label">
                             货运公司:
                         </span>
                         <div class="b-input">
                             <input type="text" class="form-control" name="delivery_company" placeholder="输入货运公司" />
                         </div>
-                    </div>
+                    </div>*@
                     <div class="b-div">
                         <span class="b-label">
                             送货地址:
@@ -370,7 +251,7 @@
                             <textarea class="form-control" rows="3" name="reason"></textarea>
                         </div>
                     </div>
-                    <div class="b-div">
+                    @*<div class="b-div">
                     <span class="b-label">
                         附件
                     </span>
@@ -397,7 +278,7 @@
                         </div>
                     </div>
                     <input type="hidden" name="has_attachment" id="hasAttachment" />
-                </div>
+                </div>*@
                     <div class="b-div">
                         <span class="b-label">
                             出货明细:

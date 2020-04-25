@@ -70,11 +70,11 @@
                 }
             });
 
-            $("#salary_clear_way").on("change", function () {
-                if ($(this).val() == "离职当天现金结算") {
-                    alert("请与组长或直接上级确认同意后再选择此项，否则会被审核人拒绝！");
-                }
-            });            
+            //$("#salary_clear_way").on("change", function () {
+            //    if ($(this).val() == "离职当天现金结算") {
+            //        alert("请与组长或直接上级确认同意后再选择此项，否则会被审核人拒绝！");
+            //    }
+            //});            
 
             $(".selectUser").on("focus", function () {
                 var self = this;
@@ -115,7 +115,11 @@
                     if (obj.quit_reason == "") {
                         toastr.error("辞职原因必须填写");
                         return;
-                    }                    
+                    }
+                    if (obj.salary_clear_way == "离职当天现金结算") {
+                        toastr.error("请确认薪资发放形式");
+                        return;
+                    }
                 } else {
                     if (!obj.absent_from || obj.absent_from == "") {
                         toastr.error("旷工开始日期必须填写");
@@ -537,9 +541,9 @@
                         工资发放要求:
                     </span>
                     <span style="display:inline-block;width:70%">                   
-                        <select class="form-control" name="salary_clear_way" id="salary_clear_way">                           
-                            @*<option value="离职当天现金结算">离职当天现金结算</option>*@
+                        <select class="form-control" name="salary_clear_way" id="salary_clear_way">
                             <option value="同部门在职员工同步发放工资卡" selected>同部门在职员工同步发放工资卡</option>
+                            <option value="离职当天现金结算">离职当天现金结算</option>
                         </select>
                     </span>
                 </div>

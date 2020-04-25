@@ -122,8 +122,10 @@ namespace EmpInfo.Services
                 }
             }
 
+            string faultyItemsString = string.Join("/", JsonConvert.DeserializeObject<List<ItItem>>(bill.faulty_items).Select(i => i.n).ToArray());
+
             FlowSvrSoapClient client = new FlowSvrSoapClient();
-            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.priority.ToString(), bill.dep_name);
+            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.priority.ToString(), faultyItemsString);
             if (result.suc) {
                 try {
                     db.ei_itApply.Add(bill);
@@ -347,5 +349,6 @@ namespace EmpInfo.Services
                 return new RedirectModel() { controllerName = "Apply", actionName = "CheckApply", routetValues = new { sysNo = result } };
             }
         }
+        
     }
 }

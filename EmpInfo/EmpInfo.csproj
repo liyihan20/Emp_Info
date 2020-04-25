@@ -162,6 +162,7 @@
     <Compile Include="Controllers\ApplyExtraController.cs" />
     <Compile Include="Controllers\ApplyController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\BIController.cs" />
     <Compile Include="Controllers\EPController.cs" />
     <Compile Include="Controllers\FileController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -190,6 +191,15 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ApplyModels.cs" />
+    <Compile Include="Models\bi_links.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\bi_sqls.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\bi_sql_params.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Canteen.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -268,7 +278,13 @@
     <Compile Include="Models\ei_CRApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_DEApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_deliveryInfo.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_DENames.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_department.cs">
@@ -278,6 +294,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_departmentAuditUser.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_DESubjects.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_dormRepair.cs">
@@ -534,6 +553,7 @@
     </Compile>
     <Compile Include="Models\ReportModels.cs" />
     <Compile Include="Models\ResModels.cs" />
+    <Compile Include="Models\SqlModels.cs" />
     <Compile Include="Models\StockbillAudit1_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -638,6 +658,7 @@
     <Compile Include="Services\BaseSv.cs" />
     <Compile Include="Services\BillSv.cs" />
     <Compile Include="Services\CRSv.cs" />
+    <Compile Include="Services\DESv.cs" />
     <Compile Include="Services\DPSv.cs" />
     <Compile Include="Services\EPSv.cs" />
     <Compile Include="Services\ETSv.cs" />
@@ -861,9 +882,11 @@
     <Content Include="Content\images\dorm_users.png" />
     <Content Include="Content\images\elepr.png" />
     <Content Include="Content\images\ep.png" />
+    <Content Include="Content\images\file.png" />
     <Content Include="Content\images\gear.png" />
     <Content Include="Content\images\house.png" />
     <Content Include="Content\images\it.png" />
+    <Content Include="Content\images\kw.png" />
     <Content Include="Content\images\leave.png" />
     <Content Include="Content\images\office.png" />
     <Content Include="Content\images\paint.png" />
@@ -1161,6 +1184,7 @@
     <Content Include="Content\tooltipster\sideTip\themes\tooltipster-sideTip-noir.min.css" />
     <Content Include="Content\tooltipster\sideTip\themes\tooltipster-sideTip-punk.min.css" />
     <Content Include="Content\tooltipster\sideTip\themes\tooltipster-sideTip-shadow.min.css" />
+    <Content Include="Content\viewer.css" />
     <Content Include="Content\webupload\Uploader.swf" />
     <Content Include="Content\webupload\webuploader.css" />
     <Content Include="favicon.ico" />
@@ -1266,9 +1290,11 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\star-rating.min.js" />
+    <Content Include="Scripts\tableExport.min.js" />
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="Scripts\tooltipster.bundle.min.js" />
+    <Content Include="Scripts\viewer.js" />
     <Content Include="Scripts\webuploader.min.js" />
     <Content Include="Scripts\webuploader.withoutimage.js" />
     <Content Include="Scripts\_references.js" />
@@ -1458,6 +1484,11 @@
     <Content Include="Views\KW\Check.cshtml" />
     <Content Include="Views\KW\KWIndex.cshtml" />
     <Content Include="Views\KW\MyList.cshtml" />
+    <Content Include="Views\Test\SqlTest.cshtml" />
+    <Content Include="Views\ApplyExtra\DENames.cshtml" />
+    <Content Include="Views\Apply\BeginApplyDE.cshtml" />
+    <Content Include="Views\Apply\CheckDEApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditDEApply.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

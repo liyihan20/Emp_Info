@@ -1,0 +1,255 @@
+﻿@using EmpInfo.Models;
+@{
+    ei_DEApply m = ViewData["am"] as ei_DEApply;
+}
+@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: top;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        $(function () {
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.sys_no" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+            });
+
+            $("#excelBt").on("click", function () {
+                window.location.href = "@Url.Content("~/Report/ExportDEExcel?sysNo=")" + "@m.sys_no";
+            });
+
+        });
+
+    </script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="ApplyIndex?billType=DE">后勤工程支出申请</a></li>
+            <li class="active">查看申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        流转记录:
+                    </span>
+                    <span class="b-input">
+                        <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <span class="b-label">
+                    Excel导出:
+                </span>
+                <span class="b-input">
+                    <button type="button" class="btn btn-default btn-sm" id="excelBt"><i class="fa fa-file-excel-o"></i> 开始导出</button>
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        审核状态:
+                    </span>
+                    <span class="b-input">
+                        @ViewData["auditStatus"]
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请流水号:
+                    </span>
+                    <span class="b-input">
+                        @m.sys_no
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请人:
+                    </span>
+                    <span class="b-input">
+                        @m.applier_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        制单日期:
+                    </span>
+                    <span class="b-input">
+                        @(((DateTime)m.bill_date).ToString("yyyy-MM-dd HH:mm"))
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        设备类别:
+                    </span>
+                    <span class="b-input">
+                        @m.catalog
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        项目:
+                    </span>
+                    <span class="b-input">
+                        @m.subject
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        名称:
+                    </span>
+                    <span class="b-input">
+                        @m.name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        单位:
+                    </span>
+                    <span class="b-input">
+                        @m.unit_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        数量:
+                    </span>
+                    <span class="b-input">
+                        @m.qty
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label" style="vertical-align:top;">
+                摘要:
+            </span>
+            <span class="b-input">
+                @m.summary
+            </span>
+        </div>
+
+        @if (m.supplier_name != null) {
+            <h4 style="border-bottom:1px solid #337ab7;font-style:italic;margin-top:24px;" class="text-primary">补充信息</h4>
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            供应商:
+                        </span>
+                        <span class="b-input">
+                            @m.supplier_name
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            单价:
+                        </span>
+                        <span class="b-input">
+                            @m.unit_price
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            金额:
+                        </span>
+                        <span class="b-input">
+                            @m.total
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            税率%:
+                        </span>
+                        <span class="b-input">
+                            @m.tax_rate
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            价税合计:
+                        </span>
+                        <span class="b-input">
+                            @m.total_with_tax
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            结算日期:
+                        </span>
+                        <span class="b-input">
+                            @(m.clear_date==null?"":((DateTime)m.clear_date).ToString("yyyy-MM-dd"))
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    备注:
+                </span>
+                <span class="b-input">
+                    @m.comment
+                </span>
+            </div>
+
+        }
+
+
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

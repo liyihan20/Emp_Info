@@ -3,37 +3,9 @@
     kw_items item = ViewData["item"] as kw_items;
 }
 
-@section Scripts{
-    <script>
-        $(function () {
-            if ($("#attList")) {
-                $.post("../Item/GetAttachments", { sysNo: "@item.item_no" }, function (data) {
-                    if (data.length > 0) {
-                        for (var i = 0; i < data.length; i++) {
-                            var shortName = data[i].fileName;
-                            if (shortName.length > 25) {
-                                var ext = shortName.substr(shortName.lastIndexOf("."));
-                                shortName = shortName.substr(0, 20) + ".." + ext;
-                            }
-                            $(attList).append('<li class="list-group-item">\
-                                    <a href="#" data-fd="' + data[i].fileName + '"><i class="fa fa-download"></i> ' + shortName + '(' + (data[i].fileSize / 1000).toFixed(1) + 'K)</a>\
-                                    </li>');
-                        }
-                    }
-                });
-            }
-
-            $("#attList").on("click", "a", function () {
-                var fileName = $(this).attr("data-fd");
-                var url = utils.GetDownloadRoute("@item.item_no") + fileName;
-                window.open(url);
-            });
-
-        });
-    </script>
-}
 
 @section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/viewer.css")" />
     <style type="text/css">
         .caption {
             text-align: center;
@@ -56,6 +28,61 @@
             float: right;
         }
     </style>
+}
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/viewer.js")"></script>
+    <script>
+        $(function () {
+            {
+                if ($(document).width() < 900) {
+                    $("img").css("width", "100%").css("height","auto");
+                }
+                $("img").viewer({
+                    title: false,
+                    toolbar: {
+                        zoomIn: 1,
+                        zoomOut: 1,
+                        oneToOne: 1,
+                        reset: 0,
+                        prev: 0,
+                        play: {
+                            show: 0,
+                        },
+                        next: 0,
+                        rotateLeft: 1,
+                        rotateRight: 1,
+                        flipHorizontal: 1,
+                        flipVertical: 1,
+                    }
+                });
+            }
+
+            if ($("#attList")) {
+                $.post("../Item/GetAttachments", { sysNo: "@item.item_no" }, function (data) {
+                    if (data.length > 0) {
+                        for (var i = 0; i < data.length; i++) {
+                            var shortName = data[i].fileName;
+                            if (shortName.length > 25) {
+                                var ext = shortName.substr(shortName.lastIndexOf("."));
+                                shortName = shortName.substr(0, 20) + ".." + ext;
+                            }
+                            $(attList).append('<li class="list-group-item">\
+                                    <a href="#" data-fd="' + data[i].fileName + '"><i class="fa fa-download"></i> ' + shortName + '('+(data[i].fileSize > 1000000 ? ((data[i].fileSize / 1000000).toFixed(1) + 'M') : ((data[i].fileSize / 1000).toFixed(1) + 'K')) + ')</a>\
+                                    </li>');
+                        }
+                    }
+                });
+            }
+
+            $("#attList").on("click", "a", function () {
+                var fileName = $(this).attr("data-fd");
+                var url = utils.GetDownloadRoute("@item.item_no") + fileName;
+                window.open(url);
+            });
+
+        });
+    </script>
 }
 
 <div class="panel panel-success">

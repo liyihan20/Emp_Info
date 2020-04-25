@@ -127,6 +127,12 @@
         <EntityTypeShape EntityType="ICAuditModel.kw_itemKey" Width="1.5" PointX="10" PointY="8.625" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.kw_items" Width="1.5" PointX="12.125" PointY="8.625" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.kw_updateLog" Width="1.5" PointX="12.125" PointY="8" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.bi_links" Width="1.5" PointX="10.375" PointY="10.875" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.bi_sql_params" Width="1.5" PointX="10.375" PointY="10.25" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.bi_sqls" Width="1.5" PointX="10.375" PointY="11.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_DEApply" Width="1.5" PointX="0.5" PointY="16.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_DENames" Width="1.5" PointX="4.25" PointY="16.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_DESubjects" Width="1.5" PointX="2.375" PointY="16.5" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

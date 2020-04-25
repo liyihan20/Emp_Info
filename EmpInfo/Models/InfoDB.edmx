@@ -14,6 +14,46 @@
           <Property Name="date_str" Type="varchar" MaxLength="10" />
           <Property Name="max_num" Type="int" />
         </EntityType>
+        <EntityType Name="bi_links">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_no" Type="varchar" MaxLength="50" />
+          <Property Name="user_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="link_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="server_name" Type="varchar" MaxLength="100" />
+          <Property Name="login_name" Type="varchar" MaxLength="100" />
+          <Property Name="login_password" Type="varchar" MaxLength="200" />
+          <Property Name="update_time" Type="datetime" Nullable="false" />
+          <Property Name="share_flag" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="bi_sql_params">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="param_id" Type="varchar" MaxLength="50" />
+          <Property Name="param_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="param_type" Type="varchar" MaxLength="50" />
+          <Property Name="value_min" Type="varchar" MaxLength="50" />
+          <Property Name="value_max" Type="varchar" MaxLength="50" />
+          <Property Name="value_default" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="bi_sqls">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="user_no" Type="varchar" MaxLength="50" />
+          <Property Name="user_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="sql_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="sql_text" Type="varchar(max)" />
+          <Property Name="update_time" Type="datetime" />
+          <Property Name="link_id" Type="int" />
+        </EntityType>
         <EntityType Name="dn_birthdayMealLog">
           <Key>
             <PropertyRef Name="id" />
@@ -373,6 +413,29 @@
           <Property Name="has_attachment" Type="bit" />
           <Property Name="is_direct_charge" Type="bit" />
         </EntityType>
+        <EntityType Name="ei_DEApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="bill_date" Type="datetime" />
+          <Property Name="catalog" Type="nvarchar" MaxLength="20" />
+          <Property Name="subject" Type="nvarchar" MaxLength="50" />
+          <Property Name="name" Type="nvarchar" MaxLength="100" />
+          <Property Name="summary" Type="nvarchar" MaxLength="500" />
+          <Property Name="unit_name" Type="nvarchar" MaxLength="20" />
+          <Property Name="qty" Type="decimal" Precision="12" Scale="4" />
+          <Property Name="unit_price" Type="decimal" Precision="12" Scale="4" />
+          <Property Name="total" Type="decimal" Precision="18" Scale="4" />
+          <Property Name="tax_rate" Type="decimal" Precision="6" Scale="2" />
+          <Property Name="total_with_tax" Type="decimal" Precision="18" Scale="4" />
+          <Property Name="comment" Type="nvarchar" MaxLength="500" />
+          <Property Name="supplier_name" Type="nvarchar" MaxLength="100" />
+          <Property Name="clear_date" Type="datetime" />
+        </EntityType>
         <EntityType Name="ei_deliveryInfo">
           <Key>
             <PropertyRef Name="id" />
@@ -390,6 +453,14 @@
           <Property Name="status" Type="varchar" MaxLength="50" />
           <Property Name="is_finish" Type="bit" />
           <Property Name="packs" Type="int" />
+        </EntityType>
+        <EntityType Name="ei_DENames">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="subject_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="name" Type="nvarchar" MaxLength="100" />
         </EntityType>
         <EntityType Name="ei_department">
           <Key>
@@ -427,6 +498,14 @@
           <Property Name="FBeginTime" Type="smalldatetime" />
           <Property Name="FEndTime" Type="smalldatetime" />
           <Property Name="isDeleted" Type="bit" />
+        </EntityType>
+        <EntityType Name="ei_DESubjects">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" />
+          <Property Name="catalog_name" Type="nvarchar" MaxLength="20" />
         </EntityType>
         <EntityType Name="ei_dormRepair">
           <Key>
@@ -2393,6 +2472,9 @@
         </Function>
         <EntityContainer Name="ICAuditModelStoreContainer">
           <EntitySet Name="all_maxNum" EntityType="Self.all_maxNum" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="bi_links" EntityType="Self.bi_links" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="bi_sql_params" EntityType="Self.bi_sql_params" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="bi_sqls" EntityType="Self.bi_sqls" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="dn_birthdayMealLog" EntityType="Self.dn_birthdayMealLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="dn_desks" EntityType="Self.dn_desks" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="dn_discountInfo" EntityType="Self.dn_discountInfo" Schema="dbo" store:Type="Tables" />
@@ -2413,10 +2495,13 @@
           <EntitySet Name="ei_askLeave" EntityType="Self.ei_askLeave" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_authority" EntityType="Self.ei_authority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_CRApply" EntityType="Self.ei_CRApply" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_DEApply" EntityType="Self.ei_DEApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_deliveryInfo" EntityType="Self.ei_deliveryInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_DENames" EntityType="Self.ei_DENames" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_department" EntityType="Self.ei_department" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_departmentAuditNode" EntityType="Self.ei_departmentAuditNode" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_departmentAuditUser" EntityType="Self.ei_departmentAuditUser" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_DESubjects" EntityType="Self.ei_DESubjects" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_dormRepair" EntityType="Self.ei_dormRepair" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_emp_portrait" EntityType="Self.ei_emp_portrait" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_empLevel" EntityType="Self.ei_empLevel" Schema="dbo" store:Type="Tables" />
@@ -3465,6 +3550,12 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySet Name="kw_itemKey" EntityType="ICAuditModel.kw_itemKey" />
           <EntitySet Name="kw_items" EntityType="ICAuditModel.kw_items" />
           <EntitySet Name="kw_updateLog" EntityType="ICAuditModel.kw_updateLog" />
+          <EntitySet Name="bi_links" EntityType="ICAuditModel.bi_links" />
+          <EntitySet Name="bi_sql_params" EntityType="ICAuditModel.bi_sql_params" />
+          <EntitySet Name="bi_sqls" EntityType="ICAuditModel.bi_sqls" />
+          <EntitySet Name="ei_DEApply" EntityType="ICAuditModel.ei_DEApply" />
+          <EntitySet Name="ei_DENames" EntityType="ICAuditModel.ei_DENames" />
+          <EntitySet Name="ei_DESubjects" EntityType="ICAuditModel.ei_DESubjects" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -5944,6 +6035,85 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="update_time" Type="DateTime" Precision="3" />
           <Property Name="item_no" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
         </EntityType>
+        <EntityType Name="bi_links">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="user_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="link_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="server_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="login_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="login_password" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="update_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="share_flag" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="bi_sql_params">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="param_id" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="param_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="param_type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="value_min" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="value_max" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="value_default" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="bi_sqls">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="user_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="user_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="sql_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="sql_text" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="update_time" Type="DateTime" Precision="3" />
+          <Property Name="link_id" Type="Int32" />
+        </EntityType>
+        <EntityType Name="ei_DEApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="bill_date" Type="DateTime" Precision="3" />
+          <Property Name="catalog" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="subject" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="summary" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="unit_name" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="qty" Type="Decimal" Precision="12" Scale="4" />
+          <Property Name="unit_price" Type="Decimal" Precision="12" Scale="4" />
+          <Property Name="total" Type="Decimal" Precision="18" Scale="4" />
+          <Property Name="tax_rate" Type="Decimal" Precision="6" Scale="2" />
+          <Property Name="total_with_tax" Type="Decimal" Precision="18" Scale="4" />
+          <Property Name="comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="supplier_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="clear_date" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="ei_DENames">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="subject_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="ei_DESubjects">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="catalog_name" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -8279,6 +8449,91 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="item_no" ColumnName="item_no" />
                 <ScalarProperty Name="update_time" ColumnName="update_time" />
                 <ScalarProperty Name="update_user" ColumnName="update_user" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="bi_links">
+            <EntityTypeMapping TypeName="ICAuditModel.bi_links">
+              <MappingFragment StoreEntitySet="bi_links">
+                <ScalarProperty Name="share_flag" ColumnName="share_flag" />
+                <ScalarProperty Name="update_time" ColumnName="update_time" />
+                <ScalarProperty Name="login_password" ColumnName="login_password" />
+                <ScalarProperty Name="login_name" ColumnName="login_name" />
+                <ScalarProperty Name="server_name" ColumnName="server_name" />
+                <ScalarProperty Name="link_name" ColumnName="link_name" />
+                <ScalarProperty Name="user_name" ColumnName="user_name" />
+                <ScalarProperty Name="user_no" ColumnName="user_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="bi_sql_params">
+            <EntityTypeMapping TypeName="ICAuditModel.bi_sql_params">
+              <MappingFragment StoreEntitySet="bi_sql_params">
+                <ScalarProperty Name="value_default" ColumnName="value_default" />
+                <ScalarProperty Name="value_max" ColumnName="value_max" />
+                <ScalarProperty Name="value_min" ColumnName="value_min" />
+                <ScalarProperty Name="param_type" ColumnName="param_type" />
+                <ScalarProperty Name="param_name" ColumnName="param_name" />
+                <ScalarProperty Name="param_id" ColumnName="param_id" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="bi_sqls">
+            <EntityTypeMapping TypeName="ICAuditModel.bi_sqls">
+              <MappingFragment StoreEntitySet="bi_sqls">
+                <ScalarProperty Name="link_id" ColumnName="link_id" />
+                <ScalarProperty Name="update_time" ColumnName="update_time" />
+                <ScalarProperty Name="sql_text" ColumnName="sql_text" />
+                <ScalarProperty Name="sql_name" ColumnName="sql_name" />
+                <ScalarProperty Name="user_name" ColumnName="user_name" />
+                <ScalarProperty Name="user_no" ColumnName="user_no" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_DEApply">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_DEApply">
+              <MappingFragment StoreEntitySet="ei_DEApply">
+                <ScalarProperty Name="clear_date" ColumnName="clear_date" />
+                <ScalarProperty Name="supplier_name" ColumnName="supplier_name" />
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="total_with_tax" ColumnName="total_with_tax" />
+                <ScalarProperty Name="tax_rate" ColumnName="tax_rate" />
+                <ScalarProperty Name="total" ColumnName="total" />
+                <ScalarProperty Name="unit_price" ColumnName="unit_price" />
+                <ScalarProperty Name="qty" ColumnName="qty" />
+                <ScalarProperty Name="unit_name" ColumnName="unit_name" />
+                <ScalarProperty Name="summary" ColumnName="summary" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="subject" ColumnName="subject" />
+                <ScalarProperty Name="catalog" ColumnName="catalog" />
+                <ScalarProperty Name="bill_date" ColumnName="bill_date" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_DENames">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_DENames">
+              <MappingFragment StoreEntitySet="ei_DENames">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="subject_name" ColumnName="subject_name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_DESubjects">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_DESubjects">
+              <MappingFragment StoreEntitySet="ei_DESubjects">
+                <ScalarProperty Name="catalog_name" ColumnName="catalog_name" />
+                <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

@@ -2426,6 +2426,91 @@ namespace EmpInfo.Controllers
 
         #endregion
 
+        #region 后勤工程支出
+
+        public void ExportDEExcel(string sysNo)
+        {
+            var d = db.ei_DEApply.Where(e => e.sys_no == sysNo).FirstOrDefault();
+            if (d == null) return;
+
+            string[] colName = new string[] { "单号","类别", "项目", "名称", "摘要", "单位","数量", "供应商", "单价","金额", "税率", "价税合计", "备注" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 12;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "后勤工程支出_" + sysNo;
+            Worksheet sheet = xls.Workbook.Worksheets.Add("电脑维修申请详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 20 * 20;
+            boldXF.Font.FontName = "宋体";
+            //boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            cells.Merge(1, 1, 1, 13);
+            cells.Add(rowIndex, colIndex, "后勤部项目申请表",boldXF);
+
+            cells.Add(++rowIndex, 2, "日期：");
+            cells.Add(rowIndex, 3, ((DateTime)d.bill_date).ToString("yyyy-MM-dd"));
+
+            rowIndex++;
+            //设置列名
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name);
+            }
+
+            
+            colIndex = 1;
+
+            //"单号","类别", "项目", "名称", "摘要", "单位","数量", "供应商", "单价","金额", "税率", "价税合计", "备注"
+            cells.Add(++rowIndex, colIndex, d.sys_no);
+            cells.Add(rowIndex, ++colIndex, d.catalog);
+            cells.Add(rowIndex, ++colIndex, d.subject);
+            cells.Add(rowIndex, ++colIndex, d.name);
+            cells.Add(rowIndex, ++colIndex, d.summary);
+            cells.Add(rowIndex, ++colIndex, d.unit_name);
+            cells.Add(rowIndex, ++colIndex, d.qty);
+            cells.Add(rowIndex, ++colIndex, d.supplier_name);
+            cells.Add(rowIndex, ++colIndex, d.unit_price);
+            cells.Add(rowIndex, ++colIndex, d.total);
+            cells.Add(rowIndex, ++colIndex, d.tax_rate);
+            cells.Add(rowIndex, ++colIndex, d.total_with_tax);
+            cells.Add(rowIndex, ++colIndex, d.comment);
+
+            //签名
+            cells.Add(19, 2, "申请人：");
+            cells.Add(20, 2, "日期：");
+            cells.Add(19, 6, "审核：");
+            cells.Add(20, 6, "日期：");
+            cells.Add(19, 10, "审批人：");
+            cells.Add(20, 10, "日期：");
+
+            xls.Send();
+
+        }
+
+        #endregion
 
     }
 }

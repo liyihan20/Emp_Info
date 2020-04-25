@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using EmpInfo.Services;
 using Newtonsoft.Json;
+using EmpInfo.Util;
 
 namespace EmpInfo.Controllers
 {
@@ -375,5 +376,62 @@ namespace EmpInfo.Controllers
         }
 
         #endregion
+
+        #region 后勤工程费用支出
+
+        public ActionResult DENames()
+        {
+            ViewData["subjectsJson"] = JsonConvert.SerializeObject(db.ei_DESubjects.ToList());
+            return View();
+        }
+
+        public JsonResult GetDENames()
+        {
+            var result = from s in db.ei_DESubjects
+                         join n in db.ei_DENames on s.name equals n.subject_name
+                         select new
+                         {
+                             catalog_name = s.catalog_name,
+                             subject_name = n.subject_name,
+                             name = n.name,
+                             id = n.id
+                         };
+            return Json(result,JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult SaveDENames(string jsonStr)
+        {
+            try {
+                ei_DENames dname = JsonConvert.DeserializeObject<ei_DENames>(jsonStr);
+                if (dname.id == 0) {
+                    db.ei_DENames.Add(dname);
+                }
+                else {
+                    var existed = db.ei_DENames.Single(d => d.id == dname.id);
+                    MyUtils.CopyPropertyValue(dname, existed);
+                }
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+        public JsonResult RemoveDEName(int id)
+        {
+            try {
+                db.ei_DENames.Remove(db.ei_DENames.Single(d => d.id == id));
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+
+        #endregion
+
     }
 }

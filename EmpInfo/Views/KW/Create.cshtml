@@ -22,6 +22,7 @@
     <script src="@Url.Content("~/Content/textboxio/textboxio.js")"></script>
     <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
     <script src="@Url.Content("~/Scripts/myUploaderPro.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
     <script>
         $(function () {
             var config = {
@@ -46,8 +47,12 @@
 
             $(".selectUser").on("focus", function () {
                 var self = this;
-                openSelectUserDialog($(self).val(), 10, function (result) {
-                    $(self).val(result);
+                $.selectUsers({
+                    userLimit: 10,
+                    userHasSelected: $(self).val(),
+                    callback: function (result) {
+                        $(self).val(result);
+                    }
                 });
             });
 
@@ -141,6 +146,5 @@
 
 
 @section Modal {
-    @Html.Partial("_SelectUsers")
     @Html.Partial("_ConfirmDialog")
 }

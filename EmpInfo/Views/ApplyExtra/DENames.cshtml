@@ -1,0 +1,167 @@
+﻿@{
+    string subJson = ViewData["subjectsJson"] as string;
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+}
+@section Scripts{
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+
+    <script>
+        //类别（catalog_name）和项目（name）的数组
+        var subJson=@Html.Raw(subJson);
+
+        //将数组内的类别取出来并去重，放入下拉列表
+        (function(catalogs){
+            for(var i=0;i<catalogs.length;i++){
+                $("#catalog_name").append("<option value='"+catalogs[i]+"'>"+catalogs[i]+"</option>");
+            }
+        })(utils.unique(subJson.map(function(s){return s.catalog_name;})));
+
+        //选择类别时，带出此类别相关联的项目
+        $("#catalog_name").on("change",function(){
+            var c=$(this).val();
+            var subjects=subJson.filter(function(s){return s.catalog_name == c;}).map(function(s){return s.name;});
+            $("#subject_name").empty();
+            $("#subject_name").append("<option value=''>---- 下拉选择项目 ----</option>");
+            for(var i=0;i<subjects.length;i++){
+                $("#subject_name").append("<option value='"+subjects[i]+"'>"+subjects[i]+"</option>");
+            }
+        });
+
+        $("#tb1").bootstrapTable({
+            url: "GetDENames",
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 20,
+            pageList: [20, 50, 100, 200],
+            search: true,
+            clickToSelect: true,
+            columns: [
+                {
+                    radio: true
+                }, {
+                    field: "catalog_name",
+                    title: "类别"
+                }, {
+                    field: "subject_name",
+                    title: "项目"
+                }, {
+                    field: "name",
+                    title: "名称"
+                }
+            ]
+        });
+
+        $(function () {
+            $("#tb1AddBt").on("click", function () {
+                $("#tb1Modal .modal-title").html("增加项目名称");
+                utils.resetForm($("#tb1Form"));
+                //$("#tb1Form input[name='id']").val("0");
+                $("#tb1Modal").modal("show");
+            });
+
+            $("#tb1ModifyBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再查询");
+                    return;
+                }
+                $("#tb1Modal .modal-title").html("修改项目名称");
+                utils.loadObjData($("#tb1Form"), rows[0]);
+                $("#tb1Modal").modal("show");
+            });
+
+            $("#tb1RemoveBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                openConfirmDialog("确定要删除选中行吗？", function () {
+                    $.post("RemoveDEName", { id: rows[0].id }, function (data) {
+                        if (data.suc) {
+                            toastr.success("删除成功");
+                            $('#tb1').bootstrapTable('refresh');
+                        } else {
+                            toastr.error("删除失败：" + data.msg);
+                        }
+                    })
+                });
+            });
+
+            $("#saveTb1FormBt").on("click", function () {
+                var obj = utils.getFormObj($("#tb1Form"));
+                if (obj.subject_name == "" || obj.name == "") {
+                    toastr.error("缺少值");
+                    return;
+                }
+                $.post("SaveDENames", { jsonStr: JSON.stringify(obj) }, function (data) {
+                    if (data.suc) {
+                        $("#tb1Modal").modal("hide");
+                        toastr.success("保存成功");
+                        $('#tb1').bootstrapTable('refresh');
+                    } else {
+                        toastr.error("保存失败：" + data.msg);
+                    }
+                });
+            });
+        });
+
+    </script>
+
+}
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=DE")">后勤工程费用支出申请</a></li>
+            <li class="active">项目名称管理</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <br />
+        <div>
+            <button class="btn btn-success" id="tb1AddBt"><i class="fa fa-plus"></i> 增加</button>
+            <button class="btn btn-primary" id="tb1ModifyBt"><i class="fa fa-edit"></i> 修改</button>
+            <button class="btn btn-danger" id="tb1RemoveBt"><i class="fa fa-plus"></i> 删除</button>
+        </div>
+        <table id="tb1"></table>
+    </div>
+</div>
+
+@section Modal{
+    <div class="modal fade" id="tb1Modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="tb1Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="tb1Form">
+                        <input type="hidden" name="id" data-value="0" />
+                        <select class="form-control" name="catalog_name" id="catalog_name">
+                            <option value="">---- 下拉选择类别 ----</option>
+                        </select>
+                        <select class="form-control" name="subject_name" id="subject_name" style="margin-top:4px;">
+                            <option value="">---- 下拉选择项目 ----</option>
+                        </select>
+                        <input type="text" class="form-control" name="name" placeholder="在此处录入名称" style="margin-top:4px;" />
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-reply"></i> 取消</button>
+                    <button id="saveTb1FormBt" type="button" class="btn btn-success"><i class="fa fa-check"></i> 确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.Partial("_ConfirmDialog")
+}
+

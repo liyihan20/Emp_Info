@@ -118,8 +118,10 @@
                     toastr.error("请先选择一行后再查询");
                     return;
                 }
-                $("#tb1Modal .modal-title").html("修改审核人");                
-                rows[0].relate_value = rows[0].name + "(" + rows[0].relate_value + ")";
+                $("#tb1Modal .modal-title").html("修改审核人");
+                if (rows[0].relate_value.indexOf("(") < 0) {
+                    rows[0].relate_value = rows[0].name + "(" + rows[0].relate_value + ")";
+                }
                 utils.loadObjData($("#tb1Form"), rows[0]);
                 $("#tb1Modal").modal("show");
             });
@@ -138,7 +140,7 @@
                         } else {
                             toastr.error("删除失败：" + data.msg);
                         }
-                    })
+                    });
                 });
             });
 

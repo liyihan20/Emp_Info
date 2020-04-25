@@ -69,7 +69,7 @@
                         html+="<div class='text-danger row' style='margin-bottom:12px;'>";
                         tempResult = result.filter(function(r){return r.item_type==itemTypes[i];});
                         for(var j in tempResult){
-                            html+="<div class='col-xs-6'><input type='checkbox' name='item' id='"+i+'-'+j+"' data-fee='"+tempResult[j].item_fee+"' value='"+tempResult[j].item_name+"' /> <label for='"+i+'-'+j+"'>"+tempResult[j].item_name+"</label></div>";
+                            html+="<div class='col-xs-6'><input type='checkbox' name='item' id='"+i+'-'+j+"' data-fee='"+tempResult[j].item_fee+"' value='"+tempResult[j].item_name+"' /> <label style='display:inline;' for='"+i+'-'+j+"'>"+tempResult[j].item_name+"</label></div>";
                         }
                         html+="</div>";
                     }

@@ -7,6 +7,9 @@ using System.Web.Mvc;
 
 namespace EmpInfo.Controllers
 {
+    /// <summary>
+    /// 知识库模块，刚通知上线就夭折了，上级担心泄密
+    /// </summary>
     public class KWController : BaseController
     {
         /// <summary>
@@ -16,6 +19,11 @@ namespace EmpInfo.Controllers
         [SessionTimeOutFilter]
         public ActionResult Create()
         {
+            if (!isAdmin()) {
+                ViewBag.tip = "没有管理权限";
+                return View("Error");
+            }
+
             ViewData["item"] = new kw_items()
             {
                 item_no = GetNextSysNum("KW")
@@ -24,28 +32,33 @@ namespace EmpInfo.Controllers
             return View();
         }
 
-        /// <summary>
-        /// 修改
-        /// </summary>
-        /// <param name="itemNo"></param>
-        /// <returns></returns>
-        [SessionTimeOutFilter]
-        public ActionResult Modify(string itemNo)
-        {
-            var item = db.kw_items.Where(k => k.item_no == itemNo).FirstOrDefault();
-            if (item == null) {
-                ViewBag.tip = "此文档不存在";
-                return View("Error");
-            }
-            if (!item.creater_no.Equals(userInfo.cardNo) && !(item.users_can_update ?? "").Contains(userInfo.cardNo)) {
-                ViewBag.tip = "你没有修改此文档的权限";
-                return View("Error");
-            }
-            ViewData["item"] = item;
-            ViewData["catalogs"] = db.kw_catalogs.Select(c => c.name).ToList();
+         //<summary>
+         //修改
+         //</summary>
+         //<param name="itemNo"></param>
+         //<returns></returns>
+        //[SessionTimeOutFilter]
+        //public ActionResult Modify(string itemNo)
+        //{
+        //    if (!isAdmin()) {
+        //        ViewBag.tip = "没有管理权限";
+        //        return View("Error");
+        //    }
 
-            return View("Create");
-        }
+        //    var item = db.kw_items.Where(k => k.item_no == itemNo).FirstOrDefault();
+        //    if (item == null) {
+        //        ViewBag.tip = "此文档不存在";
+        //        return View("Error");
+        //    }
+        //    if (!item.creater_no.Equals(userInfo.cardNo) && !(item.users_can_update ?? "").Contains(userInfo.cardNo)) {
+        //        ViewBag.tip = "你没有修改此文档的权限";
+        //        return View("Error");
+        //    }
+        //    ViewData["item"] = item;
+        //    ViewData["catalogs"] = db.kw_catalogs.Select(c => c.name).ToList();
+
+        //    return View("Create");
+        //}
 
         /// <summary>
         /// 保存
@@ -60,13 +73,18 @@ namespace EmpInfo.Controllers
                 kw_items item = new kw_items();
                 MyUtils.SetFieldValueToModel(fc, item);
 
-                bool needToGenerateKey = true; //是否需要重新生成关键字索引
+                bool needToGenerateKey = true; //是否需要重新生成关键字索引                
                 var existItem = db.kw_items.Where(k => k.item_no == item.item_no).FirstOrDefault();
                 if (existItem != null) {
                     if (existItem.item_keys.Equals(item.item_keys)) {
                         needToGenerateKey = false; //没有改动，不需要重新生成
                     }
-                    MyUtils.CopyPropertyValue(item, existItem);
+                    existItem.caption = item.caption;
+                    existItem.catalog = item.catalog;
+                    existItem.users_can_update = item.users_can_update;
+                    existItem.item_keys = item.item_keys;
+                    existItem.text_content = item.text_content;
+                    existItem.has_attachment = item.has_attachment;                    
                     existItem.last_update_time = DateTime.Now;
                 }
                 else {
@@ -87,11 +105,11 @@ namespace EmpInfo.Controllers
                 });
 
                 // 生成关键字
-                if (needToGenerateKey) {
+                if (needToGenerateKey && !string.IsNullOrWhiteSpace(item.item_keys)) {
                     var keys = item.item_keys.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     if (keys.Count() > 10) {
                         return Json(new SimpleResultModel(false, "关键字数量不能大于10个"));
-                    }                    
+                    }
                     foreach (var k in db.kw_itemKey.Where(i => i.item_no == item.item_no).ToList()) {
                         db.kw_itemKey.Remove(k);
                     }
@@ -123,28 +141,31 @@ namespace EmpInfo.Controllers
         /// </summary>
         /// <param name="itemNo"></param>
         /// <returns></returns>
-        public ActionResult Check(string itemNo)
-        {
-            var item = db.kw_items.Where(k => k.item_no == itemNo).FirstOrDefault();
-            if (item == null) {
-                ViewBag.tip = "此文档不存在";
-                return View("Error");
-            }
-            ViewData["item"] = item;
-            return View();
-        }
+        //[SessionTimeOutFilter]
+        //public ActionResult Check(string itemNo)
+        //{
+        //    var item = db.kw_items.Where(k => k.item_no == itemNo).FirstOrDefault();
+        //    if (item == null) {
+        //        ViewBag.tip = "此文档不存在";
+        //        return View("Error");
+        //    }
+        //    ViewData["item"] = item;
+        //    WriteEventLog("查看文档", item.item_no);
+        //    return View();
+        //}
 
         /// <summary>
         /// 搜索查询主界面
         /// </summary>
         /// <returns></returns>
-        public ActionResult KWIndex()
-        {
-            ViewData["catalogs"] = db.kw_catalogs.Select(k => k.name).ToList();
-            ViewData["isAdmin"] = db.ei_flowAuthority.Where(f => f.bill_type == "KW" && f.relate_type == "管理文档" && f.relate_value == userInfo.cardNo).Count() > 0;
+        //[SessionTimeOutFilter]
+        //public ActionResult KWIndex()
+        //{
+        //    ViewData["catalogs"] = db.kw_catalogs.Select(k => k.name).ToList();
+        //    ViewData["isAdmin"] = isAdmin();
 
-            return View();
-        }
+        //    return View();
+        //}
 
         /// <summary>
         /// 用户搜索
@@ -175,6 +196,7 @@ namespace EmpInfo.Controllers
                     from kw in db.kw_items
                     join ky in db.kw_itemKey on kw.item_no equals ky.item_no
                     where content.Contains(ky.item_key)
+                    && kw.open_flag == true
                     && (catalog == "所有" || kw.catalog == catalog)
                     select new KWSearchResultModels()
                     {
@@ -195,33 +217,33 @@ namespace EmpInfo.Controllers
         /// 我的列表
         /// </summary>
         /// <returns></returns>
-        [SessionTimeOutFilter]
-        public ActionResult MyList()
-        {
-            if (db.ei_flowAuthority.Where(f => f.bill_type == "KW" && f.relate_type == "管理文档" && f.relate_value == userInfo.cardNo).Count() < 1) {
-                ViewBag.tip = "没有管理权限";
-                return View("Error");
-            }
-            return View();
-        }
+        //[SessionTimeOutFilter]
+        //public ActionResult MyList()
+        //{
+        //    if (!isAdmin()) {
+        //        ViewBag.tip = "没有管理权限";
+        //        return View("Error");
+        //    }
+        //    return View();
+        //}
 
-        public JsonResult GetMyList()
-        {
-            var result = (db.kw_items.Where(k => k.creater_no == userInfo.cardNo || k.users_can_update.Contains("(" + userInfo.cardNo + ")"))
-                .Select(r => new KWSearchResultModels()
-            {
-                item_no = r.item_no,
-                caption = r.caption,
-                catalog = r.catalog,
-                creater_name = r.creater_name,
-                create_time = r.create_time,
-                last_update_time = r.last_update_time,
-                has_attachment = r.has_attachment,
-                open_flag = r.open_flag
-            }).OrderByDescending(r => r.last_update_time)).Distinct().ToList();
+        //public JsonResult GetMyList()
+        //{
+        //    var result = (db.kw_items.Where(k => k.creater_no == userInfo.cardNo || k.users_can_update.Contains("(" + userInfo.cardNo + ")"))
+        //        .Select(r => new KWSearchResultModels()
+        //    {
+        //        item_no = r.item_no,
+        //        caption = r.caption,
+        //        catalog = r.catalog,
+        //        creater_name = r.creater_name,
+        //        create_time = r.create_time,
+        //        last_update_time = r.last_update_time,
+        //        has_attachment = r.has_attachment,
+        //        open_flag = r.open_flag
+        //    }).OrderByDescending(r => r.last_update_time)).Distinct().ToList();
 
-            return Json(result, JsonRequestBehavior.AllowGet);
-        }
+        //    return Json(result, JsonRequestBehavior.AllowGet);
+        //}
 
         /// <summary>
         /// 删除
@@ -267,6 +289,23 @@ namespace EmpInfo.Controllers
             catch (Exception ex) {
                 return Json(new SimpleResultModel(ex));
             }
+        }
+
+        /// <summary>
+        /// 是否有管理权限
+        /// </summary>
+        /// <returns></returns>
+        public bool isAdmin()
+        {
+            bool isAdmin;
+            if (Session["isKWAdmin"] == null) {
+                isAdmin = db.ei_flowAuthority.Where(f => f.bill_type == "KW" && f.relate_type == "管理文档" && f.relate_value == userInfo.cardNo).Count() > 0;
+                Session["isKWAdmin"] = isAdmin;
+            }
+            else {
+                isAdmin = (bool)Session["isKWAdmin"];
+            }
+            return isAdmin;
         }
 
     }

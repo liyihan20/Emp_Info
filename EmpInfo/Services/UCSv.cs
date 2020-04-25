@@ -36,15 +36,14 @@ namespace EmpInfo.Services
             if (hour < 8 || hour >= 17 || (hour == 16 && minute > 45)) {
                 throw new Exception("非正常时间出货的申请时间必须在8时到16时45分之间，当前时间不能申请,有问题请联系物流总仓");
             }
-            if (DateTime.Now.ToString("yyyy-MM-dd") != "2019-09-29") {
-                if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday) {
-                    throw new Exception("非正常时间出货的申请不能在周日进行申请");
-                }
+            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday) {
+                throw new Exception("非正常时间出货的申请不能在周日进行申请");
             }
+            
             UCBeforeApplyModel m = new UCBeforeApplyModel();
             var list = db.flow_auditorRelation.Where(a => a.bill_type == BillType).ToList();
             m.marketList = list.Where(l => l.relate_name == "市场部总经理").Select(l => l.relate_text).Distinct().ToList();
-            m.busDepList = list.Where(l => l.relate_name == "事业部长").Select(l => l.relate_text).Distinct().ToList();
+            //m.busDepList = list.Where(l => l.relate_name == "事业部长").Select(l => l.relate_text).Distinct().ToList();
             m.accountingList = list.Where(l => l.relate_name == "会计部主管").Select(l => l.relate_text).Distinct().ToList();
 
             m.sysNum = GetNextSysNum(BillType, 2);
@@ -84,9 +83,9 @@ namespace EmpInfo.Services
                 throw new Exception("请选择出货公司！" );
             }
 
-            if (string.IsNullOrEmpty(bill.bus_dep)) {
-                throw new Exception("请选择生产事业部！" );
-            }
+            //if (string.IsNullOrEmpty(bill.bus_dep)) {
+            //    throw new Exception("请选择生产事业部！" );
+            //}
 
             if (string.IsNullOrEmpty(bill.delivery_company)) {
                 throw new Exception("请填写货运公司！" );

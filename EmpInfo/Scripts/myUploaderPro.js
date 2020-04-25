@@ -41,7 +41,7 @@
                 shortName = shortName.substr(0, 20) + ".." + ext;
             }
             $(fileListEle).append('<li class="list-group-item">\
-                                    <a href="#" data-fd="' + fileName + '"><i class="fa fa-download"></i> ' + shortName + '(' + (fileSize / 1000).toFixed(1) + 'K)</a>\
+                                    <a href="#" data-fd="' + fileName + '"><i class="fa fa-download"></i> ' + shortName + '(' + (fileSize > 1000000 ? ((fileSize / 1000000).toFixed(1) + 'M') : ((fileSize / 1000).toFixed(1) + 'K')) + ')</a>\
                                     <span class="text-danger" style="padding-left:16px;cursor:pointer;"><i class="fa fa-close" title="删除"></i> </span>\
                                     </li>');
         };

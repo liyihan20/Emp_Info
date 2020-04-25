@@ -105,11 +105,7 @@
                     field: "caption",
                     title: "标题",
                     formatter: function (value, row, index, field) {
-                        var text = value;
-                        if (row.has_attachment) {
-                            text = "<i class='fa fa-fw fa-paperclip'></i> " + value;
-                        }
-                        return text;
+                        return "<i class='fa fa-fw" + (row.has_attachment ? " fa-paperclip" : "") + "'></i> " + value;
                     }
                 }, {
                     field: "catalog",

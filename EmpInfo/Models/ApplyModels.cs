@@ -236,6 +236,21 @@ namespace EmpInfo.Models
         public string loginPassword { get; set; }
     }
 
+    public class DEBeforeApplyModel
+    {
+        public string sys_no { get; set; }
+        public string applier_name { get; set; }
+        public List<ei_DESubjects> subjects { get; set; }
+        public List<ei_DENames> names { get; set; }
+    }
+
+    public class DEAuditOtherInfoModel
+    {
+        public string billJson { get; set; }
+        public List<ei_DESubjects> subjects { get; set; }
+        public List<ei_DENames> names { get; set; }
+    }
+
     //public class TIBeforeApplyModel
     //{
     //    public string sys_no { get; set; }

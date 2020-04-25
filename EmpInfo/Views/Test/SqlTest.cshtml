@@ -1,0 +1,98 @@
+﻿@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        #sqlPanel .col-xs-12 {
+            margin-bottom: 8px;
+        }
+
+        #sqlPanel .lb {
+            font-style: italic;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/export/bootstrap-table-export.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/tableExport.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+        $(function () {
+            $("#genBtn").on("click", function () {
+                $("#genBtn").button("loading");
+                $.ajax({
+                    type: 'post',
+                    url: 'SqlExec',
+                    data: $("#fm").serialize(),
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        $("#genBtn").button("reset");
+                        if (!data.suc) {
+                            toastr.error(data.msg);
+                            return;
+                        }
+                        $("#tbPanel").css("visibility", "visible");
+                        $('#tb').bootstrapTable('destroy');
+                        $("#tb").bootstrapTable({
+                            striped: true,
+                            mobileResponsive: true,
+                            pagination: true,
+                            pageSize: 50,
+                            pageList: [20, 50, 100],
+                            search: true,
+                            showExport: true,
+                            exportDataType: "all",
+                            exportTypes: ['txt', 'excel'],
+                            columns: JSON.parse(data.columns),
+                            data: JSON.parse(data.rows)
+                        });
+                        toastr.success("查询完成");
+                    }
+                });
+            });
+        });
+    </script>
+}
+<div class="panel panel-primary" id="sqlPanel">
+    <div class="panel-heading">
+        <div class="panel-title"><i class="fa fa-gear fa-fw"></i> 动态报表设置</div>
+    </div>
+    <div class="panel-body">
+        <form id="fm">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lb">服务器:</div>
+                    <input type="text" class="form-control" name="serverName" placeholder="输入服务器IP地址" value="192.168.100.205" />
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lb">数据库名:</div>
+                    <input type="text" class="form-control" name="dbName" placeholder="输入数据库名称" value="ICAudit" />
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lb">用户名:</div>
+                    <input type="text" class="form-control" name="dbLoginName" placeholder="输入数据库登录用户名" value="ICEmp" />
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lb">密码:</div>
+                    <input type="password" class="form-control" name="dbPassword" placeholder="输入数据库登录密码" value="ICEmp12345" />
+                </div>
+                <div class="col-xs-12">
+                    <div class="lb">SQL:</div>
+                    <textarea class="form-control" rows="12" name="sqlText" placeholder="这里写入正确的sql查询语句" spellcheck="false"></textarea>
+                </div>
+            </div>
+        </form>
+        <button type="button" class="btn btn-primary btn-block" id="genBtn" data-loading-text="正在处理..."><i class="fa fa-check"></i> 开始生成</button>
+    </div>
+</div>
+
+<div class="panel panel-default" id="tbPanel" style="visibility:hidden">
+    <div class="panel-heading">
+        <div class="panel-title"><i class="fa fa-table fa-fw"></i> 执行结果</div>
+    </div>
+    <div class="panel-body">
+        <table id="tb"></table>
+    </div>
+</div>

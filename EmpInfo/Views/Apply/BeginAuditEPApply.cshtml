@@ -43,15 +43,22 @@
             minuteStep: 5,
         });
 
-        $("#applyContent").load("CheckApply", { sysNo: "@bam.sysNum" }, function () {
+        $("#applyContent").load("CheckApply #topContainer", { sysNo: "@bam.sysNum" }, function () {
             $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> 设备故障报修详情");
             $("#waiting").remove();
             $(".auditContent").css("visibility", "visible");
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@bam.sysNum" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+            });
         });
 
         $("#other_repairers,#transfer_to_other").on("focus", function () {
             var self = this;
-            var maxSelectPeople = $(this).attr("data-pn");
+            var maxSelectPeople = $(self).attr("data-pn");
+
             $.selectUsers({
                 userLimit: maxSelectPeople,
                 userHasSelected: $(self).val(),
@@ -449,5 +456,6 @@
         </div>
     </div>
     @section Modal {
+        @Html.Partial("_MessageDialog")
         @Html.Partial("_ConfirmDialog")
     }
