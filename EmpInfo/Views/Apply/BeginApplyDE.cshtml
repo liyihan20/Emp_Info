@@ -3,6 +3,7 @@
     DEBeforeApplyModel m = ViewData["infoBeforeApply"] as DEBeforeApplyModel;
 }
 @section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <style type="text/css">
         .b-label {
@@ -26,10 +27,124 @@
         }
     </style>
 }
-@section Scripts {    
+@section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
-    <script>        
+
+    <script>
+        var items = [];
+        var idx = -1;
+        
+            $("#tb").bootstrapTable({
+                striped: true,
+                mobileResponsive: true,
+                pagination: false,
+                clickToSelect: true,
+                columns: [
+                {
+                    radio: true,
+                },
+                {
+                    field: "catalog",
+                    title: "类别",
+                },
+                {
+                    field: "subject",
+                    title: "项目",
+                },
+                {
+                    field: "name",
+                    title: "名称",
+                },
+                {
+                    field: "unit_name",
+                    title: "单位",
+                },
+                {
+                    field: "qty",
+                    title: "数量",
+                },
+                {
+                    field: "summary",
+                    title: "摘要",
+                }
+                ],
+                onDblClickRow: function (row, $element, field) {
+                    $("#editBt").trigger("click");
+                }
+            });
+        
+            $(function () {
+                $("#addBt").on("click", function () {
+                    utils.resetForm($("#itemFm"));
+
+                    $("#itemTitle").html("新增");
+                    $("#itemModal").modal("show");
+                    idx = -1;
+                });
+
+                $("#editBt").on("click", function () {
+                    var rows = $('#tb').bootstrapTable('getSelections');
+                    if (rows.length == 0) {
+                        toastr.error("请先选择一行后再修改");
+                        return;
+                    }
+                    $("#itemTitle").html("修改");
+                    utils.loadObjData($("#itemFm"), rows[0]);
+                    idx = rows[0].idx;
+                    $("#itemModal").modal("show");
+                });
+
+                $("#saveBt").on("click", function () {
+                    var result = utils.validateRequiredField($("#itemFm"));
+                    if (!result.suc) {
+                        toastr.error(result.msg);
+                        return;
+                    }
+                    var item = utils.getFormObj($("#itemFm"));
+
+                    if (!utils.testIsFloat(item.qty, 4)) {
+                        toastr.error("数量必须是数字，并且小数位数最多4位");
+                        return;
+                    }
+
+                    if (idx == -1) {
+                        item.idx = items.length;
+                        items.push(item);
+                    } else {
+                        var i;                        
+                        items.map(function (it, index) { if (it.idx == idx) { i = index; item.idx = it.idx; } });
+                        items[i] = item;
+                    }
+                    $('#tb').bootstrapTable('load', items);
+                    $("#itemModal").modal("hide");
+                });
+
+                $("#removeBt").on("click", function () {
+                    var rows = $('#tb').bootstrapTable('getSelections');
+                    if (rows.length == 0) {
+                        toastr.error("请先选择一行后再删除");
+                        return;
+                    }
+                    idx = rows[0].idx;
+                    openConfirmDialog("确定要删除选中的行吗？", function () {
+                        var i;
+                        items.map(function (it, index) { if (it.idx == idx) { i = index; } });
+                        items.splice(i, 1);
+                        $('#tb').bootstrapTable('load', items);
+                    });
+                });
+
+            });
+
+    </script>
+
+    <script>
+        var subjectSelect = $("#subject").clone();
+        var nameSelect = $("#name").clone();
+
         $(function () {
             $(".form_date").datetimepicker({
                 language: 'zh-CN',
@@ -40,56 +155,43 @@
                 minView: 2
             });
 
-            $("#catalog").on("change", function () {
-                $("#subject").val("");
+            $("#catalog").on("change", function () {                
                 var v = $(this).val();
-                $("#subject").find("option").each(function (i, e) {
-                    var cat = $(e).attr("data-cat");
-                    if (cat) {
-                        if (cat == v) {
-                            $(e).show();
-                        } else {
-                            $(e).hide();
-                        }
-                    }
-                });
-            });
-            
-            $("#subject").on("change", function () {
-                $("#name").val("");
-                var v = $(this).val();
-                $("#name").find("option").each(function (i, e) {
-                    var cat = $(e).attr("data-sub");
-                    if (cat) {
-                        if (cat == v) {
-                            $(e).show();
-                        } else {
-                            $(e).hide();
-                        }
-                    }
-                });
+                $("#subject").empty();
+                $("#subject").append(subjectSelect.find("option[data-cat='']").clone());
+                $("#subject").append(subjectSelect.find("option[data-cat='"+v+"']").clone());
+                $("#subject").val("");                                
             });
 
-            $("#apply_bt").on("click",function(){
-                var obj = utils.getFormObj($("#fm"));                
+            $("#subject").on("change", function () {
+                var v = $(this).val();
+                $("#name").empty();
+                $("#name").append(nameSelect.find("option[data-sub='']").clone());
+                $("#name").append(nameSelect.find("option[data-sub='" + v + "']").clone());
+                $("#name").val("");
+            });
+
+            $("#apply_bt").on("click", function () {
+                var obj = utils.getFormObj($("#fm"));
                 var result = utils.validateRequiredField($("#fm"));
                 if (!result.suc) {
                     toastr.error(result.msg);
                     return;
                 }
-                
-                if (!utils.testIsFloat(obj.qty, 4)) {
-                    toastr.error("数量必须是数字，并且小数位数最多4位");
+
+                if (items.length < 1) {
+                    toastr.error("至少必须录入一行信息才能提交");
                     return;
                 }
 
-                var jsonObj=JSON.stringify(obj).replace(/\&/g, "%26").replace(/\+/g, "%2b").replace(/\=/g, "%3d");
+                var headJson = JSON.stringify(obj).replace(/\&/g, "%26").replace(/\+/g, "%2b").replace(/\=/g, "%3d");
+                var itemJson = JSON.stringify(items).replace(/\&/g, "%26").replace(/\+/g, "%2b").replace(/\=/g, "%3d");
                 openConfirmDialog("确定要提交申请吗？", function () {
                     $("#apply_bt").button("loading");
                     $.ajax({
                         type: 'post',
                         url: 'SaveApply',
-                        data: "obj=" + jsonObj+"&sys_no="+obj.sys_no,
+                        data: "sys_no=" + obj.sys_no + "&head=" + headJson + "&entry=" + itemJson,
                         cache: false,
                         dataType: 'json',
                         success: function (data) {
@@ -101,7 +203,6 @@
                                 toastr.error("提交失败：" + data.msg);
                                 $("#apply_bt").button("reset");
                             }
-
                         }
                     });
                 });
@@ -157,86 +258,109 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                    <div class="b-div">
-                        <span class="b-label">
-                            类别:
-                        </span>
-                        <div class="b-input">
-                            <select class="form-control" name="catalog" id="catalog" required>
-                                <option value="">---- 下拉选择类别 ----</option>
-                                @foreach (var d in m.subjects.Select(s=>s.catalog_name).Distinct()) {
-                                <option value="@d">@d</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                    <div class="b-div">
-                        <span class="b-label">
-                            项目:
-                        </span>
-                        <span class="b-input">
-                            <select class="form-control" name="subject" id="subject" required>
-                                <option value="">---- 下拉选择项目 ----</option>
-                                @foreach (var d in m.subjects) {
-                                <option value="@d.name" data-cat="@d.catalog_name">@d.name</option>
-                                }
-                            </select>
-                        </span>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                    <div class="b-div">
-                        <span class="b-label">
-                            名称:
-                        </span>
-                        <span class="b-input">
-                            <select class="form-control" name="name" id="name" required>
-                                <option value="">---- 下拉选择名称 ----</option>
-                                @foreach (var d in m.names) {
-                                <option value="@d.name" data-sub="@d.subject_name">@d.name</option>
-                                }
-                            </select>
-                        </span>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                    <div class="b-div">
-                        <span class="b-label">
-                            单位:
-                        </span>
-                        <span class="b-input">
-                            <input type="text" class="form-control" name="unit_name" required />
-                        </span>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                    <div class="b-div">
-                        <span class="b-label">
-                            数量:
-                        </span>
-                        <span class="b-input">
-                            <input type="text" class="form-control" name="qty" required />
-                        </span>
-                    </div>
-                </div>                
-            </div>            
+                </div>        
+            </div>        
             <div class="b-div">
-                <span class="b-label" style="vertical-align:top;">
-                    摘要:
+                <span class="b-label">
+                    操作按钮:
                 </span>
                 <span class="b-input">
-                    <textarea type="text" class="form-control" rows="3" name="summary" placeholder="填写具体位置等信息" required></textarea>
+                    <button class="btn btn-success btn-sm" type="button" id="addBt"> <i class="fa fa-plus"></i> 新增</button>
+                    <button class="btn btn-primary btn-sm" type="button" id="editBt" title="双击数据行也可修改"> <i class="fa fa-edit"></i> 修改</button>
+                    <button class="btn btn-danger btn-sm" type="button" id="removeBt"> <i class="fa fa-remove"></i> 删除</button>
                 </span>
             </div>
-            <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:4px;"><i class="fa fa-check-circle-o"></i> 提交申请</button>
+            <table data-toggle="table" id="tb"></table>
+            <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:24px;"><i class="fa fa-check-circle-o"></i> 提交申请</button>
         </form>
     </div>
 </div>
 
 @section Modal {
     @Html.Partial("_ConfirmDialog")
+
+    <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="itemTitle"></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="itemFm">
+                        <div class="row">
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon">类别:</div>
+                                        <select class="form-control" name="catalog" id="catalog" required>
+                                            <option value="">---- 下拉选择类别 ----</option>
+                                            @foreach (var d in m.subjects.Select(s => s.catalog_name).Distinct()) {
+                                                <option value="@d">@d</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon">项目:</div>
+                                        <select class="form-control" name="subject" id="subject" required>
+                                            <option value="" data-cat="">---- 下拉选择项目 ----</option>
+                                            @foreach (var d in m.subjects) {
+                                                <option value="@d.name" data-cat="@d.catalog_name">@d.name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon">名称:</div>
+                                        <select class="form-control" name="name" id="name" required>
+                                            <option value="" data-sub="">---- 下拉选择名称 ----</option>
+                                            @foreach (var d in m.names) {
+                                                <option value="@d.name" data-sub="@d.subject_name">@d.name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon">单位:</div>
+                                        <input type="text" class="form-control" name="unit_name" required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon">数量:</div>
+                                        <input type="text" class="form-control" name="qty" required />
+                                    </div>
+                                </div>
+                            </div>                            
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">                                
+                                    <div class="input-group">
+                                        <div class="input-group-addon">摘要:</div>
+                                        <input type="text" class="form-control" name="summary" required />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 取消</button>
+                    <button type="button" class="btn btn-success" id="saveBt"><span class="fa fa-check-circle"></span> 确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 }

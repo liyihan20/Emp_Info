@@ -247,6 +247,7 @@ namespace EmpInfo.Models
     public class DEAuditOtherInfoModel
     {
         public string billJson { get; set; }
+        public string entryJson { get; set; }
         public List<ei_DESubjects> subjects { get; set; }
         public List<ei_DENames> names { get; set; }
     }

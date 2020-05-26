@@ -43,7 +43,7 @@ namespace EmpInfo.Services
             UCBeforeApplyModel m = new UCBeforeApplyModel();
             var list = db.flow_auditorRelation.Where(a => a.bill_type == BillType).ToList();
             m.marketList = list.Where(l => l.relate_name == "市场部总经理").Select(l => l.relate_text).Distinct().ToList();
-            //m.busDepList = list.Where(l => l.relate_name == "事业部长").Select(l => l.relate_text).Distinct().ToList();
+            m.busDepList = list.Where(l => l.relate_name == "事业部长").Select(l => l.relate_text).Distinct().ToList();
             m.accountingList = list.Where(l => l.relate_name == "会计部主管").Select(l => l.relate_text).Distinct().ToList();
 
             m.sysNum = GetNextSysNum(BillType, 2);
@@ -83,9 +83,9 @@ namespace EmpInfo.Services
                 throw new Exception("请选择出货公司！" );
             }
 
-            //if (string.IsNullOrEmpty(bill.bus_dep)) {
-            //    throw new Exception("请选择生产事业部！" );
-            //}
+            if (string.IsNullOrEmpty(bill.bus_dep)) {
+                throw new Exception("请选择生产事业部！");
+            }
 
             if (string.IsNullOrEmpty(bill.delivery_company)) {
                 throw new Exception("请填写货运公司！" );
@@ -100,7 +100,7 @@ namespace EmpInfo.Services
             }
 
             if (bill.arrive_time == null) {
-                throw new Exception("到达日期不合法" );
+                throw new Exception("到达日期不合法");
             }
 
             bill.applier_name = userInfo.name;
@@ -135,9 +135,8 @@ namespace EmpInfo.Services
         {
             UCCheckApplyModel m = new UCCheckApplyModel();
             m.uc = bill;
-            m.entrys = bill.ei_ucApplyEntry.ToList();            
+            m.entrys = bill.ei_ucApplyEntry.ToList();
             return m;
-            
         }
 
         public override SimpleResultModel HandleApply(System.Web.Mvc.FormCollection fc, UserInfo userInfo)

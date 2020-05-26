@@ -11,6 +11,8 @@ namespace EmpInfo.Controllers
 {
     public class WXController : BaseController
     {
+        #region 微信公众号接口
+
         private string redirectIndex = "http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}";
         private string wLoginUrl = "http://emp.truly.com.cn/Emp/WX/WLogin?openId=";
         private string wLogoutUrl = "http://emp.truly.com.cn/Emp/WX/WLogout?openId=";
@@ -309,7 +311,9 @@ namespace EmpInfo.Controllers
             return MyUtils.AESDecrypt(str);
         }
 
+        #endregion
 
+        #region 微信公众号js接口
         public ActionResult GetLocation()
         {
             WxSv sv = new WxSv();
@@ -329,8 +333,6 @@ namespace EmpInfo.Controllers
 
             return View();
         }
-
-        #region js接口
 
         public ActionResult JsInterface(string actionType, string debug = "false")
         {

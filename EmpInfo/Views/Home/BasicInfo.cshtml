@@ -1,0 +1,119 @@
+﻿@using EmpInfo.Models
+@{
+    ei_empInfo info = ViewData["info"] as ei_empInfo;
+}
+@section CSS{
+    <style type="text/css">
+        .must-fill {
+            color:red;
+            font-weight:bold;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+           
+    </style>
+}
+
+@section Scripts{
+    <script>
+        $(function () {
+            $("#submitBtn").on("click", function () {
+                var obj = utils.getFormObj($("#fm"));
+                var v = utils.validateRequiredField($("#fm"));
+                if (!v.suc) {
+                    toastr.error(v.msg);
+                    return;
+                }
+                
+                if (obj.phone.length < 11 || isNaN(obj.phone)) {
+                    toastr.error("手机号码长度必须为11位数字");
+                    return;
+                }
+
+                if (obj.email.indexOf("@@truly") < 0) {
+                    toastr.error("邮箱地址必须登记信利的邮箱，没有可不填");
+                    return;
+                }
+
+                $.post("SaveBasicInfo", { jsonStr: utils.StringifyAndParseCharacter(obj) }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+                
+
+            });
+        })
+    </script>
+    }
+
+<div class="panel panel-danger">
+        <div class="panel-heading">
+            <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                <li class="active">员工基础信息</li>
+            </ol>
+        </div>
+        <div class="panel-body">
+            <h4 class="text-danger"><i class="fa fa-info-circle"></i> 请完善以下个人基础信息：</h4>
+            <form id="fm">
+                <div class="row">
+                    <input type="hidden" name="id" value="@info.id" />
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">姓名:</span>
+                            <div class="b-input"><input type="text" class="form-control" name="name" value="@info.name" readonly /></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">厂牌:</span>
+                            <div class="b-input"><input type="text" class="form-control" name="card_number" value="@info.card_number" readonly /></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">手机号码<span class="must-fill">*</span>:</span>
+                            <div class="b-input"> <input type="text" class="form-control" name="phone" value="@info.phone" placeholder="请输入本人手机号码" required/></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">事业部:</span>
+                            <div class="b-input"><input type="text" class="form-control" name="bus_dep" value="@info.bus_dep" placeholder="事业部名称，职能部门不用填写" /></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">部门<span class="must-fill">*</span>:</span>
+                            <div class="b-input"><input type="text" class="form-control" name="department" value="@info.department" placeholder="部门名称" required /></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">工序:</span>
+                            <div class="b-input"><input type="text" class="form-control" name="line_name" value="@info.line_name" placeholder="具体工序名称" /></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">职位<span class="must-fill">*</span>:</span>
+                            <div class="b-input"><input type="text" class="form-control" name="position" value="@info.position" placeholder="请输入职位" /></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">邮箱地址:</span>
+                            <div class="b-input"><input type="text" class="form-control" name="email" value="@info.email" placeholder="信利邮箱地址，没有可不输入" /></div>
+                        </div>
+                    </div>
+                </div>                
+            </form>
+            <button class="form-control btn btn-danger btn-block" style="margin-top:12px;" id="submitBtn"><i class="fa fa-save"></i> 保存基础信息</button>
+        </div>
+    </div>

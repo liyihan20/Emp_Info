@@ -169,7 +169,7 @@ namespace EmpInfo.Services
 
             if (!isPass) {
                 //拒绝后，将表体的状态也设置为拒绝
-                foreach (var e in bill.ei_sjApplyEntry.Where(se=>se.is_agree==true).ToList()) {
+                foreach (var e in bill.ei_sjApplyEntry.Where(se => se.is_agree == true).ToList()) {
                     e.is_agree = false;
                     e.not_agree_name = userInfo.name;
                 }

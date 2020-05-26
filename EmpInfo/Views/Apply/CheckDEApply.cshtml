@@ -1,8 +1,13 @@
-﻿@using EmpInfo.Models;
+﻿@using EmpInfo.Models
+@using Newtonsoft.Json
 @{
     ei_DEApply m = ViewData["am"] as ei_DEApply;
+    JsonSerializerSettings js = new JsonSerializerSettings();
+    js.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+    string entryJson = JsonConvert.SerializeObject(m.ei_DEApplyEntry.ToList(), js);
 }
 @section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
     <style type="text/css">
         .b-label {
             display: inline-block;
@@ -22,6 +27,73 @@
     </style>
 }
 @section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+        $("#tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: false,
+            clickToSelect: true,
+            data:@Html.Raw(entryJson),
+            columns: [
+            {
+                field: "catalog",
+                title: "类别",
+            },
+            {
+                field: "subject",
+                title: "项目",
+            },
+            {
+                field: "name",
+                title: "名称",
+            },
+            {
+                field: "unit_name",
+                title: "单位",
+            },
+            {
+                field: "qty",
+                title: "数量",
+            },
+            {
+                field: "summary",
+                title: "摘要",
+            },
+            {
+                field: "supplier_name",
+                title: "供应商",
+            },
+            {
+                field: "unit_price",
+                title: "单价",
+            },
+            {
+                field: "total",
+                title: "金额",
+            },
+            {
+                field: "tax_rate",
+                title: "税率%",
+            },
+            {
+                field: "total_with_tax",
+                title: "价税合计",
+            },
+            {
+                field: "clear_date",
+                title: "结算日期",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(row.clear_date);
+                    }
+            },
+            {
+                field: "comment",
+                title: "备注",
+            }]
+        });
+    </script>
     <script>
         $(function () {
             $("#flowRecordBt").on("click", function () {
@@ -36,7 +108,6 @@
             });
 
         });
-
     </script>
 }
 
@@ -108,11 +179,11 @@
                         制单日期:
                     </span>
                     <span class="b-input">
-                        @(((DateTime)m.bill_date).ToString("yyyy-MM-dd HH:mm"))
+                        @(((DateTime)m.bill_date).ToString("yyyy-MM-dd"))
                     </span>
                 </div>
             </div>
-            <div class="col-md-4 col-sm-6 col-xs-12">
+            @*<div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="b-div">
                     <span class="b-label">
                         设备类别:
@@ -161,18 +232,21 @@
                         @m.qty
                     </span>
                 </div>
-            </div>
+            </div>*@
         </div>
-        <div class="b-div">
+        @*<div class="b-div">
             <span class="b-label" style="vertical-align:top;">
                 摘要:
             </span>
             <span class="b-input">
                 @m.summary
             </span>
-        </div>
+        </div>*@
 
-        @if (m.supplier_name != null) {
+        <div style="margin-top:12px;">申请明细信息：</div>
+        <table data-toggle="table" id="tb"></table>
+
+        @*@if (m.supplier_name != null) {
             <h4 style="border-bottom:1px solid #337ab7;font-style:italic;margin-top:24px;" class="text-primary">补充信息</h4>
             <div class="row">
                 <div class="col-md-4 col-sm-6 col-xs-12">
@@ -245,7 +319,7 @@
                 </span>
             </div>
 
-        }
+        }*@
 
 
     </div>

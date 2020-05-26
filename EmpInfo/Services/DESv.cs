@@ -56,16 +56,22 @@ namespace EmpInfo.Services
 
         public override void SaveApply(System.Web.Mvc.FormCollection fc, UserInfo userInfo)
         {
-            bill = JsonConvert.DeserializeObject<ei_DEApply>(fc.Get("obj"));
+            bill = JsonConvert.DeserializeObject<ei_DEApply>(fc.Get("head"));
+            var entrys = JsonConvert.DeserializeObject<List<ei_DEApplyEntry>>(fc.Get("entry"));
             bill.applier_num = userInfo.cardNo;
             bill.applier_name = userInfo.name;
-            bill.tax_rate = 9;
-
+            
             FlowSvrSoapClient client = new FlowSvrSoapClient();
-            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.subject, bill.name);
+            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, entrys.First().subject, entrys.First().name);
             if (result.suc) {
                 try {
                     db.ei_DEApply.Add(bill);
+                    foreach (var e in entrys) {
+                        e.tax_rate = 9;
+                        e.ei_DEApply = bill;
+                        db.ei_DEApplyEntry.Add(e);
+                    }
+
                     db.SaveChanges();
                 }
                 catch (Exception ex) {
@@ -99,8 +105,22 @@ namespace EmpInfo.Services
             bool isPass = bool.Parse(fc.Get("isPass"));
             bool isBack = bool.Parse(fc.Get("isBack"));
 
-            if (stepName.Contains("申请人") && isPass) {
-                MyUtils.SetFieldValueToModel(fc, bill);
+            if (stepName.Contains("申请人") && isPass) { 
+                var entrys = JsonConvert.DeserializeObject<List<ei_DEApplyEntry>>(fc.Get("entry"));
+                if (stepName.Contains("补充信息")) {
+                    foreach (var e in entrys) {
+                        if (e.unit_price == null && e.qty != 0) {
+                            throw new Exception("存在数量不为0且单价为空的行，不能继续提交");
+                        }
+                    }
+                }
+                foreach (var e in bill.ei_DEApplyEntry.ToList()) {
+                    db.ei_DEApplyEntry.Remove(e);
+                }
+                foreach (var e in entrys) {
+                    e.de_id = bill.id;
+                    db.ei_DEApplyEntry.Add(e);
+                }
             }
 
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
@@ -178,7 +198,7 @@ namespace EmpInfo.Services
                         result.stepName,
                         bill.applier_name,
                         ((DateTime)bill.bill_date).ToString("yyyy-MM-dd"),
-                        string.Format("{0}:{1}", bill.subject,bill.name),
+                        string.Format("{0}:{1}", bill.ei_DEApplyEntry.First().subject, bill.ei_DEApplyEntry.First().name),
                         db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
                         );
                 }
@@ -187,19 +207,28 @@ namespace EmpInfo.Services
 
         public object GetBeginAuditOtherInfo(string sysNo, int step)
         {
+            JsonSerializerSettings js = new JsonSerializerSettings();
+            js.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+
             var info = new DEAuditOtherInfoModel();
             bill = db.ei_DEApply.Where(d => d.sys_no == sysNo).FirstOrDefault();
             if (bill == null) {
                 return null;
             }
-            if (bill.clear_date == null) {
-                bill.clear_date = DateTime.Now;
-            }
-            info.billJson = JsonConvert.SerializeObject(bill);
+            info.billJson = JsonConvert.SerializeObject(bill,js);
             info.subjects = db.ei_DESubjects.ToList();
             info.names = db.ei_DENames.ToList();
-            
+
+            info.entryJson = JsonConvert.SerializeObject(bill.ei_DEApplyEntry.ToList(), js);
+
             return info;
         }
+
+        public override bool CanAccessApply(UserInfo userInfo)
+        {
+            return db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "申请人员" && f.relate_value == userInfo.cardNo).Count() > 0;
+        }
+
+
     }
 }

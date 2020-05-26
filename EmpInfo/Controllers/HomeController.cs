@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using EmpInfo.Services;
+using Newtonsoft.Json;
 
 
 namespace EmpInfo.Controllers
@@ -572,6 +573,48 @@ namespace EmpInfo.Controllers
 
             WriteEventLog("个人公积金信息", "保存成功");
             return Json(new { suc = true, msg = "保存成功！" });
+        }
+
+        #endregion
+
+        #region 基础资料收集
+
+        [SessionTimeOutFilter]
+        public ActionResult BasicInfo()
+        {
+            var info = db.ei_empInfo.Where(e => e.card_number == userInfo.cardNo).FirstOrDefault();
+            if (info == null) {
+                info = new ei_empInfo()
+                {
+                    id = 0,
+                    card_number = userInfo.cardNo,
+                    name = userInfo.name
+                };
+            }
+            ViewData["info"] = info;
+            return View();
+        }
+
+        public JsonResult SaveBasicInfo(string jsonStr)
+        {
+            ei_empInfo info = JsonConvert.DeserializeObject<ei_empInfo>(jsonStr);
+            if (info.id == 0) {
+                db.ei_empInfo.Add(info);
+            }
+            else {
+                var existed = db.ei_empInfo.Where(e => e.id == info.id).FirstOrDefault();
+                if (existed == null) {
+                    return Json(new SimpleResultModel(false, "保存失败"));
+                }
+                MyUtils.CopyPropertyValue(info, existed);
+            }
+            try {
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true, "保存成功"));
         }
 
         #endregion

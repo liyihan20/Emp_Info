@@ -130,9 +130,11 @@ namespace EmpInfo.Models
         public DbSet<bi_links> bi_links { get; set; }
         public DbSet<bi_sql_params> bi_sql_params { get; set; }
         public DbSet<bi_sqls> bi_sqls { get; set; }
-        public DbSet<ei_DEApply> ei_DEApply { get; set; }
         public DbSet<ei_DENames> ei_DENames { get; set; }
         public DbSet<ei_DESubjects> ei_DESubjects { get; set; }
+        public DbSet<ei_DEApplyEntry> ei_DEApplyEntry { get; set; }
+        public DbSet<ei_DEApply> ei_DEApply { get; set; }
+        public DbSet<ei_empInfo> ei_empInfo { get; set; }
     
         public virtual ObjectResult<string> GetDormChargeMonth()
         {

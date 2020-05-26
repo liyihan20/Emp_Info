@@ -190,6 +190,15 @@ namespace EmpInfo.Services
                 if (stepName.Contains("部门负责人")) {
                     if (string.IsNullOrEmpty(bill.highest_charger_name)) return new SimpleResultModel() { suc = false, msg = "请选择部门最高审核人" };
                     if (string.IsNullOrEmpty(bill.highest_charger_num)) bill.highest_charger_num = GetUserCardByNameAndCardNum(bill.highest_charger_name);
+                    //部门负责人加入修改离职日期的表
+                    if (db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "修改离职日期" && f.relate_value == userInfo.cardNo).Count() < 1) {
+                        db.ei_flowAuthority.Add(new ei_flowAuthority()
+                        {
+                            bill_type = BillType,
+                            relate_type = "修改离职日期",
+                            relate_value = userInfo.cardNo
+                        });
+                    }
                 }
             }
 
@@ -232,7 +241,7 @@ namespace EmpInfo.Services
         public void UpdateLeaveDay(DateTime newDay,string notifyUsers,string cardNumber) {
             string adminNumber = ConfigurationManager.AppSettings["adminNumber"];
             if (!adminNumber.Equals(cardNumber)) {
-                if (bill.charger_num != null && !bill.charger_num.Contains(cardNumber)) {
+                if ((bill.charger_num != null && !bill.charger_num.Contains(cardNumber)) || (bill.dep_charger_num != null && !bill.dep_charger_num.Contains(cardNumber))) {
                     throw new Exception("你没有修改此离职单日期的权限");
                 }
             }

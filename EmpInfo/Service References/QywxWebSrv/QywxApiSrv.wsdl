@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://ic.truly.com.cn/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://ic.truly.com.cn/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://ic.truly.com.cn/">
+      <s:element name="GetAccessToken">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="secret" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAccessTokenResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetAccessTokenResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserIdByOpenId">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="openId" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserIdByOpenIdResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetUserIdByOpenIdResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetOpenIdByUserId">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userId" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetOpenIdByUserIdResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetOpenIdByUserIdResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetOAthLink">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="redirectUrl" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetOAthLinkResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetOAthLinkResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWebLink">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="agentId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="redirectUrl" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="state" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWebLinkResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetWebLinkResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserIdFromCode">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="secret" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="code" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserIdFromCodeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetUserIdFromCodeResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetAccessTokenSoapIn">
+    <wsdl:part name="parameters" element="tns:GetAccessToken" />
+  </wsdl:message>
+  <wsdl:message name="GetAccessTokenSoapOut">
+    <wsdl:part name="parameters" element="tns:GetAccessTokenResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetUserIdByOpenIdSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserIdByOpenId" />
+  </wsdl:message>
+  <wsdl:message name="GetUserIdByOpenIdSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserIdByOpenIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetOpenIdByUserIdSoapIn">
+    <wsdl:part name="parameters" element="tns:GetOpenIdByUserId" />
+  </wsdl:message>
+  <wsdl:message name="GetOpenIdByUserIdSoapOut">
+    <wsdl:part name="parameters" element="tns:GetOpenIdByUserIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetOAthLinkSoapIn">
+    <wsdl:part name="parameters" element="tns:GetOAthLink" />
+  </wsdl:message>
+  <wsdl:message name="GetOAthLinkSoapOut">
+    <wsdl:part name="parameters" element="tns:GetOAthLinkResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetWebLinkSoapIn">
+    <wsdl:part name="parameters" element="tns:GetWebLink" />
+  </wsdl:message>
+  <wsdl:message name="GetWebLinkSoapOut">
+    <wsdl:part name="parameters" element="tns:GetWebLinkResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetUserIdFromCodeSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserIdFromCode" />
+  </wsdl:message>
+  <wsdl:message name="GetUserIdFromCodeSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserIdFromCodeResponse" />
+  </wsdl:message>
+  <wsdl:portType name="QywxApiSrvSoap">
+    <wsdl:operation name="GetAccessToken">
+      <wsdl:input message="tns:GetAccessTokenSoapIn" />
+      <wsdl:output message="tns:GetAccessTokenSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserIdByOpenId">
+      <wsdl:input message="tns:GetUserIdByOpenIdSoapIn" />
+      <wsdl:output message="tns:GetUserIdByOpenIdSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetOpenIdByUserId">
+      <wsdl:input message="tns:GetOpenIdByUserIdSoapIn" />
+      <wsdl:output message="tns:GetOpenIdByUserIdSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetOAthLink">
+      <wsdl:input message="tns:GetOAthLinkSoapIn" />
+      <wsdl:output message="tns:GetOAthLinkSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWebLink">
+      <wsdl:input message="tns:GetWebLinkSoapIn" />
+      <wsdl:output message="tns:GetWebLinkSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserIdFromCode">
+      <wsdl:input message="tns:GetUserIdFromCodeSoapIn" />
+      <wsdl:output message="tns:GetUserIdFromCodeSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="QywxApiSrvSoap" type="tns:QywxApiSrvSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetAccessToken">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetAccessToken" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserIdByOpenId">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetUserIdByOpenId" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetOpenIdByUserId">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetOpenIdByUserId" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetOAthLink">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetOAthLink" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWebLink">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetWebLink" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserIdFromCode">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetUserIdFromCode" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="QywxApiSrvSoap12" type="tns:QywxApiSrvSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetAccessToken">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetAccessToken" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserIdByOpenId">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetUserIdByOpenId" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetOpenIdByUserId">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetOpenIdByUserId" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetOAthLink">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetOAthLink" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWebLink">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetWebLink" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserIdFromCode">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetUserIdFromCode" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="QywxApiSrv">
+    <wsdl:port name="QywxApiSrvSoap" binding="tns:QywxApiSrvSoap">
+      <soap:address location="http://192.168.90.100/QywxWebService/QywxApiSrv.asmx" />
+    </wsdl:port>
+    <wsdl:port name="QywxApiSrvSoap12" binding="tns:QywxApiSrvSoap12">
+      <soap12:address location="http://192.168.90.100/QywxWebService/QywxApiSrv.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

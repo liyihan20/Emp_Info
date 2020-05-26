@@ -128,6 +128,11 @@
                     return;
                 }
 
+                if(!utils.testIsInt(obj.qty)){
+                    toastr.error("数量请填写数字");
+                    return;
+                }
+
                 obj.faulty_items = JSON.stringify(selectedItems);
                 obj.estimate_it_fee = utils.CalArrSum(selectedItems,"v");
 
@@ -247,6 +252,16 @@
                                 }
                             </select>
                         </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            数量:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="qty" placeholder="需要申请或修理的设备数量" value="1" />
+                        </span>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-6 col-xs-12">

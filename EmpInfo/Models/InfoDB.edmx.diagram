@@ -130,9 +130,12 @@
         <EntityTypeShape EntityType="ICAuditModel.bi_links" Width="1.5" PointX="10.375" PointY="10.875" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.bi_sql_params" Width="1.5" PointX="10.375" PointY="10.25" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.bi_sqls" Width="1.5" PointX="10.375" PointY="11.5" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_DEApply" Width="1.5" PointX="0.5" PointY="16.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_DENames" Width="1.5" PointX="4.25" PointY="16.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_DESubjects" Width="1.5" PointX="2.375" PointY="16.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_DEApplyEntry" Width="1.5" PointX="0.5" PointY="17.25" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_DEApply" Width="1.5" PointX="0.5" PointY="16.5" IsExpanded="false" />
+        <AssociationConnector Association="ICAuditModel.FK_ei_DEApplyEntry_ei_DEApply" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_empInfo" Width="1.5" PointX="10.375" PointY="12.125" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

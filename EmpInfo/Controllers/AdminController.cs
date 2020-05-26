@@ -18,7 +18,7 @@ namespace EmpInfo.Controllers
     {
         int pageNumber = 30;
         string[] speciaDepNodeName = new string[] { "AH审批", "行政审批" };
-        string[] speciaDepNumber = new string[] { "1","2","101", "106" };
+        string[] speciaDepNumber = new string[] { "1","2","101", "106", "4" };
         
         [AuthorityFilter]
         public ActionResult AdminIndex()

@@ -2430,8 +2430,29 @@ namespace EmpInfo.Controllers
 
         public void ExportDEExcel(string sysNo)
         {
-            var d = db.ei_DEApply.Where(e => e.sys_no == sysNo).FirstOrDefault();
-            if (d == null) return;
+            var ds = (from de in db.ei_DEApply
+                      join e in db.ei_DEApplyEntry on de.id equals e.de_id
+                      where de.sys_no == sysNo
+                      select new
+                      {
+                          de.sys_no,
+                          de.applier_name,
+                          de.bill_date,
+                          e.catalog,
+                          e.clear_date,
+                          e.comment,
+                          e.name,
+                          e.qty,
+                          e.subject,
+                          e.summary,
+                          e.supplier_name,
+                          e.tax_rate,
+                          e.total,
+                          e.total_with_tax,
+                          e.unit_name,
+                          e.unit_price
+                      }).ToList();
+            if (ds.Count() == 0) return;
 
             string[] colName = new string[] { "单号","类别", "项目", "名称", "摘要", "单位","数量", "供应商", "单价","金额", "税率", "价税合计", "备注" };
             ushort[] colWidth = new ushort[colName.Length];
@@ -2443,7 +2464,7 @@ namespace EmpInfo.Controllers
             //設置excel文件名和sheet名
             XlsDocument xls = new XlsDocument();
             xls.FileName = "后勤工程支出_" + sysNo;
-            Worksheet sheet = xls.Workbook.Worksheets.Add("电脑维修申请详情");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("申请详情");
 
             //设置各种样式
 
@@ -2472,7 +2493,7 @@ namespace EmpInfo.Controllers
             cells.Add(rowIndex, colIndex, "后勤部项目申请表",boldXF);
 
             cells.Add(++rowIndex, 2, "日期：");
-            cells.Add(rowIndex, 3, ((DateTime)d.bill_date).ToString("yyyy-MM-dd"));
+            cells.Add(rowIndex, 3, ((DateTime)ds.First().bill_date).ToString("yyyy-MM-dd"));
 
             rowIndex++;
             //设置列名
@@ -2480,31 +2501,34 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, colIndex++, name);
             }
 
-            
-            colIndex = 1;
+            foreach (var d in ds) {
+                colIndex = 1;
 
-            //"单号","类别", "项目", "名称", "摘要", "单位","数量", "供应商", "单价","金额", "税率", "价税合计", "备注"
-            cells.Add(++rowIndex, colIndex, d.sys_no);
-            cells.Add(rowIndex, ++colIndex, d.catalog);
-            cells.Add(rowIndex, ++colIndex, d.subject);
-            cells.Add(rowIndex, ++colIndex, d.name);
-            cells.Add(rowIndex, ++colIndex, d.summary);
-            cells.Add(rowIndex, ++colIndex, d.unit_name);
-            cells.Add(rowIndex, ++colIndex, d.qty);
-            cells.Add(rowIndex, ++colIndex, d.supplier_name);
-            cells.Add(rowIndex, ++colIndex, d.unit_price);
-            cells.Add(rowIndex, ++colIndex, d.total);
-            cells.Add(rowIndex, ++colIndex, d.tax_rate);
-            cells.Add(rowIndex, ++colIndex, d.total_with_tax);
-            cells.Add(rowIndex, ++colIndex, d.comment);
+                //"单号","类别", "项目", "名称", "摘要", "单位","数量", "供应商", "单价","金额", "税率", "价税合计", "备注"
+                cells.Add(++rowIndex, colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.catalog);
+                cells.Add(rowIndex, ++colIndex, d.subject);
+                cells.Add(rowIndex, ++colIndex, d.name);
+                cells.Add(rowIndex, ++colIndex, d.summary);
+                cells.Add(rowIndex, ++colIndex, d.unit_name);
+                cells.Add(rowIndex, ++colIndex, d.qty);
+                cells.Add(rowIndex, ++colIndex, d.supplier_name);
+                cells.Add(rowIndex, ++colIndex, d.unit_price);
+                cells.Add(rowIndex, ++colIndex, d.total);
+                cells.Add(rowIndex, ++colIndex, d.tax_rate);
+                cells.Add(rowIndex, ++colIndex, d.total_with_tax);
+                cells.Add(rowIndex, ++colIndex, d.comment);
+            }
+
+            rowIndex += 3;
 
             //签名
-            cells.Add(19, 2, "申请人：");
-            cells.Add(20, 2, "日期：");
-            cells.Add(19, 6, "审核：");
-            cells.Add(20, 6, "日期：");
-            cells.Add(19, 10, "审批人：");
-            cells.Add(20, 10, "日期：");
+            cells.Add(rowIndex, 2, "申请人：");
+            cells.Add(rowIndex, 6, "审核：");
+            cells.Add(rowIndex, 10, "审批人：");
+            cells.Add(++rowIndex, 2, "日期：");
+            cells.Add(rowIndex, 6, "日期：");
+            cells.Add(rowIndex, 10, "日期：");
 
             xls.Send();
 

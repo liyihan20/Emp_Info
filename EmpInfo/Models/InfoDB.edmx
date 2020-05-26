@@ -422,6 +422,13 @@
           <Property Name="applier_num" Type="varchar" MaxLength="50" />
           <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
           <Property Name="bill_date" Type="datetime" />
+        </EntityType>
+        <EntityType Name="ei_DEApplyEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="de_id" Type="int" Nullable="false" />
           <Property Name="catalog" Type="nvarchar" MaxLength="20" />
           <Property Name="subject" Type="nvarchar" MaxLength="50" />
           <Property Name="name" Type="nvarchar" MaxLength="100" />
@@ -547,6 +554,20 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="card_number" Type="varchar" MaxLength="50" />
           <Property Name="zp" Type="image" />
+        </EntityType>
+        <EntityType Name="ei_empInfo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="card_number" Type="varchar" MaxLength="50" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" />
+          <Property Name="phone" Type="varchar" MaxLength="50" />
+          <Property Name="bus_dep" Type="nvarchar" MaxLength="50" />
+          <Property Name="department" Type="nvarchar" MaxLength="50" />
+          <Property Name="line_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="position" Type="nvarchar" MaxLength="50" />
+          <Property Name="email" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ei_empLevel">
           <Key>
@@ -845,6 +866,7 @@
           <Property Name="fetcher_phone" Type="varchar" MaxLength="50" />
           <Property Name="fetch_time" Type="datetime" />
           <Property Name="equitment_type" Type="nvarchar" MaxLength="20" />
+          <Property Name="qty" Type="int" />
         </EntityType>
         <EntityType Name="ei_itItems">
           <Key>
@@ -1233,6 +1255,8 @@
           <Property Name="wx_push_consume_info" Type="bit" />
           <Property Name="wx_push_flow_info" Type="bit" />
           <Property Name="wx_check_salary_info" Type="bit" />
+          <Property Name="has_company_wx" Type="bit" />
+          <Property Name="need_wx_clock" Type="bit" />
         </EntityType>
         <EntityType Name="ei_users_android">
           <Key>
@@ -2141,6 +2165,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ei_DEApplyEntry_ei_DEApply">
+          <End Role="ei_DEApply" Type="Self.ei_DEApply" Multiplicity="1" />
+          <End Role="ei_DEApplyEntry" Type="Self.ei_DEApplyEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_DEApply">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_DEApplyEntry">
+              <PropertyRef Name="de_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ei_deliveryInfo_ei_users">
           <End Role="ei_users" Type="Self.ei_users" Multiplicity="0..1" />
           <End Role="ei_deliveryInfo" Type="Self.ei_deliveryInfo" Multiplicity="*" />
@@ -2496,6 +2532,7 @@
           <EntitySet Name="ei_authority" EntityType="Self.ei_authority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_CRApply" EntityType="Self.ei_CRApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_DEApply" EntityType="Self.ei_DEApply" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_DEApplyEntry" EntityType="Self.ei_DEApplyEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_deliveryInfo" EntityType="Self.ei_deliveryInfo" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_DENames" EntityType="Self.ei_DENames" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_department" EntityType="Self.ei_department" Schema="dbo" store:Type="Tables" />
@@ -2504,6 +2541,7 @@
           <EntitySet Name="ei_DESubjects" EntityType="Self.ei_DESubjects" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_dormRepair" EntityType="Self.ei_dormRepair" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_emp_portrait" EntityType="Self.ei_emp_portrait" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_empInfo" EntityType="Self.ei_empInfo" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_empLevel" EntityType="Self.ei_empLevel" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_epApply" EntityType="Self.ei_epApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_epBusReportChecker" EntityType="Self.ei_epBusReportChecker" Schema="dbo" store:Type="Tables" />
@@ -3148,6 +3186,10 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <End Role="ei_apApply" EntitySet="ei_apApply" />
             <End Role="ei_apApplyEntry" EntitySet="ei_apApplyEntry" />
           </AssociationSet>
+          <AssociationSet Name="FK_ei_DEApplyEntry_ei_DEApply" Association="Self.FK_ei_DEApplyEntry_ei_DEApply">
+            <End Role="ei_DEApply" EntitySet="ei_DEApply" />
+            <End Role="ei_DEApplyEntry" EntitySet="ei_DEApplyEntry" />
+          </AssociationSet>
           <AssociationSet Name="FK_ei_deliveryInfo_ei_users" Association="Self.FK_ei_deliveryInfo_ei_users">
             <End Role="ei_users" EntitySet="ei_users" />
             <End Role="ei_deliveryInfo" EntitySet="ei_deliveryInfo" />
@@ -3553,9 +3595,15 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySet Name="bi_links" EntityType="ICAuditModel.bi_links" />
           <EntitySet Name="bi_sql_params" EntityType="ICAuditModel.bi_sql_params" />
           <EntitySet Name="bi_sqls" EntityType="ICAuditModel.bi_sqls" />
-          <EntitySet Name="ei_DEApply" EntityType="ICAuditModel.ei_DEApply" />
           <EntitySet Name="ei_DENames" EntityType="ICAuditModel.ei_DENames" />
           <EntitySet Name="ei_DESubjects" EntityType="ICAuditModel.ei_DESubjects" />
+          <EntitySet Name="ei_DEApplyEntry" EntityType="ICAuditModel.ei_DEApplyEntry" />
+          <EntitySet Name="ei_DEApply" EntityType="ICAuditModel.ei_DEApply" />
+          <AssociationSet Name="FK_ei_DEApplyEntry_ei_DEApply" Association="ICAuditModel.FK_ei_DEApplyEntry_ei_DEApply">
+            <End Role="ei_DEApply" EntitySet="ei_DEApply" />
+            <End Role="ei_DEApplyEntry" EntitySet="ei_DEApplyEntry" />
+          </AssociationSet>
+          <EntitySet Name="ei_empInfo" EntityType="ICAuditModel.ei_empInfo" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -3590,6 +3638,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="wx_push_flow_info" Type="Boolean" />
           <Property Name="wx_check_salary_info" Type="Boolean" />
           <NavigationProperty Name="ei_epEqUsers" Relationship="ICAuditModel.FK_ei_epEqUsers_ei_users" FromRole="ei_users" ToRole="ei_epEqUsers" />
+          <Property Name="has_company_wx" Type="Boolean" />
+          <Property Name="need_wx_clock" Type="Boolean" />
         </EntityType>
         <EntityType Name="ei_event_log">
           <Key>
@@ -5900,6 +5950,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="fetcher_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="fetch_time" Type="DateTime" Precision="3" />
           <Property Name="equitment_type" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="qty" Type="Int32" />
         </EntityType>
         <EntityType Name="ei_itItems">
           <Key>
@@ -6075,29 +6126,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="update_time" Type="DateTime" Precision="3" />
           <Property Name="link_id" Type="Int32" />
         </EntityType>
-        <EntityType Name="ei_DEApply">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="bill_date" Type="DateTime" Precision="3" />
-          <Property Name="catalog" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
-          <Property Name="subject" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="summary" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="unit_name" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
-          <Property Name="qty" Type="Decimal" Precision="12" Scale="4" />
-          <Property Name="unit_price" Type="Decimal" Precision="12" Scale="4" />
-          <Property Name="total" Type="Decimal" Precision="18" Scale="4" />
-          <Property Name="tax_rate" Type="Decimal" Precision="6" Scale="2" />
-          <Property Name="total_with_tax" Type="Decimal" Precision="18" Scale="4" />
-          <Property Name="comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="supplier_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="clear_date" Type="DateTime" Precision="3" />
-        </EntityType>
         <EntityType Name="ei_DENames">
           <Key>
             <PropertyRef Name="id" />
@@ -6114,6 +6142,64 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="catalog_name" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
         </EntityType>
+        <EntityType Name="ei_DEApplyEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="de_id" Type="Int32" Nullable="false" />
+          <Property Name="catalog" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="subject" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="summary" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="unit_name" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="qty" Type="Decimal" Precision="12" Scale="4" />
+          <Property Name="unit_price" Type="Decimal" Precision="12" Scale="4" />
+          <Property Name="total" Type="Decimal" Precision="18" Scale="4" />
+          <Property Name="tax_rate" Type="Decimal" Precision="6" Scale="2" />
+          <Property Name="total_with_tax" Type="Decimal" Precision="18" Scale="4" />
+          <Property Name="comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="supplier_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="clear_date" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="ei_DEApply" Relationship="ICAuditModel.FK_ei_DEApplyEntry_ei_DEApply" FromRole="ei_DEApplyEntry" ToRole="ei_DEApply" />
+        </EntityType>
+        <EntityType Name="ei_DEApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="bill_date" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="ei_DEApplyEntry" Relationship="ICAuditModel.FK_ei_DEApplyEntry_ei_DEApply" FromRole="ei_DEApply" ToRole="ei_DEApplyEntry" />
+        </EntityType>
+        <Association Name="FK_ei_DEApplyEntry_ei_DEApply">
+          <End Type="ICAuditModel.ei_DEApply" Role="ei_DEApply" Multiplicity="1" />
+          <End Type="ICAuditModel.ei_DEApplyEntry" Role="ei_DEApplyEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_DEApply">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_DEApplyEntry">
+              <PropertyRef Name="de_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ei_empInfo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="card_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="bus_dep" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="department" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="line_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="position" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -6123,6 +6209,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_users">
             <EntityTypeMapping TypeName="ICAuditModel.ei_users">
               <MappingFragment StoreEntitySet="ei_users">
+                <ScalarProperty Name="need_wx_clock" ColumnName="need_wx_clock" />
+                <ScalarProperty Name="has_company_wx" ColumnName="has_company_wx" />
                 <ScalarProperty Name="wx_check_salary_info" ColumnName="wx_check_salary_info" />
                 <ScalarProperty Name="wx_push_flow_info" ColumnName="wx_push_flow_info" />
                 <ScalarProperty Name="wx_push_consume_info" ColumnName="wx_push_consume_info" />
@@ -8266,6 +8354,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_itApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_itApply">
               <MappingFragment StoreEntitySet="ei_itApply">
+                <ScalarProperty Name="qty" ColumnName="qty" />
                 <ScalarProperty Name="equitment_type" ColumnName="equitment_type" />
                 <ScalarProperty Name="fetch_time" ColumnName="fetch_time" />
                 <ScalarProperty Name="fetcher_phone" ColumnName="fetcher_phone" />
@@ -8496,30 +8585,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="ei_DEApply">
-            <EntityTypeMapping TypeName="ICAuditModel.ei_DEApply">
-              <MappingFragment StoreEntitySet="ei_DEApply">
-                <ScalarProperty Name="clear_date" ColumnName="clear_date" />
-                <ScalarProperty Name="supplier_name" ColumnName="supplier_name" />
-                <ScalarProperty Name="comment" ColumnName="comment" />
-                <ScalarProperty Name="total_with_tax" ColumnName="total_with_tax" />
-                <ScalarProperty Name="tax_rate" ColumnName="tax_rate" />
-                <ScalarProperty Name="total" ColumnName="total" />
-                <ScalarProperty Name="unit_price" ColumnName="unit_price" />
-                <ScalarProperty Name="qty" ColumnName="qty" />
-                <ScalarProperty Name="unit_name" ColumnName="unit_name" />
-                <ScalarProperty Name="summary" ColumnName="summary" />
-                <ScalarProperty Name="name" ColumnName="name" />
-                <ScalarProperty Name="subject" ColumnName="subject" />
-                <ScalarProperty Name="catalog" ColumnName="catalog" />
-                <ScalarProperty Name="bill_date" ColumnName="bill_date" />
-                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
-                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
-                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="ei_DENames">
             <EntityTypeMapping TypeName="ICAuditModel.ei_DENames">
               <MappingFragment StoreEntitySet="ei_DENames">
@@ -8534,6 +8599,53 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               <MappingFragment StoreEntitySet="ei_DESubjects">
                 <ScalarProperty Name="catalog_name" ColumnName="catalog_name" />
                 <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_DEApplyEntry">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_DEApplyEntry">
+              <MappingFragment StoreEntitySet="ei_DEApplyEntry">
+                <ScalarProperty Name="clear_date" ColumnName="clear_date" />
+                <ScalarProperty Name="supplier_name" ColumnName="supplier_name" />
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="total_with_tax" ColumnName="total_with_tax" />
+                <ScalarProperty Name="tax_rate" ColumnName="tax_rate" />
+                <ScalarProperty Name="total" ColumnName="total" />
+                <ScalarProperty Name="unit_price" ColumnName="unit_price" />
+                <ScalarProperty Name="qty" ColumnName="qty" />
+                <ScalarProperty Name="unit_name" ColumnName="unit_name" />
+                <ScalarProperty Name="summary" ColumnName="summary" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="subject" ColumnName="subject" />
+                <ScalarProperty Name="catalog" ColumnName="catalog" />
+                <ScalarProperty Name="de_id" ColumnName="de_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_DEApply">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_DEApply">
+              <MappingFragment StoreEntitySet="ei_DEApply">
+                <ScalarProperty Name="bill_date" ColumnName="bill_date" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_empInfo">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_empInfo">
+              <MappingFragment StoreEntitySet="ei_empInfo">
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="position" ColumnName="position" />
+                <ScalarProperty Name="line_name" ColumnName="line_name" />
+                <ScalarProperty Name="department" ColumnName="department" />
+                <ScalarProperty Name="bus_dep" ColumnName="bus_dep" />
+                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

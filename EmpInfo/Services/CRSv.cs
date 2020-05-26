@@ -106,11 +106,11 @@ namespace EmpInfo.Services
                     throw new Exception("申请提交失败，原因：" + ex.Message );
                 }
 
-                SendNotification(result);                
+                SendNotification(result);
             }
             else {
                 throw new Exception("申请提交失败，原因是：" + result.msg );
-            }            
+            }
         }
 
         public override object GetBill()
@@ -208,7 +208,7 @@ namespace EmpInfo.Services
             else {
                 throw new Exception(result.msg);
             }
-        }               
+        }
 
     }
 }

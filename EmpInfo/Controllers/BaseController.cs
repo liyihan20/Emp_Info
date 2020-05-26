@@ -58,7 +58,7 @@ namespace EmpInfo.Controllers
                         _userInfo.name = MyUtils.DecodeToUTF8(cookie.Values.Get("username"));
                         _userInfo.cardNo = cookie.Values.Get("cardno");
                     }
-                    Session["userInfo"] = _userInfo;                    
+                    Session["userInfo"] = _userInfo;
                 }
 
                 return _userInfo;

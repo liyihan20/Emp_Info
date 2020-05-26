@@ -12,19 +12,16 @@ namespace EmpInfo.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class ei_DEApply
+    public partial class ei_empInfo
     {
-        public ei_DEApply()
-        {
-            this.ei_DEApplyEntry = new HashSet<ei_DEApplyEntry>();
-        }
-    
         public int id { get; set; }
-        public string sys_no { get; set; }
-        public string applier_num { get; set; }
-        public string applier_name { get; set; }
-        public Nullable<System.DateTime> bill_date { get; set; }
-    
-        public virtual ICollection<ei_DEApplyEntry> ei_DEApplyEntry { get; set; }
+        public string card_number { get; set; }
+        public string name { get; set; }
+        public string phone { get; set; }
+        public string bus_dep { get; set; }
+        public string department { get; set; }
+        public string line_name { get; set; }
+        public string position { get; set; }
+        public string email { get; set; }
     }
 }

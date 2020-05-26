@@ -140,17 +140,7 @@
                         }
                     });
                 }
-            });
-            @*openSelectUserDialog($("#depAdmin").html(), 6, function (result) {
-                $.post("@Url.Content("~/Admin/ChangeDepAdmins")", { depNum: dNum, admins: result }, function (data) {
-                    if (data.suc) {
-                        $("#depAdmin").html(result);
-                        toastr.success(data.msg);
-                    } else {
-                        toastr.error(data.msg);
-                    }
-                });
-            });*@
+            });            
         });
 
         //选择统计员
@@ -174,16 +164,6 @@
                     });
                 }
             });
-            @*openSelectUserDialog($("#depReporter").html(), 6, function (result) {
-                $.post("@Url.Content("~/Admin/ChangeDepReporters")", { depNum: dNum, reporters: result }, function (data) {
-                    if (data.suc) {
-                        $("#depReporter").html(result);
-                        toastr.success(data.msg);
-                    } else {
-                        toastr.error(data.msg);
-                    }
-                });
-            });*@
         });
 
         //是否审批节点
@@ -375,6 +355,7 @@
             });
             if (currentNodeId) {
                 $("#depTree").treeview("selectNode", [currentNodeId]);
+                $('#depTree').treeview('revealNode', [currentNodeId, { silent: true }]);
             }
         });
     }

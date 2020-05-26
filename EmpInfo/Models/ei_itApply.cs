@@ -51,5 +51,6 @@ namespace EmpInfo.Models
         public string fetcher_phone { get; set; }
         public Nullable<System.DateTime> fetch_time { get; set; }
         public string equitment_type { get; set; }
+        public Nullable<int> qty { get; set; }
     }
 }

@@ -145,9 +145,19 @@
                 $.post("GetDormEmp", { empInfo: text }, function (data) {
                     if (data.suc) {
                         var info = JSON.parse(data.extra);
+
+                        //检查是否同名不同身份证
+                        var idNumbers = utils.unique(info.map(function (x) { return x.id_number; }));
+                        if (idNumbers.length > 1) {
+                            toastr.info("查询到符合条件的员工身份证号有多个，将加载第一个员工");
+                            info = info.filter(function (x) { return x.id_number == idNumbers[0] });
+                        } else {
+                            toastr.success("信息加载成功");
+                        }
+
                         utils.loadObjData($("#fm1"), info[0]);
                         $("#tb1").bootstrapTable("load", info);
-                        toastr.success("信息加载成功");
+                        
                     } else {
                         toastr.error(data.msg);
                     }

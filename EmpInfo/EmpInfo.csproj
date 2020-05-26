@@ -172,6 +172,7 @@
     <Compile Include="Controllers\OthersController.cs" />
     <Compile Include="Controllers\PackageController.cs" />
     <Compile Include="Controllers\PushController.cs" />
+    <Compile Include="Controllers\QYWXController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\RestaurantBaseController.cs" />
     <Compile Include="Controllers\RestaurantController.cs" />
@@ -281,6 +282,9 @@
     <Compile Include="Models\ei_DEApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_DEApplyEntry.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_deliveryInfo.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -300,6 +304,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_dormRepair.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_empInfo.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_empLevel.cs">
@@ -653,6 +660,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="Service References\QywxWebSrv\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Services\ALSv.cs" />
     <Compile Include="Services\APSv.cs" />
     <Compile Include="Services\BaseSv.cs" />
@@ -872,12 +884,14 @@
     <Content Include="Content\fontawesome\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\images\assist.png" />
     <Content Include="Content\images\auditors.png" />
+    <Content Include="Content\images\basic_info.png" />
     <Content Include="Content\images\bind.gif" />
     <Content Include="Content\images\book.png" />
     <Content Include="Content\images\box.png" />
     <Content Include="Content\images\bubble-sprite.png" />
     <Content Include="Content\images\cargo.png" />
     <Content Include="Content\images\computer.png" />
+    <Content Include="Content\images\de.png" />
     <Content Include="Content\images\dep.png" />
     <Content Include="Content\images\dorm_users.png" />
     <Content Include="Content\images\elepr.png" />
@@ -910,6 +924,7 @@
     <Content Include="Content\images\public_fund.png" />
     <Content Include="Content\images\purchase.png" />
     <Content Include="Content\images\quit.png" />
+    <Content Include="Content\images\qywx.png" />
     <Content Include="Content\images\rc.png" />
     <Content Include="Content\images\repair.png" />
     <Content Include="Content\images\report.png" />
@@ -1297,6 +1312,7 @@
     <Content Include="Scripts\viewer.js" />
     <Content Include="Scripts\webuploader.min.js" />
     <Content Include="Scripts\webuploader.withoutimage.js" />
+    <Content Include="Scripts\wwLogin-1.0.0.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Scripts\particles.json" />
     <None Include="Service References\EmpWebSvr\TrulyEmpSvr.disco" />
@@ -1328,6 +1344,13 @@
     <None Include="Service References\FlowSvr\configuration91.svcinfo" />
     <None Include="Service References\FlowSvr\configuration.svcinfo" />
     <None Include="Service References\FlowSvr\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\QywxWebSrv\QywxApiSrv.disco" />
+    <None Include="Service References\QywxWebSrv\configuration91.svcinfo" />
+    <None Include="Service References\QywxWebSrv\configuration.svcinfo" />
+    <None Include="Service References\QywxWebSrv\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
@@ -1489,6 +1512,8 @@
     <Content Include="Views\Apply\BeginApplyDE.cshtml" />
     <Content Include="Views\Apply\CheckDEApply.cshtml" />
     <Content Include="Views\Apply\BeginAuditDEApply.cshtml" />
+    <None Include="Service References\QywxWebSrv\QywxApiSrv.wsdl" />
+    <Content Include="Views\Home\BasicInfo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1507,6 +1532,7 @@
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\EmpWebSvr\" />
     <WCFMetadataStorage Include="Service References\FlowSvr\" />
+    <WCFMetadataStorage Include="Service References\QywxWebSrv\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

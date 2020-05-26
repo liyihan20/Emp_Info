@@ -47,6 +47,8 @@ namespace EmpInfo.Models
         public Nullable<bool> wx_push_consume_info { get; set; }
         public Nullable<bool> wx_push_flow_info { get; set; }
         public Nullable<bool> wx_check_salary_info { get; set; }
+        public Nullable<bool> has_company_wx { get; set; }
+        public Nullable<bool> need_wx_clock { get; set; }
     
         public virtual ICollection<ei_groupUser> ei_groupUser { get; set; }
         public virtual ICollection<ei_deliveryInfo> ei_deliveryInfo { get; set; }

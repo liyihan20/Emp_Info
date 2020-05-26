@@ -175,5 +175,8 @@
     //获取下载路径
     GetDownloadRoute: function (sysNum) {
         return "../Att/" + sysNum.substr(0, 2) + "/20" + sysNum.substr(2, 2) + "/" + sysNum.substr(4, 2) + "/" + sysNum + "/";
+    },
+    StringifyAndParseCharacter: function (obj) {
+        return JSON.stringify(obj).replace(/\&/g, "%26").replace(/\+/g, "%2b").replace(/\=/g, "%3d");
     }
 }

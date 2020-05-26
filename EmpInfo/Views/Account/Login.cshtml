@@ -16,6 +16,11 @@
                 }
             }
         };
+
+        if (window.location.href.indexOf("emp.truly.com.cn") >= 0) {
+            $("#fastLogin").show();
+        }
+
         var currentStep = 0;
         var cardNumber = "";
         $(function () {
@@ -341,6 +346,12 @@
             <h3 class="panel-title"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> 信利移动办公平台</h3>
         </div>
         <div class="panel-body">
+            <div id="fastLogin" class="small text-primary hidden-xs" style="padding-left:16px;display:none;">
+                快捷登录：
+                <a href="@Url.Content("~/QYWX/ComputerWebLoginUrl")">
+                    <img src="@Url.Content("~/Content/images/qywx.png")" alt="企业微信登录" style="width:18px;height:18px;" />
+                </a>
+            </div>
             <div class="form-signin" id="form_signin">
                 <label for="userName" class="sr-only">用户名</label>
                 <div class="input-group">
@@ -391,6 +402,8 @@
     </div>
 </div> 
 @section Modal {
+    @Html.Partial("_MessageDialog")
+
     @*注册对话框*@
     <div class="modal fade" id="registerModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
         <div class="modal-dialog">

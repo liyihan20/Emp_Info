@@ -141,18 +141,18 @@ namespace EmpInfo.Controllers
         /// </summary>
         /// <param name="itemNo"></param>
         /// <returns></returns>
-        //[SessionTimeOutFilter]
-        //public ActionResult Check(string itemNo)
-        //{
-        //    var item = db.kw_items.Where(k => k.item_no == itemNo).FirstOrDefault();
-        //    if (item == null) {
-        //        ViewBag.tip = "此文档不存在";
-        //        return View("Error");
-        //    }
-        //    ViewData["item"] = item;
-        //    WriteEventLog("查看文档", item.item_no);
-        //    return View();
-        //}
+        [SessionTimeOutFilter]
+        public ActionResult Check(string itemNo)
+        {
+            var item = db.kw_items.Where(k => k.item_no == itemNo).FirstOrDefault();
+            if (item == null) {
+                ViewBag.tip = "此文档不存在";
+                return View("Error");
+            }
+            ViewData["item"] = item;
+            WriteEventLog("查看文档", item.item_no);
+            return View();
+        }
 
         /// <summary>
         /// 搜索查询主界面
