@@ -24,6 +24,7 @@
 @section Scripts {
     <script>
         $(function () {
+            $("#attDiv").load("../Item/PicAttachments", { sysNo: "@m.sys_no" }, function () { });
             $("#flowRecordBt").on("click", function () {
                 var box = $("<div></div>");
                 $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.sys_no" }, function () {
@@ -300,7 +301,10 @@
                     <div class="b-input">
                         @m.auto_quit_comment
                     </div>
-                </div>
+                </div>                
+                @if (m.has_attachment == true) {
+                    <div class="b-div" id="attDiv"></div>
+                }            
             </div>
             }
             

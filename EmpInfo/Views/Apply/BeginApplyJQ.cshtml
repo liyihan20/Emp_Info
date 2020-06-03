@@ -5,6 +5,7 @@
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
     <style type="text/css">
         .b-label {
             display: inline-block;
@@ -27,148 +28,162 @@
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script> 
     <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUploader.js")"></script>
 
     <script>
-        $(function () {
+    $(function () {
+        var myUploaderIsLoaded = false;
 
-            $(".datePicker").datetimepicker({
-                language: 'zh-CN',
-                format: "yyyy-mm-dd",
-                autoclose: true,
-                startView: 2,
-                minView: 2,
-                initialDate: "@DateTime.Now.ToString("yyyy-MM-dd")"
-            });
+        $(".datePicker").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            startView: 2,
+            minView: 2,
+            initialDate: "@DateTime.Now.ToString("yyyy-MM-dd")"
+        });
 
-            //设置日期联动，结束日期不能大于起始日期
-            $("#dp1").on("changeDate", function (e) {
-                $('#dp2').datetimepicker('setStartDate', e.date);
-            });
-            $("#dp2").on("changeDate", function (e) {
-                $('#dp1').datetimepicker('setEndDate', e.date);
-            });
+        //设置日期联动，结束日期不能大于起始日期
+        $("#dp1").on("changeDate", function (e) {
+            $('#dp2').datetimepicker('setStartDate', e.date);
+        });
+        $("#dp2").on("changeDate", function (e) {
+            $('#dp1').datetimepicker('setEndDate', e.date);
+        });
 
-            $("#card_number").on("blur", function () {
-                if ($("#card_number").val().length > 7) {
-                    getHREmpDetail();
-                } else {
-                    toastr.error("请输入正确的厂牌编号");
+        $("#card_number").on("blur", function () {
+            if ($("#card_number").val().length > 7) {
+                getHREmpDetail();
+            } else {
+                toastr.error("请输入正确的厂牌编号");
+            }
+        });
+
+        $("#quit_type").on("change", function () {
+            if ($(this).val() == "辞职") {
+                $("#card_number").val("@m.applierNum");
+                $("#card_number").attr("readonly", "readonly");
+                getHREmpDetail();
+                $("#autoQuit").hide();
+                $("#normalQuit").show();
+            } else {
+                $("#card_number").removeAttr("readonly");
+                $("#autoQuit").show();
+                $("#normalQuit").hide();
+                if (!myUploaderIsLoaded) {
+                    myUploaderIsLoaded = true;
+                    $("#myUploader").myUploader({ sysNum: "@m.sysNum" });
+                }
+            }
+        });
+
+        //$("#salary_clear_way").on("change", function () {
+        //    if ($(this).val() == "离职当天现金结算") {
+        //        alert("请与组长或直接上级确认同意后再选择此项，否则会被审核人拒绝！");
+        //    }
+        //});
+
+        $(".selectUser").on("focus", function () {
+            var self = this;
+            $.selectUsers({
+                userHasSelected: $(self).val(),
+                callback: function (result) {
+                    $(self).val(result);
                 }
             });
+        });
 
-            $("#quit_type").on("change", function () {
-                if ($(this).val() == "辞职") {
-                    $("#card_number").val("@m.applierNum");
-                    $("#card_number").attr("readonly", "readonly");
-                    getHREmpDetail();
-                    $("#autoQuit").hide();
-                    $("#normalQuit").show();
-                } else {
-                    $("#card_number").removeAttr("readonly");
-                    $("#autoQuit").show();
-                    $("#normalQuit").hide();
-                }
-            });
+        $("input[name='real_dep']").iCheck({
+            radioClass: 'iradio_square-red'
+        });
 
-            //$("#salary_clear_way").on("change", function () {
-            //    if ($(this).val() == "离职当天现金结算") {
-            //        alert("请与组长或直接上级确认同意后再选择此项，否则会被审核人拒绝！");
-            //    }
-            //});            
+        $("#dep1_text,#dep2_text").click(function () {
+            var ck = $(this).parent().find("input")[0];
+            $(ck).iCheck("check");
+        });
 
-            $(".selectUser").on("focus", function () {
-                var self = this;
-                $.selectUsers({
-                    userHasSelected: $(self).val(),
-                    callback: function (result) {
-                        $(self).val(result);
-                    }
-                });
-            });
+        $("#apply_bt").on("click", function () {
+            var obj = utils.getFormObj($("#fm"));
+            var attNum = $("#myUploader").getMyUploaderFilesNum();
 
-            $("input[name='real_dep']").iCheck({
-                radioClass: 'iradio_square-red'
-            });
 
-            $("#dep1_text,#dep2_text").click(function () {
-                var ck = $(this).parent().find("input")[0];
-                $(ck).iCheck("check");
-            });
+            if (obj.quit_type == "") {
+                toastr.error("离职类别必须选择");
+                return;
+            }
+            if (obj.card_number == "") {
+                toastr.error("厂牌编码必须填写");
+                return;
+            }
 
-            $("#apply_bt").on("click", function () {
-                var obj = utils.getFormObj($("#fm"));
-                
-                if (obj.quit_type == "") {
-                    toastr.error("离职类别必须选择");
+            if (obj.quit_type == "辞职") {
+                if ($.trim(obj.card_number) != $.trim("@m.applierNum")) {
+                    toastr.error("辞职的必须由本人填写申请");
                     return;
                 }
-                if (obj.card_number == "") {
-                    toastr.error("厂牌编码必须填写");
+                if (obj.quit_reason == "") {
+                    toastr.error("辞职原因必须填写");
                     return;
                 }
-
-                if (obj.quit_type == "辞职") {
-                    if ($.trim(obj.card_number) != $.trim("@m.applierNum")) {
-                        toastr.error("辞职的必须由本人填写申请");
-                        return;
-                    }
-                    if (obj.quit_reason == "") {
-                        toastr.error("辞职原因必须填写");
-                        return;
-                    }
-                    if (obj.salary_clear_way == "离职当天现金结算") {
-                        toastr.error("请确认薪资发放形式");
-                        return;
-                    }
-                } else {
-                    if (!obj.absent_from || obj.absent_from == "") {
-                        toastr.error("旷工开始日期必须填写");
-                        return;
-                    }
-                    if (!obj.absent_to || obj.absent_to == "") {
-                        toastr.error("旷工结束日期必须填写");
-                        return;
-                    }
-                    if (!obj.absent_days || obj.absent_days == "") {
-                        toastr.error("旷工天数必须填写");
-                        return;
-                    }
-                    if (isNaN(obj.absent_days)) {
-                        toastr.error("旷工天数必须是纯数字格式");
-                        return;
-                    }
-                    if (obj.has_connect_emp = "") {
-                        toastr.error("必须选择是否已联系到该员工");
-                        return;
-                    }
-                    if (obj.has_connect_family = "") {
-                        toastr.error("必须选择是否已联系到该员工家属");
-                        return;
-                    }
-                    if (obj.has_resign_apply = "") {
-                        toastr.error("必须选择是否已提交辞职申请表");
-                        return;
-                    }
-                }
-                if (obj.salary_type == "月薪") {
-                    if (obj.dep_charger_name == "") {
-                        toastr.error("必须选择部门负责人");
-                        return;
-                    }
-                } else if (obj.salary_type == "计件") {
-                    if (obj.group_leader_name == "") {
-                        toastr.error("必须选择组长");
-                        return;
-                    }
-                } else {
-                    toastr.error("只有月薪或计件的员工才能申请此流程");
+                if (obj.salary_clear_way == "离职当天现金结算") {
+                    toastr.error("请确认薪资发放形式");
                     return;
                 }
+            } else {
+                if (!obj.absent_from || obj.absent_from == "") {
+                    toastr.error("旷工开始日期必须填写");
+                    return;
+                }
+                if (!obj.absent_to || obj.absent_to == "") {
+                    toastr.error("旷工结束日期必须填写");
+                    return;
+                }
+                if (!obj.absent_days || obj.absent_days == "") {
+                    toastr.error("旷工天数必须填写");
+                    return;
+                }
+                if (isNaN(obj.absent_days)) {
+                    toastr.error("旷工天数必须是纯数字格式");
+                    return;
+                }
+                if (obj.has_connect_emp = "") {
+                    toastr.error("必须选择是否已联系到该员工");
+                    return;
+                }
+                if (obj.has_connect_family = "") {
+                    toastr.error("必须选择是否已联系到该员工家属");
+                    return;
+                }
+                if (obj.has_resign_apply = "") {
+                    toastr.error("必须选择是否已提交辞职申请表");
+                    return;
+                }
+                if (attNum < 1) {
+                    toastr.error("自离申请必须上传联络图片证明");
+                    return;
+                }
+            }
+            if (obj.salary_type == "月薪") {
+                if (obj.dep_charger_name == "") {
+                    toastr.error("必须选择部门负责人");
+                    return;
+                }
+            } else if (obj.salary_type == "计件") {
+                if (obj.group_leader_name == "") {
+                    toastr.error("必须选择组长");
+                    return;
+                }
+            } else {
+                toastr.error("只有月薪或计件的员工才能申请此流程");
+                return;
+            }
 
-                // 计件员工离职，如果离职人和组长的人事部门不一致，则弹出选框给申请人选择哪个部门 2019-12-17
-                if (obj.salary_type == "计件") {
-                    var group_leader_num = obj.group_leader_name.split("(")[1].split(")")[0];
-                    $.post("@Url.Content("~/Item/GetHREmpInfoDetail")", { cardNumber: group_leader_num }, function (data) {
+            $("#hasAttachment").val(attNum > 0);
+            // 计件员工离职，如果离职人和组长的人事部门不一致，则弹出选框给申请人选择哪个部门 2019-12-17
+            if (obj.salary_type == "计件") {
+                var group_leader_num = obj.group_leader_name.split("(")[1].split(")")[0];
+                $.post("@Url.Content("~/Item/GetHREmpInfoDetail")", { cardNumber: group_leader_num }, function (data) {
                         if (data.suc) {
                             var group_leader = JSON.parse(data.extra);
                             if (obj.dep_name != group_leader.dep_name) {
@@ -181,7 +196,7 @@
                                 beginApply();
                             }
                         } else {
-                            toastr.error("组长："+data.msg);
+                            toastr.error("组长：" + data.msg);
                         }
                     });
                 } else {
@@ -215,7 +230,7 @@
                         $("#apply_bt").button("reset");
                         if (data.suc) {
                             toastr.success("提交成功:" + data.msg);
-                            setTimeout(function () { window.location.href = "CheckApply?sysNo=" + obj.sys_no; }, 2000);
+                            setTimeout(function () { window.location.href = "CheckApply?sysNo=" + "@m.sysNum"; }, 2000);
                         } else {
                             toastr.error("提交失败：" + data.msg);
                             $("#apply_bt").button("reset");
@@ -229,24 +244,24 @@
         function getHREmpDetail() {
             var num = $("#card_number").val();
             $.post("@Url.Content("~/Item/GetHREmpInfoDetail")", { cardNumber: num }, function (data) {
-                if (data.suc) {
-                    var info = JSON.parse(data.extra);
-                    utils.loadObjData($("#fm"), info);
-                    if (info.salary_type == "计件") {
-                        $("#auditors1").show();
-                        $("#auditors2").hide();
-                    } else if (info.salary_type == "月薪") {
-                        $("#auditors2").show();
-                        $("#auditors1").hide();
-                    }
-
-                } else {
-                    toastr.error(data.msg);
+            if (data.suc) {
+                var info = JSON.parse(data.extra);
+                utils.loadObjData($("#fm"), info);
+                if (info.salary_type == "计件") {
+                    $("#auditors1").show();
+                    $("#auditors2").hide();
+                } else if (info.salary_type == "月薪") {
+                    $("#auditors2").show();
+                    $("#auditors1").hide();
                 }
-            });
-        }
 
-        
+            } else {
+                toastr.error(data.msg);
+            }
+        });
+    }
+
+
 
     </script>
 }
@@ -515,6 +530,20 @@
                         <textarea type="text" class="form-control" rows="3" id="auto_quit_comment" name="auto_quit_comment"></textarea>
                     </span>
                 </div>
+                
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;">
+                        上传附件:
+                    </span>
+                    <div style="display:inline-block;width:70%">
+                        <div id="uploader" class="wu-example">
+                            <div id="picker"> + </div>
+                        </div>
+                    </div>
+                    <p class="small text-danger"><i class="fa fa-info-circle"></i> 行政部要求：自离的需提交与员工的联系沟通信息截图或书面扫描图片</p>
+                </div>
+                <div id="myUploader"></div>
+                <input type="hidden" name="has_attachment" id="hasAttachment" />
             </div>
 
             @*辞职的*@

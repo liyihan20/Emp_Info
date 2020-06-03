@@ -89,6 +89,62 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="GetVarifyMsg">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="token" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="encodingAESKey" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="msg_signature" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="timestamp" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="nonce" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="echostr" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetVarifyMsgResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetVarifyMsgResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDecryptMsg">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="token" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="encodingAESKey" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="msg_signature" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="timestamp" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="nonce" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="post_data" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDecryptMsgResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetDecryptMsgResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetEncryptMsg">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="token" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="encodingAESKey" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="timestamp" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="nonce" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="replyData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetEncryptMsgResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetEncryptMsgResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
     </s:schema>
   </wsdl:types>
   <wsdl:message name="GetAccessTokenSoapIn">
@@ -127,6 +183,24 @@
   <wsdl:message name="GetUserIdFromCodeSoapOut">
     <wsdl:part name="parameters" element="tns:GetUserIdFromCodeResponse" />
   </wsdl:message>
+  <wsdl:message name="GetVarifyMsgSoapIn">
+    <wsdl:part name="parameters" element="tns:GetVarifyMsg" />
+  </wsdl:message>
+  <wsdl:message name="GetVarifyMsgSoapOut">
+    <wsdl:part name="parameters" element="tns:GetVarifyMsgResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetDecryptMsgSoapIn">
+    <wsdl:part name="parameters" element="tns:GetDecryptMsg" />
+  </wsdl:message>
+  <wsdl:message name="GetDecryptMsgSoapOut">
+    <wsdl:part name="parameters" element="tns:GetDecryptMsgResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetEncryptMsgSoapIn">
+    <wsdl:part name="parameters" element="tns:GetEncryptMsg" />
+  </wsdl:message>
+  <wsdl:message name="GetEncryptMsgSoapOut">
+    <wsdl:part name="parameters" element="tns:GetEncryptMsgResponse" />
+  </wsdl:message>
   <wsdl:portType name="QywxApiSrvSoap">
     <wsdl:operation name="GetAccessToken">
       <wsdl:input message="tns:GetAccessTokenSoapIn" />
@@ -151,6 +225,18 @@
     <wsdl:operation name="GetUserIdFromCode">
       <wsdl:input message="tns:GetUserIdFromCodeSoapIn" />
       <wsdl:output message="tns:GetUserIdFromCodeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetVarifyMsg">
+      <wsdl:input message="tns:GetVarifyMsgSoapIn" />
+      <wsdl:output message="tns:GetVarifyMsgSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDecryptMsg">
+      <wsdl:input message="tns:GetDecryptMsgSoapIn" />
+      <wsdl:output message="tns:GetDecryptMsgSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetEncryptMsg">
+      <wsdl:input message="tns:GetEncryptMsgSoapIn" />
+      <wsdl:output message="tns:GetEncryptMsgSoapOut" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="QywxApiSrvSoap" type="tns:QywxApiSrvSoap">
@@ -209,6 +295,33 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetVarifyMsg">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetVarifyMsg" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDecryptMsg">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetDecryptMsg" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetEncryptMsg">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetEncryptMsg" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="QywxApiSrvSoap12" type="tns:QywxApiSrvSoap">
     <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
@@ -259,6 +372,33 @@
     </wsdl:operation>
     <wsdl:operation name="GetUserIdFromCode">
       <soap12:operation soapAction="http://ic.truly.com.cn/GetUserIdFromCode" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVarifyMsg">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetVarifyMsg" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDecryptMsg">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetDecryptMsg" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetEncryptMsg">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetEncryptMsg" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

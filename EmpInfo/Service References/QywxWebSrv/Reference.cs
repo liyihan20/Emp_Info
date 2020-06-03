@@ -38,6 +38,18 @@ namespace EmpInfo.QywxWebSrv {
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 secret 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetUserIdFromCode", ReplyAction="*")]
         EmpInfo.QywxWebSrv.GetUserIdFromCodeResponse GetUserIdFromCode(EmpInfo.QywxWebSrv.GetUserIdFromCodeRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 token 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetVarifyMsg", ReplyAction="*")]
+        EmpInfo.QywxWebSrv.GetVarifyMsgResponse GetVarifyMsg(EmpInfo.QywxWebSrv.GetVarifyMsgRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 token 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetDecryptMsg", ReplyAction="*")]
+        EmpInfo.QywxWebSrv.GetDecryptMsgResponse GetDecryptMsg(EmpInfo.QywxWebSrv.GetDecryptMsgRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 token 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetEncryptMsg", ReplyAction="*")]
+        EmpInfo.QywxWebSrv.GetEncryptMsgResponse GetEncryptMsg(EmpInfo.QywxWebSrv.GetEncryptMsgRequest request);
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -460,6 +472,266 @@ namespace EmpInfo.QywxWebSrv {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetVarifyMsgRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetVarifyMsg", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.GetVarifyMsgRequestBody Body;
+        
+        public GetVarifyMsgRequest() {
+        }
+        
+        public GetVarifyMsgRequest(EmpInfo.QywxWebSrv.GetVarifyMsgRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetVarifyMsgRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string token;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string encodingAESKey;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public string msg_signature;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string timestamp;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        public string nonce;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=5)]
+        public string echostr;
+        
+        public GetVarifyMsgRequestBody() {
+        }
+        
+        public GetVarifyMsgRequestBody(string token, string encodingAESKey, string msg_signature, string timestamp, string nonce, string echostr) {
+            this.token = token;
+            this.encodingAESKey = encodingAESKey;
+            this.msg_signature = msg_signature;
+            this.timestamp = timestamp;
+            this.nonce = nonce;
+            this.echostr = echostr;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetVarifyMsgResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetVarifyMsgResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.GetVarifyMsgResponseBody Body;
+        
+        public GetVarifyMsgResponse() {
+        }
+        
+        public GetVarifyMsgResponse(EmpInfo.QywxWebSrv.GetVarifyMsgResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetVarifyMsgResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string GetVarifyMsgResult;
+        
+        public GetVarifyMsgResponseBody() {
+        }
+        
+        public GetVarifyMsgResponseBody(string GetVarifyMsgResult) {
+            this.GetVarifyMsgResult = GetVarifyMsgResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetDecryptMsgRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetDecryptMsg", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.GetDecryptMsgRequestBody Body;
+        
+        public GetDecryptMsgRequest() {
+        }
+        
+        public GetDecryptMsgRequest(EmpInfo.QywxWebSrv.GetDecryptMsgRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetDecryptMsgRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string token;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string encodingAESKey;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public string msg_signature;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string timestamp;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        public string nonce;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=5)]
+        public string post_data;
+        
+        public GetDecryptMsgRequestBody() {
+        }
+        
+        public GetDecryptMsgRequestBody(string token, string encodingAESKey, string msg_signature, string timestamp, string nonce, string post_data) {
+            this.token = token;
+            this.encodingAESKey = encodingAESKey;
+            this.msg_signature = msg_signature;
+            this.timestamp = timestamp;
+            this.nonce = nonce;
+            this.post_data = post_data;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetDecryptMsgResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetDecryptMsgResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.GetDecryptMsgResponseBody Body;
+        
+        public GetDecryptMsgResponse() {
+        }
+        
+        public GetDecryptMsgResponse(EmpInfo.QywxWebSrv.GetDecryptMsgResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetDecryptMsgResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string GetDecryptMsgResult;
+        
+        public GetDecryptMsgResponseBody() {
+        }
+        
+        public GetDecryptMsgResponseBody(string GetDecryptMsgResult) {
+            this.GetDecryptMsgResult = GetDecryptMsgResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetEncryptMsgRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetEncryptMsg", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.GetEncryptMsgRequestBody Body;
+        
+        public GetEncryptMsgRequest() {
+        }
+        
+        public GetEncryptMsgRequest(EmpInfo.QywxWebSrv.GetEncryptMsgRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetEncryptMsgRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string token;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string encodingAESKey;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public string timestamp;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string nonce;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        public string replyData;
+        
+        public GetEncryptMsgRequestBody() {
+        }
+        
+        public GetEncryptMsgRequestBody(string token, string encodingAESKey, string timestamp, string nonce, string replyData) {
+            this.token = token;
+            this.encodingAESKey = encodingAESKey;
+            this.timestamp = timestamp;
+            this.nonce = nonce;
+            this.replyData = replyData;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetEncryptMsgResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetEncryptMsgResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.GetEncryptMsgResponseBody Body;
+        
+        public GetEncryptMsgResponse() {
+        }
+        
+        public GetEncryptMsgResponse(EmpInfo.QywxWebSrv.GetEncryptMsgResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetEncryptMsgResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string GetEncryptMsgResult;
+        
+        public GetEncryptMsgResponseBody() {
+        }
+        
+        public GetEncryptMsgResponseBody(string GetEncryptMsgResult) {
+            this.GetEncryptMsgResult = GetEncryptMsgResult;
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public interface QywxApiSrvSoapChannel : EmpInfo.QywxWebSrv.QywxApiSrvSoap, System.ServiceModel.IClientChannel {
     }
@@ -566,6 +838,59 @@ namespace EmpInfo.QywxWebSrv {
             inValue.Body.code = code;
             EmpInfo.QywxWebSrv.GetUserIdFromCodeResponse retVal = ((EmpInfo.QywxWebSrv.QywxApiSrvSoap)(this)).GetUserIdFromCode(inValue);
             return retVal.Body.GetUserIdFromCodeResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.QywxWebSrv.GetVarifyMsgResponse EmpInfo.QywxWebSrv.QywxApiSrvSoap.GetVarifyMsg(EmpInfo.QywxWebSrv.GetVarifyMsgRequest request) {
+            return base.Channel.GetVarifyMsg(request);
+        }
+        
+        public string GetVarifyMsg(string token, string encodingAESKey, string msg_signature, string timestamp, string nonce, string echostr) {
+            EmpInfo.QywxWebSrv.GetVarifyMsgRequest inValue = new EmpInfo.QywxWebSrv.GetVarifyMsgRequest();
+            inValue.Body = new EmpInfo.QywxWebSrv.GetVarifyMsgRequestBody();
+            inValue.Body.token = token;
+            inValue.Body.encodingAESKey = encodingAESKey;
+            inValue.Body.msg_signature = msg_signature;
+            inValue.Body.timestamp = timestamp;
+            inValue.Body.nonce = nonce;
+            inValue.Body.echostr = echostr;
+            EmpInfo.QywxWebSrv.GetVarifyMsgResponse retVal = ((EmpInfo.QywxWebSrv.QywxApiSrvSoap)(this)).GetVarifyMsg(inValue);
+            return retVal.Body.GetVarifyMsgResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.QywxWebSrv.GetDecryptMsgResponse EmpInfo.QywxWebSrv.QywxApiSrvSoap.GetDecryptMsg(EmpInfo.QywxWebSrv.GetDecryptMsgRequest request) {
+            return base.Channel.GetDecryptMsg(request);
+        }
+        
+        public string GetDecryptMsg(string token, string encodingAESKey, string msg_signature, string timestamp, string nonce, string post_data) {
+            EmpInfo.QywxWebSrv.GetDecryptMsgRequest inValue = new EmpInfo.QywxWebSrv.GetDecryptMsgRequest();
+            inValue.Body = new EmpInfo.QywxWebSrv.GetDecryptMsgRequestBody();
+            inValue.Body.token = token;
+            inValue.Body.encodingAESKey = encodingAESKey;
+            inValue.Body.msg_signature = msg_signature;
+            inValue.Body.timestamp = timestamp;
+            inValue.Body.nonce = nonce;
+            inValue.Body.post_data = post_data;
+            EmpInfo.QywxWebSrv.GetDecryptMsgResponse retVal = ((EmpInfo.QywxWebSrv.QywxApiSrvSoap)(this)).GetDecryptMsg(inValue);
+            return retVal.Body.GetDecryptMsgResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.QywxWebSrv.GetEncryptMsgResponse EmpInfo.QywxWebSrv.QywxApiSrvSoap.GetEncryptMsg(EmpInfo.QywxWebSrv.GetEncryptMsgRequest request) {
+            return base.Channel.GetEncryptMsg(request);
+        }
+        
+        public string GetEncryptMsg(string token, string encodingAESKey, string timestamp, string nonce, string replyData) {
+            EmpInfo.QywxWebSrv.GetEncryptMsgRequest inValue = new EmpInfo.QywxWebSrv.GetEncryptMsgRequest();
+            inValue.Body = new EmpInfo.QywxWebSrv.GetEncryptMsgRequestBody();
+            inValue.Body.token = token;
+            inValue.Body.encodingAESKey = encodingAESKey;
+            inValue.Body.timestamp = timestamp;
+            inValue.Body.nonce = nonce;
+            inValue.Body.replyData = replyData;
+            EmpInfo.QywxWebSrv.GetEncryptMsgResponse retVal = ((EmpInfo.QywxWebSrv.QywxApiSrvSoap)(this)).GetEncryptMsg(inValue);
+            return retVal.Body.GetEncryptMsgResult;
         }
     }
 }

@@ -537,6 +537,78 @@ namespace EmpInfo.Controllers
             xls.Send();
         }
 
+        [SessionTimeOutFilter]
+        public ActionResult SRBillReport()
+        {
+            return View();
+        }
+
+        public void BeginExportSRBills(DateTime fromDate, DateTime toDate)
+        {
+            toDate = toDate.AddDays(1);
+            var result = db.GetSRBills(fromDate, toDate).ToList().OrderBy(r => r.FOutTimeSpan).ThenBy(r => r.FCompany).ToList();
+            
+            string[] colName = new string[] { "公司", "出货期间", "到货日期", "当前状态", "出库单号", "申请单号","申请人", "客户名称", "出货公司",
+                                              "出货地址", "出货联系人", "出货联系电话", "订单号", "出货数量" };
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "出货申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("夜间出货详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colName.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(18 * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result) {
+                colIndex = 1;
+
+                //"公司", "出货期间", "到货日期", "当前状态", "出库单号", "申请单号","申请人", "客户名称", "出货公司",
+                //                              "出货地址", "出货联系人", "出货联系电话", "订单号", "出货数量" 
+                cells.Add(++rowIndex, colIndex, d.FCompany);
+                cells.Add(rowIndex, ++colIndex, d.FOutTimeSpan);
+                cells.Add(rowIndex, ++colIndex, d.FArriveDate);
+                cells.Add(rowIndex, ++colIndex, d.FStatus);
+                cells.Add(rowIndex, ++colIndex, d.FStockNo);
+                cells.Add(rowIndex, ++colIndex, d.FBillNo);
+                cells.Add(rowIndex, ++colIndex, d.FApplier);
+                cells.Add(rowIndex, ++colIndex, d.FSupplierName);
+                cells.Add(rowIndex, ++colIndex, d.FShipToName);
+
+                cells.Add(rowIndex, ++colIndex, d.FShipToAddress);
+                cells.Add(rowIndex, ++colIndex, d.FShipToAttn);
+                cells.Add(rowIndex, ++colIndex, d.FShipToTel);
+                cells.Add(rowIndex, ++colIndex, d.FOrderBillNo);
+                cells.Add(rowIndex, ++colIndex, d.FQty);
+            }
+
+            xls.Send();
+        }
+
         #endregion                
 
         #region 导出出货系统审批记录

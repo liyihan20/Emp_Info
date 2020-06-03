@@ -503,6 +503,9 @@
     <Compile Include="Models\GetSalarySummary_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\GetSRBills_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\GetSRFlowRecord_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -1272,6 +1275,7 @@
     <Content Include="Scripts\echarts.simple.min.js" />
     <Content Include="Scripts\html5shiv.min.js" />
     <Content Include="Scripts\icheck.js" />
+    <Content Include="Scripts\jweixin-1.2.0.js" />
     <Content Include="Scripts\myUserSelecter.js" />
     <Content Include="Scripts\myUploaderPro.js" />
     <Content Include="Scripts\myUploader.js" />
@@ -1514,6 +1518,7 @@
     <Content Include="Views\Apply\BeginAuditDEApply.cshtml" />
     <None Include="Service References\QywxWebSrv\QywxApiSrv.wsdl" />
     <Content Include="Views\Home\BasicInfo.cshtml" />
+    <Content Include="Views\Report\SRBillReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -598,14 +598,12 @@ namespace EmpInfo.Controllers
         public JsonResult SaveBasicInfo(string jsonStr)
         {
             ei_empInfo info = JsonConvert.DeserializeObject<ei_empInfo>(jsonStr);
-            if (info.id == 0) {
+
+            var existed = db.ei_empInfo.Where(e => e.card_number == info.card_number).FirstOrDefault();
+            if (existed == null) {
                 db.ei_empInfo.Add(info);
             }
             else {
-                var existed = db.ei_empInfo.Where(e => e.id == info.id).FirstOrDefault();
-                if (existed == null) {
-                    return Json(new SimpleResultModel(false, "保存失败"));
-                }
                 MyUtils.CopyPropertyValue(info, existed);
             }
             try {
@@ -670,7 +668,11 @@ namespace EmpInfo.Controllers
         //    return "suc";
         //}
 
-
+        public string Write()
+        {
+            MyUtils.Write("tmp.txt", "hello");
+            return "OK";
+        }
 
     }
 }

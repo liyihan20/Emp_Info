@@ -600,5 +600,18 @@ namespace EmpInfo.Models
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetDormInfoByGuard_Result>("GetDormInfoByGuard", dormNumberParameter);
         }
+    
+        public virtual ObjectResult<GetSRBills_Result> GetSRBills(Nullable<System.DateTime> fromDate, Nullable<System.DateTime> toDate)
+        {
+            var fromDateParameter = fromDate.HasValue ?
+                new ObjectParameter("fromDate", fromDate) :
+                new ObjectParameter("fromDate", typeof(System.DateTime));
+    
+            var toDateParameter = toDate.HasValue ?
+                new ObjectParameter("toDate", toDate) :
+                new ObjectParameter("toDate", typeof(System.DateTime));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSRBills_Result>("GetSRBills", fromDateParameter, toDateParameter);
+        }
     }
 }

@@ -60,6 +60,12 @@ namespace EmpInfo.Services
                     iconFont = "fa-file-text-o",
                     url = "../Report/UCReport"
                 });
+                menus.Add(new ApplyMenuItemModel()
+                {
+                    text = "出货平台报表",
+                    iconFont = "fa-file-text-o",
+                    url = "../Report/SRBillReport"
+                });
             }
 
             return menus;

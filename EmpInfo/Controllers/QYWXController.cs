@@ -6,15 +6,30 @@ using System.Web.Mvc;
 using EmpInfo.QywxWebSrv;
 using EmpInfo.Services;
 using EmpInfo.Util;
+using System.IO;
+using System.Text;
+using System.Xml;
 
 namespace EmpInfo.Controllers
 {
     public class QYWXController : BaseController
     {
-        private const string SECRET = "wZRxdsuqeFAqJDG7VLaCTkImfsuce0qwyLO3ksBUkMY";
-        private const string AGENTID = "1000007";
+        private const string SECRET = "wZRxdsuqeFAqJDG7VLaCTkImfsuce0qwyLO3ksBUkMY"; //应用secret
+        private const string AGENTID = "1000007"; //应用id
         private const string LOGIN_URL = "http://emp.truly.com.cn/emp/QYWX/Login";
 
+        private const string TOKEN = "daGjLiUJ65Os7E39qVRm8r2tYyCp";
+        private const string ENCODINGAESKEY = "v6cJQ1YJOke9Z6MnLHHi0kS5MO1MeJvH1FkcAoia43C";
+
+        #region 登录、免密进入系统
+
+        /// <summary>
+        /// 利用该企业微信免密进入的链接
+        /// </summary>
+        /// <param name="code">由企业微信官方带过来的code，用以获取userid</param>
+        /// <param name="returnUrl">需要跳转到的本地链接</param>
+        /// <param name="state"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         public ActionResult Login(string code, string returnUrl = "",string state="")
         {
@@ -37,7 +52,7 @@ namespace EmpInfo.Controllers
                 }
 
                 //没有cookie的，通过code获取userid，也即是厂牌
-                QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();                
+                QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();
                 try {
                     userID = wx.GetUserIdFromCode(SECRET, code);
                 }
@@ -78,6 +93,10 @@ namespace EmpInfo.Controllers
             return wx.GetOAthLink("http://emp.truly.com.cn/emp/home/index?from=hello");
         }
 
+        /// <summary>
+        /// 网页端进入的链接
+        /// </summary>
+        /// <returns></returns>
         public ActionResult ComputerWebLoginUrl()
         {
             QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();
@@ -86,6 +105,9 @@ namespace EmpInfo.Controllers
             string url = wx.GetWebLink(AGENTID, LOGIN_URL, state);
             return Redirect(url);
         }
+
+        #endregion
+        
 
     }
 }

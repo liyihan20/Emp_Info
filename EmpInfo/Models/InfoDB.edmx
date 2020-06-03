@@ -925,6 +925,7 @@
           <Property Name="salary_clear_way" Type="nvarchar" MaxLength="50" />
           <Property Name="leave_date" Type="smalldatetime" />
           <Property Name="check1" Type="bit" />
+          <Property Name="has_attachment" Type="bit" />
         </EntityType>
         <EntityType Name="ei_k3RestLog">
           <Key>
@@ -2469,6 +2470,10 @@
           <Parameter Name="end_date" Type="datetime" Mode="In" />
           <Parameter Name="month_no" Type="varchar" Mode="In" />
         </Function>
+        <Function Name="GetSRBills" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="fromDate" Type="datetime" Mode="In" />
+          <Parameter Name="toDate" Type="datetime" Mode="In" />
+        </Function>
         <Function Name="GetSRFlowRecord" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="account" Type="varchar" Mode="In" />
           <Parameter Name="beginDate" Type="smalldatetime" Mode="In" />
@@ -3604,6 +3609,10 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <End Role="ei_DEApplyEntry" EntitySet="ei_DEApplyEntry" />
           </AssociationSet>
           <EntitySet Name="ei_empInfo" EntityType="ICAuditModel.ei_empInfo" />
+          <FunctionImport Name="GetSRBills" ReturnType="Collection(ICAuditModel.GetSRBills_Result)">
+            <Parameter Name="fromDate" Mode="In" Type="DateTime" />
+            <Parameter Name="toDate" Mode="In" Type="DateTime" />
+          </FunctionImport>
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -5448,6 +5457,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="salary_clear_way" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="leave_date" Type="DateTime" Precision="0" />
           <Property Name="check1" Type="Boolean" />
+          <Property Name="has_attachment" Type="Boolean" />
         </EntityType>
         <EntityType Name="vw_JQExcel">
           <Key>
@@ -6200,6 +6210,22 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="position" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
+        <ComplexType Name="GetSRBills_Result">
+          <Property Type="String" Name="FCompany" Nullable="false" MaxLength="6" />
+          <Property Type="String" Name="FOutTimeSpan" Nullable="true" MaxLength="20" />
+          <Property Type="String" Name="FArriveDate" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="FStatus" Nullable="false" MaxLength="12" />
+          <Property Type="String" Name="FStockNo" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="FBillNo" Nullable="true" MaxLength="25" />
+          <Property Type="String" Name="FApplier" Nullable="true" MaxLength="101" />
+          <Property Type="String" Name="FSupplierName" Nullable="true" MaxLength="80" />
+          <Property Type="String" Name="FShipToName" Nullable="true" MaxLength="200" />
+          <Property Type="String" Name="FShipToAddress" Nullable="true" MaxLength="250" />
+          <Property Type="String" Name="FShipToAttn" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="FShipToTel" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="FOrderBillNo" Nullable="true" MaxLength="24" />
+          <Property Type="Decimal" Name="FQty" Nullable="true" Precision="18" Scale="4" />
+        </ComplexType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -7858,6 +7884,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_jqApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_jqApply">
               <MappingFragment StoreEntitySet="ei_jqApply">
+                <ScalarProperty Name="has_attachment" ColumnName="has_attachment" />
                 <ScalarProperty Name="check1" ColumnName="check1" />
                 <ScalarProperty Name="leave_date" ColumnName="leave_date" />
                 <ScalarProperty Name="salary_clear_way" ColumnName="salary_clear_way" />
@@ -8650,6 +8677,26 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetSRBills" FunctionName="ICAuditModel.Store.GetSRBills">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetSRBills_Result">
+                <ScalarProperty Name="FCompany" ColumnName="FCompany" />
+                <ScalarProperty Name="FOutTimeSpan" ColumnName="FOutTimeSpan" />
+                <ScalarProperty Name="FArriveDate" ColumnName="FArriveDate" />
+                <ScalarProperty Name="FStatus" ColumnName="FStatus" />
+                <ScalarProperty Name="FStockNo" ColumnName="FStockNo" />
+                <ScalarProperty Name="FBillNo" ColumnName="FBillNo" />
+                <ScalarProperty Name="FApplier" ColumnName="FApplier" />
+                <ScalarProperty Name="FSupplierName" ColumnName="FSupplierName" />
+                <ScalarProperty Name="FShipToName" ColumnName="FShipToName" />
+                <ScalarProperty Name="FShipToAddress" ColumnName="FShipToAddress" />
+                <ScalarProperty Name="FShipToAttn" ColumnName="FShipToAttn" />
+                <ScalarProperty Name="FShipToTel" ColumnName="FShipToTel" />
+                <ScalarProperty Name="FOrderBillNo" ColumnName="FOrderBillNo" />
+                <ScalarProperty Name="FQty" ColumnName="FQty" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
           </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

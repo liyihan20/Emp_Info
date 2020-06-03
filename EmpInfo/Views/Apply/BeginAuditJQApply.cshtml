@@ -62,9 +62,10 @@
             $("#flowRecordBt").on("click", function () {
                 var box = $("<div></div>");
                 $(box).load("CheckFlowRecord .list-group", { sysNo: "@bam.sysNum" }, function () {
-                        openMessageDialog($(box).html(), "查看流转记录");
-                    });
+                    openMessageDialog($(box).html(), "查看流转记录");
                 });
+            });
+            $("#attDiv").load("../Item/PicAttachments", { sysNo: "@bam.sysNum" }, function () { });
         });
         var auditJson=@Html.Raw(auditJson);
         auditJson.leave_date=utils.parseTDate(auditJson.leave_date);

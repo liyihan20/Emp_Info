@@ -590,5 +590,45 @@ namespace EmpInfo.Util
             session.Clear();
         }
 
+        public static string GetTimeStamp()
+        {
+            TimeSpan ts = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return Convert.ToInt64(ts.TotalSeconds).ToString();
+        }
+
+        public static string Read(string path)
+        {
+            path = Path.Combine(System.Environment.CurrentDirectory, path);
+            if (!File.Exists(path)) {
+                return null;
+            }
+            String line, content = "";
+            using (StreamReader sr = new StreamReader(path, Encoding.Default)) {
+                while ((line = sr.ReadLine()) != null) {
+                    content += line.ToString();
+                }
+            }
+
+            return content;
+        }
+
+        public static void Write(string path, string content)
+        {
+            path = Path.Combine("D:\\ei_upload", path);
+            if (File.Exists(path)) {
+                File.Delete(path);
+            }
+            using (FileStream fs = new FileStream(path, FileMode.Create)) {
+                using (StreamWriter sw = new StreamWriter(fs)) {
+                    //开始写入
+                    sw.Write(content);
+                    //清空缓冲区
+                    sw.Flush();
+                    //关闭流
+                }
+
+            }
+        }
+
     }
 }

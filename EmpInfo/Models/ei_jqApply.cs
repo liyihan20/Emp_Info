@@ -58,5 +58,6 @@ namespace EmpInfo.Models
         public string salary_clear_way { get; set; }
         public Nullable<System.DateTime> leave_date { get; set; }
         public Nullable<bool> check1 { get; set; }
+        public Nullable<bool> has_attachment { get; set; }
     }
 }
