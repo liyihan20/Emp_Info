@@ -10,7 +10,12 @@ namespace EmpInfo.Models
         public string text { get; set; }
         public int intValue { get; set; }
         public string stringValue { get; set; }
+    }
 
+    public class DormReportModel
+    {
+        public string charge_type { get; set; }
+        public decimal type_sum { get; set; }
     }
 
     public class SimpleResultModel

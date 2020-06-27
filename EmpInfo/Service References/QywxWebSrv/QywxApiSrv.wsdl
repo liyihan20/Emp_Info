@@ -16,6 +16,20 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="GetJsApiTicket">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="secret" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetJsApiTicketResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetJsApiTicketResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="GetUserIdByOpenId">
         <s:complexType>
           <s:sequence>
@@ -145,6 +159,80 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="PushTextMsg">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="secret" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="opUserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="textMsg" type="tns:TextMsg" />
+            <s:element minOccurs="1" maxOccurs="1" name="whenToPush" nillable="true" type="s:dateTime" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="TextMsg">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="touser" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="toparty" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="totag" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="agentid" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="text" type="tns:TextContent" />
+          <s:element minOccurs="1" maxOccurs="1" name="safe" nillable="true" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="enable_id_trans" nillable="true" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="enable_duplicate_check" nillable="true" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="duplicate_check_interval" nillable="true" type="s:int" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="TextContent">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="content" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="PushTextMsgResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="PushTextCardMsg">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="secret" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="opUserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="textCardMsg" type="tns:TextCardMsg" />
+            <s:element minOccurs="1" maxOccurs="1" name="whenToPush" nillable="true" type="s:dateTime" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="TextCardMsg">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="touser" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="toparty" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="totag" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="agentid" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="textcard" type="tns:TextCardContent" />
+          <s:element minOccurs="1" maxOccurs="1" name="enable_id_trans" nillable="true" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="enable_duplicate_check" nillable="true" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="duplicate_check_interval" nillable="true" type="s:int" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="TextCardContent">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="title" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="description" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="url" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="btntxt" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="PushTextCardMsgResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="TestPush">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="content" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestPushResponse">
+        <s:complexType />
+      </s:element>
     </s:schema>
   </wsdl:types>
   <wsdl:message name="GetAccessTokenSoapIn">
@@ -152,6 +240,12 @@
   </wsdl:message>
   <wsdl:message name="GetAccessTokenSoapOut">
     <wsdl:part name="parameters" element="tns:GetAccessTokenResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetJsApiTicketSoapIn">
+    <wsdl:part name="parameters" element="tns:GetJsApiTicket" />
+  </wsdl:message>
+  <wsdl:message name="GetJsApiTicketSoapOut">
+    <wsdl:part name="parameters" element="tns:GetJsApiTicketResponse" />
   </wsdl:message>
   <wsdl:message name="GetUserIdByOpenIdSoapIn">
     <wsdl:part name="parameters" element="tns:GetUserIdByOpenId" />
@@ -201,10 +295,32 @@
   <wsdl:message name="GetEncryptMsgSoapOut">
     <wsdl:part name="parameters" element="tns:GetEncryptMsgResponse" />
   </wsdl:message>
+  <wsdl:message name="PushTextMsgSoapIn">
+    <wsdl:part name="parameters" element="tns:PushTextMsg" />
+  </wsdl:message>
+  <wsdl:message name="PushTextMsgSoapOut">
+    <wsdl:part name="parameters" element="tns:PushTextMsgResponse" />
+  </wsdl:message>
+  <wsdl:message name="PushTextCardMsgSoapIn">
+    <wsdl:part name="parameters" element="tns:PushTextCardMsg" />
+  </wsdl:message>
+  <wsdl:message name="PushTextCardMsgSoapOut">
+    <wsdl:part name="parameters" element="tns:PushTextCardMsgResponse" />
+  </wsdl:message>
+  <wsdl:message name="TestPushSoapIn">
+    <wsdl:part name="parameters" element="tns:TestPush" />
+  </wsdl:message>
+  <wsdl:message name="TestPushSoapOut">
+    <wsdl:part name="parameters" element="tns:TestPushResponse" />
+  </wsdl:message>
   <wsdl:portType name="QywxApiSrvSoap">
     <wsdl:operation name="GetAccessToken">
       <wsdl:input message="tns:GetAccessTokenSoapIn" />
       <wsdl:output message="tns:GetAccessTokenSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetJsApiTicket">
+      <wsdl:input message="tns:GetJsApiTicketSoapIn" />
+      <wsdl:output message="tns:GetJsApiTicketSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="GetUserIdByOpenId">
       <wsdl:input message="tns:GetUserIdByOpenIdSoapIn" />
@@ -238,11 +354,34 @@
       <wsdl:input message="tns:GetEncryptMsgSoapIn" />
       <wsdl:output message="tns:GetEncryptMsgSoapOut" />
     </wsdl:operation>
+    <wsdl:operation name="PushTextMsg">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">发送文本消息</wsdl:documentation>
+      <wsdl:input message="tns:PushTextMsgSoapIn" />
+      <wsdl:output message="tns:PushTextMsgSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="PushTextCardMsg">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">发送文本卡片消息</wsdl:documentation>
+      <wsdl:input message="tns:PushTextCardMsgSoapIn" />
+      <wsdl:output message="tns:PushTextCardMsgSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TestPush">
+      <wsdl:input message="tns:TestPushSoapIn" />
+      <wsdl:output message="tns:TestPushSoapOut" />
+    </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="QywxApiSrvSoap" type="tns:QywxApiSrvSoap">
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
     <wsdl:operation name="GetAccessToken">
       <soap:operation soapAction="http://ic.truly.com.cn/GetAccessToken" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetJsApiTicket">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetJsApiTicket" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -322,11 +461,47 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="PushTextMsg">
+      <soap:operation soapAction="http://ic.truly.com.cn/PushTextMsg" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PushTextCardMsg">
+      <soap:operation soapAction="http://ic.truly.com.cn/PushTextCardMsg" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestPush">
+      <soap:operation soapAction="http://ic.truly.com.cn/TestPush" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="QywxApiSrvSoap12" type="tns:QywxApiSrvSoap">
     <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
     <wsdl:operation name="GetAccessToken">
       <soap12:operation soapAction="http://ic.truly.com.cn/GetAccessToken" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetJsApiTicket">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetJsApiTicket" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -399,6 +574,33 @@
     </wsdl:operation>
     <wsdl:operation name="GetEncryptMsg">
       <soap12:operation soapAction="http://ic.truly.com.cn/GetEncryptMsg" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PushTextMsg">
+      <soap12:operation soapAction="http://ic.truly.com.cn/PushTextMsg" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PushTextCardMsg">
+      <soap12:operation soapAction="http://ic.truly.com.cn/PushTextCardMsg" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestPush">
+      <soap12:operation soapAction="http://ic.truly.com.cn/TestPush" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

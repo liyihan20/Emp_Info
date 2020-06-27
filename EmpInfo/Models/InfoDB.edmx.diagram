@@ -136,6 +136,12 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_DEApply" Width="1.5" PointX="0.5" PointY="16.5" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_DEApplyEntry_ei_DEApply" />
         <EntityTypeShape EntityType="ICAuditModel.ei_empInfo" Width="1.5" PointX="10.375" PointY="12.125" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_ksApply" Width="1.5" PointX="6" PointY="15" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.qywx_secondeValify" Width="1.5" PointX="10.375" PointY="12.75" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_KSExcel" Width="1.5" PointX="10.375" PointY="13.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_bus_place_detail" Width="1.5" PointX="6" PointY="16.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_bus_place" Width="1.5" PointX="6" PointY="15.75" IsExpanded="false" />
+        <AssociationConnector Association="ICAuditModel.FK_ei_bus_place_detail_ei_bus_place" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

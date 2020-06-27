@@ -30,8 +30,9 @@ namespace EmpInfo.Controllers
 
         public JsonResult SqlExec(FormCollection fc)
         {
-            SqlGenModel m = new SqlGenModel();
+            ConnectionModel m = new ConnectionModel();
             MyUtils.SetFieldValueToModel(fc, m);
+            string sqlText = fc.Get("sqlText");
 
             if (string.IsNullOrWhiteSpace(m.serverName)) {
                 return Json(new SimpleResultModel(false, "服务器地址不能为空"));
@@ -42,48 +43,24 @@ namespace EmpInfo.Controllers
             if (string.IsNullOrWhiteSpace(m.dbLoginName)) {
                 return Json(new SimpleResultModel(false, "用户名不能为空"));
             }
-            if (string.IsNullOrWhiteSpace(m.sqlText)) {
+            if (string.IsNullOrWhiteSpace(sqlText)) {
                 return Json(new SimpleResultModel(false, "SQL不能为空"));
             }
 
-            string conString = string.Format("Data Source = {0};Initial Catalog = {1};Persist Security Info = True;User ID = {2};Password = {3}", m.serverName, m.dbName, m.dbLoginName, m.dbPassword);
-            DataSet ds = null;
-            SqlConnection conn = null;
-
+            ConnectionModel cm = new ConnectionModel() { serverName = m.serverName, dbName = m.dbName, dbLoginName = m.dbLoginName, dbPassword = m.dbPassword };
             try {
-                using (conn = new SqlConnection(conString)) {
-                    conn.Open();
-                    ds = new DataSet();
-                    new SqlDataAdapter(m.sqlText, conn).Fill(ds);
-                }
+                var result = new BIBaseSv().GetTableResult(sqlText, cm);
+                return Json(new { suc = true, columns = result.columns, rows = result.rows });
             }
             catch (Exception ex) {
                 return Json(new SimpleResultModel(ex));
             }
-
-            var tb = ds.Tables[0];
-
-            List<TableColumnModel> columns = new List<TableColumnModel>();
-            for (var i = 0; i < tb.Columns.Count; i++) {
-                columns.Add(new TableColumnModel(tb.Columns[i].ColumnName));
-            }
-
-            List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
-            Dictionary<string, object> dic;
-            foreach (DataRow row in tb.Rows) {
-                dic = new Dictionary<string, object>();
-                foreach (var cn in columns) {
-                    dic.Add(cn.field, row[cn.field]);
-                }
-                rows.Add(dic);
-            }
-
-            return Json(new { suc = true, columns = JsonConvert.SerializeObject(columns), rows = JsonConvert.SerializeObject(rows) });
+            
         }
 
         public string ExecTest()
         {
-            string conString = "Data Source = 192.168.100.205;Initial Catalog = ICAudit;Persist Security Info = True;User ID = ICEmp;Password = ICEmp12345";
+            string conString = db.Database.Connection.ConnectionString;
             var sql = "select number,name,en_name,(case when number > 4 then 'b' else 's' end) as [好的] from dbo.dn_authority where number > {0}";
             DataSet ds = null;
             SqlConnection conn = null;

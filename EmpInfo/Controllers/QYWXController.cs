@@ -9,6 +9,7 @@ using EmpInfo.Util;
 using System.IO;
 using System.Text;
 using System.Xml;
+using EmpInfo.Models;
 
 namespace EmpInfo.Controllers
 {
@@ -81,7 +82,7 @@ namespace EmpInfo.Controllers
             WriteEventLog("企业微信", "进入应用：" + returnUrl);
 
             if (!string.IsNullOrEmpty(returnUrl)) {
-                return Redirect(returnUrl);
+                return Redirect(Uri.UnescapeDataString(returnUrl));
             }
 
             return RedirectToAction("Index", "Home", new { });
@@ -104,6 +105,45 @@ namespace EmpInfo.Controllers
             Session["state"] = state;
             string url = wx.GetWebLink(AGENTID, LOGIN_URL, state);
             return Redirect(url);
+        }
+
+        /// <summary>
+        /// 企业微信二次验证
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public ActionResult SecondValify(string code)
+        {
+            if (string.IsNullOrEmpty(code)) {
+                ViewBag.tip = "获取不到code，授权失败";
+                return View("Error2");
+            }
+            string userID = "";
+            QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();
+            try {
+                userID = wx.GetUserIdFromCode(SECRET, code);
+            }
+            catch (Exception ex) {
+                ViewBag.tip = ex.Message;
+                return View("Error2");
+            }
+
+            var vf = db.qywx_secondeValify.Where(q => q.card_number == userID).FirstOrDefault();
+            if (vf == null) {
+                vf = new qywx_secondeValify();
+                vf.card_number = userID;
+                vf.code = code;
+            }
+            else {
+                if (vf.suc == true) {
+                    ViewBag.tip = "你已通过验证，不需再次验证";
+                    return View("Error2");
+                }
+                vf.code = code;
+            }
+            TempData["card_number"] = userID;
+
+            return View();
         }
 
         #endregion

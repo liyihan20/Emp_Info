@@ -1,0 +1,172 @@
+﻿@using EmpInfo.Models;
+@{
+    List<BusPlaces> ps = ViewData["ps"] as List<BusPlaces>;
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        th{
+            font-size:18px;
+        }
+        td{
+            font-size:16px;
+        }
+    </style>
+}
+@section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+
+    <script type="text/javascript">
+        var inter;
+        var isRolling = true;
+        var rollSpeed = 40;
+        var currentPx = 0;
+        $(function () {
+            //改为自适应全屏宽度
+            $("#topContainer").removeClass("container").addClass("container-fluid");
+            $("#tb").bootstrapTable('refreshOptions', { height: window.innerHeight - 120 });
+            $("#stSpeed").val(rollSpeed);
+
+            $("#btnStop").on("click", function () {
+                if (isRolling) {
+                    window.clearInterval(inter);
+                    isRolling = false;
+                    $("#btnStop").html("继续滚动");
+                } else {
+                    setInter();
+                    isRolling = true;
+                    $("#btnStop").html("暂停滚动");
+                }
+            });
+
+            $("#stSpeed").on("change", function () {
+                rollSpeed = $(this).val();
+                setInter()
+            });
+
+            setInter();
+        });
+
+        function setInter() {
+            window.clearInterval(inter);
+            var scrollPosition = -1;
+            var lastPosition = -1;
+            inter = setInterval(function () {
+                if (currentPx == 0) {
+                    //在顶部也暂停2秒
+                    isRolling = false;
+                    window.clearInterval(inter);
+                    setTimeout(function () { setInter(); isRolling = true; }, 2000);
+                }
+                $("#tb").bootstrapTable('scrollTo', currentPx++);
+                scrollPosition = $("#tb").bootstrapTable('getScrollPosition');
+                if (lastPosition == scrollPosition) {
+                    currentPx = 0;
+                    //到底部暂停2秒
+                    window.clearInterval(inter);
+                    isRolling = false;
+                    setTimeout(function () { setInter(); isRolling = true; }, 2000);
+                } else {
+                    lastPosition = scrollPosition;
+                }
+            }, rollSpeed);
+        }
+
+    </script>
+}
+<div class="text-center" style="font-size:36px;">汕尾工业城厂房简介</div>
+<div id="btns">
+    <button id="btnStop" class="btn btn-success pull-right">暂停滚动</button>
+    <div class="pull-left">
+        滚动速度：
+        <select id="stSpeed" class="form-control" style="display:inline-block;width:100px;">
+            <option value="60">慢速</option>
+            <option value="40">中速</option>
+            <option value="20">快速</option>
+        </select>
+    </div>
+</div>
+<div class="clearfix" style="margin-bottom:12px;"></div>
+
+<table id="tb" data-toggle="table" data-show-columns="false">
+    <thead>
+        <tr>
+            <th data-field="sort_no" data-valign="middle" data-align="center">
+                序号
+            </th>
+            <th data-field="place" data-valign="middle" data-align="center">
+                地点
+            </th>
+            <th data-field="floor" data-valign="middle" data-align="center">
+                楼层
+            </th>
+            <th data-field="dep_name">
+                部门
+            </th>
+            <th data-field="area_size" data-valign="middle" data-align="center">
+                厂房面积(㎡)
+            </th>
+            <th data-field="dep_size" data-valign="middle" data-align="center">
+                车间面积(㎡)
+            </th>
+            <th data-field="clear_level" data-valign="middle" data-align="center">
+                净房等级
+            </th>
+            <th data-field="dep_plan">
+                车间整合规划
+            </th>
+        </tr>
+    </thead>
+    <tbody id="tbody">
+        @{
+            int currentID = 0;
+            int currentRowSpan = 1;
+            bool isSameAsLast = false;
+        }
+        @foreach (var p in ps) {
+            <tr>
+                @if (currentID != p.place_id) {
+                    currentID = p.place_id;
+                    currentRowSpan = ps.Count(s => s.place_id == currentID);
+                    isSameAsLast = false;
+                }
+                else {
+                    isSameAsLast = true;
+                    currentRowSpan = 1;
+                }
+                @if (!isSameAsLast) {
+                    <td rowspan="@currentRowSpan">@p.sort_no</td>
+                    <td rowspan="@currentRowSpan">@p.place</td>
+                }
+                <td>@p.floor</td>
+                <td>@p.dep_name</td>
+                @if (!isSameAsLast) {
+                    <td rowspan="@currentRowSpan">@p.area_size</td>
+                }
+                <td>@p.dep_size</td>
+                <td>@p.clear_level</td>
+                <td>@p.dep_plan</td>
+            </tr>
+        }
+
+        @*@foreach (var h in head) {
+                var rowspan = entrys.Count(e => e.place_id == h.id);
+                <tr>
+                    <td rowspan="@rowspan">@h.sort_no</td>
+                    <td rowspan="@rowspan">@h.place</td>
+                    @foreach (var e in entrys.Where(e => e.place_id == h.id).OrderBy(e => e.floor).ToList()) {
+                        <td>@e.floor</td>
+                        <td>@e.dep_name</td>
+                    }
+                    <td rowspan="@rowspan">@h.area_size</td>
+                    @foreach (var e in entrys.Where(e => e.place_id == h.id).OrderBy(e => e.floor).ToList()) {
+                        <td>@e.dep_size</td>
+                        <td>@e.clear_level</td>
+                        <td>@e.dep_plan</td>
+                    }
+                </tr>
+            }*@
+    </tbody>
+</table>

@@ -1,0 +1,273 @@
+﻿@using EmpInfo.Models;
+@{
+    ei_ksApply m = ViewData["am"] as ei_ksApply;
+}
+@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: top;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+
+        pre {
+            margin: 0;
+            border: 0;
+            background-color: white;
+            padding: 0;
+        }
+    </style>
+}
+
+<script>
+    $(function () {
+        $("#flowRecordBt").on("click", function () {
+            var box = $("<div></div>");
+            $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.sys_no" }, function () {
+                openMessageDialog($(box).html(), "查看流转记录");
+            });
+        });
+        if ($("#attList")) {
+            $.post("../Item/GetAttachments", { sysNo: "@m.sys_no" }, function (data) {
+                if (data.length > 0) {
+                    for (var i = 0; i < data.length; i++) {
+                        var shortName = data[i].fileName;
+                        if (shortName.length > 25) {
+                            var ext = shortName.substr(shortName.lastIndexOf("."));
+                            shortName = shortName.substr(0, 20) + ".." + ext;
+                        }
+                        $(attList).append('<li class="list-group-item">\
+                                    <a href="#" data-fd="' + data[i].fileName + '"><i class="fa fa-download"></i> ' + shortName + '(' + (data[i].fileSize > 1000000 ? ((data[i].fileSize / 1000000).toFixed(1) + 'M') : ((data[i].fileSize / 1000).toFixed(1) + 'K')) + ')</a>\
+                                    </li>');
+                    }
+                }
+            });
+        }
+
+        $("#attList").on("click", "a", function () {
+            var fileName = $(this).attr("data-fd");
+            var url = utils.GetDownloadRoute("@m.sys_no") + fileName;
+            window.open(url);
+        });
+    });
+
+</script>
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="ApplyIndex?billType=KS">开源节流建议</a></li>
+            <li class="active">查看申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div>
+            <div class="b-div">
+                <span class="b-label">
+                    流转记录:
+                </span>
+                <span class="b-input">
+                    <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        审核状态:
+                    </span>
+                    <span class="b-input">
+                        @ViewData["auditStatus"]
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请流水号:
+                    </span>
+                    <span class="b-input">
+                        @m.sys_no
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请时间:
+                    </span>
+                    <span class="b-input">
+                        @(((DateTime)m.apply_time).ToString("yyyy-MM-dd HH:mm"))
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请人:
+                    </span>
+                    <span class="b-input">
+                        @m.applier_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        厂牌:
+                    </span>
+                    <span class="b-input">
+                        @m.applier_number
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        联系电话:
+                    </span>
+                    <div class="b-input">
+                        @m.applier_phone
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        部门名称:
+                    </span>
+                    <div class="b-input">
+                        @m.dep_name
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label" style="vertical-align:top;">
+                现状简介:
+            </span>
+            <span class="b-input">
+                <pre>@m.situation</pre>
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label" style="vertical-align:top;">
+                建议详情:
+            </span>
+            <span class="b-input">
+                <pre>@m.suggestion</pre>
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label" style="vertical-align:top;">
+                收益评估:
+            </span>
+            <span class="b-input">
+                <pre>@m.benefit</pre>
+            </span>
+        </div>
+
+        @if (m.applier_reward != null) {
+            <h4 style="border-bottom:1px solid #337ab7;font-style:italic;margin:12px 0;" class="text-primary">营运部确认</h4>
+            if (m.applier_reward > 0) {
+                <div class="b-div">
+                    <span class="b-label">
+                        采纳奖励:
+                    </span>
+                    <span class="b-input">
+                        @m.applier_reward <span class="text-danger">(单位：元，给建议提交人的奖励)</span>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        评级:
+                    </span>
+                    <span class="b-input">
+                        @m.level_name
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        评级奖励:
+                    </span>
+                    <span class="b-input">
+                        @m.level_reward <span class="text-danger">(单位：元，完成后给执行人团队的奖励)</span>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        执行人:
+                    </span>
+                    <span class="b-input">
+                        @string.Format("{0}({1})", m.executor_name, m.executor_number)
+                    </span>
+                </div>
+            }
+            <div class="b-div">
+                <span class="b-label" style="vertical-align:top;">
+                    营运部意见:
+                </span>
+                <span class="b-input">
+                    <pre>@m.operation_dep_opinion</pre>
+                </span>
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(m.group_members)) {
+            <h4 style="border-bottom:1px solid #337ab7;font-style:italic;margin:12px 0;" class="text-primary">执行人处理</h4>
+            <div class="b-div">
+                <span class="b-label" style="vertical-align:top;">
+                    团队组员:
+                </span>
+                <span class="b-input">
+                    <pre>@m.group_members</pre>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label" style="vertical-align:top;">
+                    成果说明:
+                </span>
+                <span class="b-input">
+                    <pre>@m.result_description</pre>
+                </span>
+            </div>
+            if (m.has_attachment) {
+                <div>
+                    <div style="margin-bottom:6px;">附件：</div>
+                    <ul class="list-group" id="attList"></ul>
+                </div>
+            }
+        }
+
+        @if (m.operation_dep_summary != null) {
+            <h4 style="border-bottom:1px solid #337ab7;font-style:italic;margin:12px 0;" class="text-primary">营运部确认</h4>
+
+            <div class="b-div">
+                <span class="b-label" style="vertical-align:top;">
+                    营运部备注:
+                </span>
+                <span class="b-input">
+                    <pre>@m.operation_dep_summary</pre>
+                </span>
+            </div>
+        }
+
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

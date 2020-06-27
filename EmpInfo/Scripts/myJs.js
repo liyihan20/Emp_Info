@@ -53,7 +53,11 @@
     parseTDate: function (d, hasHour) {
         if (!d) return "";
         if (d.indexOf("T") > 0) {
-            return d.split("T")[0];
+            if (hasHour) {
+                return d.split(".")[0].replace("T", " ");
+            } else {
+                return d.split("T")[0];
+            }
         } else if (d.indexOf("Date") >= 0) {
             var date = eval('new ' + eval(d).source)
             var date_str = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + " ";

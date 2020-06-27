@@ -252,9 +252,19 @@ namespace EmpInfo.Models
         public List<ei_DENames> names { get; set; }
     }
 
-    //public class TIBeforeApplyModel
-    //{
-    //    public string sys_no { get; set; }
+    public class KSBeforeApplyModel
+    {
+        public string sys_no { get; set; }
+        public string applier_name { get; set; }
+        public string applier_number { get; set; }
+        public string dep_name { get; set; }
 
-    //}
+    }
+
+    public class KSAuditOtherInfoModel
+    {        
+        public string level_name { get; set; }
+        public int level_reward { get; set; }
+    }
+
 }

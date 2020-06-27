@@ -1,0 +1,310 @@
+﻿@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+}
+@section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+        var current_place_id = 0;
+        $(function () {
+            $("#tb1").bootstrapTable({
+                url: "GetDSes",
+                striped: true,
+                pagination: true,
+                pageSize: 10,
+                pageList: [10, 20, 40],
+                singleSelect: true,
+                clickToSelect: true,
+                selectItemName:"r1",
+                columns: [
+                    {
+                        radio: true
+                    },
+                    {
+                        field: "sort_no",
+                        title: "序号"
+                    }, {
+                        field: "place",
+                        title: "地点"
+                    }, {
+                        field: "area_size",
+                        title: "厂房面积"
+                    }
+                ],
+                onClickRow: function (row, $element, field) {
+                    current_place_id = row.id;
+                    $("#tb2").bootstrapTable('refreshOptions', { url: "GetDSDetail?place_id=" + row.id });
+                },
+                rowStyle: function (row, index) {
+                    return { css: { cursor: 'pointer' } };
+                }
+            });
+
+            $("#tb2").bootstrapTable({
+                striped: true,
+                singleSelect: true,
+                clickToSelect: true,
+                selectItemName: "r2",
+                columns: [
+                    {
+                        radio: true
+                    },
+                    {
+                        field: "floor",
+                        title: "楼层"
+                    }, {
+                        field: "dep_name",
+                        title: "部门"
+                    }, {
+                        field: "dep_size",
+                        title: "车间面积"
+                    },
+                    {
+                        field: "clear_level",
+                        title: "净房等级"
+                    }, {
+                        field: "dep_plan",
+                        title: "车间整合规划"
+                    }
+                ],
+                rowStyle: function (row, index) {
+                    return { css: { cursor: 'pointer' } };
+                }
+            });
+
+        });
+    </script>
+    <script>
+        $(function () {
+            $("#tb1AddBt").on("click", function () {
+                $("#tb1Modal .modal-title").html("增加地点信息");
+                utils.resetForm($("#tb1Form"));
+                $("#tb1Modal").modal("show");
+            });
+
+            $("#tb1ModifyBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再操作");
+                    return;
+                }
+                $("#tb1Modal .modal-title").html("修改地点信息");
+                utils.loadObjData($("#tb1Form"), rows[0]);
+                $("#tb1Modal").modal("show");
+            });
+
+            $("#tb1RemoveBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                openConfirmDialog("确定要删除选中行吗？", function () {
+                    $.post("RemoveDs", { id: rows[0].id }, function (data) {
+                        if (data.suc) {
+                            toastr.success("删除成功");
+                            $('#tb1').bootstrapTable('refresh');
+                        } else {
+                            toastr.error("删除失败：" + data.msg);
+                        }
+                    });
+                });
+            });
+
+            $("#saveTb1FormBt").on("click", function () {
+                var obj = utils.getFormObj($("#tb1Form"));
+                if (obj.sort_no == "" || obj.place == "" || obj.area_size == "") {
+                    toastr.error("请输入完整信息再提交");
+                    return;
+                }
+                if (!utils.testIsInt(obj.area_size)) {
+                    toastr.error("厂房面积必须是整数");
+                    return;
+                }
+                console.log(obj);
+                $.post("SaveDs", { obj: JSON.stringify(obj) }, function (data) {
+                    if (data.suc) {
+                        $("#tb1Modal").modal("hide");
+                        toastr.success("保存成功");
+                        $('#tb1').bootstrapTable('refresh');
+                    } else {
+                        toastr.error("保存失败：" + data.msg);
+                    }
+                });
+            });
+
+            $("#tb1ViewBt").on("click", function () {
+                window.open("DS");
+            });
+
+        });
+    </script>
+
+    <script>
+        $(function () {
+            $("#tb2AddBt").on("click", function () {
+                if (current_place_id == 0) {
+                    toastr.error("请先选择地点后再新增楼层");
+                    return;
+                }
+                $("#tb2Modal .modal-title").html("增加楼层信息");
+                utils.resetForm($("#tb2Form"));
+                $("#place_id").val(current_place_id);
+                $("#tb2Modal").modal("show");
+            });
+
+            $("#tb2ModifyBt").on("click", function () {
+                $("#tb2Modal .modal-title").html("修改楼层信息");
+                var rows = $('#tb2').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再操作");
+                    return;
+                }
+                utils.loadObjData($("#tb2Form"), rows[0]);
+                $("#tb2Modal").modal("show");
+            });
+
+            $("#tb2RemoveBt").on("click", function () {
+                var rows = $('#tb2').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                openConfirmDialog("确定要删除选中行吗？", function () {
+                    $.post("RemoveDsDetail", { id: rows[0].id }, function (data) {
+                        if (data.suc) {
+                            toastr.success("删除成功");
+                            $('#tb2').bootstrapTable('refresh');
+                        } else {
+                            toastr.error("删除失败：" + data.msg);
+                        }
+                    })
+                });
+            });
+
+            $("#saveTb2FormBt").on("click", function () {
+                var obj = utils.getFormObj($("#tb2Form"));
+                if (obj.floor == "" || obj.dep_name == "" || obj.dep_size == "" || obj.clear_level == "") {
+                    toastr.error("存在必填但未填写的字段，保存失败");
+                    return;
+                }
+                if (!utils.testIsInt(obj.dep_size)) {
+                    toastr.error("车间面积必须为整数，保存失败");
+                }
+                console.log(obj);
+                $.post("SaveDsDetail", { obj: JSON.stringify(obj) }, function (data) {
+                    if (data.suc) {
+                        $("#tb2Modal").modal("hide");
+                        toastr.success("保存成功");
+                        $('#tb2').bootstrapTable('refresh');
+                    } else {
+                        toastr.error("保存失败：" + data.msg);
+                    }
+                });
+            });
+        });
+    </script>
+
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li class="active">厂房简介维护</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6">
+
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title"><i class="fa fa-list"></i> 地点列表</div>
+                    </div>
+                    <div class="panel-body">
+                        <div style="margin-bottom:12px;">
+                            <button class="btn btn-sm btn-success" id="tb1AddBt"><i class="fa fa-plus"></i> 新增地点</button>
+                            <button class="btn btn-sm btn-primary" id="tb1ModifyBt"><i class="fa fa-edit"></i> 修改地点</button>
+                            <button class="btn btn-sm btn-danger" id="tb1RemoveBt"><i class="fa fa-remove"></i> 删除地点</button>
+                            <button class="btn btn-sm btn-warning pull-right" id="tb1ViewBt"><i class="fa fa-eye"></i> 查看展示</button>
+                        </div>
+                        @*地点table*@
+                        <table id="tb1"></table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title"><i class="fa fa-th-list"></i> 楼层明细信息</div>
+                    </div>
+                    <div class="panel-body">
+                        <div style="margin-bottom:12px;">
+                            <button class="btn btn-sm btn-success" id="tb2AddBt"><i class="fa fa-plus"></i> 新增楼层</button>
+                            <button class="btn btn-sm btn-primary" id="tb2ModifyBt"><i class="fa fa-edit"></i> 修改楼层</button>
+                            <button class="btn btn-sm btn-danger" id="tb2RemoveBt"><i class="fa fa-remove"></i> 删除楼层</button>
+                        </div>
+                        @*楼层table*@
+                        <table id="tb2"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal{
+    <div class="modal fade" id="tb1Modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="tb1Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> 增加地点信息</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="tb1Form">
+                        <input type="hidden" name="id" data-value="0" />
+                        <input type="text" class="form-control" name="sort_no" placeholder="序号，必填" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="place" placeholder="地点，必填" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="area_size" placeholder="厂房面积，必填" style="margin-top:4px;" />
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-reply"></i> 取消</button>
+                    <button id="saveTb1FormBt" type="button" class="btn btn-success"><i class="fa fa-check"></i> 确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="tb2Modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="tb2Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> 增加楼层</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="tb2Form">
+                        <input type="hidden" name="id" data-value="0" />
+                        <input type="hidden" name="place_id" id="place_id" />
+                        <input type="text" class="form-control" name="floor" placeholder="楼层，必填" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="dep_name" placeholder="部门，必填" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="dep_size" placeholder="车间面积，必填" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="clear_level" placeholder="净房等级，必填" style="margin-top:4px;" />
+                        <textarea class="form-control" rows="3" name="dep_plan" placeholder="车间整合规划，选填" style="margin-top:4px;"></textarea>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-reply"></i> 取消</button>
+                    <button id="saveTb2FormBt" type="button" class="btn btn-success"><i class="fa fa-check"></i> 确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @Html.Partial("_ConfirmDialog")
+}

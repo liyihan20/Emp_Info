@@ -1,5 +1,6 @@
 ﻿using EmpInfo.FlowSvr;
 using EmpInfo.Models;
+using EmpInfo.QywxWebSrv;
 using EmpInfo.Util;
 using System;
 using System.Collections.Generic;
@@ -332,6 +333,24 @@ namespace EmpInfo.Services
             SendWxMessageForCompleted(processName, sysNo, result, new List<vw_push_users>() { pushUser });
         }
 
+        public void SendQywxMessageForCompleted(string processName, string sysNo, string result, List<string> cardNumberList)
+        {
+            string cardNumber = string.Join("|", cardNumberList);
+            string url = "";
+            TextCardMsg msg = new TextCardMsg();
+            msg.touser = cardNumber;
+            msg.textcard = new TextCardContent();
+            msg.textcard.title = "你有一张申请单已审批完成";
+            msg.textcard.description = " <div class=\"highlight\">流程名称：" + processName + "</div>";
+            msg.textcard.description += "<div class=\"highlight\">流程编号：" + sysNo + "</div>";
+            msg.textcard.description += "<div class=\"highlight\">审批结果：" + result + "</div>";
+            msg.textcard.description += "<div class=\"highlight\">办结时间：" + DateTime.Now.ToString("yyyy-MM-dd HH:mm") + "</div>";
+            url = "http://emp.truly.com.cn/emp/QYWX/Login?returnUrl=http://emp.truly.com.cn/emp/Apply/CheckApply?sysNo=" + sysNo;
+            msg.textcard.url = GetQYWXOAthLink(url);
+                        
+            SendQYWXCardMsg(msg);
+            
+        }
         public void SendWxMessageForCompleted(string processName, string sysNo, string result, List<vw_push_users> pushUsers)
         {
             foreach (var pushUser in pushUsers) {
@@ -389,6 +408,27 @@ namespace EmpInfo.Services
             db.SaveChanges();
         }
 
+        public void SendQywxMessageToNextAuditor(string processName, string sysNo, int step, string auditStepName, string applierName, string applierTime, string applyContent, List<string> cardNumberList)
+        {
+            string cardNumber = string.Join("|", cardNumberList);
+            string url = "";
+            TextCardMsg msg = new TextCardMsg();
+            msg.touser = cardNumber;
+            msg.textcard = new TextCardContent();
+            msg.textcard.title = "你有一张待处理事项";
+            msg.textcard.description = " <div class=\"highlight\">流程名称：" + processName + "</div>";
+            msg.textcard.description += "<div class=\"highlight\">流程编号：" + sysNo + "</div>";
+            msg.textcard.description += "<div class=\"highlight\">申请人：" + applierName + "</div>";
+            msg.textcard.description += "<div class=\"highlight\">申请时间：" + applierTime + "</div>";
+            msg.textcard.description += "<div class=\"highlight\">申请内容：" + applyContent + "</div>";
+            msg.textcard.description += "<div class=\"highlight\">处理节点：" + auditStepName + "</div>";
+            url = "http://emp.truly.com.cn/emp/QYWX/Login?returnUrl=" + Uri.EscapeDataString("http://emp.truly.com.cn/emp/Apply/BeginAuditApply?sysNo=" + sysNo + "&step=" + step);
+            
+            msg.textcard.url = GetQYWXOAthLink(url);
+
+            SendQYWXCardMsg(msg);
+        }
+
         /// <summary>
         /// 行政部发送约谈信息
         /// </summary>
@@ -423,31 +463,44 @@ namespace EmpInfo.Services
                 addr = "研发楼一楼行政及人力资源部";
                 phone = "0752-6568888/7888";
             }
+            else if (recevierDepName.Contains("光电仁寿")) {
+                addr = "行政部";
+                phone = "";
+            }
             else {
                 addr = "写字楼（行政大楼）一楼行政部";
                 phone = "3003";
             }
 
-            //发微信
-            foreach (var ad in receviers.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
-                var pushUsers = db.vw_push_users.Where(u => u.card_number == ad).ToList();
-                if (pushUsers.Count() == 0) {
-                    continue;
-                }
-                var pushUser = pushUsers.First();
-                wx_pushMsg pm = new wx_pushMsg();
-                pm.FCardNumber = ad;
-                pm.FFirst = string.Format("{0}，请您于下述时间，前往{2}与{1}面谈。", recevierName, senderName, addr);
-                pm.FHasSend = false;
-                pm.FInTime = DateTime.Now;
-                pm.FkeyWord1 = pushMsg;
-                pm.FKeyWord2 = dt.ToString("yyyy-MM-dd HH:mm");
-                pm.FOpenId = pushUser.wx_openid;
-                pm.FPushType = "行政面谈";
-                pm.FRemark = "请您准时到达，如有疑问。请致电行政部" + senderName + "，电话：" + phone;
-                db.wx_pushMsg.Add(pm);
-            }
-            db.SaveChanges();
+            //发微信,改到企业微信
+            TextMsg msg = new TextMsg();
+            msg.touser = receviers.Replace(";", "|");
+            msg.text = new TextContent();
+            msg.text.content = string.Format("{0}，请您于下述时间，前往{2}与{1}面谈。", recevierName, senderName, addr);
+            msg.text.content += "\n面谈内容： " + pushMsg;
+            msg.text.content += "\n预约时间： " + dt.ToString("yyyy-MM-dd HH:mm");
+            msg.text.content += "\n请您准时到达，如有疑问。请致电行政部" + senderName + "，电话：" + phone;
+            SendQYWXMsg(msg);
+
+            //foreach (var ad in receviers.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
+            //    var pushUsers = db.vw_push_users.Where(u => u.card_number == ad).ToList();
+            //    if (pushUsers.Count() == 0) {
+            //        continue;
+            //    }
+            //    var pushUser = pushUsers.First();
+            //    wx_pushMsg pm = new wx_pushMsg();
+            //    pm.FCardNumber = ad;
+            //    pm.FFirst = string.Format("{0}，请您于下述时间，前往{2}与{1}面谈。", recevierName, senderName, addr);
+            //    pm.FHasSend = false;
+            //    pm.FInTime = DateTime.Now;
+            //    pm.FkeyWord1 = pushMsg;
+            //    pm.FKeyWord2 = dt.ToString("yyyy-MM-dd HH:mm");
+            //    pm.FOpenId = pushUser.wx_openid;
+            //    pm.FPushType = "行政面谈";
+            //    pm.FRemark = "请您准时到达，如有疑问。请致电行政部" + senderName + "，电话：" + phone;
+            //    db.wx_pushMsg.Add(pm);
+            //}
+            //db.SaveChanges();
 
             //发送邮件
             string subject = "行政部面谈通知";
@@ -455,66 +508,32 @@ namespace EmpInfo.Services
             string ccEmails = GetUserEmailByCardNum(step1Auditors);
             string content = string.Format("<div>{0}，你好！</div><div style='margin-left:30px;'>请您于下述时间，前往{1}与{2}面谈。<br /> 面谈内容：{3} <br/> 预约时间：{4:yyyy-MM-dd HH:mm}</div>", recevierName, addr, senderName, pushMsg, dt);
             MyEmail.SendEmail(subject, emailAddrs, content, ccEmails);
-        }
-
-
-        public void ITPushMsg(string sysNo, string recevierNum, string recevierName, string recevierDepName, string senderName)
-        {            
-            ei_leaveDayExceedPushLog log = new ei_leaveDayExceedPushLog();
-            log.send_date = DateTime.Now;
-            log.send_user = senderName;
-            log.sys_no = sysNo;
-            db.ei_leaveDayExceedPushLog.Add(log);
-
-            var receviers = recevierNum;            
-
-            string addr, phone;
-            //if (recevierDepName.StartsWith("惠州")) {
-            //    addr = "研发楼一楼行政及人力资源部";
-            //    phone = "0752-6568888/7888";
-            //}
-            //else {
-            //    addr = "4栋2楼IT部";
-            //    phone = "8051";
-            //}
-
-            addr = "4栋2楼IT部";
-            phone = "8051";
-
-            //发微信
-            foreach (var ad in receviers.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
-                var pushUsers = db.vw_push_users.Where(u => u.card_number == ad).ToList();
-                if (pushUsers.Count() == 0) {
-                    continue;
-                }
-                var pushUser = pushUsers.First();
-                wx_pushMsg pm = new wx_pushMsg();
-                pm.FCardNumber = ad;
-                pm.FFirst = string.Format("{0}，请您将故障电脑或设备搬至{1}等待处理。", recevierName, addr);
-                pm.FHasSend = false;
-                pm.FInTime = DateTime.Now;
-                pm.FkeyWord1 = "电脑/设备故障维修";
-                pm.FKeyWord2 = "尽快";
-                pm.FOpenId = pushUser.wx_openid;
-                pm.FPushType = "行政面谈";
-                pm.FRemark = "如有疑问，请致电IT部" + senderName + "，电话：" + phone;
-                db.wx_pushMsg.Add(pm);
-            }
-            db.SaveChanges();
-
-            //发送邮件
-            string subject = "故障电脑/设备维修通知";
-            string emailAddrs = GetUserEmailByCardNum(recevierNum);
-            string content = string.Format("<div>{0}，你好！</div><div style='margin-left:30px;'>请您尽快将故障电脑或设备搬至{1}等待处理。</div>", recevierName, addr);
-            MyEmail.SendEmail(subject, emailAddrs, content);
-        }
+        }        
 
         public ei_leaveDayExceedPushLog GetAHMsgPushLog(string sysNo)
         {
             return db.ei_leaveDayExceedPushLog.Where(l => l.sys_no == sysNo).OrderByDescending(l => l.id).FirstOrDefault();
         }
 
-        
+        public void SendQYWXMsg(TextMsg msg, DateTime? whenToPush = null)
+        {
+            msg.agentid = "1000007";
+            QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();
+            wx.PushTextMsg("wZRxdsuqeFAqJDG7VLaCTkImfsuce0qwyLO3ksBUkMY", "李逸焊", msg, whenToPush);
+        }
+
+        public void SendQYWXCardMsg(TextCardMsg msg, DateTime? whenToPush = null)
+        {
+            msg.agentid = "1000007";
+            QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();
+            wx.PushTextCardMsg("wZRxdsuqeFAqJDG7VLaCTkImfsuce0qwyLO3ksBUkMY", "李逸焊", msg, whenToPush);
+        }
+
+        public string GetQYWXOAthLink(string url)
+        {
+            QywxApiSrvSoapClient client = new QywxApiSrvSoapClient();
+            return client.GetOAthLink(url);
+        }
 
     }
 }

@@ -255,22 +255,7 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel(true));
         }
 
-        public JsonResult ITComputerPush(string sysNo)
-        {
-            try {
-                var sv = new ITSv(sysNo);
-                var bill = sv.GetBill() as ei_itApply;
-                sv.ITPushMsg(sysNo, bill.applier_num, bill.applier_name, bill.dep_name, userInfo.name);
-            }
-            catch (Exception ex) {
-                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
-            }
-
-            WriteEventLog("IT电脑报修申请", sysNo + ">发送电脑搬动通知");
-
-            return Json(new SimpleResultModel() { suc = true });
-        }
-
+        
         //打印维修二维码、取回电脑
         public ActionResult PrintITCode()
         {
@@ -373,6 +358,32 @@ namespace EmpInfo.Controllers
             }
 
             return Json(new SimpleResultModel(true));
+        }
+
+        // 健林调高优先级到6
+        public ActionResult TurnUPITPriority()
+        {
+            return View();
+        }
+
+        public JsonResult UpdateITPriority(string sysNo)
+        {
+            try {
+                new ITSv().UpdatePriority(sysNo);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true,"优先级已提升"));
+        }
+
+        public JsonResult SearchITApply(string searchContent)
+        {
+            var bill = new ITSv().SearchItApply(searchContent);
+            if (bill == null) {
+                return Json(new SimpleResultModel(false,"查询不到符合条件的申请记录"));
+            }
+            return Json(new SimpleResultModel(true,"", JsonConvert.SerializeObject(new { bill.sys_no, bill.applier_name, bill.apply_time, bill.dep_name, bill.faulty_items })));
         }
 
         #endregion

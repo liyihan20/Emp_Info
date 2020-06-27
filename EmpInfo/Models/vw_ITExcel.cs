@@ -52,5 +52,7 @@ namespace EmpInfo.Models
         public Nullable<System.DateTime> fetch_time { get; set; }
         public string audit_result { get; set; }
         public string equitment_type { get; set; }
+        public Nullable<System.DateTime> dep_charger_audit_time { get; set; }
+        public Nullable<System.DateTime> ic_manager_audit_time { get; set; }
     }
 }

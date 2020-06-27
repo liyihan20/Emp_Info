@@ -149,11 +149,16 @@ namespace EmpInfo.Services
                         GetUserEmailByCardNum(bill.applier_num)
                         );
 
-                    SendWxMessageForCompleted(
-                        BillTypeName,
-                        bill.sys_no,
-                        (isSuc ? "批准" : "被拒绝"),
-                        db.vw_push_users.Where(v => v.card_number == bill.applier_num).FirstOrDefault()
+                    //SendWxMessageForCompleted(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    (isSuc ? "批准" : "被拒绝"),
+                    //    db.vw_push_users.Where(v => v.card_number == bill.applier_num).FirstOrDefault()
+                    //    );
+                    SendQywxMessageForCompleted(
+                        BillTypeName, bill.sys_no,
+                        (isSuc ? "审批通过" : "审批不通过"),
+                        new List<string>() { bill.applier_num }
                         );
                 }
                 else {
@@ -170,7 +175,18 @@ namespace EmpInfo.Services
                         );
 
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    SendWxMessageToNextAuditor(
+                    //SendWxMessageToNextAuditor(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    result.step,
+                    //    result.stepName,
+                    //    bill.applier_name,
+                    //    ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                    //    string.Format("漏刷日期：{0:yyyy-MM-dd}；漏刷时间：{1} {2} {3} {4}", bill.forgot_date,bill.time1,bill.time2,bill.time3,bill.time4),
+                    //    db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                    //    );
+
+                    SendQywxMessageToNextAuditor(
                         BillTypeName,
                         bill.sys_no,
                         result.step,
@@ -178,8 +194,9 @@ namespace EmpInfo.Services
                         bill.applier_name,
                         ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
                         string.Format("漏刷日期：{0:yyyy-MM-dd}；漏刷时间：{1} {2} {3} {4}", bill.forgot_date,bill.time1,bill.time2,bill.time3,bill.time4),
-                        db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                        nextAuditors.ToList()
                         );
+
                 }
             }
         }

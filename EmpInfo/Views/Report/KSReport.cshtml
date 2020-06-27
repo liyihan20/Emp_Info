@@ -1,6 +1,12 @@
-﻿@section CSS{
+﻿@using EmpInfo.Models;
+@section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        .lbText{
+            font-style:italic;
+        }
+    </style>
 }
 @section Scripts {
     @*加入以下js，使IE8支持datetimepicker组件*@
@@ -31,7 +37,6 @@
     <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
     <script>
-    var currentTr;
     $(function () {
         $(".form_date").datetimepicker({
             language: 'zh-CN',
@@ -59,10 +64,12 @@
                 return;
             }
             toastr.info("数据正在导出，请稍等...");
-            window.location.href = "@Url.Content("~/Report/BeginExportAPReport?")"
+            window.location.href = "@Url.Content("~/Report/ExportKSExcel?")"
                 + "fromDate=" + $("#fromDate").val()
                 + "&toDate=" + $("#toDate").val()
-                ;
+                + "&applierName=" + $("#applierName").val()
+                + "&executorName=" + $("#executorName").val()
+            ;
             });
 
         $("#checkBt").on("click", function () {
@@ -75,9 +82,11 @@
                 return;
             }
             
-            $.post("@Url.Content("~/Report/CheckAPReport")", {
+            $.post("@Url.Content("~/Report/GetKSDatas")", {
                 fromDate: $("#fromDate").val(),
-                toDate: $("#toDate").val()
+                toDate: $("#toDate").val(),
+                applierName: $("#applierName").val(),
+                executorName: $("#executorName").val()
             }, function (data) {
                 $('#check_tb').bootstrapTable('load', data);
                 if (data.length == 0) {
@@ -95,18 +104,27 @@
             mobileResponsive: true,
             pagination: true,
             pageSize: 40,
-            pageList: [20, 40, 60, 100],
+            pageList:[20,40,60,100],
             search:true,
             columns: [
+                 {
+                     field: "audit_result",
+                     title: "处理进度",
+                     cellStyle: function (value, row, index, field) {
+                         if (value == "完成维修") {
+                             return { css: { color: 'green' }};
+                         }
+                         else if (value == "被拒绝") {
+                             return { css: { color: 'red' } };
+                         }
+                         else {
+                             return { css: { color: '#333' } };
+                         }
+                     }
+                },
                 {
                     field: "sys_no",
                     title: "流水号"
-                }, {
-                    field: "bus_name",
-                    title: "事业部"
-                }, {
-                    field: "dep_name",
-                    title: "申购部门"
                 }, {
                     field: "applier_name",
                     title: "申请人"
@@ -114,14 +132,17 @@
                     field: "apply_time",
                     title: "申请时间",
                     formatter: function (value, row, index, field) {
-                        return utils.parseTDate(value,true);
+                        return utils.parseTDate(value, true);
                     }
                 }, {
-                    field: "po_number",
-                    title: "PR单号"
+                    field: "dep_name",
+                    title: "部门"
                 }, {
-                    field: "audit_result",
-                    title: "处理结果"
+                    field: "executor_name",
+                    title: "执行人"
+                }, {
+                    field: "level_name",
+                    title: "评级"
                 }
             ],
             onClickRow: function (row, $element, field) {
@@ -143,35 +164,42 @@
         <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
-            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
-            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=AP")">辅料订购申请</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=KS")">开源节流建议流程</a></li>
             <li class="active">查询报表</li>
         </ol>
     </div>
     <div class="panel-body">
-        <div class="row" style="margin-bottom:20px;">
+        <div class="row" style="margin-bottom:6px;">
             <div class="col-xs-12 col-sm-6 col-md-4">
-                
+                <div class="lbText">提交日期从：</div>
                 <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    <input class="form-control" type="text" id="fromDate" name="fromDate" placeholder="请输入起始日期" readonly />
+                    <input class="form-control" type="text" id="fromDate" name="fromDate" readonly value="@DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd")" />
                 </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">提交日期到：</div>
                 <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    <input class="form-control" type="text" id="toDate" name="toDate" placeholder="请输入结束日期" readonly />
+                    <input class="form-control" type="text" id="toDate" name="toDate" readonly value="@DateTime.Now.ToString("yyyy-MM-dd")" />
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-4">
-                <div class="btn-group btn-group-justified" role="group" style="margin:6px 0;">
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-primary" id="checkBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
-                    </div>
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-success" id="reportBt" data-loading-text="导出中..."><i class="fa fa-file-excel-o"></i> 导出报表</button>
-                    </div>
-                </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">申请人：</div>
+                <input type="text" class="form-control" name="applierName" id="applierName" style="margin:6px 0;" />
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">执行人：</div>
+                <input type="text" class="form-control" name="executorName" id="executorName" style="margin:6px 0;" />                
+            </div>
+        </div>
+        <div class="btn-group btn-group-justified" role="group" style="margin-bottom:20px;">
+            <div class="btn-group" role="group">
+                <button class="btn btn-primary" id="checkBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
+            </div>
+            <div class="btn-group" role="group">
+                <button class="btn btn-success" id="reportBt" data-loading-text="导出中..."><i class="fa fa-file-excel-o"></i> 导出报表</button>
             </div>
         </div>
 
@@ -179,4 +207,7 @@
 
     </div>
 </div>
+
+
+
 

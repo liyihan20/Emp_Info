@@ -135,6 +135,11 @@ namespace EmpInfo.Models
         public DbSet<ei_DEApplyEntry> ei_DEApplyEntry { get; set; }
         public DbSet<ei_DEApply> ei_DEApply { get; set; }
         public DbSet<ei_empInfo> ei_empInfo { get; set; }
+        public DbSet<ei_ksApply> ei_ksApply { get; set; }
+        public DbSet<qywx_secondeValify> qywx_secondeValify { get; set; }
+        public DbSet<vw_KSExcel> vw_KSExcel { get; set; }
+        public DbSet<ei_bus_place_detail> ei_bus_place_detail { get; set; }
+        public DbSet<ei_bus_place> ei_bus_place { get; set; }
     
         public virtual ObjectResult<string> GetDormChargeMonth()
         {

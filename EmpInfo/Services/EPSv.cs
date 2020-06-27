@@ -1,6 +1,7 @@
 ﻿using EmpInfo.FlowSvr;
 using EmpInfo.Interfaces;
 using EmpInfo.Models;
+using EmpInfo.QywxWebSrv;
 using EmpInfo.Util;
 using Newtonsoft.Json;
 using System;
@@ -373,26 +374,43 @@ namespace EmpInfo.Services
             if (eqDep != null) {
                 users.Add(eqDep.minister_num);
             }
-            foreach (var user in users) {
-                var pushUser = db.vw_push_users.Where(u => u.card_number == user && u.wx_push_flow_info == true).FirstOrDefault();
-                if (pushUser != null) {
-                    wx_pushMsg pm = new wx_pushMsg();
-                    pm.FCardNumber = user;
-                    pm.FFirst = "有一张维修工单被评价为不满意";
-                    pm.FHasSend = false;
-                    pm.FInTime = DateTime.Now;
-                    pm.FkeyWord1 = "设备故障报修申请流程";
-                    pm.FKeyWord2 = bill.sys_no;
-                    pm.FKeyWord3 = "不满意，原因：" + bill.evaluation_content;
-                    pm.FKeyWord4 = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
-                    pm.FOpenId = pushUser.wx_openid;
-                    pm.FPushType = "办结";
-                    pm.FRemark = "点击可查看详情";
-                    pm.FUrl = string.Format("http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}&controllerName=Apply&actionName=CheckApply&param={2}", user, MyUtils.getMD5(user), bill.sys_no);
-                    db.wx_pushMsg.Add(pm);
-                }
-            }
-            db.SaveChanges();
+
+            //改为企业微信推送
+            string cardNumber = string.Join("|", users);
+            string url = "";
+            TextCardMsg msg = new TextCardMsg();
+            msg.touser = cardNumber;
+            msg.textcard = new TextCardContent();
+            msg.textcard.title = "有一张维修工单被评价为不满意";
+            msg.textcard.description = " <div class=\"highlight\">流程名称：" + BillTypeName + "</div>";
+            msg.textcard.description += " <div class=\"highlight\">流程编号：" + bill.sys_no + "</div>";
+            msg.textcard.description += " <div class=\"highlight\">差评原因：" + bill.evaluation_content + "</div>";
+            msg.textcard.description += " <div class=\"highlight\">评价时间：" + DateTime.Now.ToString("yyyy-MM-dd HH:mm") + "</div>";
+            url = "http://emp.truly.com.cn/emp/QYWX/Login?returnUrl=http://emp.truly.com.cn/emp/Apply/CheckApply?sysNo=" + bill.sys_no;
+            msg.textcard.url = GetQYWXOAthLink(url);
+
+            SendQYWXCardMsg(msg);
+
+            //foreach (var user in users) {
+            //    var pushUser = db.vw_push_users.Where(u => u.card_number == user && u.wx_push_flow_info == true).FirstOrDefault();
+            //    if (pushUser != null) {
+            //        wx_pushMsg pm = new wx_pushMsg();
+            //        pm.FCardNumber = user;
+            //        pm.FFirst = "有一张维修工单被评价为不满意";
+            //        pm.FHasSend = false;
+            //        pm.FInTime = DateTime.Now;
+            //        pm.FkeyWord1 = "设备故障报修申请流程";
+            //        pm.FKeyWord2 = bill.sys_no;
+            //        pm.FKeyWord3 = "不满意，原因：" + bill.evaluation_content;
+            //        pm.FKeyWord4 = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+            //        pm.FOpenId = pushUser.wx_openid;
+            //        pm.FPushType = "办结";
+            //        pm.FRemark = "点击可查看详情";
+            //        pm.FUrl = string.Format("http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}&controllerName=Apply&actionName=CheckApply&param={2}", user, MyUtils.getMD5(user), bill.sys_no);
+            //        db.wx_pushMsg.Add(pm);
+            //    }
+            //}
+            //db.SaveChanges();
         }
 
         /// <summary>
@@ -401,24 +419,37 @@ namespace EmpInfo.Services
         /// <param name="ep"></param>
         public void EPAcceptedInform()
         {
-            var applier = db.vw_push_users.Where(u => u.card_number == bill.applier_num && u.wx_push_flow_info == true).ToList();
-            if (applier.Count() > 0) {
-                var pushUser = applier.First();
-                wx_pushMsg pm = new wx_pushMsg();
-                pm.FCardNumber = bill.applier_num;
-                pm.FFirst = "维修人员已接单，请耐心等待处理";
-                pm.FHasSend = false;
-                pm.FInTime = DateTime.Now;
-                pm.FkeyWord1 = bill.sys_no;
-                pm.FKeyWord2 = bill.equitment_name;
-                pm.FKeyWord3 = bill.accept_user_name;
-                pm.FOpenId = pushUser.wx_openid;
-                pm.FPushType = "接单通知";
-                pm.FRemark = "点击可查看详情";
-                pm.FUrl = string.Format("http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}&controllerName=Apply&actionName=CheckApply&param={2}", bill.applier_num, MyUtils.getMD5(bill.applier_num), bill.sys_no);
-                db.wx_pushMsg.Add(pm);
-                db.SaveChanges();
-            }
+            string url = "";
+            TextCardMsg msg = new TextCardMsg();
+            msg.touser = bill.applier_num;
+            msg.textcard = new TextCardContent();
+            msg.textcard.title = "设备维修人员已接单，请耐心等待处理";
+            msg.textcard.description = " <div class=\"highlight\">流程名称：" + BillTypeName + "</div>";
+            msg.textcard.description += " <div class=\"highlight\">流程编号：" + bill.sys_no + "</div>";
+            msg.textcard.description += " <div class=\"highlight\">设备名称：" + bill.equitment_name + "</div>";
+            msg.textcard.description += " <div class=\"highlight\">维修人员：" + bill.accept_user_name + "</div>";
+            url = "http://emp.truly.com.cn/emp/QYWX/Login?returnUrl=http://emp.truly.com.cn/emp/Apply/CheckApply?sysNo=" + bill.sys_no;
+            msg.textcard.url = GetQYWXOAthLink(url);
+
+            SendQYWXCardMsg(msg);
+            //var applier = db.vw_push_users.Where(u => u.card_number == bill.applier_num && u.wx_push_flow_info == true).ToList();
+            //if (applier.Count() > 0) {
+            //    var pushUser = applier.First();
+            //    wx_pushMsg pm = new wx_pushMsg();
+            //    pm.FCardNumber = bill.applier_num;
+            //    pm.FFirst = "维修人员已接单，请耐心等待处理";
+            //    pm.FHasSend = false;
+            //    pm.FInTime = DateTime.Now;
+            //    pm.FkeyWord1 = bill.sys_no;
+            //    pm.FKeyWord2 = bill.equitment_name;
+            //    pm.FKeyWord3 = bill.accept_user_name;
+            //    pm.FOpenId = pushUser.wx_openid;
+            //    pm.FPushType = "接单通知";
+            //    pm.FRemark = "点击可查看详情";
+            //    pm.FUrl = string.Format("http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}&controllerName=Apply&actionName=CheckApply&param={2}", bill.applier_num, MyUtils.getMD5(bill.applier_num), bill.sys_no);
+            //    db.wx_pushMsg.Add(pm);
+            //    db.SaveChanges();
+            //}
         }
 
         public object GetBeginAuditOtherInfo(string sysNo, int step)

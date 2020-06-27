@@ -29,7 +29,7 @@ namespace EmpInfo.Services
         public override string BillTypeName
         {
             get { return "员工辞职/自离申请单"; }
-        }        
+        }
                 
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
@@ -165,7 +165,6 @@ namespace EmpInfo.Services
 
             MyUtils.SetFieldValueToModel(fc, bill);
 
-            string leaveDate = fc.Get("leave_date");
             if (isPass) {
                 if (bill.leave_date == null) return new SimpleResultModel() { suc = false, msg = "离职时间必须填写" };
                 if (string.IsNullOrEmpty(bill.work_evaluation)) return new SimpleResultModel() { suc = false, msg = "工作评价必须选择" };

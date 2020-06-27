@@ -1,0 +1,39 @@
+﻿@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/export/bootstrap-table-export.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/tableExport.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+        
+            var columns=@Html.Raw(ViewData["columns"]);
+            var rows=@Html.Raw(ViewData["rows"]);
+            $("#tb").bootstrapTable({
+                striped: true,
+                mobileResponsive: true,
+                pagination: true,
+                pageSize: 50,
+                pageList: [20, 50, 100],
+                search: true,
+                showExport: true,
+                exportDataType: "all",
+                exportTypes: ['txt', 'excel'],
+                columns: columns,
+                data: rows
+            });
+        
+    </script>
+}
+
+<div class="panel panel-default" id="tbPanel">
+    <div class="panel-heading">
+        <div class="panel-title"><i class="fa fa-table fa-fw"></i> @ViewData["title"]</div>
+    </div>
+    <div class="panel-body">
+        <table id="tb"></table>
+    </div>
+</div>

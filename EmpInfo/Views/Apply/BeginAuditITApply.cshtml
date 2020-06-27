@@ -36,7 +36,7 @@
                 });
             });
         }
-</script>
+    </script>
     @if (bam.isPass != null) {
         <script>
             $(function () {
@@ -84,6 +84,10 @@
 
                             } else {
                                 toastr.error(data.msg);
+                                if(data.msg.indexOf("接单后未维修")>=0){
+                                    var msgNo=data.msg.split(">")[1];
+                                    setTimeout(function () { window.location.href = "BeginAuditApply?sysNo="+msgNo +"&step=20"}, 5000);
+                                }
                             }
                         });
                     });
@@ -118,19 +122,7 @@
                 var hasFetchItems = false;
 
                 $(function () {
-                    //getSendMsgLog();
                     updateFixedItemUI();
-
-                    @*$("#sendMsgBt").on("click", function () {
-                                $.post("@Url.Content("~/ApplyExtra/ITComputerPush")", { sysNo: "@bam.sysNum"}, function (data) {
-                                    if (data.suc) {
-                                        toastr.success("已成功发送电脑搬动通知");
-                                        setTimeout(getSendMsgLog, 1000);
-                                    } else {
-                                        toastr.error(data.msg);
-                                    }
-                                });
-                            });*@
 
                     $("#selectBtn").on("click",function(){
                         if(hasFetchItems){
@@ -193,16 +185,6 @@
 
                 });
 
-                @*function getSendMsgLog() {
-                            $.post("@Url.Content("~/ApplyExtra/GetITPushLog")", { sysNo: "@bam.sysNum" }, function (data) {
-                                if (data.suc) {
-                                    $("#msgLog").html(data.msg);
-                                } else {
-                                    $("#msgLog").html("此维修单未发送过通知电脑搬动信息");
-                                }
-                            });
-                        }*@
-
                 function updateFixedItemUI() {
                     $("#fixItemList").empty();
                     var sumFee = 0;
@@ -221,7 +203,7 @@
                         if(fixedItems.length < 1){
                             toastr.error("请最少选择一行维修项目");
                             return;
-                        }                        
+                        }
 
                         fixed_items=JSON.stringify(fixedItems);
                         real_it_fee = utils.CalArrSum(fixedItems,"v");
@@ -396,8 +378,8 @@ else {
                     <i class='fa fa-wrench fa-fw'></i> 搬电脑到IT部
                 </div>
                 <div class="panel-body">
-                    <button type="button" class="btn btn-block btn-danger" style="margin:12px;" onclick="applierMoveComputer(false)"><i class="fa fa-reply"></i> 电脑已正常不需修理</button>         
-                    <button type="button" class="btn btn-block btn-success" style="margin:12px;" onclick="applierMoveComputer(true)"><i class="fa fa-check"></i> 已将电脑搬到IT部并打印标签</button>                               
+                    <button type="button" class="btn btn-block btn-danger" style="margin:12px;" onclick="applierMoveComputer(false)"><i class="fa fa-reply"></i> 电脑已正常不需修理</button>
+                    <button type="button" class="btn btn-block btn-success" style="margin:12px;" onclick="applierMoveComputer(true)"><i class="fa fa-check"></i> 已将电脑搬到IT部并打印标签</button>
                 </div>
             </div>
         </div>

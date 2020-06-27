@@ -192,6 +192,7 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ApplyModels.cs" />
+    <Compile Include="Models\BIModels.cs" />
     <Compile Include="Models\bi_links.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -274,6 +275,12 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_authority.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_bus_place.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_bus_place_detail.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_CRApply.cs">
@@ -367,6 +374,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_k3RestLog.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_ksApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_leaveDayExceedPushLog.cs">
@@ -561,6 +571,9 @@
     <Compile Include="Models\public_fund_item.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\qywx_secondeValify.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ReportModels.cs" />
     <Compile Include="Models\ResModels.cs" />
     <Compile Include="Models\SqlModels.cs" />
@@ -613,6 +626,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_JQExcel.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\vw_KSExcel.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vw_leaving_days.cs">
@@ -671,6 +687,7 @@
     <Compile Include="Services\ALSv.cs" />
     <Compile Include="Services\APSv.cs" />
     <Compile Include="Services\BaseSv.cs" />
+    <Compile Include="Services\BIBaseSv.cs" />
     <Compile Include="Services\BillSv.cs" />
     <Compile Include="Services\CRSv.cs" />
     <Compile Include="Services\DESv.cs" />
@@ -680,6 +697,7 @@
     <Compile Include="Services\HRDBSv.cs" />
     <Compile Include="Services\IESv.cs" />
     <Compile Include="Services\ITSv.cs" />
+    <Compile Include="Services\KSSv.cs" />
     <Compile Include="Services\SJSv.cs" />
     <Compile Include="Services\JQSv.cs" />
     <Compile Include="Services\SASv.cs" />
@@ -885,6 +903,7 @@
     <Content Include="Content\fontawesome\fontcss\font-awesome.css" />
     <Content Include="Content\fontawesome\fontcss\font-awesome.min.css" />
     <Content Include="Content\fontawesome\fonts\fontawesome-webfont.svg" />
+    <Content Include="Content\images\bus_deps.png" />
     <Content Include="Content\images\assist.png" />
     <Content Include="Content\images\auditors.png" />
     <Content Include="Content\images\basic_info.png" />
@@ -903,6 +922,7 @@
     <Content Include="Content\images\gear.png" />
     <Content Include="Content\images\house.png" />
     <Content Include="Content\images\it.png" />
+    <Content Include="Content\images\ks.png" />
     <Content Include="Content\images\kw.png" />
     <Content Include="Content\images\leave.png" />
     <Content Include="Content\images\office.png" />
@@ -1519,6 +1539,16 @@
     <None Include="Service References\QywxWebSrv\QywxApiSrv.wsdl" />
     <Content Include="Views\Home\BasicInfo.cshtml" />
     <Content Include="Views\Report\SRBillReport.cshtml" />
+    <Content Include="Views\Apply\BeginApplyKS.cshtml" />
+    <Content Include="Views\Apply\CheckKSApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditKSApply.cshtml" />
+    <Content Include="Views\QYWX\SecondValify.cshtml" />
+    <Content Include="Views\Shared\Error2.cshtml" />
+    <Content Include="Views\Report\KSReport.cshtml" />
+    <Content Include="Views\BI\BasicTable.cshtml" />
+    <Content Include="Views\ApplyExtra\TurnUPITPriority.cshtml" />
+    <Content Include="Views\Others\DS.cshtml" />
+    <Content Include="Views\Others\DSIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

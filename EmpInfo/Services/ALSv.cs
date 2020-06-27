@@ -336,10 +336,15 @@ namespace EmpInfo.Services
                         isSuc ? GetUserEmailByCardNum(bill.inform_man + (string.IsNullOrEmpty(bill.agent_man) ? "" : (";" + bill.agent_man))) : ""
                         );
 
-                    SendWxMessageForCompleted(
+                    //SendWxMessageForCompleted(
+                    //    BillTypeName, bill.sys_no,
+                    //    (isSuc ? "审批通过" : "审批不通过"),
+                    //    db.vw_push_users.Where(v => v.card_number == bill.applier_num).FirstOrDefault()
+                    //    );
+                    SendQywxMessageForCompleted(
                         BillTypeName, bill.sys_no,
                         (isSuc ? "审批通过" : "审批不通过"),
-                        db.vw_push_users.Where(v => v.card_number == bill.applier_num).FirstOrDefault()
+                        new List<string>() { bill.applier_num }
                         );
                 }
                 else {
@@ -356,7 +361,18 @@ namespace EmpInfo.Services
                         );
 
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    SendWxMessageToNextAuditor(
+                    //SendWxMessageToNextAuditor(
+                    //    BillTypeName + (model.msg.Contains("撤销") ? "(撤销)" : ""),
+                    //    bill.sys_no,
+                    //    result.step,
+                    //    result.stepName,
+                    //    bill.applier_name,
+                    //    ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                    //    string.Format("部门【{0}】;请假时间【{1} ~ {2}】", bill.dep_long_name, ((DateTime)bill.from_date).ToString("yyyy-MM-dd HH:mm"), ((DateTime)bill.to_date).ToString("yyyy-MM-dd HH:mm")),
+                    //    db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                    //    );
+
+                    SendQywxMessageToNextAuditor(
                         BillTypeName + (model.msg.Contains("撤销") ? "(撤销)" : ""),
                         bill.sys_no,
                         result.step,
@@ -364,7 +380,7 @@ namespace EmpInfo.Services
                         bill.applier_name,
                         ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
                         string.Format("部门【{0}】;请假时间【{1} ~ {2}】", bill.dep_long_name, ((DateTime)bill.from_date).ToString("yyyy-MM-dd HH:mm"), ((DateTime)bill.to_date).ToString("yyyy-MM-dd HH:mm")),
-                        db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                        nextAuditors.ToList()
                         );
 
                 }

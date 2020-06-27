@@ -180,7 +180,41 @@
                         toastr.error(data.msg);
                     }
                 });
-            })
+            });
+
+            $("#searchReportBt").on("click", function () {
+                $.post("GetDormFeeReport", { yearMonth: $("#yearMonthSt").val() }, function (data) {
+                    if (!data.suc) {
+                        toastr.error(data.msg);
+                        return;
+                    }
+                    var r = JSON.parse(data.extra);
+                    $("#tb4 b").each(function (i, ele) {
+                        var self = this;
+                        var id = $(self).attr("id");
+                        var temp = r.filter(function (t) { return t.charge_type == id });
+                        if (temp.length > 0) {
+                            if (id != "工资代扣" && temp[0].type_sum > 0) {
+                                $(self).css("cursor", "pointer");
+                            }
+                            $(self).html(temp[0].type_sum);
+                        } else {
+                            $(self).html(0);
+                        }
+                    });
+                    toastr.success("读取成功");
+                });
+            });
+
+            $("#tb4 b").on("click", function () {
+                if (!isNaN($(this).html()) && parseFloat($(this).html()) > 0) {
+                    var id = $(this).attr("id");
+                    if (id != "工资代扣") {
+                        window.open("GetDormFeeReportDetail?yearMonth=" + $("#yearMonthSt").val() + "&chargeType=" + id);
+                    }
+                }
+            });
+
         });
     </script>
 }
@@ -199,6 +233,8 @@
             <li role="presentation" class="active"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">员工查询</a></li>
             <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">宿舍查询</a></li>
             <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab">空房统计</a></li>
+            <li role="presentation"><a href="#tab4" aria-controls="tab4" role="tab" data-toggle="tab">收支统计</a></li>
+
         </ul>
 
         <!-- Tab panes -->
@@ -327,6 +363,62 @@
                     </div>
                 </div>
             </div>
+
+             <div role="tabpanel" class="tab-pane fade" id="tab4">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        @{
+                            List<string> yearMonth = ViewData["yearMonth"] as List<string>;
+                        }
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-3" style="margin-bottom:12px;">
+                                <select class="form-control" id="yearMonthSt">
+                                    @foreach (var ym in yearMonth) {
+                                        <option value="@(ym.Substring(0,4)+"-"+ym.Substring(4))">@(ym.Substring(0, 4) + "-" + ym.Substring(4))</option>
+                                    }
+                                </select>
+                                <div class="small text-danger"><i class="fa fa-info-circle"></i> 2020-05之后开始有统计数据</div>
+                            </div>
+                            <div class="col-xs-12 col-sm-3" style="margin-bottom:12px;">
+                                <button class="btn btn-primary" id="searchReportBt"><i class="fa fa-search"></i> 统计查询</button>
+                            </div>
+                        </div>
+
+
+                        <table class="table table-bordered" id="tb4">
+                            <tr>
+                                <td class="text-center" style="width:25%;"><span style="color:#666666"> 工资代扣</span></td>
+                                <td style="width:25%;"><b class="pull-right text-primary" id="工资代扣"></b></td>
+                                <td class="text-center" style="width:25%;"><span style="color:#666666"> 公司转账</span></td>
+                                <td style="width:25%;"><b class="pull-right text-primary" id="公司转账"></b></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="width:25%;"><span style="color:#666666"> 劳务抵扣</span></td>
+                                <td style="width:25%;"><b class="pull-right text-primary" id="劳务抵扣"></b></td>
+                                <td class="text-center" style="width:25%;"><span style="color:#666666"> 现金收款</span></td>
+                                <td style="width:25%;"><b class="pull-right text-primary" id="现金收款"></b></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="width:25%;"><span style="color:#666666"> 扣款失败</span></td>
+                                <td style="width:25%;"><b class="pull-right text-primary" id="扣款失败"></b></td>
+                                <td class="text-center" style="width:25%;"><span style="color:#666666"> 行政减免</span></td>
+                                <td style="width:25%;"><b class="pull-right text-primary" id="行政减免"></b></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="width:25%;"><span style="color:#666666"> 杂费收入</span></td>
+                                <td style="width:25%;"><b class="pull-right text-primary" id="杂费收入"></b></td>
+                                <td class="text-center" style="width:25%;"><span style="color:#666666"> 未处理</span></td>
+                                <td style="width:25%;"><b class="pull-right text-primary" id="未处理"></b></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="width:25%;"><span style="color:#666666"> 工程支出</span></td>
+                                <td style="width:25%;"><b class="pull-right text-primary" id="工程支出"></b></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

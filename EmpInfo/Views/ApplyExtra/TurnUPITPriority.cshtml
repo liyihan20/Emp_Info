@@ -1,0 +1,147 @@
+﻿@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: top;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        var sysNo;
+        $(function () {
+            $("#get_info_btn").on("click", function () {
+                var sinfo = $.trim($("#searchContent").val());
+                if (!sinfo || sinfo.length < 6) {
+                    toastr.error("请输入正确的信息后再获取");
+                    return;
+                }
+                $.post("SearchITApply", { searchContent: sinfo }, function (data) {
+                    if (data.suc) {
+                        var it = JSON.parse(data.extra);
+                        sysNo = it.sys_no;
+                        $("#empName").val(it.applier_name);
+                        $("#depName").val(it.dep_name);
+                        $("#applyDate").val(utils.parseTDate(it.apply_time,true));
+                        $("#itemList").empty();
+                        var selectedItems = JSON.parse(it.faulty_items);
+                        var sumFee = 0;
+                        for (var i in selectedItems) {
+                            $("#itemList").append("<li><i class='fa-li fa fa-circle'></i> " + selectedItems[i].n + " : " + selectedItems[i].v + "</li>");
+                            sumFee += parseInt(selectedItems[i].v);
+                        }
+                        $("#itemList").append("<li><i class='fa-li fa fa-cny'></i> 预计产生IT费用" + " : " + sumFee + "</li>");
+                    } else {
+                        sysNo = "";
+                        $("#itemList").empty();
+                        $("#empName").val("");
+                        $("#depName").val("");
+                        $("#applyDate").val("");
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+            $("#apply_bt").on("click", function () {
+                if (!sysNo) {
+                    toastr.error("请先获取信息");
+                    return;
+                }
+                openConfirmDialog("确定要提升此申请单的优先级吗？", function () {
+                    $.post("UpdateITPriority", { sysNo: sysNo }, function (data) {
+                        if (!data.suc) {
+                            toastr.error(data.msg);
+                        } else {
+                            toastr.success(data.msg);
+                        }
+                    });
+                });
+
+            });
+
+        });
+    </script>
+}
+
+<div class="row" style="margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                    <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                    <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                    <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+                    <li><a href="../Apply/ApplyIndex?billType=IT">电脑维修申请</a></li>
+                    <li class="active">提升处理优先级</li>
+                </ol>
+            </div>
+            <div class="panel-body">
+                <div class="b-div">
+                    <span class="b-label">
+                        输入信息:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control" id="searchContent" placeholder="请输入申请流水号或申请人厂牌" />
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        获取信息:
+                    </span>
+                    <span class="b-input">
+                        <button class="btn btn-success btn-sm" type="button" id="get_info_btn"><i class="fa fa-search"></i> 获取信息</button>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        姓名:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control" id="empName" placeholder="由系统带出" readonly />
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        部门:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control" id="depName" placeholder="由系统带出" readonly />
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        提交时间:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control" id="applyDate" placeholder="由系统带出" readonly />
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        报修项目:
+                    </span>
+                    <div class="b-input">                        
+                        <ul class="text-danger fa-ul" id="itemList">
+                            @*在此处插入it项目*@
+                        </ul>
+                    </div>
+                </div>
+
+                <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在处理..."><i class="fa fa-check-circle-o"></i> 确认提升优先级</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+}

@@ -7,6 +7,7 @@ using EmpInfo.Models;
 using EmpInfo.Util;
 using EmpInfo.Filter;
 using Newtonsoft.Json;
+using EmpInfo.Services;
 
 namespace EmpInfo.Controllers
 {
@@ -61,6 +62,27 @@ namespace EmpInfo.Controllers
             }
             return Json(new SimpleResultModel());
         }
+
+        public ActionResult BasicTable()
+        {
+            string title = TempData["title"] as string;
+            string sqlText = TempData["sqlText"] as string;
+            ConnectionModel cm = TempData["cm"] as ConnectionModel;
+
+            try {
+                var result = new BIBaseSv().GetTableResult(sqlText, cm);
+                ViewData["title"] = title;
+                ViewData["columns"] = result.columns;
+                ViewData["rows"] = result.rows;
+            }
+            catch (Exception ex) {
+                ViewBag.tip = ex.Message;
+                return View("Error");
+            }
+            return View();
+
+        }
+        
 
     }
 }

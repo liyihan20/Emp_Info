@@ -38,6 +38,19 @@ namespace EmpInfo.Models
         public string[] tags { get; set; }        
         public string color { get; set; }
         public bool selectable { get; set; }
-    }    
+    }
+
+    public class BusPlaces
+    {
+        public int place_id { get; set; }
+        public int sort_no { get; set; }
+        public string place { get; set; }
+        public string floor { get; set; }
+        public string dep_name { get; set; }
+        public int area_size { get; set; }
+        public int dep_size { get; set; }
+        public string clear_level { get; set; }
+        public string dep_plan { get; set; }
+    }
 
 }

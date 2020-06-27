@@ -1,5 +1,4 @@
 ﻿(function ($, window) {
-
     // 初始化插件参数并配置插件各项事件
     function init(options) {
         var defaults = {

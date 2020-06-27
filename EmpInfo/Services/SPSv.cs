@@ -32,16 +32,43 @@ namespace EmpInfo.Services
 
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
-            var menus = base.GetApplyMenuItems(userInfo);
+            var list = base.GetApplyMenuItems(userInfo);
+            //var list = new List<ApplyMenuItemModel>();
+            //list.Add(new ApplyMenuItemModel()
+            //{
+            //    url = "../Att/SP/wl_tg.png",
+            //    text = "开始申请",
+            //    iconFont = "fa-pencil",
+            //    colorClass = "text-danger"
+            //});
+            //list.Add(new ApplyMenuItemModel()
+            //{
+            //    url = "GetMyApplyList?billType=" + BillType,
+            //    text = "我申请的",
+            //    iconFont = "fa-th"
+            //});
+            //list.Add(new ApplyMenuItemModel()
+            //{
+            //    url = "GetMyAuditingList?billType=" + BillType,
+            //    text = "我的待办",
+            //    iconFont = "fa-th-list"
+            //});
+            //list.Add(new ApplyMenuItemModel()
+            //{
+            //    url = "GetMyAuditedList?billType=" + BillType,
+            //    text = "我的已办",
+            //    iconFont = "fa-th-large"
+            //});
+
             if (HasGotPower("SPReport", userInfo.id)) {
-                menus.Add(new ApplyMenuItemModel()
+                list.Add(new ApplyMenuItemModel()
                 {
                     text = "查询报表",
                     iconFont = "fa-file-text-o",
                     url = "../Report/SPReport"
                 });
             }
-            return menus;
+            return list;
         }
 
         public override string AuditViewName()
@@ -51,7 +78,7 @@ namespace EmpInfo.Services
 
         public override object GetInfoBeforeApply(UserInfo userInfo, UserInfoDetail userInfoDetail)
         {
-            //throw new Exception("新流程正在开发中，将加入放行条功能，等待开发完成后再开放此流程");
+            //throw new Exception("收寄件服务暂停，待物流确认后再启用");
             string sysNo = GetNextSysNum(BillType);
             var sp = db.ei_spApply.Where(s => s.applier_num == userInfo.cardNo).OrderByDescending(s => s.id).FirstOrDefault();
             var busDepList = db.flow_auditorRelation.Where(f => f.bill_type == BillType && f.relate_name == "事业部审批").Select(f => f.relate_text).Distinct().ToList();

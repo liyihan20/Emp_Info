@@ -2608,5 +2608,119 @@ namespace EmpInfo.Controllers
 
         #endregion
 
+        #region 开源节流
+
+        [SessionTimeOutFilter]
+        public ActionResult KSReport()
+        {
+            return View();
+        }
+
+        public IQueryable<vw_KSExcel> SearchKSDatas(DateTime fromDate, DateTime toDate, string applierName,string executorName)
+        {
+            toDate = toDate.AddDays(1);
+            var result = from v in db.vw_KSExcel
+                         where v.apply_time >= fromDate
+                         && v.apply_time < toDate
+                         select v;
+            if (!string.IsNullOrWhiteSpace(applierName)) {
+                result = result.Where(r => r.applier_name.Contains(applierName));
+            }
+            if (!string.IsNullOrWhiteSpace(executorName)) {
+                result = result.Where(r => r.executor_name.Contains(executorName));
+            }
+            return result;
+        }
+
+        public JsonResult GetKSDatas(DateTime fromDate, DateTime toDate, string applierName, string executorName)
+        {
+            var result = SearchKSDatas(fromDate, toDate, applierName,executorName).Select(r => new
+            {
+                r.applier_name,
+                r.apply_time,
+                r.dep_name,
+                r.executor_name,
+                r.audit_result,
+                r.level_name,
+                r.sys_no,
+            }).OrderBy(r => r.apply_time).ToList();
+
+            return Json(result);
+        }
+
+        public void ExportKSExcel(DateTime fromDate, DateTime toDate, string applierName, string executorName)
+        {
+            var result = SearchKSDatas(fromDate, toDate, applierName, executorName).OrderBy(r => r.apply_time).ToList();
+            string[] colName = new string[] { "处理进度","申请流水号", "申请人", "申请时间", "联系电话", "部门", "现状", "建议","收益", "采纳奖励",
+                                              "评级", "评级奖励", "执行人", "营运部意见","团队组员","成果说明", "营运部备注" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 24;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "开源节流申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("申请详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result) {
+                colIndex = 1;
+
+                //"处理进度","申请流水号", "申请人", "申请时间", "联系电话", "部门", "现状", "建议","收益", "采纳奖励",
+                //"评级", "评级奖励", "执行人", "营运部意见","团队组员","成果说明", "营运部备注"
+                cells.Add(++rowIndex, colIndex, d.audit_result);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.applier_name);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.applier_phone);
+                cells.Add(rowIndex, ++colIndex, d.dep_name);
+                cells.Add(rowIndex, ++colIndex, d.situation);
+                cells.Add(rowIndex, ++colIndex, d.suggestion);
+                cells.Add(rowIndex, ++colIndex, d.benefit);
+                cells.Add(rowIndex, ++colIndex, d.applier_reward);
+                
+                cells.Add(rowIndex, ++colIndex, d.level_name);
+                cells.Add(rowIndex, ++colIndex, d.level_reward);
+                cells.Add(rowIndex, ++colIndex, d.executor_name);
+                cells.Add(rowIndex, ++colIndex, d.operation_dep_opinion);
+                cells.Add(rowIndex, ++colIndex, d.group_members);
+                cells.Add(rowIndex, ++colIndex, d.result_description);
+                cells.Add(rowIndex, ++colIndex, d.operation_dep_summary);
+            }
+
+            xls.Send();
+        }
+
+        #endregion
+
     }
 }

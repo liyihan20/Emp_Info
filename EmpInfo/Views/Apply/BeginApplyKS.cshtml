@@ -1,0 +1,166 @@
+﻿@using EmpInfo.Models;
+@{
+    KSBeforeApplyModel ks = ViewData["infoBeforeApply"] as KSBeforeApplyModel;
+}
+@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: middle;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 4px 0;
+        }
+
+        .item_header {
+            cursor: pointer;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        $(function () {
+
+            $("#apply_bt").on("click",function(){
+                var obj = utils.getFormObj($("#fm"));
+                
+                var reqInfo = utils.validateRequiredField($("#fm"));
+                if (!reqInfo.suc) {
+                    toastr.error(reqInfo.msg);
+                    return;
+                }
+                var jsonObj = utils.StringifyAndParseCharacter(obj);
+                openConfirmDialog("确定要提交此建议吗？", function () {
+                    $("#apply_bt").button("loading");
+                    $.ajax({
+                        type: 'post',
+                        url: 'SaveApply',
+                        data: "obj=" + jsonObj+"&sys_no="+obj.sys_no,
+                        cache: false,
+                        dataType: 'json',
+                        success: function (data) {
+                            $("#apply_bt").button("reset");
+                            if (data.suc) {
+                                toastr.success("提交成功:" + data.msg);
+                                setTimeout(function () { window.location.href = "CheckApply?sysNo=" + obj.sys_no; }, 2000);
+                            } else {
+                                toastr.error("提交失败：" + data.msg);
+                                $("#apply_bt").button("reset");
+                            }
+                        }
+                    });
+                });
+
+            });
+
+        });
+        
+
+    </script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="ApplyIndex?billType=KS">开源节流建议</a></li>
+            <li class="active">开始申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <form id="fm">
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请流水号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="sys_no" value="@ks.sys_no" readonly />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请人:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="applier_name" value="@ks.applier_name" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            厂牌:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="applier_number" value="@ks.applier_number" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            部门名称:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="dep_name" value="@ks.dep_name" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            联系电话:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control" name="applier_phone" placeholder="必填，请输入联系电话" required />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label" style="vertical-align:top;">
+                    现状简介:
+                </span>
+                <span class="b-input">
+                    <textarea type="text" class="form-control" rows="3" id="situation" name="situation" placeholder="必填，请在此描述当前状况、可改善优化的问题点等" required></textarea>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label" style="vertical-align:top;">
+                    建议详情:
+                </span>
+                <span class="b-input">
+                    <textarea type="text" class="form-control" rows="5" id="suggestion" name="suggestion" placeholder="必填，请在此填写建议、解决方案等" required></textarea>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label" style="vertical-align:top;">
+                    收益评估:
+                </span>
+                <span class="b-input">
+                    <textarea type="text" class="form-control" rows="3" id="benefit" name="benefit" placeholder="选填，请在此填写实施建议成功后的预计收益"></textarea>
+                </span>
+            </div>
+            <p class="small text-danger"><i class="fa fa-info-circle"></i> 建议被营运部成功采纳后将会获得一定的金额奖励</p>
+            <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:4px;"><i class="fa fa-check-circle-o"></i> 提交建议</button>
+        </form>
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+}

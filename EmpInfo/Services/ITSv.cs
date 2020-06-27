@@ -5,6 +5,7 @@ using EmpInfo.Util;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.Objects;
 using System.Linq;
 
 namespace EmpInfo.Services
@@ -70,6 +71,15 @@ namespace EmpInfo.Services
                 iconFont = "fa-barcode 扫描维修标签",
                 url = "../WX/JsInterface?actionType=scanQRCode"
             });
+
+            if (db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "提升优先级" && f.relate_value == userInfo.cardNo).Count() > 0) {
+                menus.Add(new ApplyMenuItemModel()
+                    {
+                        text = "提升优先级",
+                        iconFont = "fa-level-up",
+                        url = "../ApplyExtra/TurnUPITPriority"
+                    });
+            }
             return menus;
         }
 
@@ -158,6 +168,21 @@ namespace EmpInfo.Services
             string opinion = fc.Get("opinion");
 
             if (stepName.Equals("IT部接单")) {
+                if (bill.priority < 6) {
+                    // 优先级少于6的，接单之前，判断是否有7天未处理完成的单，如有，不允许接，给提示
+                    var exceedBills = (from i in db.vw_ITExcel
+                                       where i.accept_man_number == userInfo.cardNo
+                                       && i.repair_time == null
+                                       && i.audit_result != "被拒绝"
+                                       && ((i.repair_way == "现场维修" && EntityFunctions.DiffDays(i.print_time, DateTime.Now) >= 7)
+                                       || (i.repair_way == "远程维修" && EntityFunctions.DiffDays(i.accept_time, DateTime.Now) >= 7)
+                                       )
+                                       orderby i.accept_time
+                                       select i.sys_no).Take(1).ToList();
+                    if (exceedBills.Count() > 0) {
+                        throw new Exception("存在超过7天接单后未维修的申请，请先处理后再接单，5秒后将跳转到需处理的页面>" + exceedBills.First());
+                    }
+                }
                 MyUtils.SetFieldValueToModel(fc, bill);
                 bill.accept_man_name = userInfo.name;
                 bill.accept_man_number = userInfo.cardNo;
@@ -330,6 +355,30 @@ namespace EmpInfo.Services
             bill.fetcher_no = cardNumber;
             bill.fetcher_phone = phone;
             db.SaveChanges();
+        }
+
+        /// <summary>
+        /// 健林可以提高某人的优先级
+        /// </summary>
+        /// <param name="sysNo"></param>
+        public void UpdatePriority(string sysNo)
+        {
+            bill = db.ei_itApply.Where(i => i.sys_no == sysNo).FirstOrDefault();
+            if (bill != null) {
+                if (bill.priority == 6) {
+                    throw new Exception("优先级已提升过，不能重复操作");
+                }
+                bill.priority = 6;
+                db.SaveChanges();
+            }
+            else {
+                throw new Exception("申请单不存在");
+            }
+        }
+
+        public ei_itApply SearchItApply(string searchContent)
+        {
+            return db.ei_itApply.Where(i => i.applier_num == searchContent || i.sys_no == searchContent).OrderByDescending(i => i.id).FirstOrDefault();
         }
 
         /// <summary>

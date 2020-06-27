@@ -205,11 +205,16 @@ namespace EmpInfo.Services
                         ccEmails
                         );
 
-                    SendWxMessageForCompleted(
-                        BillTypeName,
-                        bill.sys_no,
-                        (isSuc ? "批准" : "被拒绝"),
-                        pushUsers
+                    //SendWxMessageForCompleted(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    (isSuc ? "批准" : "被拒绝"),
+                    //    pushUsers
+                    //    );
+                    SendQywxMessageForCompleted(
+                        BillTypeName, bill.sys_no,
+                        (isSuc ? "审批通过" : "审批不通过"),
+                        new List<string>() { bill.applier_num }
                         );
                 }
                 else {
@@ -226,15 +231,25 @@ namespace EmpInfo.Services
                         );
 
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    SendWxMessageToNextAuditor(
-                        BillTypeName,
-                        bill.sys_no,
-                        result.step,
-                        result.stepName,
-                        bill.applier_name,
-                        ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
-                        string.Format("{0}等{1}项", bill.ei_apApplyEntry.First().item_modual,bill.ei_apApplyEntry.Count()),
-                        db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                    //SendWxMessageToNextAuditor(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    result.step,
+                    //    result.stepName,
+                    //    bill.applier_name,
+                    //    ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                    //    string.Format("{0}等{1}项", bill.ei_apApplyEntry.First().item_modual,bill.ei_apApplyEntry.Count()),
+                    //    db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                    //    );
+                    SendQywxMessageToNextAuditor(
+                            BillTypeName,
+                            bill.sys_no,
+                            result.step,
+                            result.stepName,
+                            bill.applier_name,
+                            ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                            string.Format("{0}等{1}项", bill.ei_apApplyEntry.First().item_modual,bill.ei_apApplyEntry.Count()),
+                            nextAuditors.ToList()
                         );
                 }
             }

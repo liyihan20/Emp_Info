@@ -9,10 +9,11 @@ using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using EmpInfo.Services;
 using Newtonsoft.Json;
+using EmpInfo.QywxWebSrv;
 
 
 namespace EmpInfo.Controllers
-{    
+{
     public class HomeController : BaseController
     {
         //主页
@@ -20,7 +21,7 @@ namespace EmpInfo.Controllers
         public ActionResult Index()
         {
             WriteEventLog("主界面", "打开主页");
-            ViewData["username"] = userInfo.name;            
+            ViewData["username"] = userInfo.name;
             ViewData["autStr"] = MyPowers();
 
             if ("06022701".Equals(userInfo.cardNo)) {
@@ -33,9 +34,9 @@ namespace EmpInfo.Controllers
 
             List<vw_push_users> pushUsers = new List<vw_push_users>();
             try {
-                pushUsers = db.vw_push_users.Where(v => v.id == userInfo.id).ToList();                
+                pushUsers = db.vw_push_users.Where(v => v.id == userInfo.id).ToList();
             }
-            catch {}
+            catch { }
             ViewData["wxSetting"] = pushUsers.Count() > 0 ? "1" : "0"; //是否可以看到微信公众号的有关设置
             //查看工资是否需要再次确认密码
             bool checkSalaryNeedPassword = false;
@@ -85,7 +86,7 @@ namespace EmpInfo.Controllers
         //获取一维码
         public ActionResult GetCode39()
         {
-            byte[] code=MyUtils.GetCode39(userInfo.cardNo);
+            byte[] code = MyUtils.GetCode39(userInfo.cardNo);
             return File(code, @"image/bmp");
         }
 
@@ -96,8 +97,7 @@ namespace EmpInfo.Controllers
         public JsonResult ValidateOldPassword(string old_pass)
         {
             old_pass = MyUtils.getMD5(old_pass);
-            if (db.ei_users.Where(u => u.card_number == userInfo.cardNo && u.password == old_pass).Count() < 1)
-            {
+            if (db.ei_users.Where(u => u.card_number == userInfo.cardNo && u.password == old_pass).Count() < 1) {
                 WriteEventLog("主界面", "验证旧密码，错误");
                 return Json(new SimpleResultModel() { suc = false, msg = "原始密码错误" });
             }
@@ -107,7 +107,7 @@ namespace EmpInfo.Controllers
             bool checkSalaryInfo = false, pushSalaryInfo = false, pushConsumeInfo = false, pushFlowInfo = false;
 
             if (pushUsers.Count() > 0) {
-                var pushUser=pushUsers.First();
+                var pushUser = pushUsers.First();
                 checkSalaryInfo = pushUser.wx_check_salary_info ?? false;
                 pushSalaryInfo = pushUser.wx_push_salary_info ?? false;
                 pushConsumeInfo = pushUser.wx_push_consume_info ?? false;
@@ -132,7 +132,7 @@ namespace EmpInfo.Controllers
         [SessionTimeOutJsonFilter]
         public JsonResult UpdatePersonalInfo(FormCollection fc)
         {
-            string phone=fc.Get("phone");
+            string phone = fc.Get("phone");
             string email = fc.Get("email");
             string new_pass = fc.Get("new_pass");
             string shortPhone = fc.Get("shortPhone");
@@ -144,16 +144,14 @@ namespace EmpInfo.Controllers
             string pushFlowInfo = fc.Get("pushFlowInfo");
 
             var user = db.ei_users.Single(u => u.card_number == userInfo.cardNo);
-            if (!string.IsNullOrEmpty(email))
-            {
+            if (!string.IsNullOrEmpty(email)) {
                 email = email.Trim();
                 var emailR = new Regex(@"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$");
-                if (!emailR.IsMatch(email))
-                {
+                if (!emailR.IsMatch(email)) {
                     return Json(new SimpleResultModel() { suc = false, msg = "邮箱地址不合法" });
                 }
                 var emailOwner = db.ei_users.Where(u => u.email == email && u.id != userInfo.id && u.name != userInfo.name).FirstOrDefault();
-                
+
                 if (emailOwner != null) {
                     if (db.vw_ei_simple_users.Where(s => s.card_number == emailOwner.card_number && s.dep_name != null).Count() > 0) {
                         return Json(new SimpleResultModel() { suc = false, msg = "此邮箱已被其他人绑定" });
@@ -168,12 +166,10 @@ namespace EmpInfo.Controllers
             else {
                 user.email = "";
             }
-            if (!string.IsNullOrEmpty(phone))
-            {
+            if (!string.IsNullOrEmpty(phone)) {
                 var phoneR = new Regex(@"^\d{11}$");
                 phone = phone.Trim();
-                if (!phoneR.IsMatch(phone))
-                {                    
+                if (!phoneR.IsMatch(phone)) {
                     return Json(new SimpleResultModel() { suc = false, msg = "手机长号必须是11位数字" });
                 }
                 if (db.ei_users.Where(u => u.phone == phone && u.id != userInfo.id && u.name != userInfo.name).Count() > 0) {
@@ -185,8 +181,7 @@ namespace EmpInfo.Controllers
                 user.phone = "";
             }
             user.short_phone = shortPhone;
-            if (!string.IsNullOrEmpty(new_pass))
-            {
+            if (!string.IsNullOrEmpty(new_pass)) {
                 string passTip = MyUtils.ValidatePassword(new_pass);
                 if (string.IsNullOrEmpty(passTip)) {
                     user.password = MyUtils.getMD5(new_pass);
@@ -195,7 +190,7 @@ namespace EmpInfo.Controllers
                     return Json(new SimpleResultModel() { suc = false, msg = passTip });
                 }
             }
-            
+
             if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(phone) && !string.IsNullOrEmpty(shortPhone)) {
                 db.InsertIntoYFEmp(email ?? "", phone ?? "", shortPhone ?? "", user.name, user.card_number);
             }
@@ -219,8 +214,7 @@ namespace EmpInfo.Controllers
         public JsonResult ValidateDorm()
         {
             var result = db.ValidateDormStatus(userInfoDetail.salaryNo).ToList();
-            if (result.Count() > 0)
-            {
+            if (result.Count() > 0) {
                 return Json(new SimpleResultModel() { suc = result.First().suc == 1 ? true : false, msg = result.First().msg });
             }
             return Json(new SimpleResultModel() { suc = false, msg = "查询失败" });
@@ -232,17 +226,15 @@ namespace EmpInfo.Controllers
         {
             //住宿状态
             var dormInfo = db.GetEmpDormInfo(userInfo.cardNo).ToList();
-            
+
             var model = new DormLivingInfo();
-            if (dormInfo.Count() > 0)
-            {
+            if (dormInfo.Count() > 0) {
                 model.livingStatus = "在住";
                 model.areaNumber = dormInfo.First().area;
                 model.dormNumber = dormInfo.First().dorm_number;
                 model.inDate = ((DateTime)dormInfo.First().in_date).ToString("yyyy-MM-dd");
             }
-            else
-            {
+            else {
                 model.livingStatus = "未住宿";
                 model.areaNumber = "无";
                 model.dormNumber = "无";
@@ -250,7 +242,7 @@ namespace EmpInfo.Controllers
             }
             ViewData["dormLivingInfo"] = model;
             //费用年月份
-            var yearMonthArr = db.GetDormChargeMonth().ToArray();
+            var yearMonthArr = db.GetDormChargeMonth().Take(6).ToArray();
             ViewData["yearMonthArr"] = yearMonthArr;
 
             WriteEventLog("住宿界面", "获取基础住宿信息");
@@ -262,14 +254,12 @@ namespace EmpInfo.Controllers
         public JsonResult GetDormFee(string year_month)
         {
             var fees = db.GetDormFeeByMonth(year_month.Replace("-", ""), userInfoDetail.salaryNo).ToList();
-            if (fees.Count() < 1)
-            {
+            if (fees.Count() < 1) {
                 return Json(new SimpleResultModel() { suc = false, msg = "查询不到相关信息" });
             }
             DormFeeModel model = new DormFeeModel();
             model.yearMonth = year_month;
-            foreach (var fee in fees)
-            {
+            foreach (var fee in fees) {
                 model.dormNumber += "  " + fee.dorm_number;
                 model.rent += "  " + fee.rent;
                 model.management += "  " + fee.management;
@@ -300,7 +290,7 @@ namespace EmpInfo.Controllers
                 return View();
             }
             catch (Exception ex) {
-                ViewBag.tip = "饭卡查询出错："+ex.Message;
+                ViewBag.tip = "饭卡查询出错：" + ex.Message;
                 return View("Error");
             }
         }
@@ -310,14 +300,12 @@ namespace EmpInfo.Controllers
         public JsonResult GetConsumeRecords(string from_date, string to_date)
         {
             var records = canteenDb.ljq20160323_001(userInfo.cardNo, from_date, to_date).ToList();
-            if (records.Count() < 1)
-            {
+            if (records.Count() < 1) {
                 WriteEventLog("饭卡查询", "消费记录：" + from_date + "~" + to_date + ":此时间段查询不到相关记录");
                 return Json(new SimpleResultModel() { suc = false, msg = "此时间段查询不到相关记录" });
             }
             List<DiningCardConsumeRecords> list = new List<DiningCardConsumeRecords>();
-            foreach (var r in records.OrderByDescending(r => r.消费时间))
-            {
+            foreach (var r in records.OrderByDescending(r => r.消费时间)) {
                 list.Add(new DiningCardConsumeRecords()
                 {
                     consumeTime = r.消费时间.ToString("yyyy-MM-dd HH:mm"),
@@ -335,14 +323,12 @@ namespace EmpInfo.Controllers
         public JsonResult GetRechargeRecords(string from_date, string to_date)
         {
             var records = canteenDb.ljq20160323_003(userInfo.cardNo, from_date, to_date).ToList();
-            if (records.Count() < 1)
-            {
+            if (records.Count() < 1) {
                 WriteEventLog("饭卡查询", "充值记录：" + from_date + "~" + to_date + ":此时间段查询不到相关记录");
                 return Json(new SimpleResultModel() { suc = false, msg = "此时间段查询不到相关记录" });
             }
             List<DiningCardRechargeRecords> list = new List<DiningCardRechargeRecords>();
-            foreach (var r in records.OrderByDescending(r=>r.充值时间))
-            {
+            foreach (var r in records.OrderByDescending(r => r.充值时间)) {
                 list.Add(new DiningCardRechargeRecords()
                 {
                     beforeSum = ((decimal)r.充值前金额).ToString("0.0"),
@@ -376,7 +362,7 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel() { suc = false, msg = "操作失败" });
         }
 
-                
+
         //饭卡绑定
         [SessionTimeOutJsonFilter]
         public JsonResult GetDinnerCardBinding()
@@ -401,7 +387,7 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = "保存设定需要先绑定手机长号，请在主界面点击头像设置手机长号" });
             }
             else {
-                var phoneExists = db.ei_users.Where(u => u.phone == phone && u.name != userInfo.name).Select(u=>u.name).Distinct().ToArray();
+                var phoneExists = db.ei_users.Where(u => u.phone == phone && u.name != userInfo.name).Select(u => u.name).Distinct().ToArray();
                 if (phoneExists.Count() > 0) {
                     return Json(new SimpleResultModel() { suc = false, msg = "你的手机长号与[" + string.Join(",", phoneExists) + "]重复，保存失败。" });
                 }
@@ -443,7 +429,7 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = "服务器错误，保存失败，请联系管理员" });
             }
 
-            return Json(new SimpleResultModel() { suc = true, msg = "保存设定成功！" }); 
+            return Json(new SimpleResultModel() { suc = true, msg = "保存设定成功！" });
         }
 
         #endregion
@@ -492,7 +478,7 @@ namespace EmpInfo.Controllers
                 return View("Error");
             }
 
-            ViewData["salaryNo"] = salaryNo;            
+            ViewData["salaryNo"] = salaryNo;
             ViewData["months"] = db.GetSalaryMonths(salaryNo).ToList();
             ViewData["info"] = info;
             WriteEventLog("工资查询", "进入工资查询页面");
@@ -500,13 +486,13 @@ namespace EmpInfo.Controllers
         }
 
         public JsonResult CheckSalarySummary(string yearMonth)
-        {            
+        {
             DateTime firstDay = DateTime.Parse(yearMonth + "-01");
             DateTime lastDay = firstDay.AddMonths(1);
             yearMonth = yearMonth.Replace("-", "");
 
-            WriteEventLog("工资查询", "查询工资月度摘要:"+yearMonth);
-            return Json(db.GetSalarySummary(userInfoDetail.salaryNo, firstDay, lastDay,yearMonth).ToList().First());
+            WriteEventLog("工资查询", "查询工资月度摘要:" + yearMonth);
+            return Json(db.GetSalarySummary(userInfoDetail.salaryNo, firstDay, lastDay, yearMonth).ToList().First());
         }
 
         public JsonResult CheckSalaryDetail(string yearMonth)
@@ -516,7 +502,7 @@ namespace EmpInfo.Controllers
             yearMonth = yearMonth.Replace("-", "");
 
             WriteEventLog("工资查询", "查询工资月度明细:" + yearMonth);
-            var result = db.GetSalaryAllDetail(userInfoDetail.salaryNo, firstDay, lastDay,yearMonth).ToList();
+            var result = db.GetSalaryAllDetail(userInfoDetail.salaryNo, firstDay, lastDay, yearMonth).ToList();
             if (result.Count() == 0) {
                 return Json(new { suc = false, msg = "查询不到此月份的工资数据" });
             }
@@ -616,7 +602,7 @@ namespace EmpInfo.Controllers
         }
 
         #endregion
-
+                
 
         public ActionResult test()
         {
@@ -641,23 +627,9 @@ namespace EmpInfo.Controllers
 
         [SessionTimeOutFilter]
         public ActionResult WorkGroupIndex()
-        {            
-            //ViewData["autStr"] = MyPowers();
+        {
             return View();
         }
-
-        //[SessionTimeOutFilter]
-        //public ActionResult EleProcess()
-        //{            
-        //    return View();
-        //}
-
-        //[SessionTimeOutFilter]
-        //public ActionResult NoPaperProcess()
-        //{
-        //    ViewData["autStr"] = MyPowers();
-        //    return View();
-        //}
 
         //public string img()
         //{
@@ -672,6 +644,13 @@ namespace EmpInfo.Controllers
         {
             MyUtils.Write("tmp.txt", "hello");
             return "OK";
+        }
+
+        public string msg()
+        {
+            new ALSv().SendQywxMessageToNextAuditor("请假流程", "AL2006090848", 1, "部门负责人", "李逸焊", "2020-06-20 08:15", "家里有事", new List<string>() { "110428101" });
+
+            return "ok";
         }
 
     }
