@@ -199,8 +199,8 @@ namespace EmpInfo.Services
                 if (model.msg.Contains("完成") || model.msg.Contains("NG")) {
                     bool isSuc = model.msg.Contains("NG") ? false : true;
                     string ccEmails = "";
-                    List<vw_push_users> pushUsers = db.vw_push_users.Where(v => v.card_number == bill.applier_num).ToList();
-
+                    //List<vw_push_users> pushUsers = db.vw_push_users.Where(v => v.card_number == bill.applier_num).ToList();
+                    List<string> pushUsers = new List<string>() { bill.applier_num };
                     if (isSuc) {
                         List<string> additionCardNumber = new List<string>(); //需要额外通知的厂牌
                         additionCardNumber.Add(bill.in_clerk_num); //调入部门文员
@@ -212,12 +212,13 @@ namespace EmpInfo.Services
                             additionCardNumber.AddRange(db.flow_notifyUsers.Where(n => n.bill_type == BillType && n.cond1 == "月薪").Select(n => n.card_number));
                         }
 
-                        pushUsers.AddRange(
-                            from v in db.vw_push_users
-                            where v.wx_push_flow_info == true
-                            && additionCardNumber.Contains(v.card_number)
-                            select v
-                            );
+                        pushUsers.AddRange(additionCardNumber);
+                        //pushUsers.AddRange(
+                        //    from v in db.vw_push_users
+                        //    where v.wx_push_flow_info == true
+                        //    && additionCardNumber.Contains(v.card_number)
+                        //    select v
+                        //    );
                     }
 
                     SendEmailForCompleted(
@@ -229,7 +230,13 @@ namespace EmpInfo.Services
                         ccEmails
                         );
 
-                    SendWxMessageForCompleted(
+                    //SendWxMessageForCompleted(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    (isSuc ? "批准" : "被拒绝"),
+                    //    pushUsers
+                    //    );
+                    SendQywxMessageForCompleted(
                         BillTypeName,
                         bill.sys_no,
                         (isSuc ? "批准" : "被拒绝"),
@@ -250,7 +257,17 @@ namespace EmpInfo.Services
                         );
 
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    SendWxMessageToNextAuditor(
+                    //SendWxMessageToNextAuditor(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    result.step,
+                    //    result.stepName,
+                    //    bill.applier_name,
+                    //    ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                    //    string.Format("{0}{1}的调动申请", bill.ei_sjApplyEntry.First().name, bill.ei_sjApplyEntry.Count() > 1 ? ("等" + bill.ei_sjApplyEntry.Count() + "人") : ""),
+                    //    db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                    //    );
+                    SendQywxMessageToNextAuditor(
                         BillTypeName,
                         bill.sys_no,
                         result.step,
@@ -258,7 +275,7 @@ namespace EmpInfo.Services
                         bill.applier_name,
                         ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
                         string.Format("{0}{1}的调动申请", bill.ei_sjApplyEntry.First().name, bill.ei_sjApplyEntry.Count() > 1 ? ("等" + bill.ei_sjApplyEntry.Count() + "人") : ""),
-                        db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                        nextAuditors.ToList()
                         );
                 }
             }

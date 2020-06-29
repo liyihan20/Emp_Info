@@ -159,11 +159,17 @@ namespace EmpInfo.Services
                         ccEmails
                         );
 
-                    SendWxMessageForCompleted(
+                    //SendWxMessageForCompleted(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    (isSuc ? "批准" : "被拒绝"),
+                    //    pushUsers
+                    //    );
+                    SendQywxMessageForCompleted(
                         BillTypeName,
                         bill.sys_no,
                         (isSuc ? "批准" : "被拒绝"),
-                        pushUsers
+                        new List<string>() { bill.applier_number }
                         );
                 }
                 else {
@@ -180,7 +186,17 @@ namespace EmpInfo.Services
                         );
 
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    SendWxMessageToNextAuditor(
+                    //SendWxMessageToNextAuditor(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    result.step,
+                    //    result.stepName,
+                    //    bill.applier_name,
+                    //    ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                    //    string.Format("{0}的{1}", bill.applier_name, BillTypeName),
+                    //    db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                    //    );
+                    SendQywxMessageToNextAuditor(
                         BillTypeName,
                         bill.sys_no,
                         result.step,
@@ -188,7 +204,7 @@ namespace EmpInfo.Services
                         bill.applier_name,
                         ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
                         string.Format("{0}的{1}", bill.applier_name, BillTypeName),
-                        db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                        nextAuditors.ToList()
                         );
                 }
             }

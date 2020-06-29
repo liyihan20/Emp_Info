@@ -3743,10 +3743,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <End Role="ei_DEApplyEntry" EntitySet="ei_DEApplyEntry" />
           </AssociationSet>
           <EntitySet Name="ei_empInfo" EntityType="ICAuditModel.ei_empInfo" />
-          <FunctionImport Name="GetSRBills" ReturnType="Collection(ICAuditModel.GetSRBills_Result)">
-            <Parameter Name="fromDate" Mode="In" Type="DateTime" />
-            <Parameter Name="toDate" Mode="In" Type="DateTime" />
-          </FunctionImport>
           <EntitySet Name="ei_ksApply" EntityType="ICAuditModel.ei_ksApply" />
           <EntitySet Name="qywx_secondeValify" EntityType="ICAuditModel.qywx_secondeValify" />
           <EntitySet Name="vw_KSExcel" EntityType="ICAuditModel.vw_KSExcel" />
@@ -3756,6 +3752,10 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <End Role="ei_bus_place" EntitySet="ei_bus_place" />
             <End Role="ei_bus_place_detail" EntitySet="ei_bus_place_detail" />
           </AssociationSet>
+          <FunctionImport Name="GetSRBills" ReturnType="Collection(ICAuditModel.GetSRBills_Result)">
+            <Parameter Name="fromDate" Mode="In" Type="DateTime" />
+            <Parameter Name="toDate" Mode="In" Type="DateTime" />
+          </FunctionImport>
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -6355,22 +6355,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="position" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
-        <ComplexType Name="GetSRBills_Result">
-          <Property Type="String" Name="FCompany" Nullable="false" MaxLength="6" />
-          <Property Type="String" Name="FOutTimeSpan" Nullable="true" MaxLength="20" />
-          <Property Type="String" Name="FArriveDate" Nullable="true" MaxLength="50" />
-          <Property Type="String" Name="FStatus" Nullable="false" MaxLength="12" />
-          <Property Type="String" Name="FStockNo" Nullable="true" MaxLength="255" />
-          <Property Type="String" Name="FBillNo" Nullable="true" MaxLength="25" />
-          <Property Type="String" Name="FApplier" Nullable="true" MaxLength="101" />
-          <Property Type="String" Name="FSupplierName" Nullable="true" MaxLength="80" />
-          <Property Type="String" Name="FShipToName" Nullable="true" MaxLength="200" />
-          <Property Type="String" Name="FShipToAddress" Nullable="true" MaxLength="250" />
-          <Property Type="String" Name="FShipToAttn" Nullable="true" MaxLength="50" />
-          <Property Type="String" Name="FShipToTel" Nullable="true" MaxLength="50" />
-          <Property Type="String" Name="FOrderBillNo" Nullable="true" MaxLength="24" />
-          <Property Type="Decimal" Name="FQty" Nullable="true" Precision="18" Scale="4" />
-        </ComplexType>
         <EntityType Name="ei_ksApply">
           <Key>
             <PropertyRef Name="id" />
@@ -6468,6 +6452,24 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <ComplexType Name="GetSRBills_Result">
+          <Property Type="String" Name="FCompany" Nullable="false" MaxLength="6" />
+          <Property Type="String" Name="FOutTimeSpan" Nullable="true" MaxLength="20" />
+          <Property Type="String" Name="FArriveDate" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="FStatus" Nullable="false" MaxLength="12" />
+          <Property Type="String" Name="FStockNo" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="FBillNo" Nullable="true" MaxLength="25" />
+          <Property Type="String" Name="FApplier" Nullable="true" MaxLength="101" />
+          <Property Type="String" Name="FSupplierName" Nullable="true" MaxLength="80" />
+          <Property Type="String" Name="FShipToName" Nullable="true" MaxLength="200" />
+          <Property Type="String" Name="FShipToAddress" Nullable="true" MaxLength="250" />
+          <Property Type="String" Name="FShipToAttn" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="FShipToTel" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="FOrderBillNo" Nullable="true" MaxLength="24" />
+          <Property Type="Decimal" Name="FQty" Nullable="true" Precision="18" Scale="4" />
+          <Property Type="String" Name="FModel" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="FdeptName" Nullable="true" MaxLength="80" />
+        </ComplexType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -8921,26 +8923,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="GetSRBills" FunctionName="ICAuditModel.Store.GetSRBills">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ICAuditModel.GetSRBills_Result">
-                <ScalarProperty Name="FCompany" ColumnName="FCompany" />
-                <ScalarProperty Name="FOutTimeSpan" ColumnName="FOutTimeSpan" />
-                <ScalarProperty Name="FArriveDate" ColumnName="FArriveDate" />
-                <ScalarProperty Name="FStatus" ColumnName="FStatus" />
-                <ScalarProperty Name="FStockNo" ColumnName="FStockNo" />
-                <ScalarProperty Name="FBillNo" ColumnName="FBillNo" />
-                <ScalarProperty Name="FApplier" ColumnName="FApplier" />
-                <ScalarProperty Name="FSupplierName" ColumnName="FSupplierName" />
-                <ScalarProperty Name="FShipToName" ColumnName="FShipToName" />
-                <ScalarProperty Name="FShipToAddress" ColumnName="FShipToAddress" />
-                <ScalarProperty Name="FShipToAttn" ColumnName="FShipToAttn" />
-                <ScalarProperty Name="FShipToTel" ColumnName="FShipToTel" />
-                <ScalarProperty Name="FOrderBillNo" ColumnName="FOrderBillNo" />
-                <ScalarProperty Name="FQty" ColumnName="FQty" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
           <EntitySetMapping Name="ei_ksApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_ksApply">
               <MappingFragment StoreEntitySet="ei_ksApply">
@@ -9028,6 +9010,28 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetSRBills" FunctionName="ICAuditModel.Store.GetSRBills">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetSRBills_Result">
+                <ScalarProperty Name="FCompany" ColumnName="FCompany" />
+                <ScalarProperty Name="FOutTimeSpan" ColumnName="FOutTimeSpan" />
+                <ScalarProperty Name="FArriveDate" ColumnName="FArriveDate" />
+                <ScalarProperty Name="FStatus" ColumnName="FStatus" />
+                <ScalarProperty Name="FStockNo" ColumnName="FStockNo" />
+                <ScalarProperty Name="FBillNo" ColumnName="FBillNo" />
+                <ScalarProperty Name="FApplier" ColumnName="FApplier" />
+                <ScalarProperty Name="FSupplierName" ColumnName="FSupplierName" />
+                <ScalarProperty Name="FShipToName" ColumnName="FShipToName" />
+                <ScalarProperty Name="FShipToAddress" ColumnName="FShipToAddress" />
+                <ScalarProperty Name="FShipToAttn" ColumnName="FShipToAttn" />
+                <ScalarProperty Name="FShipToTel" ColumnName="FShipToTel" />
+                <ScalarProperty Name="FOrderBillNo" ColumnName="FOrderBillNo" />
+                <ScalarProperty Name="FQty" ColumnName="FQty" />
+                <ScalarProperty Name="FModel" ColumnName="FModel" />
+                <ScalarProperty Name="FdeptName" ColumnName="FdeptName" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
           </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

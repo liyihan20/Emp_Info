@@ -187,16 +187,14 @@ namespace EmpInfo.Services
                 if (model.msg.Contains("完成") || model.msg.Contains("NG")) {
                     bool isSuc = model.msg.Contains("NG") ? false : true;
                     string ccEmails = "";
-                    List<vw_push_users> pushUsers = db.vw_push_users.Where(v => v.card_number == bill.applier_num).ToList();
-
+                    //List<vw_push_users> pushUsers = db.vw_push_users.Where(v => v.card_number == bill.applier_num).ToList();
+                    List<string> pushUsers = new List<string> { bill.applier_num };
                     if (isSuc) {
                         //通知知会人
                         pushUsers.AddRange(
                             (from u in db.flow_notifyUsers
-                             join v in db.vw_push_users on u.card_number equals v.card_number
-                             where v.wx_push_flow_info == true
-                             && u.bill_type == BillType
-                             select v).ToList()
+                             where u.bill_type == BillType
+                             select u.card_number).ToList()
                         );
                         ccEmails = string.Join(",", (
                             from u in db.flow_notifyUsers
@@ -216,7 +214,13 @@ namespace EmpInfo.Services
                         ccEmails
                         );
 
-                    SendWxMessageForCompleted(
+                    //SendWxMessageForCompleted(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    (isSuc ? "批准" : "被拒绝"),
+                    //    pushUsers
+                    //    );
+                    SendQywxMessageForCompleted(
                         BillTypeName,
                         bill.sys_no,
                         (isSuc ? "批准" : "被拒绝"),
@@ -237,7 +241,17 @@ namespace EmpInfo.Services
                         );
 
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    SendWxMessageToNextAuditor(
+                    //SendWxMessageToNextAuditor(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    result.step,
+                    //    result.stepName,
+                    //    bill.applier_name,
+                    //    ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                    //    string.Format("{0}：{1}等", bill.customer_name, bill.ei_etApplyEntry.First().item_modual),
+                    //    db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                    //    );
+                    SendQywxMessageToNextAuditor(
                         BillTypeName,
                         bill.sys_no,
                         result.step,
@@ -245,8 +259,8 @@ namespace EmpInfo.Services
                         bill.applier_name,
                         ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
                         string.Format("{0}：{1}等", bill.customer_name, bill.ei_etApplyEntry.First().item_modual),
-                        db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
-                        );
+                        nextAuditors.ToList()
+                    );
                 }
             }
         }

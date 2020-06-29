@@ -156,7 +156,8 @@ namespace EmpInfo.Services
                     //    db.vw_push_users.Where(v => v.card_number == bill.applier_num).FirstOrDefault()
                     //    );
                     SendQywxMessageForCompleted(
-                        BillTypeName, bill.sys_no,
+                        BillTypeName, 
+                        bill.sys_no,
                         (isSuc ? "审批通过" : "审批不通过"),
                         new List<string>() { bill.applier_num }
                         );

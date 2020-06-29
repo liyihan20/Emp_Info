@@ -325,13 +325,13 @@ namespace EmpInfo.Services
         /// <param name="sysNo">流程编号</param>
         /// <param name="result">处理结果</param>
         /// <param name="pushUser">推送用户</param>
-        public void SendWxMessageForCompleted(string processName, string sysNo, string result, vw_push_users pushUser)
-        {
-            if (pushUser == null) {
-                return;
-            }
-            SendWxMessageForCompleted(processName, sysNo, result, new List<vw_push_users>() { pushUser });
-        }
+        //public void SendWxMessageForCompleted(string processName, string sysNo, string result, vw_push_users pushUser)
+        //{
+        //    if (pushUser == null) {
+        //        return;
+        //    }
+        //    SendWxMessageForCompleted(processName, sysNo, result, new List<vw_push_users>() { pushUser });
+        //}
 
         public void SendQywxMessageForCompleted(string processName, string sysNo, string result, List<string> cardNumberList)
         {
@@ -351,26 +351,26 @@ namespace EmpInfo.Services
             SendQYWXCardMsg(msg);
             
         }
-        public void SendWxMessageForCompleted(string processName, string sysNo, string result, List<vw_push_users> pushUsers)
-        {
-            foreach (var pushUser in pushUsers) {
-                wx_pushMsg pm = new wx_pushMsg();
-                pm.FCardNumber = pushUser.card_number;
-                pm.FFirst = "你有一张申请单已审批完成";
-                pm.FHasSend = false;
-                pm.FInTime = DateTime.Now;
-                pm.FkeyWord1 = processName;
-                pm.FKeyWord2 = sysNo;
-                pm.FKeyWord3 = result;
-                pm.FKeyWord4 = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
-                pm.FOpenId = pushUser.wx_openid;
-                pm.FPushType = "办结";
-                pm.FRemark = "点击可查看详情";
-                pm.FUrl = string.Format("http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}&controllerName=Apply&actionName=CheckApply&param={2}", pushUser.card_number, MyUtils.getMD5(pushUser.card_number), sysNo);
-                db.wx_pushMsg.Add(pm);
-            }
-            db.SaveChanges();
-        }
+        //public void SendWxMessageForCompleted(string processName, string sysNo, string result, List<vw_push_users> pushUsers)
+        //{
+        //    foreach (var pushUser in pushUsers) {
+        //        wx_pushMsg pm = new wx_pushMsg();
+        //        pm.FCardNumber = pushUser.card_number;
+        //        pm.FFirst = "你有一张申请单已审批完成";
+        //        pm.FHasSend = false;
+        //        pm.FInTime = DateTime.Now;
+        //        pm.FkeyWord1 = processName;
+        //        pm.FKeyWord2 = sysNo;
+        //        pm.FKeyWord3 = result;
+        //        pm.FKeyWord4 = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+        //        pm.FOpenId = pushUser.wx_openid;
+        //        pm.FPushType = "办结";
+        //        pm.FRemark = "点击可查看详情";
+        //        pm.FUrl = string.Format("http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}&controllerName=Apply&actionName=CheckApply&param={2}", pushUser.card_number, MyUtils.getMD5(pushUser.card_number), sysNo);
+        //        db.wx_pushMsg.Add(pm);
+        //    }
+        //    db.SaveChanges();
+        //}
 
         /// <summary>
         /// 发送通知审核的微信给审核人，统一用【待审2】模板
@@ -383,30 +383,30 @@ namespace EmpInfo.Services
         /// <param name="applierTime">申请时间</param>
         /// <param name="applyContent">申请内容</param>
         /// <param name="pushUsers">审核人list</param>
-        public void SendWxMessageToNextAuditor(string processName, string sysNo, int step, string auditStepName, string applierName, string applierTime, string applyContent, List<vw_push_users> pushUsers)
-        {
-            if (pushUsers.Count()==0) {
-                return;
-            }
-            foreach (var u in pushUsers) {
-                wx_pushMsg pm = new wx_pushMsg();
-                pm.FCardNumber = u.card_number;
-                pm.FFirst = "你有一张待审批事项：" + sysNo;
-                pm.FHasSend = false;
-                pm.FInTime = DateTime.Now;
-                pm.FkeyWord1 = processName;
-                pm.FKeyWord2 = applierName;
-                pm.FKeyWord3 = applierTime;
-                pm.FKeyWord4 = applyContent;
-                pm.FKeyWord5 = auditStepName;
-                pm.FOpenId = u.wx_openid;
-                pm.FPushType = "待审2";
-                pm.FRemark = "点击可进入审批此申请";
-                pm.FUrl = string.Format("http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}&controllerName=Apply&actionName=BeginAuditApply&param={2}", u.card_number, MyUtils.getMD5(u.card_number), sysNo + "%3B" + step); //%3B是分号;
-                db.wx_pushMsg.Add(pm);
-            }
-            db.SaveChanges();
-        }
+        //public void SendWxMessageToNextAuditor(string processName, string sysNo, int step, string auditStepName, string applierName, string applierTime, string applyContent, List<vw_push_users> pushUsers)
+        //{
+        //    if (pushUsers.Count()==0) {
+        //        return;
+        //    }
+        //    foreach (var u in pushUsers) {
+        //        wx_pushMsg pm = new wx_pushMsg();
+        //        pm.FCardNumber = u.card_number;
+        //        pm.FFirst = "你有一张待审批事项：" + sysNo;
+        //        pm.FHasSend = false;
+        //        pm.FInTime = DateTime.Now;
+        //        pm.FkeyWord1 = processName;
+        //        pm.FKeyWord2 = applierName;
+        //        pm.FKeyWord3 = applierTime;
+        //        pm.FKeyWord4 = applyContent;
+        //        pm.FKeyWord5 = auditStepName;
+        //        pm.FOpenId = u.wx_openid;
+        //        pm.FPushType = "待审2";
+        //        pm.FRemark = "点击可进入审批此申请";
+        //        pm.FUrl = string.Format("http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}&controllerName=Apply&actionName=BeginAuditApply&param={2}", u.card_number, MyUtils.getMD5(u.card_number), sysNo + "%3B" + step); //%3B是分号;
+        //        db.wx_pushMsg.Add(pm);
+        //    }
+        //    db.SaveChanges();
+        //}
 
         public void SendQywxMessageToNextAuditor(string processName, string sysNo, int step, string auditStepName, string applierName, string applierTime, string applyContent, List<string> cardNumberList)
         {
@@ -500,7 +500,7 @@ namespace EmpInfo.Services
             //    pm.FRemark = "请您准时到达，如有疑问。请致电行政部" + senderName + "，电话：" + phone;
             //    db.wx_pushMsg.Add(pm);
             //}
-            //db.SaveChanges();
+            db.SaveChanges();
 
             //发送邮件
             string subject = "行政部面谈通知";

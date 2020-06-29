@@ -231,11 +231,17 @@ namespace EmpInfo.Services
                         GetUserEmailByCardNum(bill.applier_num)
                         );
 
-                    SendWxMessageForCompleted(
+                    //SendWxMessageForCompleted(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    (isSuc ? "维修完成" : "被拒绝"),
+                    //    pushUsers
+                    //    );
+                    SendQywxMessageForCompleted(
                         BillTypeName,
                         bill.sys_no,
                         (isSuc ? "维修完成" : "被拒绝"),
-                        pushUsers
+                        new List<string>() { bill.applier_num }
                         );
                 }
                 else {
@@ -266,7 +272,17 @@ namespace EmpInfo.Services
                     else {
                         wxPushContent = string.Format("所在部门：{0}；计算机名/IP地址：{1}/{2}", bill.dep_name, bill.computer_name ?? "", bill.ip_addr ?? "");
                     }
-                    SendWxMessageToNextAuditor(
+                    //SendWxMessageToNextAuditor(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    result.step,
+                    //    result.stepName,
+                    //    bill.applier_name,
+                    //    ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                    //    wxPushContent,
+                    //    db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                    //    );
+                    SendQywxMessageToNextAuditor(
                         BillTypeName,
                         bill.sys_no,
                         result.step,
@@ -274,7 +290,7 @@ namespace EmpInfo.Services
                         bill.applier_name,
                         ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
                         wxPushContent,
-                        db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                        nextAuditors.ToList()
                         );
                 }
             }

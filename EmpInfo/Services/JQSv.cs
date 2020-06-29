@@ -287,7 +287,7 @@ namespace EmpInfo.Services
                 if (model.msg.Contains("完成") || model.msg.Contains("NG")) {
                     bool isSuc = model.msg.Contains("NG") ? false : true;
                     string ccEmails = "";
-                    List<vw_push_users> pushUsers = db.vw_push_users.Where(v => v.card_number == bill.applier_num).ToList();                                       
+                    //List<vw_push_users> pushUsers = db.vw_push_users.Where(v => v.card_number == bill.applier_num).ToList();                                       
 
                     SendEmailForCompleted(
                         bill.sys_no,
@@ -298,11 +298,17 @@ namespace EmpInfo.Services
                         ccEmails
                         );
 
-                    SendWxMessageForCompleted(
+                    //SendWxMessageForCompleted(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    (isSuc ? "批准" : "被拒绝"),
+                    //    pushUsers
+                    //    );
+                    SendQywxMessageForCompleted(
                         BillTypeName,
                         bill.sys_no,
                         (isSuc ? "批准" : "被拒绝"),
-                        pushUsers
+                        new List<string>() { bill.applier_num }
                         );
                 }
                 else {
@@ -319,15 +325,25 @@ namespace EmpInfo.Services
                         );
 
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    SendWxMessageToNextAuditor(
+                    //SendWxMessageToNextAuditor(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    result.step,
+                    //    result.stepName,
+                    //    bill.applier_name,
+                    //    ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                    //    string.Format("[{2}]{0}的{1}申请", bill.name,bill.quit_type,bill.dep_name),
+                    //    db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                    //    );
+                    SendQywxMessageToNextAuditor(
                         BillTypeName,
                         bill.sys_no,
                         result.step,
                         result.stepName,
                         bill.applier_name,
                         ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
-                        string.Format("[{2}]{0}的{1}申请", bill.name,bill.quit_type,bill.dep_name),
-                        db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                        string.Format("[{2}]{0}的{1}申请", bill.name, bill.quit_type, bill.dep_name),
+                        nextAuditors.ToList()
                         );
                 }
             }

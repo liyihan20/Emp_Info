@@ -224,6 +224,12 @@ namespace EmpInfo.Services
                         string.Format("你申请的单号为【{0}】的{1}已{2}，请知悉。", bill.sys_no, BillTypeName, (isSuc ? "处理完成" : "被拒绝")),
                         GetUserEmailByCardNum(bill.applier_num)
                         );
+                    SendQywxMessageForCompleted(
+                        BillTypeName, 
+                        bill.sys_no,
+                        (isSuc ? "审批通过" : "审批不通过"),
+                        new List<string>() { bill.applier_num }
+                        );
                 }
                 else {
                     FlowSvrSoapClient flow = new FlowSvrSoapClient();
@@ -236,6 +242,16 @@ namespace EmpInfo.Services
                         GetUserNameByCardNum(model.nextAuditors),
                         string.Format("你有一张待处理的单号为【{0}】的{1}，请尽快登陆系统处理。", bill.sys_no, BillTypeName),
                         GetUserEmailByCardNum(model.nextAuditors)
+                        );
+                    SendQywxMessageToNextAuditor(
+                        BillTypeName,
+                        bill.sys_no,
+                        result.step,
+                        result.stepName,
+                        bill.applier_name,
+                        ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                        string.Format("宿舍号：{0}；维修内容：{1}", bill.dorm_num, bill.repair_content),
+                        model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList()
                         );
                 }
             }

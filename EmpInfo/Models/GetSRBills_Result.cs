@@ -27,5 +27,7 @@ namespace EmpInfo.Models
         public string FShipToTel { get; set; }
         public string FOrderBillNo { get; set; }
         public Nullable<decimal> FQty { get; set; }
+        public string FModel { get; set; }
+        public string FdeptName { get; set; }
     }
 }

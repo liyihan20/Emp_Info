@@ -328,11 +328,17 @@ namespace EmpInfo.Services
                         GetUserEmailByCardNum(bill.applier_num)
                         );
 
-                    SendWxMessageForCompleted(
+                    //SendWxMessageForCompleted(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    (isSuc ? "处理完成" : "被拒接"),
+                    //    db.vw_push_users.Where(v => v.card_number == bill.applier_num).FirstOrDefault()
+                    //    );
+                    SendQywxMessageForCompleted(
                         BillTypeName,
                         bill.sys_no,
                         (isSuc ? "处理完成" : "被拒接"),
-                        db.vw_push_users.Where(v => v.card_number == bill.applier_num).FirstOrDefault()
+                        new List<string>() { bill.applier_num }
                         );
                 }
                 else {
@@ -349,7 +355,18 @@ namespace EmpInfo.Services
                         );
 
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    SendWxMessageToNextAuditor(
+                    //SendWxMessageToNextAuditor(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    result.step,
+                    //    result.stepName,
+                    //    bill.applier_name,
+                    //    ((DateTime)bill.report_time).ToString("yyyy-MM-dd HH:mm"),
+                    //    string.Format("生产车间：{0}；设备名称：{1}；影响停产程度：{2}", bill.produce_dep_name, bill.equitment_name, ((EmergencyEnum)bill.emergency_level).ToString()),
+                    //    db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                    //    );
+
+                    SendQywxMessageToNextAuditor(
                         BillTypeName,
                         bill.sys_no,
                         result.step,
@@ -357,8 +374,9 @@ namespace EmpInfo.Services
                         bill.applier_name,
                         ((DateTime)bill.report_time).ToString("yyyy-MM-dd HH:mm"),
                         string.Format("生产车间：{0}；设备名称：{1}；影响停产程度：{2}", bill.produce_dep_name, bill.equitment_name, ((EmergencyEnum)bill.emergency_level).ToString()),
-                        db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                        nextAuditors.ToList()
                         );
+
                 }
             }
         }

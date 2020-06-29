@@ -548,8 +548,8 @@ namespace EmpInfo.Controllers
             toDate = toDate.AddDays(1);
             var result = db.GetSRBills(fromDate, toDate).ToList().OrderBy(r => r.FOutTimeSpan).ThenBy(r => r.FCompany).ToList();
             
-            string[] colName = new string[] { "公司", "出货期间", "到货日期", "当前状态", "出库单号", "申请单号","申请人", "客户名称", "出货公司",
-                                              "出货地址", "出货联系人", "出货联系电话", "订单号", "出货数量" };
+            string[] colName = new string[] { "公司", "出货期间", "到货日期", "当前状态", "出库单号", "申请单号","申请人", "部门", "客户名称", "出货公司",
+                                              "出货地址", "出货联系人", "出货联系电话", "订单号", "规格型号", "出货数量" };
 
             //設置excel文件名和sheet名
             XlsDocument xls = new XlsDocument();
@@ -588,7 +588,7 @@ namespace EmpInfo.Controllers
                 colIndex = 1;
 
                 //"公司", "出货期间", "到货日期", "当前状态", "出库单号", "申请单号","申请人", "客户名称", "出货公司",
-                //                              "出货地址", "出货联系人", "出货联系电话", "订单号", "出货数量" 
+                //"出货地址", "出货联系人", "出货联系电话", "订单号", "出货数量" 
                 cells.Add(++rowIndex, colIndex, d.FCompany);
                 cells.Add(rowIndex, ++colIndex, d.FOutTimeSpan);
                 cells.Add(rowIndex, ++colIndex, d.FArriveDate);
@@ -596,6 +596,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.FStockNo);
                 cells.Add(rowIndex, ++colIndex, d.FBillNo);
                 cells.Add(rowIndex, ++colIndex, d.FApplier);
+                cells.Add(rowIndex, ++colIndex, d.FdeptName);
                 cells.Add(rowIndex, ++colIndex, d.FSupplierName);
                 cells.Add(rowIndex, ++colIndex, d.FShipToName);
 
@@ -603,6 +604,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.FShipToAttn);
                 cells.Add(rowIndex, ++colIndex, d.FShipToTel);
                 cells.Add(rowIndex, ++colIndex, d.FOrderBillNo);
+                cells.Add(rowIndex, ++colIndex, d.FModel);
                 cells.Add(rowIndex, ++colIndex, d.FQty);
             }
 

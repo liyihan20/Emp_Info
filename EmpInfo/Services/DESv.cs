@@ -159,7 +159,7 @@ namespace EmpInfo.Services
                 if (model.msg.Contains("完成") || model.msg.Contains("NG")) {
                     bool isSuc = model.msg.Contains("NG") ? false : true;
                     string ccEmails = "";
-                    List<vw_push_users> pushUsers = db.vw_push_users.Where(v => v.card_number == bill.applier_num).ToList();
+                    //List<vw_push_users> pushUsers = db.vw_push_users.Where(v => v.card_number == bill.applier_num).ToList();
 
                     SendEmailForCompleted(
                         bill.sys_no,
@@ -170,11 +170,17 @@ namespace EmpInfo.Services
                         ccEmails
                         );
 
-                    SendWxMessageForCompleted(
-                        BillTypeName,
+                    //SendWxMessageForCompleted(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    (isSuc ? "批准" : "被拒绝"),
+                    //    pushUsers
+                    //    );
+                    SendQywxMessageForCompleted(
+                        BillTypeName, 
                         bill.sys_no,
                         (isSuc ? "批准" : "被拒绝"),
-                        pushUsers
+                        new List<string>() { bill.applier_num }
                         );
                 }
                 else {
@@ -191,7 +197,17 @@ namespace EmpInfo.Services
                         );
 
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    SendWxMessageToNextAuditor(
+                    //SendWxMessageToNextAuditor(
+                    //    BillTypeName,
+                    //    bill.sys_no,
+                    //    result.step,
+                    //    result.stepName,
+                    //    bill.applier_name,
+                    //    ((DateTime)bill.bill_date).ToString("yyyy-MM-dd"),
+                    //    string.Format("{0}:{1}", bill.ei_DEApplyEntry.First().subject, bill.ei_DEApplyEntry.First().name),
+                    //    db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                    //    );
+                    SendQywxMessageToNextAuditor(
                         BillTypeName,
                         bill.sys_no,
                         result.step,
@@ -199,7 +215,7 @@ namespace EmpInfo.Services
                         bill.applier_name,
                         ((DateTime)bill.bill_date).ToString("yyyy-MM-dd"),
                         string.Format("{0}:{1}", bill.ei_DEApplyEntry.First().subject, bill.ei_DEApplyEntry.First().name),
-                        db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
+                        nextAuditors.ToList()
                         );
                 }
             }
