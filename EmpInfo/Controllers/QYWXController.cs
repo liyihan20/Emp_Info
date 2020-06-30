@@ -10,11 +10,16 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using EmpInfo.Models;
+using EmpInfo.Interfaces;
 
 namespace EmpInfo.Controllers
 {
+    /// <summary>
+    /// 企业微信相关开发
+    /// </summary>
     public class QYWXController : BaseController
     {
+        private const string APPID = "wwd136c62daa97a189"; //企业ID
         private const string SECRET = "wZRxdsuqeFAqJDG7VLaCTkImfsuce0qwyLO3ksBUkMY"; //应用secret
         private const string AGENTID = "1000007"; //应用id
         private const string LOGIN_URL = "http://emp.truly.com.cn/emp/QYWX/Login";
@@ -147,7 +152,53 @@ namespace EmpInfo.Controllers
         }
 
         #endregion
-        
 
+        #region js接口
+
+        public ActionResult JsInterface(string actionType, string debug = "false")
+        {            
+            QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();
+
+            QywxJsConfigParam p = new QywxJsConfigParam();
+            p.timestamp = MyUtils.GetTimeStamp();
+            p.appId = APPID;
+            p.nonceStr = MyUtils.CreateValidateNumber(8);
+            p.debug = debug;
+            p.actionType = actionType;
+
+            try {
+                p.signature = wx.GetSignature(SECRET, p.nonceStr, p.timestamp, Request.Url.ToString());
+            }
+            catch (Exception ex) {
+                ViewBag.tip = ex.Message;
+                return View("Error");
+            }
+            ViewData["qywxConfigParam"] = p;
+
+            return View();
+        }
+
+        public ActionResult HandleJsResult(string actionType, string result)
+        {            
+            try {
+                switch (actionType) {
+                    case "scanQRCode":                        
+                        var resultArr = result.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);                        
+                        SetBillByType(resultArr[0]);
+                        var iJs = bill as IJsInterface;
+                        if (iJs != null) {
+                            var iJsResult = iJs.HandleJsInterface(resultArr[1], userInfo);
+                            return RedirectToAction(iJsResult.actionName, iJsResult.controllerName, iJsResult.routetValues);
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex) {
+                return Content("二维码内容:" + result + ";提示信息:" + ex.Message);
+            }
+            return Content(result);
+        }
+
+        #endregion
     }
 }

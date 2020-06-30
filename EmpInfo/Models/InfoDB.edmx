@@ -408,6 +408,7 @@
           <Property Name="dep_size" Type="int" Nullable="false" />
           <Property Name="clear_level" Type="nvarchar" MaxLength="50" />
           <Property Name="dep_plan" Type="nvarchar" MaxLength="500" />
+          <Property Name="usage" Type="nvarchar" MaxLength="500" />
         </EntityType>
         <EntityType Name="ei_CRApply">
           <Key>
@@ -6429,6 +6430,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="clear_level" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="dep_plan" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="ei_bus_place" Relationship="ICAuditModel.FK_ei_bus_place_detail_ei_bus_place" FromRole="ei_bus_place_detail" ToRole="ei_bus_place" />
+          <Property Name="usage" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ei_bus_place">
           <Key>
@@ -8990,6 +8992,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_bus_place_detail">
             <EntityTypeMapping TypeName="ICAuditModel.ei_bus_place_detail">
               <MappingFragment StoreEntitySet="ei_bus_place_detail">
+                <ScalarProperty Name="usage" ColumnName="usage" />
                 <ScalarProperty Name="dep_plan" ColumnName="dep_plan" />
                 <ScalarProperty Name="clear_level" ColumnName="clear_level" />
                 <ScalarProperty Name="dep_size" ColumnName="dep_size" />

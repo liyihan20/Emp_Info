@@ -254,8 +254,7 @@ namespace EmpInfo.Controllers
             }
             return Json(new SimpleResultModel(true));
         }
-
-        
+                
         //打印维修二维码、取回电脑
         public ActionResult PrintITCode()
         {
@@ -360,7 +359,7 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel(true));
         }
 
-        // 健林调高优先级到6
+        //健林调高优先级到6
         public ActionResult TurnUPITPriority()
         {
             return View();

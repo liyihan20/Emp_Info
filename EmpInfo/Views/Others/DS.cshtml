@@ -1,16 +1,18 @@
 ﻿@using EmpInfo.Models;
 @{
     List<BusPlaces> ps = ViewData["ps"] as List<BusPlaces>;
+    List<string> places = ViewData["places"] as List<string>;
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
     <style type="text/css">
-        th{
-            font-size:18px;
+        th {
+            font-size: 18px;
         }
-        td{
-            font-size:16px;
+
+        td {
+            font-size: 16px;
         }
     </style>
 }
@@ -21,8 +23,9 @@
     <script type="text/javascript">
         var inter;
         var isRolling = true;
-        var rollSpeed = 40;
+        var rollSpeed = 60;
         var currentPx = 0;
+
         $(function () {
             //改为自适应全屏宽度
             $("#topContainer").removeClass("container").addClass("container-fluid");
@@ -33,13 +36,14 @@
                 if (isRolling) {
                     window.clearInterval(inter);
                     isRolling = false;
-                    $("#btnStop").html("继续滚动");
+                    $("#btnStop").html("<i class='fa fa-play'></i> 继续滚动");
                 } else {
                     setInter();
                     isRolling = true;
-                    $("#btnStop").html("暂停滚动");
+                    $("#btnStop").html("<i class='fa fa-stop'></i> 暂停滚动");
                 }
             });
+
 
             $("#stSpeed").on("change", function () {
                 rollSpeed = $(this).val();
@@ -74,21 +78,121 @@
             }, rollSpeed);
         }
 
+
+
     </script>
+
+    <script>
+        @*搜索选项*@
+        $(function () {
+
+            $("#ckEmpty").iCheck({
+                checkboxClass: 'icheckbox_square-blue'
+            });
+            if ("@ViewData["isEmpty"]" == "1") {
+                $('#ckEmpty').iCheck('check');
+            }
+
+            $("#stPlace").val("@ViewData["place"]");
+
+            $("#txDepName").val("@ViewData["depName"]");
+
+            $("#btnSearch").on("click", function () {
+                //需要给时间，输入法隐藏后再加载，否则会缺少输入法的空间
+                setTimeout(function () {
+                    reloadPage();
+                }, 500);
+            });
+
+        });
+        function reloadPage() {
+            var isEmpty = $("#ckEmpty:checked").length;
+            var place = $("#stPlace").val();
+            var depName = $("#txDepName").val();
+
+            place = encodeURIComponent(place);
+            depName = encodeURIComponent(depName);
+
+            window.location.href = "DS?isEmpty=" + isEmpty + "&place=" + place + "&depName=" + depName;
+        }
+    </script>
+    <script>
+        $(function () {
+            //全屏
+            $("#btnFullScreen").on("click", function () {
+                fullScreen();
+            })
+            //退出全屏
+            $("#exitFullScreen").on("click", function () {
+                exitFullscreen();
+            })
+        });
+
+        //fullScreen()和exitScreen()有多种实现方式，此处只使用了其中一种
+        //全屏
+        function fullScreen() {
+            var element = document.documentElement;
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen();
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+            }
+        }
+
+        //退出全屏 
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        }
+    </script>
+
 }
-<div class="text-center" style="font-size:36px;">汕尾工业城厂房简介</div>
+<div class="text-center" style="font-size:36px;margin-bottom:6px;">汕尾工业城厂房简介</div>
 <div id="btns">
-    <button id="btnStop" class="btn btn-success pull-right">暂停滚动</button>
-    <div class="pull-left">
-        滚动速度：
-        <select id="stSpeed" class="form-control" style="display:inline-block;width:100px;">
-            <option value="60">慢速</option>
-            <option value="40">中速</option>
-            <option value="20">快速</option>
-        </select>
+    <button id="btnStop" class="btn btn-success btn-sm pull-right"><i class="fa fa-stop"></i> 暂停滚动</button>    
+    <button id="btnFullScreen" class="btn btn-success btn-sm pull-right"><i class="fa fa-stop"></i> 全屏</button>
+    <div class="pull-left" style="line-height:30px;">
+        <span>
+            滚动速度：
+            <select id="stSpeed" class="form-control input-sm" style="display:inline-block;width:100px;">
+                <option value="60">慢速</option>
+                <option value="40">中速</option>
+                <option value="20">快速</option>
+            </select>
+        </span>
+        <span style="padding-left:16px;">
+            闲置厂房：<input type="checkbox" id="ckEmpty" />
+        </span>
+        <span style="padding-left:16px;">
+            地点：
+            <select id="stPlace" class="form-control input-sm" style="display:inline-block;width:100px;">
+                <option value="">全部</option>
+                @foreach (var p in places) {
+                    <option value="@p">@p</option>
+                }
+            </select>
+        </span>
+        <span style="padding-left:16px;">
+            部门：<input type="text" class="form-control input-sm" id="txDepName" style="display:inline-block;width:100px;" />
+        </span>
+        <span style="padding-left:16px">
+            <button class="btn btn-sm btn-primary" id="btnSearch"><i class="fa fa-search"></i> 搜索</button>
+        </span>
     </div>
+
 </div>
-<div class="clearfix" style="margin-bottom:12px;"></div>
+<div class="clearfix" style="margin-bottom:8px;"></div>
 
 <table id="tb" data-toggle="table" data-show-columns="false">
     <thead>
@@ -116,6 +220,9 @@
             </th>
             <th data-field="dep_plan">
                 车间整合规划
+            </th>
+            <th data-field="usage">
+                用途
             </th>
         </tr>
     </thead>
@@ -148,25 +255,8 @@
                 <td>@p.dep_size</td>
                 <td>@p.clear_level</td>
                 <td>@p.dep_plan</td>
+                <td>@p.usage</td>
             </tr>
         }
-
-        @*@foreach (var h in head) {
-                var rowspan = entrys.Count(e => e.place_id == h.id);
-                <tr>
-                    <td rowspan="@rowspan">@h.sort_no</td>
-                    <td rowspan="@rowspan">@h.place</td>
-                    @foreach (var e in entrys.Where(e => e.place_id == h.id).OrderBy(e => e.floor).ToList()) {
-                        <td>@e.floor</td>
-                        <td>@e.dep_name</td>
-                    }
-                    <td rowspan="@rowspan">@h.area_size</td>
-                    @foreach (var e in entrys.Where(e => e.place_id == h.id).OrderBy(e => e.floor).ToList()) {
-                        <td>@e.dep_size</td>
-                        <td>@e.clear_level</td>
-                        <td>@e.dep_plan</td>
-                    }
-                </tr>
-            }*@
     </tbody>
 </table>

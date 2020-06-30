@@ -228,25 +228,42 @@ namespace EmpInfo.Controllers
         
         #region 厂区表格展示
         
-        public ActionResult DS()
+        public ActionResult DS(int isEmpty = 0, string place = "", string depName = "")
         {
-            var result = (from b in db.ei_bus_place
-                          join e in db.ei_bus_place_detail on b.id equals e.place_id
-                          orderby b.sort_no, e.floor
-                          select new BusPlaces()
-                          {
-                              place_id = b.id,
-                              sort_no = b.sort_no,
-                              place = b.place,
-                              area_size = b.area_size,
-                              floor = e.floor,
-                              dep_name = e.dep_name,
-                              dep_size = e.dep_size,
-                              clear_level = e.clear_level,
-                              dep_plan = e.dep_plan
-                          }).ToList();
+            var result = from b in db.ei_bus_place
+                         join e in db.ei_bus_place_detail on b.id equals e.place_id
+                         orderby b.sort_no, e.floor
+                         select new BusPlaces()
+                         {
+                             place_id = b.id,
+                             sort_no = b.sort_no,
+                             place = b.place,
+                             area_size = b.area_size,
+                             floor = e.floor,
+                             dep_name = e.dep_name,
+                             dep_size = e.dep_size,
+                             clear_level = e.clear_level,
+                             dep_plan = e.dep_plan,
+                             usage = e.usage
+                         };
 
-            ViewData["ps"] = result;
+            if (isEmpty == 1) {
+                result = result.Where(r => r.dep_plan.Contains("闲置") || r.dep_name.Contains("闲置"));
+            }
+
+            if (!string.IsNullOrEmpty(place)) {
+                result = result.Where(r => r.place == place);
+            }
+
+            if (!string.IsNullOrEmpty(depName)) {
+                result = result.Where(r => r.dep_name.Contains(depName));
+            }
+
+            ViewData["isEmpty"] = isEmpty;
+            ViewData["place"] = place;
+            ViewData["depName"] = depName;
+            ViewData["ps"] = result.ToList();
+            ViewData["places"] = db.ei_bus_place.Select(b => b.place).Distinct().ToList();
             return View();
         }
 
@@ -283,7 +300,8 @@ namespace EmpInfo.Controllers
                               d.dep_plan,
                               d.dep_size,
                               d.floor,
-                              d.place_id
+                              d.place_id,
+                              d.usage
                           }).ToList();
             return Json(result, JsonRequestBehavior.AllowGet);
         }

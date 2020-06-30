@@ -486,6 +486,10 @@ namespace EmpInfo.QywxWebSrv {
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetJsApiTicket", ReplyAction="*")]
         EmpInfo.QywxWebSrv.GetJsApiTicketResponse GetJsApiTicket(EmpInfo.QywxWebSrv.GetJsApiTicketRequest request);
         
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 secret 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetSignature", ReplyAction="*")]
+        EmpInfo.QywxWebSrv.GetSignatureResponse GetSignature(EmpInfo.QywxWebSrv.GetSignatureRequest request);
+        
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 openId 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetUserIdByOpenId", ReplyAction="*")]
         EmpInfo.QywxWebSrv.GetUserIdByOpenIdResponse GetUserIdByOpenId(EmpInfo.QywxWebSrv.GetUserIdByOpenIdRequest request);
@@ -664,6 +668,86 @@ namespace EmpInfo.QywxWebSrv {
         
         public GetJsApiTicketResponseBody(string GetJsApiTicketResult) {
             this.GetJsApiTicketResult = GetJsApiTicketResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetSignatureRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetSignature", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.GetSignatureRequestBody Body;
+        
+        public GetSignatureRequest() {
+        }
+        
+        public GetSignatureRequest(EmpInfo.QywxWebSrv.GetSignatureRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetSignatureRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string secret;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string noncestr;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public string timestamp;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string url;
+        
+        public GetSignatureRequestBody() {
+        }
+        
+        public GetSignatureRequestBody(string secret, string noncestr, string timestamp, string url) {
+            this.secret = secret;
+            this.noncestr = noncestr;
+            this.timestamp = timestamp;
+            this.url = url;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetSignatureResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetSignatureResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.GetSignatureResponseBody Body;
+        
+        public GetSignatureResponse() {
+        }
+        
+        public GetSignatureResponse(EmpInfo.QywxWebSrv.GetSignatureResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetSignatureResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string GetSignatureResult;
+        
+        public GetSignatureResponseBody() {
+        }
+        
+        public GetSignatureResponseBody(string GetSignatureResult) {
+            this.GetSignatureResult = GetSignatureResult;
         }
     }
     
@@ -1537,6 +1621,22 @@ namespace EmpInfo.QywxWebSrv {
             inValue.Body.secret = secret;
             EmpInfo.QywxWebSrv.GetJsApiTicketResponse retVal = ((EmpInfo.QywxWebSrv.QywxApiSrvSoap)(this)).GetJsApiTicket(inValue);
             return retVal.Body.GetJsApiTicketResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.QywxWebSrv.GetSignatureResponse EmpInfo.QywxWebSrv.QywxApiSrvSoap.GetSignature(EmpInfo.QywxWebSrv.GetSignatureRequest request) {
+            return base.Channel.GetSignature(request);
+        }
+        
+        public string GetSignature(string secret, string noncestr, string timestamp, string url) {
+            EmpInfo.QywxWebSrv.GetSignatureRequest inValue = new EmpInfo.QywxWebSrv.GetSignatureRequest();
+            inValue.Body = new EmpInfo.QywxWebSrv.GetSignatureRequestBody();
+            inValue.Body.secret = secret;
+            inValue.Body.noncestr = noncestr;
+            inValue.Body.timestamp = timestamp;
+            inValue.Body.url = url;
+            EmpInfo.QywxWebSrv.GetSignatureResponse retVal = ((EmpInfo.QywxWebSrv.QywxApiSrvSoap)(this)).GetSignature(inValue);
+            return retVal.Body.GetSignatureResult;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]

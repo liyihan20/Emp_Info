@@ -66,6 +66,9 @@
                     }, {
                         field: "dep_plan",
                         title: "车间整合规划"
+                    }, {
+                        field: "usage",
+                        title: "用途"
                     }
                 ],
                 rowStyle: function (row, index) {
@@ -295,7 +298,8 @@
                         <input type="text" class="form-control" name="dep_name" placeholder="部门，必填" style="margin-top:4px;" />
                         <input type="text" class="form-control" name="dep_size" placeholder="车间面积，必填" style="margin-top:4px;" />
                         <input type="text" class="form-control" name="clear_level" placeholder="净房等级，必填" style="margin-top:4px;" />
-                        <textarea class="form-control" rows="3" name="dep_plan" placeholder="车间整合规划，选填" style="margin-top:4px;"></textarea>
+                        <textarea class="form-control" rows="2" name="dep_plan" placeholder="车间整合规划，选填" style="margin-top:4px;"></textarea>
+                        <textarea class="form-control" rows="2" name="usage" placeholder="用途，选填" style="margin-top:4px;"></textarea>
                     </form>
                 </div>
                 <div class="modal-footer">

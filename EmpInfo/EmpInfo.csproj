@@ -571,6 +571,7 @@
     <Compile Include="Models\public_fund_item.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\QywxModels.cs" />
     <Compile Include="Models\qywx_secondeValify.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -1549,6 +1550,7 @@
     <Content Include="Views\ApplyExtra\TurnUPITPriority.cshtml" />
     <Content Include="Views\Others\DS.cshtml" />
     <Content Include="Views\Others\DSIndex.cshtml" />
+    <Content Include="Views\QYWX\JsInterface.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -304,10 +304,10 @@
             @if (bam.isPass == null) {
                 <div class="btn-group btn-group-justified" role="group">
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
+                        <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
                     </div>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
+                        <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
                     </div>
                 </div>
             }
