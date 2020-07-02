@@ -228,7 +228,7 @@ namespace EmpInfo.Controllers
         
         #region 厂区表格展示
         
-        public ActionResult DS(int isEmpty = 0, string place = "", string depName = "")
+        public ActionResult DS(int isEmpty = 0, string place = "", string depName = "",string depCharger="")
         {
             var result = from b in db.ei_bus_place
                          join e in db.ei_bus_place_detail on b.id equals e.place_id
@@ -244,7 +244,10 @@ namespace EmpInfo.Controllers
                              dep_size = e.dep_size,
                              clear_level = e.clear_level,
                              dep_plan = e.dep_plan,
-                             usage = e.usage
+                             usage = e.usage,
+                             pic_name = e.pic_name,
+                             detail_id=e.id,
+                             dep_charger=e.dep_charger
                          };
 
             if (isEmpty == 1) {
@@ -259,11 +262,20 @@ namespace EmpInfo.Controllers
                 result = result.Where(r => r.dep_name.Contains(depName));
             }
 
-            ViewData["isEmpty"] = isEmpty;
-            ViewData["place"] = place;
-            ViewData["depName"] = depName;
-            ViewData["ps"] = result.ToList();
-            ViewData["places"] = db.ei_bus_place.Select(b => b.place).Distinct().ToList();
+            if (!string.IsNullOrEmpty(depCharger)) {
+                result = result.Where(r => r.dep_charger == depCharger);
+            }
+
+            DSModel dm = new DSModel();
+            dm.isEmpty = isEmpty;
+            dm.place = place;
+            dm.depName = depName;
+            dm.depCharger = depCharger;
+            dm.ps = result.ToList();
+            dm.places = db.ei_bus_place.OrderBy(b => b.sort_no).Select(b => b.place).ToList();
+            dm.chargers = db.ei_bus_place_detail.Where(b => b.dep_charger != null && b.dep_charger != "").Select(b => b.dep_charger).Distinct().ToList();
+
+            ViewData["dm"] = dm;
             return View();
         }
 
@@ -301,7 +313,9 @@ namespace EmpInfo.Controllers
                               d.dep_size,
                               d.floor,
                               d.place_id,
-                              d.usage
+                              d.usage,
+                              d.pic_name,
+                              d.dep_charger
                           }).ToList();
             return Json(result, JsonRequestBehavior.AllowGet);
         }
@@ -313,7 +327,7 @@ namespace EmpInfo.Controllers
                 if (bp.id == 0) {
                     if (db.ei_bus_place.Where(b => b.place == bp.place).Count() > 0) {
                         return Json(new SimpleResultModel(false, "存在重复的地点，不能保存：" + bp.place));
-                    }
+                    }                    
                     db.ei_bus_place.Add(bp);
                 }
                 else {
@@ -351,6 +365,7 @@ namespace EmpInfo.Controllers
             try {
                 ei_bus_place_detail bpd = JsonConvert.DeserializeObject<ei_bus_place_detail>(obj);
                 if (bpd.id == 0) {
+                    bpd.pic_name = "";
                     db.ei_bus_place_detail.Add(bpd);
                 }
                 else {
@@ -376,6 +391,35 @@ namespace EmpInfo.Controllers
             catch (Exception ex) {
                 return Json(new SimpleResultModel(ex));
             }
+        }
+
+        public ActionResult CheckDSPic(int id)
+        {
+            var detail = db.ei_bus_place_detail.Where(d => d.id == id).FirstOrDefault();
+            if (detail == null) {
+                return Content("楼层不存在或已删除");
+            }
+            else {
+                if (string.IsNullOrEmpty(detail.pic_name)) {
+                    return Content("平面图不存在");
+                }
+                else {
+                    return File(detail.pic, @"image/bmp");
+                }
+            }
+        }
+
+        public JsonResult RemoveDSPic(int id)
+        {
+            var detail = db.ei_bus_place_detail.Where(d => d.id == id).FirstOrDefault();
+            if (detail == null) {
+                return Json(new SimpleResultModel(false, "楼层不存在或已删除"));
+            }
+            detail.pic = null;
+            detail.pic_name = "";
+            db.SaveChanges();
+
+            return Json(new SimpleResultModel(true));
         }
 
         #endregion

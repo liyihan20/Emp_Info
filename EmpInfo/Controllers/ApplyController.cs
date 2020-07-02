@@ -49,14 +49,6 @@ namespace EmpInfo.Controllers
         public ActionResult BeginApply(string billType)
         {
             try {
-                if (db.vw_push_users.Where(v => v.card_number == userInfo.cardNo).Count() < 1) {
-                    ViewBag.tip = "必须绑定【信利e家】微信公众号之后才能进行申请";
-                    return View("Error");
-                }
-            }
-            catch { }
-
-            try {
                 SetBillByType(billType); 
                 ViewData["infoBeforeApply"] = bill.GetInfoBeforeApply(userInfo, userInfoDetail);
             }

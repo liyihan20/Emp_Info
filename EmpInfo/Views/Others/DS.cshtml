@@ -1,7 +1,6 @@
 ﻿@using EmpInfo.Models;
 @{
-    List<BusPlaces> ps = ViewData["ps"] as List<BusPlaces>;
-    List<string> places = ViewData["places"] as List<string>;
+    DSModel dm = ViewData["dm"] as DSModel;
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
@@ -29,7 +28,7 @@
         $(function () {
             //改为自适应全屏宽度
             $("#topContainer").removeClass("container").addClass("container-fluid");
-            $("#tb").bootstrapTable('refreshOptions', { height: window.innerHeight - 120 });
+            $("#tb").bootstrapTable('refreshOptions', { height: window.innerHeight - 112 });
             $("#stSpeed").val(rollSpeed);
 
             $("#btnStop").on("click", function () {
@@ -43,11 +42,15 @@
                     $("#btnStop").html("<i class='fa fa-stop'></i> 暂停滚动");
                 }
             });
-
-
+            
             $("#stSpeed").on("change", function () {
                 rollSpeed = $(this).val();
                 setInter()
+            });
+            
+            $(".pic_d").parent("td").on("click", function () {
+                var detail_id = $(this).find("span").html();
+                window.open("CheckDSPic?id=" + detail_id);
             });
 
             setInter();
@@ -78,24 +81,23 @@
             }, rollSpeed);
         }
 
-
+        
 
     </script>
 
-    <script>
+        <script>
         @*搜索选项*@
         $(function () {
 
             $("#ckEmpty").iCheck({
                 checkboxClass: 'icheckbox_square-blue'
             });
-            if ("@ViewData["isEmpty"]" == "1") {
+            if ("@dm.isEmpty" == "1") {
                 $('#ckEmpty').iCheck('check');
             }
 
-            $("#stPlace").val("@ViewData["place"]");
-
-            $("#txDepName").val("@ViewData["depName"]");
+            $("#stPlace").val("@dm.place");
+            $("#stCharger").val("@dm.depCharger");
 
             $("#btnSearch").on("click", function () {
                 //需要给时间，输入法隐藏后再加载，否则会缺少输入法的空间
@@ -109,59 +111,20 @@
             var isEmpty = $("#ckEmpty:checked").length;
             var place = $("#stPlace").val();
             var depName = $("#txDepName").val();
+            var charger = $("#stCharger").val();
 
             place = encodeURIComponent(place);
             depName = encodeURIComponent(depName);
+            charger = encodeURIComponent(charger);
 
-            window.location.href = "DS?isEmpty=" + isEmpty + "&place=" + place + "&depName=" + depName;
-        }
-    </script>
-    <script>
-        $(function () {
-            //全屏
-            $("#btnFullScreen").on("click", function () {
-                fullScreen();
-            })
-            //退出全屏
-            $("#exitFullScreen").on("click", function () {
-                exitFullscreen();
-            })
-        });
-
-        //fullScreen()和exitScreen()有多种实现方式，此处只使用了其中一种
-        //全屏
-        function fullScreen() {
-            var element = document.documentElement;
-            if (element.requestFullscreen) {
-                element.requestFullscreen();
-            } else if (element.msRequestFullscreen) {
-                element.msRequestFullscreen();
-            } else if (element.mozRequestFullScreen) {
-                element.mozRequestFullScreen();
-            } else if (element.webkitRequestFullscreen) {
-                element.webkitRequestFullscreen();
-            }
-        }
-
-        //退出全屏 
-        function exitFullscreen() {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            }
+            window.location.href = "DS?isEmpty=" + isEmpty + "&place=" + place + "&depName=" + depName + "&depCharger=" + charger;
         }
     </script>
 
 }
 <div class="text-center" style="font-size:36px;margin-bottom:6px;">汕尾工业城厂房简介</div>
 <div id="btns">
-    <button id="btnStop" class="btn btn-success btn-sm pull-right"><i class="fa fa-stop"></i> 暂停滚动</button>    
-    <button id="btnFullScreen" class="btn btn-success btn-sm pull-right"><i class="fa fa-stop"></i> 全屏</button>
+    <button id="btnStop" class="btn btn-success btn-sm pull-right"><i class="fa fa-stop"></i> 暂停滚动</button>
     <div class="pull-left" style="line-height:30px;">
         <span>
             滚动速度：
@@ -178,13 +141,22 @@
             地点：
             <select id="stPlace" class="form-control input-sm" style="display:inline-block;width:100px;">
                 <option value="">全部</option>
-                @foreach (var p in places) {
+                @foreach (var p in dm.places) {
                     <option value="@p">@p</option>
                 }
             </select>
         </span>
         <span style="padding-left:16px;">
-            部门：<input type="text" class="form-control input-sm" id="txDepName" style="display:inline-block;width:100px;" />
+            部门：<input type="text" class="form-control input-sm" id="txDepName" style="display:inline-block;width:100px;" value="@dm.depName" />
+        </span>
+        <span style="padding-left:16px;">
+            负责人：
+            <select id="stCharger" class="form-control input-sm" style="display:inline-block;width:100px;">
+                <option value="">全部</option>
+                @foreach (var p in dm.chargers) {
+                    <option value="@p">@p</option>
+                }
+            </select>
         </span>
         <span style="padding-left:16px">
             <button class="btn btn-sm btn-primary" id="btnSearch"><i class="fa fa-search"></i> 搜索</button>
@@ -224,6 +196,9 @@
             <th data-field="usage">
                 用途
             </th>
+            <th data-field="pic_name" data-valign="middle" data-align="center">
+                平面图
+            </th>
         </tr>
     </thead>
     <tbody id="tbody">
@@ -232,11 +207,11 @@
             int currentRowSpan = 1;
             bool isSameAsLast = false;
         }
-        @foreach (var p in ps) {
+        @foreach (var p in dm.ps) {
             <tr>
                 @if (currentID != p.place_id) {
                     currentID = p.place_id;
-                    currentRowSpan = ps.Count(s => s.place_id == currentID);
+                    currentRowSpan = dm.ps.Count(s => s.place_id == currentID);
                     isSameAsLast = false;
                 }
                 else {
@@ -256,6 +231,15 @@
                 <td>@p.clear_level</td>
                 <td>@p.dep_plan</td>
                 <td>@p.usage</td>
+                <td>
+                    @if (string.IsNullOrEmpty(p.pic_name)) {
+                        <text>无</text>
+                    }
+                    else {
+                        <i class="fa fa-file-picture-o pic_d" style="color:#5cb85c;cursor:pointer;"></i>
+                        <span style="display:none;">@p.detail_id</span>
+                    }
+                </td>
             </tr>
         }
     </tbody>

@@ -22,6 +22,9 @@ namespace EmpInfo.Models
         public string clear_level { get; set; }
         public string dep_plan { get; set; }
         public string usage { get; set; }
+        public byte[] pic { get; set; }
+        public string pic_name { get; set; }
+        public string dep_charger { get; set; }
     
         public virtual ei_bus_place ei_bus_place { get; set; }
     }

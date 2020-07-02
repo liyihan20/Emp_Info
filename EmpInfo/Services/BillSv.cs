@@ -469,7 +469,7 @@ namespace EmpInfo.Services
             }
             else {
                 addr = "写字楼（行政大楼）一楼行政部";
-                phone = "3003";
+                phone = "3380015-3003";
             }
 
             //发微信,改到企业微信
@@ -479,7 +479,7 @@ namespace EmpInfo.Services
             msg.text.content = string.Format("{0}，请您于下述时间，前往{2}与{1}面谈。", recevierName, senderName, addr);
             msg.text.content += "\n面谈内容： " + pushMsg;
             msg.text.content += "\n预约时间： " + dt.ToString("yyyy-MM-dd HH:mm");
-            msg.text.content += "\n请您准时到达，如有疑问。请致电行政部" + senderName + "，电话：" + phone;
+            msg.text.content += "\n请您准时到达，如有疑问,请致电行政部" + senderName + "，电话：" + phone;
             SendQYWXMsg(msg);
 
             //foreach (var ad in receviers.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {

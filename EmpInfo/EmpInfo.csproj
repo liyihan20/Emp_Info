@@ -435,6 +435,12 @@
     </Compile>
     <Compile Include="Models\EmergencyEnum.cs" />
     <Compile Include="Models\EpModels.cs" />
+    <Compile Include="Models\flow_apply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\flow_applyEntry.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\flow_applyEntryQueue.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -1297,6 +1303,7 @@
     <Content Include="Scripts\html5shiv.min.js" />
     <Content Include="Scripts\icheck.js" />
     <Content Include="Scripts\jweixin-1.2.0.js" />
+    <Content Include="Scripts\myUploaderSim.js" />
     <Content Include="Scripts\myUserSelecter.js" />
     <Content Include="Scripts\myUploaderPro.js" />
     <Content Include="Scripts\myUploader.js" />

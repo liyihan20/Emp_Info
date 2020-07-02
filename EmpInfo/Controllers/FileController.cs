@@ -63,5 +63,29 @@ namespace EmpInfo.Controllers
         }
         
 
+        //厂房简介中上传平面图图片到数据库
+        [AcceptVerbs(HttpVerbs.Post)]
+        public JsonResult BeginUploadDSImg(HttpPostedFileBase file, int detailId)
+        {
+            try {
+                byte[] imgByteArr = new byte[file.ContentLength];
+                file.InputStream.Read(imgByteArr, 0, file.ContentLength);
+
+                var detail = db.ei_bus_place_detail.Where(d => d.id == detailId).FirstOrDefault();
+                if (detail == null) {
+                    return Json(new SimpleResultModel(false, "楼层不存在，可能已被删除，请刷新后再操作"));
+                }
+                detail.pic = imgByteArr;
+                detail.pic_name = file.FileName;
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                WriteEventLog("上传厂房平面图", "失败：" + detailId + ";error:" + ex.Message);
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+            WriteEventLog("上传厂房平面图", "成功：" + detailId);
+            return Json(new SimpleResultModel() { suc = true });
+        } 
+
     }
 }

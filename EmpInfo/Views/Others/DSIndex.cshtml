@@ -1,12 +1,33 @@
 ﻿@section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style>
+        .webuploader-container {
+	        position: relative;
+        }
+        .webuploader-element-invisible {
+	        position: absolute !important;
+	        clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+            clip: rect(1px,1px,1px,1px);
+        }
+        .webuploader-pick {
+	        position: relative;
+	        cursor: pointer;
+	        text-align: center;
+	        border-radius: 3px;
+	        overflow: hidden;
+        }
+    </style>
 }
 @section Scripts {
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
-    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>    
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUploaderSim.js")"></script>
     <script>
         var current_place_id = 0;
+        var currentDetailRow = undefined;
         $(function () {
             $("#tb1").bootstrapTable({
                 url: "GetDSes",
@@ -63,16 +84,41 @@
                     {
                         field: "clear_level",
                         title: "净房等级"
+                    },
+                    {
+                        field: "dep_charger",
+                        title: "负责人"
                     }, {
                         field: "dep_plan",
                         title: "车间整合规划"
                     }, {
                         field: "usage",
                         title: "用途"
+                    }, {
+                        field: "pic_name",
+                        title: "平面图",
+                        align: "center",
+                        formatter: function (value, row, index, field) {
+                            if (row.pic_name) {
+                                return "<i class='fa fa-file-picture-o pic_i' style='color:#5cb85c;'></i>";
+                            } else {
+                                return "无";
+                            }
+                        }
                     }
                 ],
                 rowStyle: function (row, index) {
                     return { css: { cursor: 'pointer' } };
+                },
+                onCheck:function(row, $element){
+                    currentDetailRow = row;
+                },
+                onClickCell: function (field, value, row, $element) {
+                    if ("pic_name" == field) {
+                        if (row.pic_name) {
+                            setTimeout(function () { window.open("CheckDSPic?id=" + row.id); }, 50);
+                        }
+                    }
                 }
             });
 
@@ -146,6 +192,7 @@
 
     <script>
         $(function () {
+
             $("#tb2AddBt").on("click", function () {
                 if (current_place_id == 0) {
                     toastr.error("请先选择地点后再新增楼层");
@@ -159,23 +206,23 @@
 
             $("#tb2ModifyBt").on("click", function () {
                 $("#tb2Modal .modal-title").html("修改楼层信息");
-                var rows = $('#tb2').bootstrapTable('getSelections');
-                if (rows.length == 0) {
+                if (currentDetailRow == undefined) {
                     toastr.error("请先选择一行后再操作");
                     return;
                 }
-                utils.loadObjData($("#tb2Form"), rows[0]);
+                console.log(currentDetailRow);
+                utils.loadObjData($("#tb2Form"), currentDetailRow);
                 $("#tb2Modal").modal("show");
             });
 
             $("#tb2RemoveBt").on("click", function () {
                 var rows = $('#tb2').bootstrapTable('getSelections');
-                if (rows.length == 0) {
-                    toastr.error("请先选择一行后再删除");
+                if (currentDetailRow == undefined) {
+                    toastr.error("请先选择一行后再操作");
                     return;
                 }
                 openConfirmDialog("确定要删除选中行吗？", function () {
-                    $.post("RemoveDsDetail", { id: rows[0].id }, function (data) {
+                    $.post("RemoveDsDetail", { id: currentDetailRow.id }, function (data) {
                         if (data.suc) {
                             toastr.success("删除成功");
                             $('#tb2').bootstrapTable('refresh');
@@ -206,6 +253,45 @@
                     }
                 });
             });
+
+            //上传模块
+            $("<div></div>").myUploader({
+                server: '../File/BeginUploadDSImg',
+                pick: "#tb2AddPicBt",
+                duplicate: true, //可重复上传图片
+                //图片上传成功后的回调
+                successCallback: function () {
+                    toastr.success("图片上传成功！");
+                    $('#tb2').bootstrapTable('refresh');
+                },
+                //上传之前的验证与设置formdata
+                beforeQueued: function (uploader) {
+                    if (!currentDetailRow) {
+                        toastr.error("请先选择一行后再操作");
+                    } else {
+                        uploader.option("formData", { detailId: currentDetailRow.id });
+                    }
+                }
+            });
+
+            //删除平面图
+            $("#tb2RemovePicBt").on("click", function () {
+                if (currentDetailRow == undefined) {
+                    toastr.error("请先选择一行后再操作");
+                    return;
+                }
+                openConfirmDialog("确定要删除选中行的平面图吗？", function () {
+                    $.post("RemoveDSPic", { id: currentDetailRow.id }, function (data) {
+                        if (data.suc) {
+                            toastr.success("删除成功");
+                            $('#tb2').bootstrapTable('refresh');
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                });
+            });
+
         });
     </script>
 
@@ -222,7 +308,7 @@
     </div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-xs-12 col-sm-6">
+            <div class="col-xs-12 col-sm-12 col-md-5">
 
                 <div class="panel panel-primary">
                     <div class="panel-heading">
@@ -240,7 +326,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-6">
+            <div class="col-xs-12 col-sm-12 col-md-7">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <div class="panel-title"><i class="fa fa-th-list"></i> 楼层明细信息</div>
@@ -250,9 +336,12 @@
                             <button class="btn btn-sm btn-success" id="tb2AddBt"><i class="fa fa-plus"></i> 新增楼层</button>
                             <button class="btn btn-sm btn-primary" id="tb2ModifyBt"><i class="fa fa-edit"></i> 修改楼层</button>
                             <button class="btn btn-sm btn-danger" id="tb2RemoveBt"><i class="fa fa-remove"></i> 删除楼层</button>
+                            <button class="btn btn-sm btn-default" id="tb2AddPicBt"><i class="fa fa-file-picture-o"></i> 上传平面图</button>
+                            <button class="btn btn-sm btn-danger" id="tb2RemovePicBt"><i class="fa fa-remove"></i> 删除平面图</button>
                         </div>
                         @*楼层table*@
                         <table id="tb2"></table>
+                        <p class="text-danger small" style="margin-top:6px;"><i class="fa fa-info-circle"></i> 每一行对应一张平面图，重复上传会覆盖掉旧的</p>
                     </div>
                 </div>
             </div>
@@ -298,6 +387,7 @@
                         <input type="text" class="form-control" name="dep_name" placeholder="部门，必填" style="margin-top:4px;" />
                         <input type="text" class="form-control" name="dep_size" placeholder="车间面积，必填" style="margin-top:4px;" />
                         <input type="text" class="form-control" name="clear_level" placeholder="净房等级，必填" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="dep_charger" placeholder="负责人，选填" style="margin-top:4px;" />
                         <textarea class="form-control" rows="2" name="dep_plan" placeholder="车间整合规划，选填" style="margin-top:4px;"></textarea>
                         <textarea class="form-control" rows="2" name="usage" placeholder="用途，选填" style="margin-top:4px;"></textarea>
                     </form>

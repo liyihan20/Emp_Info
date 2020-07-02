@@ -11,7 +11,7 @@ namespace EmpInfo.Controllers
 {
     public class WXController : BaseController
     {
-        #region 微信公众号接口
+        #region 微信公众号接口 2020-7-1停用，转到企业微信
 
         private string redirectIndex = "http://emp.truly.com.cn/Emp/WX/WIndex?cardnumber={0}&secret={1}";
         private string wLoginUrl = "http://emp.truly.com.cn/Emp/WX/WLogin?openId=";
@@ -109,6 +109,8 @@ namespace EmpInfo.Controllers
         //微信openid认证通过跳转的页面
         public ActionResult WIndex(string cardnumber, string secret, string controllerName = "Home", string actionName = "Index",string param="")
         {
+            return Content("微信公众号中的移动办公功能已于2020-07-01全部停用，请移步企业微信操作");            
+
             string msg = "";
             bool suc = false;
             if (!MyUtils.getMD5(cardnumber).Equals(secret)) {

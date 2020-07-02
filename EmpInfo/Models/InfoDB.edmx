@@ -409,6 +409,9 @@
           <Property Name="clear_level" Type="nvarchar" MaxLength="50" />
           <Property Name="dep_plan" Type="nvarchar" MaxLength="500" />
           <Property Name="usage" Type="nvarchar" MaxLength="500" />
+          <Property Name="pic" Type="image" />
+          <Property Name="pic_name" Type="nvarchar" MaxLength="100" />
+          <Property Name="dep_charger" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ei_CRApply">
           <Key>
@@ -1323,6 +1326,36 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="v_day" Type="smalldatetime" Nullable="false" />
           <Property Name="comment" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="flow_apply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="flow_template_id" Type="int" />
+          <Property Name="create_user" Type="varchar" MaxLength="50" />
+          <Property Name="success" Type="bit" />
+          <Property Name="start_date" Type="datetime" />
+          <Property Name="finish_date" Type="datetime" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="form_title" Type="varchar" MaxLength="500" />
+          <Property Name="form_sub_title" Type="varchar" MaxLength="500" />
+          <Property Name="user_abort" Type="bit" />
+        </EntityType>
+        <EntityType Name="flow_applyEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="apply_id" Type="int" />
+          <Property Name="auditors" Type="varchar" MaxLength="500" />
+          <Property Name="pass" Type="bit" />
+          <Property Name="audit_time" Type="datetime" />
+          <Property Name="opinion" Type="varchar" MaxLength="500" />
+          <Property Name="step" Type="int" />
+          <Property Name="step_name" Type="varchar" MaxLength="50" />
+          <Property Name="flow_template_entry_id" Type="int" />
+          <Property Name="final_auditor" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="flow_applyEntryQueue">
           <Key>
@@ -2470,6 +2503,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_flow_applyEntry_flow_apply">
+          <End Role="flow_apply" Type="Self.flow_apply" Multiplicity="0..1" />
+          <End Role="flow_applyEntry" Type="Self.flow_applyEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="flow_apply">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="flow_applyEntry">
+              <PropertyRef Name="apply_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Function Name="BindK3Emp" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="k3_username" Type="varchar" Mode="In" />
           <Parameter Name="card_number" Type="varchar" Mode="In" />
@@ -2687,6 +2732,8 @@
           <EntitySet Name="ei_users" EntityType="Self.ei_users" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_users_android" EntityType="Self.ei_users_android" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_vacationDays" EntityType="Self.ei_vacationDays" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="flow_apply" EntityType="Self.flow_apply" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="flow_applyEntry" EntityType="Self.flow_applyEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="flow_applyEntryQueue" EntityType="Self.flow_applyEntryQueue" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="flow_auditorRelation" EntityType="Self.flow_auditorRelation" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="flow_notifyUsers" EntityType="Self.flow_notifyUsers" Schema="dbo" store:Type="Tables" />
@@ -3394,6 +3441,10 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <End Role="ei_ucApply" EntitySet="ei_ucApply" />
             <End Role="ei_ucApplyEntry" EntitySet="ei_ucApplyEntry" />
           </AssociationSet>
+          <AssociationSet Name="FK_flow_applyEntry_flow_apply" Association="Self.FK_flow_applyEntry_flow_apply">
+            <End Role="flow_apply" EntitySet="flow_apply" />
+            <End Role="flow_applyEntry" EntitySet="flow_applyEntry" />
+          </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -3757,6 +3808,12 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <Parameter Name="fromDate" Mode="In" Type="DateTime" />
             <Parameter Name="toDate" Mode="In" Type="DateTime" />
           </FunctionImport>
+          <EntitySet Name="flow_apply" EntityType="ICAuditModel.flow_apply" />
+          <EntitySet Name="flow_applyEntry" EntityType="ICAuditModel.flow_applyEntry" />
+          <AssociationSet Name="FK_flow_applyEntry_flow_apply" Association="ICAuditModel.FK_flow_applyEntry_flow_apply">
+            <End Role="flow_apply" EntitySet="flow_apply" />
+            <End Role="flow_applyEntry" EntitySet="flow_applyEntry" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -6431,6 +6488,9 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="dep_plan" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="ei_bus_place" Relationship="ICAuditModel.FK_ei_bus_place_detail_ei_bus_place" FromRole="ei_bus_place_detail" ToRole="ei_bus_place" />
           <Property Name="usage" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="pic" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="pic_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="dep_charger" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ei_bus_place">
           <Key>
@@ -6472,6 +6532,50 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Type="String" Name="FModel" Nullable="true" MaxLength="255" />
           <Property Type="String" Name="FdeptName" Nullable="true" MaxLength="80" />
         </ComplexType>
+        <EntityType Name="flow_apply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="flow_template_id" Type="Int32" />
+          <Property Name="create_user" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="success" Type="Boolean" />
+          <Property Name="start_date" Type="DateTime" Precision="3" />
+          <Property Name="finish_date" Type="DateTime" Precision="3" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="form_title" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="form_sub_title" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="user_abort" Type="Boolean" />
+          <NavigationProperty Name="flow_applyEntry" Relationship="ICAuditModel.FK_flow_applyEntry_flow_apply" FromRole="flow_apply" ToRole="flow_applyEntry" />
+        </EntityType>
+        <EntityType Name="flow_applyEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="apply_id" Type="Int32" />
+          <Property Name="auditors" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="pass" Type="Boolean" />
+          <Property Name="audit_time" Type="DateTime" Precision="3" />
+          <Property Name="opinion" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="step" Type="Int32" />
+          <Property Name="step_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="flow_template_entry_id" Type="Int32" />
+          <Property Name="final_auditor" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="flow_apply" Relationship="ICAuditModel.FK_flow_applyEntry_flow_apply" FromRole="flow_applyEntry" ToRole="flow_apply" />
+        </EntityType>
+        <Association Name="FK_flow_applyEntry_flow_apply">
+          <End Type="ICAuditModel.flow_apply" Role="flow_apply" Multiplicity="0..1" />
+          <End Type="ICAuditModel.flow_applyEntry" Role="flow_applyEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="flow_apply">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="flow_applyEntry">
+              <PropertyRef Name="apply_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -8992,6 +9096,9 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_bus_place_detail">
             <EntityTypeMapping TypeName="ICAuditModel.ei_bus_place_detail">
               <MappingFragment StoreEntitySet="ei_bus_place_detail">
+                <ScalarProperty Name="dep_charger" ColumnName="dep_charger" />
+                <ScalarProperty Name="pic_name" ColumnName="pic_name" />
+                <ScalarProperty Name="pic" ColumnName="pic" />
                 <ScalarProperty Name="usage" ColumnName="usage" />
                 <ScalarProperty Name="dep_plan" ColumnName="dep_plan" />
                 <ScalarProperty Name="clear_level" ColumnName="clear_level" />
@@ -9035,6 +9142,38 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="flow_apply">
+            <EntityTypeMapping TypeName="ICAuditModel.flow_apply">
+              <MappingFragment StoreEntitySet="flow_apply">
+                <ScalarProperty Name="user_abort" ColumnName="user_abort" />
+                <ScalarProperty Name="form_sub_title" ColumnName="form_sub_title" />
+                <ScalarProperty Name="form_title" ColumnName="form_title" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="finish_date" ColumnName="finish_date" />
+                <ScalarProperty Name="start_date" ColumnName="start_date" />
+                <ScalarProperty Name="success" ColumnName="success" />
+                <ScalarProperty Name="create_user" ColumnName="create_user" />
+                <ScalarProperty Name="flow_template_id" ColumnName="flow_template_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="flow_applyEntry">
+            <EntityTypeMapping TypeName="ICAuditModel.flow_applyEntry">
+              <MappingFragment StoreEntitySet="flow_applyEntry">
+                <ScalarProperty Name="final_auditor" ColumnName="final_auditor" />
+                <ScalarProperty Name="flow_template_entry_id" ColumnName="flow_template_entry_id" />
+                <ScalarProperty Name="step_name" ColumnName="step_name" />
+                <ScalarProperty Name="step" ColumnName="step" />
+                <ScalarProperty Name="opinion" ColumnName="opinion" />
+                <ScalarProperty Name="audit_time" ColumnName="audit_time" />
+                <ScalarProperty Name="pass" ColumnName="pass" />
+                <ScalarProperty Name="auditors" ColumnName="auditors" />
+                <ScalarProperty Name="apply_id" ColumnName="apply_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

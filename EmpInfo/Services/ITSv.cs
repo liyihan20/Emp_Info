@@ -69,7 +69,7 @@ namespace EmpInfo.Services
             {
                 text = "维修标签扫描",
                 iconFont = "fa-barcode 扫描维修标签",
-                url = "../WX/JsInterface?actionType=scanQRCode"
+                url = "../QYWX/JsInterface?actionType=scanQRCode"
             });
 
             if (db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "提升优先级" && f.relate_value == userInfo.cardNo).Count() > 0) {
@@ -380,11 +380,13 @@ namespace EmpInfo.Services
         public void UpdatePriority(string sysNo)
         {
             bill = db.ei_itApply.Where(i => i.sys_no == sysNo).FirstOrDefault();
+            var apply = db.flow_apply.Where(a => a.sys_no == sysNo).FirstOrDefault();
             if (bill != null) {
                 if (bill.priority == 6) {
                     throw new Exception("优先级已提升过，不能重复操作");
                 }
                 bill.priority = 6;
+                apply.form_title = "6";
                 db.SaveChanges();
             }
             else {

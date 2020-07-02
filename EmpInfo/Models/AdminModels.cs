@@ -52,6 +52,20 @@ namespace EmpInfo.Models
         public string clear_level { get; set; }
         public string dep_plan { get; set; }
         public string usage { get; set; }
+        public string pic_name { get; set; }
+        public int detail_id { get; set; }
+        public string dep_charger { get; set; }
+    }
+
+    public class DSModel
+    {
+        public List<BusPlaces> ps { get; set; }
+        public int isEmpty { get; set; }
+        public string place { get; set; }
+        public string depName { get; set; }
+        public string depCharger { get; set; }
+        public List<string> places { get; set; }
+        public List<string> chargers { get; set; }
     }
 
 }

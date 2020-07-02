@@ -140,6 +140,8 @@ namespace EmpInfo.Models
         public DbSet<vw_KSExcel> vw_KSExcel { get; set; }
         public DbSet<ei_bus_place_detail> ei_bus_place_detail { get; set; }
         public DbSet<ei_bus_place> ei_bus_place { get; set; }
+        public DbSet<flow_apply> flow_apply { get; set; }
+        public DbSet<flow_applyEntry> flow_applyEntry { get; set; }
     
         public virtual ObjectResult<string> GetDormChargeMonth()
         {

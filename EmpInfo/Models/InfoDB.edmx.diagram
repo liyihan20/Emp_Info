@@ -142,6 +142,9 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_bus_place_detail" Width="1.5" PointX="6" PointY="16.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_bus_place" Width="1.5" PointX="6" PointY="15.75" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_bus_place_detail_ei_bus_place" />
+        <EntityTypeShape EntityType="ICAuditModel.flow_apply" Width="1.5" PointX="10.375" PointY="14.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.flow_applyEntry" Width="1.5" PointX="10.375" PointY="15.125" IsExpanded="false" />
+        <AssociationConnector Association="ICAuditModel.FK_flow_applyEntry_flow_apply" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
