@@ -58,7 +58,7 @@ namespace EmpInfo.Controllers
         [AuthorityFilter]
         public ActionResult DormAndEmps()
         {
-            ViewData["yearMonth"] = db.GetDormChargeMonth().ToList().Where(d => d.CompareTo("202005") >= 0).ToList();
+            
             return View();
         }
 
@@ -131,59 +131,6 @@ namespace EmpInfo.Controllers
         }
 
 
-        public JsonResult GetDormFeeReport(string yearMonth)
-        {
-            DateTime fromDate = DateTime.Parse(yearMonth + "-01");
-            DateTime toDate = fromDate.AddMonths(1);
-            List<DormReportModel> result;
-            try {
-                result = db.Database.SqlQuery<DormReportModel>("exec [192.168.100.205].[LogisticsDB].[dbo].[getChargeTypeReport] @fd = {0:yyyy-MM-dd},@td = {1:yyyy-MM-dd}", fromDate, toDate).ToList();
-            }
-            catch (Exception ex) {
-                return Json(new SimpleResultModel(ex));
-            }
-
-            //加入工程支出的
-            decimal deSum = db.ei_DEApplyEntry.Where(d => d.clear_date >= fromDate && d.clear_date < toDate).Sum(d => d.total_with_tax) ?? 0;
-            result.Add(new DormReportModel() { charge_type = "工程支出", type_sum = deSum });
-            return Json(new SimpleResultModel(true, "", JsonConvert.SerializeObject(result)));
-        }
-
-        public ActionResult GetDormFeeReportDetail(string yearMonth, string chargeType)
-        {
-            DateTime fromDate = DateTime.Parse(yearMonth + "-01");
-            DateTime toDate = fromDate.AddMonths(1);
-
-            string title = string.Format("{0}({1:yyyy-MM-dd} ~ {2:yyyy-MM-dd})", chargeType, fromDate, toDate.AddDays(-1));
-
-            string sqltext = "";
-            ConnectionModel cm = null;
-            if ("工程支出".Equals(chargeType)) {
-                sqltext = @"select 
-                    catalog as [类别],subject as [项目],name as [名称],total_with_tax as [金额],
-                    summary as [摘要],convert(varchar(10),clear_date,23) as [结算日期]
-                    from ei_DEApplyEntry ";
-                sqltext += string.Format("where clear_date >= '{0:yyyy-MM-dd}' and clear_date < '{1:yyyy-MM-dd}'", fromDate, toDate);
-            }
-            else {
-                cm = new ConnectionModel()
-                {
-                    serverName = "192.168.100.205",
-                    dbName = "LogisticsDB",
-                    dbLoginName = "Logistics",
-                    dbPassword = "Logistics123456"
-                };
-                sqltext = string.Format("exec getChargeTypeReportDetail @fd = '{0:yyyy-MM-dd}',@td = '{1:yyyy-MM-dd}',@type = '{2}'", fromDate, toDate, chargeType);
-            }
-
-            //跳转到基础输出表格
-            TempData["title"] = title;
-            TempData["sqlText"] = sqltext;
-            TempData["cm"] = cm;
-            return RedirectToAction("BasicTable", "BI", null);
-
-        }
-
         //对宿舍统计信息进行排序
         private class DormComparer : IComparer<vw_dormEmptyRoom>
         {
@@ -225,9 +172,93 @@ namespace EmpInfo.Controllers
         }
         
         #endregion
-        
+
+        #region 宿舍收支统计
+
+        [AuthorityFilter]
+        public ActionResult DormFeeReport()
+        {
+            ViewData["yearMonth"] = db.GetDormChargeMonth().ToList().Where(d => d.CompareTo("202005") >= 0).ToList();
+            return View();
+        }
+
+        public JsonResult GetDormFeeReport(string yearMonth)
+        {
+            DateTime fromDate = DateTime.Parse(yearMonth + "-01");
+            DateTime toDate = fromDate.AddMonths(1);
+            List<DormReportModel> result;
+            try {
+                result = db.Database.SqlQuery<DormReportModel>("exec [192.168.100.205].[LogisticsDB].[dbo].[getChargeTypeReport] @fd = {0:yyyy-MM-dd},@td = {1:yyyy-MM-dd}", fromDate, toDate).ToList();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+
+            //加入工程支出的
+            decimal deSum = db.ei_DEApplyEntry.Where(d => d.clear_date >= fromDate && d.clear_date < toDate).Sum(d => d.total_with_tax) ?? 0;
+            result.Add(new DormReportModel() { charge_type = "工程支出", type_sum = deSum });
+
+            //加入后勤工资
+            decimal salarySum = db.GetLodDepSalarySum(yearMonth.Replace("-", "")).FirstOrDefault() ?? 0;
+            result.Add(new DormReportModel() { charge_type = "后勤工资", type_sum = salarySum });
+
+            //加入辅料支出,奇怪的使用参数传参的形式总是报日期转化错误，只能用拼接的方式
+            decimal fSum = db.Database.SqlQuery<decimal?>("select sum([金额]) from v_erp_po where [日期] >= '" + fromDate.ToString("yyyy-MM-dd") + "' and [日期] < '" + toDate.ToString("yyyy-MM-dd") + "' and [物料名称] <> '设备维修备件'").FirstOrDefault() ?? 0m;
+            result.Add(new DormReportModel() { charge_type = "辅料类", type_sum = fSum });
+
+            //加入设备类支出
+            decimal sSum = db.Database.SqlQuery<decimal?>("select sum([金额]) from v_erp_po where [日期] >= '" + fromDate.ToString("yyyy-MM-dd") + "' and [日期] < '" + toDate.ToString("yyyy-MM-dd") + "' and [物料名称] = '设备维修备件'").FirstOrDefault() ?? 0m;
+            result.Add(new DormReportModel() { charge_type = "辅料类", type_sum = sSum });
+
+            return Json(new SimpleResultModel(true, "", JsonConvert.SerializeObject(result)));
+        }
+
+        public ActionResult GetDormFeeReportDetail(string yearMonth, string chargeType)
+        {
+            DateTime fromDate = DateTime.Parse(yearMonth + "-01");
+            DateTime toDate = fromDate.AddMonths(1);
+
+            string title = string.Format("{0}({1:yyyy-MM-dd} ~ {2:yyyy-MM-dd})", chargeType, fromDate, toDate.AddDays(-1));
+
+            string sqltext = "";
+            ConnectionModel cm = null;
+            if ("工程支出".Equals(chargeType)) {
+                sqltext = @"select 
+                    catalog as [类别],subject as [项目],name as [名称],total_with_tax as [金额],
+                    summary as [摘要],convert(varchar(10),clear_date,23) as [结算日期]
+                    from ei_DEApplyEntry ";
+                sqltext += string.Format("where clear_date >= '{0:yyyy-MM-dd}' and clear_date < '{1:yyyy-MM-dd}'", fromDate, toDate);
+            }
+            else if (new string[] { "辅料类", "设备类" }.Contains(chargeType)) {
+                sqltext = @"select
+                        convert(varchar(20),[日期],23) as [日期],[采购单号],[供应商],[物料名称],
+                        [物料型号],[辅助属性],[采购数量],[含税单价],[金额],[摘要]
+                        from v_erp_po ";
+                sqltext += string.Format("where [日期] >= '{0:yyyy-MM-dd}' and [日期] < '{1:yyyy-MM-dd}' and [物料名称] {3} '{2}' order by [日期]", fromDate, toDate, "设备维修备件", chargeType.Equals("设备类") ? "=" : "<>");
+            }
+            else {
+                cm = new ConnectionModel()
+                {
+                    serverName = "192.168.100.205",
+                    dbName = "LogisticsDB",
+                    dbLoginName = "Logistics",
+                    dbPassword = "Logistics123456"
+                };
+                sqltext = string.Format("exec getChargeTypeReportDetail @fd = '{0:yyyy-MM-dd}',@td = '{1:yyyy-MM-dd}',@type = '{2}'", fromDate, toDate, chargeType);
+            }
+
+            //跳转到基础输出表格
+            TempData["title"] = title;
+            TempData["sqlText"] = sqltext;
+            TempData["cm"] = cm;
+            return RedirectToAction("BasicTable", "BI", null);
+
+        }
+
+        #endregion
+
         #region 厂区表格展示
-        
+
         public ActionResult DS(int isEmpty = 0, string place = "", string depName = "",string depCharger="")
         {
             var result = from b in db.ei_bus_place
@@ -247,11 +278,12 @@ namespace EmpInfo.Controllers
                              usage = e.usage,
                              pic_name = e.pic_name,
                              detail_id=e.id,
-                             dep_charger=e.dep_charger
+                             dep_charger=e.dep_charger,
+                             is_empty=e.is_empty
                          };
 
             if (isEmpty == 1) {
-                result = result.Where(r => r.dep_plan.Contains("闲置") || r.dep_name.Contains("闲置"));
+                result = result.Where(r => r.is_empty);
             }
 
             if (!string.IsNullOrEmpty(place)) {
@@ -315,7 +347,8 @@ namespace EmpInfo.Controllers
                               d.place_id,
                               d.usage,
                               d.pic_name,
-                              d.dep_charger
+                              d.dep_charger,
+                              is_empty = d.is_empty?"是":""
                           }).ToList();
             return Json(result, JsonRequestBehavior.AllowGet);
         }

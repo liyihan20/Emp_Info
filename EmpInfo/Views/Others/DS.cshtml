@@ -92,9 +92,18 @@
             $("#ckEmpty").iCheck({
                 checkboxClass: 'icheckbox_square-blue'
             });
+
             if ("@dm.isEmpty" == "1") {
                 $('#ckEmpty').iCheck('check');
             }
+            $('#ckEmpty').on('ifChanged', function (event) {
+                reloadPage();
+            });
+            $("#stPlace,#stCharger").on("change", function () {
+                reloadPage();
+            });
+
+
 
             $("#stPlace").val("@dm.place");
             $("#stCharger").val("@dm.depCharger");
@@ -122,7 +131,7 @@
     </script>
 
 }
-<div class="text-center" style="font-size:36px;margin-bottom:6px;">汕尾工业城厂房简介</div>
+<div class="text-center" style="font-size:36px;margin-bottom:6px;">信利厂房简介</div>
 <div id="btns">
     <button id="btnStop" class="btn btn-success btn-sm pull-right"><i class="fa fa-stop"></i> 暂停滚动</button>
     <div class="pull-left" style="line-height:30px;">
@@ -147,9 +156,6 @@
             </select>
         </span>
         <span style="padding-left:16px;">
-            部门：<input type="text" class="form-control input-sm" id="txDepName" style="display:inline-block;width:100px;" value="@dm.depName" />
-        </span>
-        <span style="padding-left:16px;">
             负责人：
             <select id="stCharger" class="form-control input-sm" style="display:inline-block;width:100px;">
                 <option value="">全部</option>
@@ -157,6 +163,9 @@
                     <option value="@p">@p</option>
                 }
             </select>
+        </span>
+        <span style="padding-left:16px;">
+            部门：<input type="text" class="form-control input-sm" id="txDepName" style="display:inline-block;width:100px;" value="@dm.depName" />
         </span>
         <span style="padding-left:16px">
             <button class="btn btn-sm btn-primary" id="btnSearch"><i class="fa fa-search"></i> 搜索</button>
@@ -190,11 +199,11 @@
             <th data-field="clear_level" data-valign="middle" data-align="center">
                 净房等级
             </th>
+            <th data-field="usage">
+                生产工序
+            </th>
             <th data-field="dep_plan">
                 车间整合规划
-            </th>
-            <th data-field="usage">
-                用途
             </th>
             <th data-field="pic_name" data-valign="middle" data-align="center">
                 平面图
@@ -229,8 +238,8 @@
                 }
                 <td>@p.dep_size</td>
                 <td>@p.clear_level</td>
-                <td>@p.dep_plan</td>
                 <td>@p.usage</td>
+                <td>@p.dep_plan</td>
                 <td>
                     @if (string.IsNullOrEmpty(p.pic_name)) {
                         <text>无</text>

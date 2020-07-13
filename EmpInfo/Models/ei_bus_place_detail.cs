@@ -25,6 +25,7 @@ namespace EmpInfo.Models
         public byte[] pic { get; set; }
         public string pic_name { get; set; }
         public string dep_charger { get; set; }
+        public bool is_empty { get; set; }
     
         public virtual ei_bus_place ei_bus_place { get; set; }
     }

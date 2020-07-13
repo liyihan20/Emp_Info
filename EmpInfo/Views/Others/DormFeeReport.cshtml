@@ -1,0 +1,160 @@
+﻿@{
+    List<string> yearMonth = ViewData["yearMonth"] as List<string>;
+}
+
+<script>
+    $(function () {
+        $("#searchReportBt").on("click", function () {
+            var self = this;
+            var yearMonth = $("#yearMonthSt").val();
+            $(".btn_yearmonth").html(yearMonth);
+            $(self).button("loading");
+            $.post("GetDormFeeReport", { yearMonth: yearMonth }, function (data) {
+                $(self).button("reset");
+                if (!data.suc) {
+                    toastr.error(data.msg);
+                    return;
+                }
+                var r = JSON.parse(data.extra);
+                $("table .r").each(function (i, ele) {
+                    var self = this;
+                    var id = $(self).attr("id");
+                    var temp = r.filter(function (t) { return id.indexOf(t.charge_type) == 0 });
+                    if (temp.length > 0) {
+                        if ($(self).hasClass("d") && temp[0].type_sum > 0) {
+                            $(self).css("cursor", "pointer");
+                        }
+                        $(self).html(temp[0].type_sum);
+                    } else {
+                        $(self).html(0);
+                    }
+                });
+
+                var totalIn =
+                    parseFloat($("#工资代扣").html())
+                    + parseFloat($("#公司转账").html())
+                    + parseFloat($("#劳务抵扣").html())
+                    + parseFloat($("#现金收款").html())
+                    + parseFloat($("#扣款失败").html())
+                    + parseFloat($("#行政减免").html())
+                    + parseFloat($("#杂费收入").html())
+                    + parseFloat($("#未处理").html())
+                ;
+                var totalOut =
+                    parseFloat($("#工程支出").html())
+                    + parseFloat($("#后勤水电费").html())
+                    + parseFloat($("#后勤工资").html())
+                    + parseFloat($("#扣款失败").html())
+                    + parseFloat($("#行政减免").html())
+                    + parseFloat($("#劳务抵扣").html())
+                    + parseFloat($("#辅料类").html())
+                    + parseFloat($("#设备类").html())
+                ;
+                $("#收入汇总").html(totalIn.toFixed(2));
+                $("#支出汇总").html(totalOut.toFixed(2));
+                toastr.success("处理完毕");
+            });
+        });
+
+        $("table .d").on("click", function () {
+            if (!isNaN($(this).html()) && parseFloat($(this).html()) > 0) {
+                var id = $(this).attr("id");
+                //id后缀为2的去掉
+                id = id.replace("2", "");
+                window.open("GetDormFeeReportDetail?yearMonth=" + $("#yearMonthSt").val() + "&chargeType=" + id);                
+            }
+        });
+    });
+</script>
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li class="active">宿舍收支统计</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-sm-3" style="margin-bottom:12px;">
+                <select class="form-control" id="yearMonthSt">
+                    @foreach (var ym in yearMonth) {
+                        <option value="@(ym.Substring(0,4)+"-"+ym.Substring(4))">@(ym.Substring(0, 4) + "-" + ym.Substring(4))</option>
+                    }
+                </select>
+                <div class="small text-danger"><i class="fa fa-info-circle"></i> 2020-05之后开始有统计数据</div>
+            </div>
+            <div class="col-xs-12 col-sm-3" style="margin-bottom:12px;">
+                <button class="btn btn-primary" id="searchReportBt" data-loading-text="查询与计算中..."><i class="fa fa-search"></i> 统计查询</button>
+            </div>
+        </div>
+
+
+        <button class="btn btn-block btn-success disabled" style="text-align:left;margin-bottom:2px;border-radius:0;font-style:italic;"><i class="fa fa-plus-square"></i> <span class="btn_yearmonth"></span> 收入统计</button>
+        <table class="table table-bordered">
+            <tr>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 工资代扣</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r" id="工资代扣"></b></td>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 公司转账</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="公司转账"></b></td>
+            </tr>
+            <tr>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 现金收款</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="现金收款"></b></td>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 杂费收入</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="杂费收入"></b></td>
+            </tr>
+            <tr>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 未处理</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="未处理"></b></td>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 扣款失败</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="扣款失败"></b></td>
+            </tr>
+            <tr>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 行政减免</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="行政减免"></b></td>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 劳务抵扣</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="劳务抵扣"></b></td>
+            </tr>
+            <tr>                
+                <td class="text-center" style="width:25%;"><b style="color:#5cb85c;"> 收入汇总</b></td>
+                <td style="width:25%;"><b class="pull-right text-primary" id="收入汇总" style="color:#5cb85c;"></b></td>
+            </tr>
+        </table>        
+
+        <button class="btn btn-block btn-danger disabled" style="text-align:left;margin-bottom:2px;border-radius:0;font-style:italic;"><i class="fa fa-minus-square"></i> <span class="btn_yearmonth"></span> 支出统计</button>
+        <table class="table table-bordered">
+            <tr>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 后勤工资</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r" id="后勤工资"></b></td>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 后勤水电费</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="后勤水电费"></b></td>
+            </tr>
+            <tr>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 工程支出</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="工程支出"></b></td>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 辅料类</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="辅料类"></b></td>
+            </tr>
+            <tr>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 设备类</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="设备类"></b></td>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 扣款失败</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="扣款失败2"></b></td>
+            </tr>
+            <tr>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 行政减免</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="行政减免2"></b></td>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 劳务抵扣</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="劳务抵扣2"></b></td>
+            </tr>
+            <tr>               
+                <td class="text-center" style="width:25%;"><b style="color:#d9534f;"> 支出汇总</b></td>
+                <td style="width:25%;"><b class="pull-right text-primary" id="支出汇总" style="color:#d9534f;"></b></td>
+            </tr>
+        </table>
+
+    </div>
+</div>

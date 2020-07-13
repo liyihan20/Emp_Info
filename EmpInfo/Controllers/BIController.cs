@@ -69,6 +69,11 @@ namespace EmpInfo.Controllers
             string sqlText = TempData["sqlText"] as string;
             ConnectionModel cm = TempData["cm"] as ConnectionModel;
 
+            if (string.IsNullOrEmpty(sqlText)) {
+                ViewBag.tip = "数据已过期，请重新查询";
+                return View("Error");
+            }
+
             try {
                 var result = new BIBaseSv().GetTableResult(sqlText, cm);
                 ViewData["title"] = title;

@@ -925,6 +925,7 @@
     <Content Include="Content\images\dorm_users.png" />
     <Content Include="Content\images\elepr.png" />
     <Content Include="Content\images\ep.png" />
+    <Content Include="Content\images\fee_report.png" />
     <Content Include="Content\images\file.png" />
     <Content Include="Content\images\gear.png" />
     <Content Include="Content\images\house.png" />
@@ -1558,6 +1559,7 @@
     <Content Include="Views\Others\DS.cshtml" />
     <Content Include="Views\Others\DSIndex.cshtml" />
     <Content Include="Views\QYWX\JsInterface.cshtml" />
+    <Content Include="Views\Others\DormFeeReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

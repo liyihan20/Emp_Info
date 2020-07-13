@@ -412,6 +412,7 @@
           <Property Name="pic" Type="image" />
           <Property Name="pic_name" Type="nvarchar" MaxLength="100" />
           <Property Name="dep_charger" Type="nvarchar" MaxLength="50" />
+          <Property Name="is_empty" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="ei_CRApply">
           <Key>
@@ -2582,6 +2583,9 @@
         <Function Name="GetKQRecord" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="account_no" Type="varchar" Mode="In" />
         </Function>
+        <Function Name="GetLodDepSalarySum" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="yearMonth" Type="varchar" Mode="In" />
+        </Function>
         <Function Name="GetOutStockBillsForAudit1" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="account" Type="varchar" Mode="In" />
           <Parameter Name="fd" Type="smalldatetime" Mode="In" />
@@ -3814,6 +3818,9 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <End Role="flow_apply" EntitySet="flow_apply" />
             <End Role="flow_applyEntry" EntitySet="flow_applyEntry" />
           </AssociationSet>
+          <FunctionImport Name="GetLodDepSalarySum" ReturnType="Collection(Decimal)">
+            <Parameter Name="yearMonth" Mode="In" Type="String" />
+          </FunctionImport>
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -6491,6 +6498,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="pic" Type="Binary" MaxLength="Max" FixedLength="false" />
           <Property Name="pic_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="dep_charger" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="is_empty" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="ei_bus_place">
           <Key>
@@ -9096,6 +9104,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_bus_place_detail">
             <EntityTypeMapping TypeName="ICAuditModel.ei_bus_place_detail">
               <MappingFragment StoreEntitySet="ei_bus_place_detail">
+                <ScalarProperty Name="is_empty" ColumnName="is_empty" />
                 <ScalarProperty Name="dep_charger" ColumnName="dep_charger" />
                 <ScalarProperty Name="pic_name" ColumnName="pic_name" />
                 <ScalarProperty Name="pic" ColumnName="pic" />
@@ -9174,6 +9183,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetLodDepSalarySum" FunctionName="ICAuditModel.Store.GetLodDepSalarySum" />
           </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

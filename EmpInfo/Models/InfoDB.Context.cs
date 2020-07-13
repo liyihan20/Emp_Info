@@ -620,5 +620,14 @@ namespace EmpInfo.Models
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetSRBills_Result>("GetSRBills", fromDateParameter, toDateParameter);
         }
+    
+        public virtual ObjectResult<Nullable<decimal>> GetLodDepSalarySum(string yearMonth)
+        {
+            var yearMonthParameter = yearMonth != null ?
+                new ObjectParameter("yearMonth", yearMonth) :
+                new ObjectParameter("yearMonth", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<decimal>>("GetLodDepSalarySum", yearMonthParameter);
+        }
     }
 }
