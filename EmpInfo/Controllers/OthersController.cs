@@ -52,7 +52,6 @@ namespace EmpInfo.Controllers
 
         #endregion
 
-
         #region 宿舍员工查询
 
         [AuthorityFilter]
@@ -198,19 +197,21 @@ namespace EmpInfo.Controllers
             decimal deSum = db.ei_DEApplyEntry.Where(d => d.clear_date >= fromDate && d.clear_date < toDate).Sum(d => d.total_with_tax) ?? 0;
             result.Add(new DormReportModel() { charge_type = "工程支出", type_sum = deSum });
 
-            //加入后勤工资
-            decimal salarySum = db.GetLodDepSalarySum(yearMonth.Replace("-", "")).FirstOrDefault() ?? 0;
-            result.Add(new DormReportModel() { charge_type = "后勤工资", type_sum = salarySum });
+            //从工资系统查询的后勤工资、宿舍房租和水电等
+            result.AddRange(db.GetLodDepSalarySum(yearMonth.Replace("-", "")).ToList().Select(l => new DormReportModel() { charge_type = l.charge_type, type_sum = l.type_sum }));
 
-            //加入辅料支出,奇怪的使用参数传参的形式总是报日期转化错误，只能用拼接的方式
-            decimal fSum = db.Database.SqlQuery<decimal?>("select sum([金额]) from v_erp_po where [日期] >= '" + fromDate.ToString("yyyy-MM-dd") + "' and [日期] < '" + toDate.ToString("yyyy-MM-dd") + "' and [物料名称] <> '设备维修备件'").FirstOrDefault() ?? 0m;
-            result.Add(new DormReportModel() { charge_type = "辅料类", type_sum = fSum });
-
-            //加入设备类支出
-            decimal sSum = db.Database.SqlQuery<decimal?>("select sum([金额]) from v_erp_po where [日期] >= '" + fromDate.ToString("yyyy-MM-dd") + "' and [日期] < '" + toDate.ToString("yyyy-MM-dd") + "' and [物料名称] = '设备维修备件'").FirstOrDefault() ?? 0m;
-            result.Add(new DormReportModel() { charge_type = "辅料类", type_sum = sSum });
+            var k3Datas = db.Database.SqlQuery<k3ReportModel>("select [物料名称],[金额] from v_erp_po where [日期] >= '" + fromDate.ToString("yyyy-MM-dd") + "' and [日期] < '" + toDate.ToString("yyyy-MM-dd") + "'").ToList();
+            //加入辅料支出和设备类支出,奇怪的使用参数传参的形式总是报日期转化错误，只能用拼接的方式
+            result.Add(new DormReportModel() { charge_type = "辅料类", type_sum = k3Datas.Where(k => k.物料名称 != "设备维修备件").Sum(k => k.金额) ?? 0m });
+            result.Add(new DormReportModel() { charge_type = "设备类", type_sum = k3Datas.Where(k => k.物料名称 == "设备维修备件").Sum(k => k.金额) ?? 0m });
 
             return Json(new SimpleResultModel(true, "", JsonConvert.SerializeObject(result)));
+        }
+
+        private class k3ReportModel
+        {
+            public string 物料名称 { get; set; }
+            public decimal? 金额 { get; set; }
         }
 
         public ActionResult GetDormFeeReportDetail(string yearMonth, string chargeType)
@@ -263,7 +264,7 @@ namespace EmpInfo.Controllers
         {
             var result = from b in db.ei_bus_place
                          join e in db.ei_bus_place_detail on b.id equals e.place_id
-                         orderby b.sort_no, e.floor
+                         orderby b.sort_no, e.floor_sort_no
                          select new BusPlaces()
                          {
                              place_id = b.id,
@@ -279,7 +280,9 @@ namespace EmpInfo.Controllers
                              pic_name = e.pic_name,
                              detail_id=e.id,
                              dep_charger=e.dep_charger,
-                             is_empty=e.is_empty
+                             is_empty=e.is_empty,
+                             all_charger = e.all_charger,
+                             produce_charger = e.produce_charger
                          };
 
             if (isEmpty == 1) {
@@ -315,7 +318,7 @@ namespace EmpInfo.Controllers
         public ActionResult DSIndex()
         {
             return View();
-        }
+        }        
 
         public JsonResult GetDSes()
         {
@@ -335,7 +338,7 @@ namespace EmpInfo.Controllers
         {
             var result = (from d in db.ei_bus_place_detail
                           where d.place_id == place_id
-                          orderby d.floor
+                          orderby d.floor_sort_no
                           select new
                           {
                               d.id,
@@ -348,7 +351,10 @@ namespace EmpInfo.Controllers
                               d.usage,
                               d.pic_name,
                               d.dep_charger,
-                              is_empty = d.is_empty?"是":""
+                              is_empty = d.is_empty ? "是" : "",
+                              d.all_charger,
+                              d.produce_charger,
+                              d.floor_sort_no
                           }).ToList();
             return Json(result, JsonRequestBehavior.AllowGet);
         }
@@ -456,5 +462,35 @@ namespace EmpInfo.Controllers
         }
 
         #endregion
+
+        #region 经营报表统计
+
+        public ActionResult ManagementReport()
+        {
+            if (db.ei_flowAuthority.Where(f => f.bill_type == "ManageR" && f.relate_value == userInfo.cardNo && f.relate_type == "查看报表").Count() < 1) {
+                return View("Warn");
+            }
+            ViewData["depList"] = db.Database.SqlQuery<string>("select yname from [192.168.100.205].truly_data.dbo.jy_dept where close_flag=1 order by yname").ToList();
+
+            return View();
+        }
+
+        public JsonResult GetManagementReport(string depName, string yearMonth)
+        {
+            yearMonth = yearMonth.Replace("-", "");
+            string sqlText = string.Format("exec [192.168.100.205].truly_data.dbo.tpro_jy_data_yybb @dept_name = {0},@month_no = {1}", depName, yearMonth);
+            try {
+                var result = new BIBaseSv().GetTableResult(sqlText);
+
+                return Json(new { suc = true, columns = result.columns, rows = result.rows });
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }            
+
+        }
+
+        #endregion
+
     }
 }

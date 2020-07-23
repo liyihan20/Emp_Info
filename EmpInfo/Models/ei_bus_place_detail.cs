@@ -26,6 +26,9 @@ namespace EmpInfo.Models
         public string pic_name { get; set; }
         public string dep_charger { get; set; }
         public bool is_empty { get; set; }
+        public string all_charger { get; set; }
+        public string produce_charger { get; set; }
+        public Nullable<int> floor_sort_no { get; set; }
     
         public virtual ei_bus_place ei_bus_place { get; set; }
     }

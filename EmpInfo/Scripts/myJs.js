@@ -76,7 +76,7 @@
     },
     //测试是否整数
     testIsInt: function (str) {
-        var reg = new RegExp(/^[0-9]+$/);
+        var reg = new RegExp(/^-?[0-9]+$/);
         return reg.test(str);
     },
     //测试是否符合指定小数位的数字，如果指定小数位是3，那给出的必须是小于3位的小数或整数；如果不指定小数位，则最多可以包含100个小数位，相当于没限制
@@ -157,7 +157,7 @@
         return sum;
     },
     //节流，将高频率的相同操作当做一个操作，delay为毫秒数
-    Debounce: function(fn, delay) {
+    Debounce: function (fn, delay) {
         var timer = null;
 
         return function () {
@@ -180,7 +180,33 @@
     GetDownloadRoute: function (sysNum) {
         return "../Att/" + sysNum.substr(0, 2) + "/20" + sysNum.substr(2, 2) + "/" + sysNum.substr(4, 2) + "/" + sysNum + "/";
     },
+    //转json字符串并转移特殊符号
     StringifyAndParseCharacter: function (obj) {
         return JSON.stringify(obj).replace(/\&/g, "%26").replace(/\+/g, "%2b").replace(/\=/g, "%3d");
+    },
+    //加上千分位逗号
+    parseDecimalToThousandBit: function (value) {
+        if (isNaN(value)) return value;
+        if (value == 0 || value == "" || value == null) return 0;
+        if (value < 1000 && value > -1000) return value;
+        var isNegtive = value < 0;//是否负数
+        var partInt = Math.abs(parseInt(value)); //取出整数部分
+        var partDecimal = value.toString().split(".")[1]; //取出小数部分
+
+        //对整数部分加千分位逗号
+        var partIntStr = partInt.toString();
+        var result = "";
+        while (partIntStr.length > 3) {
+            result = "," + partIntStr.slice(-3) + result;
+            partIntStr = partIntStr.slice(0, partIntStr.length - 3);
+        }
+        if (partIntStr.length > 0) result = partIntStr + result;
+        //如果有小数部分，加上
+        if(partDecimal) result = result + "." + partDecimal;
+        //如果是负数，加负号
+        if (isNegtive) result = "-" + result;
+
+        return result;
     }
+
 }

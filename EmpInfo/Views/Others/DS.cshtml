@@ -18,6 +18,7 @@
 @section Scripts {
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.cookie.js")"></script>
 
     <script type="text/javascript">
         var inter;
@@ -41,11 +42,12 @@
                     isRolling = true;
                     $("#btnStop").html("<i class='fa fa-stop'></i> 暂停滚动");
                 }
+                $.cookie("isRolling", isRolling);
             });
             
             $("#stSpeed").on("change", function () {
                 rollSpeed = $(this).val();
-                setInter()
+                setInter();
             });
             
             $(".pic_d").parent("td").on("click", function () {
@@ -53,7 +55,25 @@
                 window.open("CheckDSPic?id=" + detail_id);
             });
 
-            setInter();
+            //文档只有2个参数，实际上还有第一个参数e。。。自己误打误撞想出来的，保存隐藏列信息
+            $("#tb").on("column-switch.bs.table", function (e,field, checked) {
+                $.cookie(field, checked, { expires: 400 });
+            });
+
+            //隐藏之前隐藏的列
+            $($("#tb").bootstrapTable("getVisibleColumns")).each(function (idx, ele) {                
+                if ($.cookie(ele.field) == "false") {
+                    $("#tb").bootstrapTable("hideColumn", ele.field);
+                }                
+            });
+            
+            //通过cookie记住上次的是否滚定设置
+            if ($.cookie("isRolling") == "true" || $.cookie("isRolling") == undefined) {
+                setInter();
+            } else {
+                $("#btnStop").html("<i class='fa fa-play'></i> 继续滚动");
+                isRolling = false;
+            }
         });
 
         function setInter() {
@@ -137,7 +157,7 @@
     <div class="pull-left" style="line-height:30px;">
         <span>
             滚动速度：
-            <select id="stSpeed" class="form-control input-sm" style="display:inline-block;width:100px;">
+            <select id="stSpeed" class="form-control input-sm" style="display:inline-block;width:70px;">
                 <option value="60">慢速</option>
                 <option value="40">中速</option>
                 <option value="20">快速</option>
@@ -156,7 +176,7 @@
             </select>
         </span>
         <span style="padding-left:16px;">
-            负责人：
+            直接负责人：
             <select id="stCharger" class="form-control input-sm" style="display:inline-block;width:100px;">
                 <option value="">全部</option>
                 @foreach (var p in dm.chargers) {
@@ -175,7 +195,7 @@
 </div>
 <div class="clearfix" style="margin-bottom:8px;"></div>
 
-<table id="tb" data-toggle="table" data-show-columns="false">
+<table id="tb" data-toggle="table" data-show-columns="true">
     <thead>
         <tr>
             <th data-field="sort_no" data-valign="middle" data-align="center">
@@ -189,6 +209,15 @@
             </th>
             <th data-field="dep_name">
                 部门
+            </th>
+            <th data-field="all_charger">
+                总负责人
+            </th>
+            <th data-field="dep_charger">
+                直接负责人
+            </th>
+            <th data-field="produce_charger">
+                生产主管
             </th>
             <th data-field="area_size" data-valign="middle" data-align="center">
                 厂房面积(㎡)
@@ -212,12 +241,27 @@
     </thead>
     <tbody id="tbody">
         @{
+            //是否同一栋，同一栋需要合并
             int currentID = 0;
             int currentRowSpan = 1;
             bool isSameAsLast = false;
+
+            //是否同一层楼，同一层的话要把图片合并
+            string currentFloor = "";
+            int currentFloorSpan = 1;
+            bool isSameFloorAsLast = false; 
         }
         @foreach (var p in dm.ps) {
             <tr>
+                @if (currentID != p.place_id || currentFloor != p.floor) {
+                    currentFloor = p.floor;
+                    currentFloorSpan = dm.ps.Count(s => s.place_id == p.place_id && s.floor == p.floor);
+                    isSameFloorAsLast = false;
+                }
+                else {
+                    isSameFloorAsLast = true;
+                }
+
                 @if (currentID != p.place_id) {
                     currentID = p.place_id;
                     currentRowSpan = dm.ps.Count(s => s.place_id == currentID);
@@ -227,12 +271,17 @@
                     isSameAsLast = true;
                     currentRowSpan = 1;
                 }
+                
+
                 @if (!isSameAsLast) {
                     <td rowspan="@currentRowSpan">@p.sort_no</td>
                     <td rowspan="@currentRowSpan">@p.place</td>
                 }
                 <td>@p.floor</td>
                 <td>@p.dep_name</td>
+                <td>@p.all_charger</td>
+                <td>@p.dep_charger</td>
+                <td>@p.produce_charger</td>
                 @if (!isSameAsLast) {
                     <td rowspan="@currentRowSpan">@p.area_size</td>
                 }
@@ -240,7 +289,8 @@
                 <td>@p.clear_level</td>
                 <td>@p.usage</td>
                 <td>@p.dep_plan</td>
-                <td>
+                @if (!isSameFloorAsLast) { 
+                <td rowspan="@currentFloorSpan">
                     @if (string.IsNullOrEmpty(p.pic_name)) {
                         <text>无</text>
                     }
@@ -249,6 +299,7 @@
                         <span style="display:none;">@p.detail_id</span>
                     }
                 </td>
+                }
             </tr>
         }
     </tbody>

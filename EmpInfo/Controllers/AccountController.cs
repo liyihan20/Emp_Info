@@ -284,7 +284,7 @@ namespace EmpInfo.Controllers
                     msg = "电话号码后4位不正确，验证失败";
                 }
             }
-            if (!string.IsNullOrWhiteSpace(email_code))
+            if (!pass && !string.IsNullOrWhiteSpace(email_code))
             {
                 if (ValidateEmailCode(email_code))
                 {

@@ -123,6 +123,8 @@
                 } else if (currentStep == 3) {
                     var phoneNumber = $("#phoneNumber").val();
                     var emailCode = $("#emailCode").val();
+                    if (emailCode.indexOf("验证码") > 0) emailCode = ""; //IE8中，会把placeholder当成value
+
                     if (phoneNumber == "" && emailCode == "") {
                         toastr.error("手机号码与邮箱验证必须至少输入一项才可以验证通过。如果两者都没有在人事系统登记或信息有变动，请联系部门文员到人事系统更新或补全信息");
                         return;

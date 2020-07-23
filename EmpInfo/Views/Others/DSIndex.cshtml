@@ -55,10 +55,14 @@
                 ],
                 onClickRow: function (row, $element, field) {
                     current_place_id = row.id;
+                    currentDetailRow = undefined;
                     $("#tb2").bootstrapTable('refreshOptions', { url: "GetDSDetail?place_id=" + row.id });
                 },
                 rowStyle: function (row, index) {
                     return { css: { cursor: 'pointer' } };
+                },
+                onDblClickRow: function (row, $element, field) {                    
+                    $("#tb1ModifyBt").trigger("click");                    
                 }
             });
 
@@ -70,6 +74,10 @@
                 columns: [
                     {
                         radio: true
+                    },
+                    {
+                        field: "floor_sort_no",
+                        title: "序号"
                     },
                     {
                         field: "floor",
@@ -89,8 +97,16 @@
                         title: "净房等级"
                     },
                     {
+                        field: "all_charger",
+                        title: "总负责人"
+                    },
+                    {
                         field: "dep_charger",
-                        title: "负责人"
+                        title: "直接负责人"
+                    },
+                    {
+                        field: "produce_charger",
+                        title: "生产主管"
                     }, {
                         field: "usage",
                         title: "生产工序"
@@ -121,6 +137,11 @@
                         if (row.pic_name) {
                             setTimeout(function () { window.open("CheckDSPic?id=" + row.id); }, 50);
                         }
+                    }
+                },
+                onDblClickRow: function (row, $element, field) {
+                    if ("pic_name" != field) {
+                        $("#tb2ModifyBt").trigger("click");
                     }
                 }
             });
@@ -238,12 +259,17 @@
 
             $("#saveTb2FormBt").on("click", function () {
                 var obj = utils.getFormObj($("#tb2Form"));
-                if (obj.floor == "" || obj.dep_name == "" || obj.dep_size == "" || obj.clear_level == "") {
+                if (obj.floor == "" || obj.dep_name == "" || obj.dep_size == "" || obj.clear_level == "" || obj.floor_sort_no=="") {
                     toastr.error("存在必填但未填写的字段，保存失败");
                     return;
                 }
                 if (!utils.testIsInt(obj.dep_size)) {
                     toastr.error("车间面积必须为整数，保存失败");
+                    return;
+                }
+                if (!utils.testIsInt(obj.floor_sort_no)) {
+                    toastr.error("序号必须为整数，保存失败");
+                    return;
                 }
                 if (obj.is_empty == "是") {
                     obj.is_empty = true;
@@ -349,7 +375,7 @@
                         </div>
                         @*楼层table*@
                         <table id="tb2"></table>
-                        <p class="text-danger small" style="margin-top:6px;"><i class="fa fa-info-circle"></i> 每一行对应一张平面图，重复上传会覆盖掉旧的</p>
+                        <p class="text-danger small" style="margin-top:6px;"><i class="fa fa-info-circle"></i> 在展示页面每一层楼对应一张平面图，同一层在第一行上传平面图即可，重复上传会覆盖掉旧的</p>
                     </div>
                 </div>
             </div>
@@ -391,12 +417,15 @@
                     <form id="tb2Form">
                         <input type="hidden" name="id" data-value="0" />
                         <input type="hidden" name="place_id" id="place_id" />
+                        <input type="text" class="form-control" name="floor_sort_no" placeholder="序号，必填" style="margin-top:4px;" />
                         <input type="text" class="form-control" name="floor" placeholder="楼层，必填" style="margin-top:4px;" />
                         <input type="text" class="form-control" name="dep_name" placeholder="部门，必填" style="margin-top:4px;" />
                         <input type="text" class="form-control" name="dep_size" placeholder="车间面积，必填" style="margin-top:4px;" />
                         <input type="text" class="form-control" name="clear_level" placeholder="净房等级，必填" style="margin-top:4px;" />
                         <input type="text" class="form-control" name="is_empty" placeholder="是否闲置" style="margin-top:4px;" />
-                        <input type="text" class="form-control" name="dep_charger" placeholder="负责人，选填" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="all_charger" placeholder="总负责人，选填" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="dep_charger" placeholder="直接负责人，选填" style="margin-top:4px;" />
+                        <input type="text" class="form-control" name="produce_charger" placeholder="生产主管，选填" style="margin-top:4px;" />
                         <textarea class="form-control" rows="2" name="usage" placeholder="生产工序，选填" style="margin-top:4px;"></textarea>
                         <textarea class="form-control" rows="2" name="dep_plan" placeholder="车间整合规划，选填" style="margin-top:4px;"></textarea>
                     </form>

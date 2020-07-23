@@ -56,6 +56,8 @@ namespace EmpInfo.Models
         public int detail_id { get; set; }
         public string dep_charger { get; set; }
         public bool is_empty { get; set; }
+        public string produce_charger { get; set; }
+        public string all_charger { get; set; }
     }
 
     public class DSModel

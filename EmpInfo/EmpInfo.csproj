@@ -501,6 +501,9 @@
     <Compile Include="Models\GetKQRecord_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\GetLodDepSalarySum_Result.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\GetOutStockBillsForAudit1To2_Result.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -933,6 +936,7 @@
     <Content Include="Content\images\ks.png" />
     <Content Include="Content\images\kw.png" />
     <Content Include="Content\images\leave.png" />
+    <Content Include="Content\images\managemen_report.png" />
     <Content Include="Content\images\office.png" />
     <Content Include="Content\images\paint.png" />
     <Content Include="Content\images\paper.png" />
@@ -1560,6 +1564,7 @@
     <Content Include="Views\Others\DSIndex.cshtml" />
     <Content Include="Views\QYWX\JsInterface.cshtml" />
     <Content Include="Views\Others\DormFeeReport.cshtml" />
+    <Content Include="Views\Others\ManagementReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

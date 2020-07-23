@@ -240,6 +240,178 @@
       <s:element name="PushTextCardMsgResponse">
         <s:complexType />
       </s:element>
+      <s:element name="WxBeginApply">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="apply" type="tns:WxApply" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="WxApply">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="creator_userid" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="template_id" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="use_template_approver" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="approver" type="tns:ArrayOfWxApplyApprover" />
+          <s:element minOccurs="0" maxOccurs="1" name="notifyer" type="tns:ArrayOfString" />
+          <s:element minOccurs="1" maxOccurs="1" name="notify_type" nillable="true" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="apply_data" type="tns:WxApplyData" />
+          <s:element minOccurs="0" maxOccurs="1" name="summary_list" type="tns:ArrayOfSummaryListModel" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfWxApplyApprover">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="WxApplyApprover" nillable="true" type="tns:WxApplyApprover" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="WxApplyApprover">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="attr" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="userid" type="tns:ArrayOfString" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="WxApplyData">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="contents" type="tns:ArrayOfWxApplyDataContent" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfWxApplyDataContent">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="WxApplyDataContent" nillable="true" type="tns:WxApplyDataContent" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="WxApplyDataContent">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="control" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="id" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="value" type="tns:ControValue" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ControValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="text" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="new_number" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="new_money" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="date" type="tns:DateValue" />
+          <s:element minOccurs="0" maxOccurs="1" name="selector" type="tns:SelectorValue" />
+          <s:element minOccurs="0" maxOccurs="1" name="members" type="tns:ArrayOfMembersValue" />
+          <s:element minOccurs="0" maxOccurs="1" name="departments" type="tns:ArrayOfDepartmentsValue" />
+          <s:element minOccurs="0" maxOccurs="1" name="files" type="tns:ArrayOfFilesValue" />
+          <s:element minOccurs="0" maxOccurs="1" name="children" type="tns:ArrayOfChildrenValue" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="DateValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="type" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="s_timestamp" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="SelectorValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="type" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="options" type="tns:ArrayOfSelectorOption" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfSelectorOption">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="SelectorOption" nillable="true" type="tns:SelectorOption" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="SelectorOption">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="key" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfMembersValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="MembersValue" nillable="true" type="tns:MembersValue" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="MembersValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="userid" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfDepartmentsValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="DepartmentsValue" nillable="true" type="tns:DepartmentsValue" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="DepartmentsValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="openapi_id" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfFilesValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="FilesValue" nillable="true" type="tns:FilesValue" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="FilesValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="file_id" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfChildrenValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="ChildrenValue" nillable="true" type="tns:ChildrenValue" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ChildrenValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="list" type="tns:ArrayOfControValue" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfControValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="ControValue" nillable="true" type="tns:ControValue" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfSummaryListModel">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="SummaryListModel" nillable="true" type="tns:SummaryListModel" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="SummaryListModel">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="summary_info" type="tns:ArrayOfSummaryInfoModel" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfSummaryInfoModel">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="SummaryInfoModel" nillable="true" type="tns:SummaryInfoModel" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="SummaryInfoModel">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="text" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="lang" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="WxBeginApplyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="WxBeginApplyResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestApply">
+        <s:complexType />
+      </s:element>
+      <s:element name="TestApplyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TestApplyResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="TestPush">
         <s:complexType>
           <s:sequence>
@@ -330,6 +502,18 @@
   <wsdl:message name="PushTextCardMsgSoapOut">
     <wsdl:part name="parameters" element="tns:PushTextCardMsgResponse" />
   </wsdl:message>
+  <wsdl:message name="WxBeginApplySoapIn">
+    <wsdl:part name="parameters" element="tns:WxBeginApply" />
+  </wsdl:message>
+  <wsdl:message name="WxBeginApplySoapOut">
+    <wsdl:part name="parameters" element="tns:WxBeginApplyResponse" />
+  </wsdl:message>
+  <wsdl:message name="TestApplySoapIn">
+    <wsdl:part name="parameters" element="tns:TestApply" />
+  </wsdl:message>
+  <wsdl:message name="TestApplySoapOut">
+    <wsdl:part name="parameters" element="tns:TestApplyResponse" />
+  </wsdl:message>
   <wsdl:message name="TestPushSoapIn">
     <wsdl:part name="parameters" element="tns:TestPush" />
   </wsdl:message>
@@ -390,6 +574,15 @@
       <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">发送文本卡片消息</wsdl:documentation>
       <wsdl:input message="tns:PushTextCardMsgSoapIn" />
       <wsdl:output message="tns:PushTextCardMsgSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="WxBeginApply">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">提交审批申请</wsdl:documentation>
+      <wsdl:input message="tns:WxBeginApplySoapIn" />
+      <wsdl:output message="tns:WxBeginApplySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TestApply">
+      <wsdl:input message="tns:TestApplySoapIn" />
+      <wsdl:output message="tns:TestApplySoapOut" />
     </wsdl:operation>
     <wsdl:operation name="TestPush">
       <wsdl:input message="tns:TestPushSoapIn" />
@@ -508,6 +701,24 @@
     </wsdl:operation>
     <wsdl:operation name="PushTextCardMsg">
       <soap:operation soapAction="http://ic.truly.com.cn/PushTextCardMsg" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="WxBeginApply">
+      <soap:operation soapAction="http://ic.truly.com.cn/WxBeginApply" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestApply">
+      <soap:operation soapAction="http://ic.truly.com.cn/TestApply" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -637,6 +848,24 @@
     </wsdl:operation>
     <wsdl:operation name="PushTextCardMsg">
       <soap12:operation soapAction="http://ic.truly.com.cn/PushTextCardMsg" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="WxBeginApply">
+      <soap12:operation soapAction="http://ic.truly.com.cn/WxBeginApply" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestApply">
+      <soap12:operation soapAction="http://ic.truly.com.cn/TestApply" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

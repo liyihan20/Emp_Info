@@ -413,6 +413,9 @@
           <Property Name="pic_name" Type="nvarchar" MaxLength="100" />
           <Property Name="dep_charger" Type="nvarchar" MaxLength="50" />
           <Property Name="is_empty" Type="bit" Nullable="false" />
+          <Property Name="all_charger" Type="nvarchar" MaxLength="50" />
+          <Property Name="produce_charger" Type="nvarchar" MaxLength="50" />
+          <Property Name="floor_sort_no" Type="int" />
         </EntityType>
         <EntityType Name="ei_CRApply">
           <Key>
@@ -3818,8 +3821,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <End Role="flow_apply" EntitySet="flow_apply" />
             <End Role="flow_applyEntry" EntitySet="flow_applyEntry" />
           </AssociationSet>
-          <FunctionImport Name="GetLodDepSalarySum" ReturnType="Collection(Decimal)">
-            <Parameter Name="yearMonth" Mode="In" Type="String" />
+          <FunctionImport Name="GetLodDepSalarySum" ReturnType="Collection(ICAuditModel.GetLodDepSalarySum_Result)">
+          <Parameter Name="yearMonth" Mode="In" Type="String" />
           </FunctionImport>
           </EntityContainer>
         <EntityType Name="ei_users">
@@ -6499,6 +6502,9 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="pic_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="dep_charger" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="is_empty" Type="Boolean" Nullable="false" />
+          <Property Name="all_charger" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="produce_charger" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="floor_sort_no" Type="Int32" />
         </EntityType>
         <EntityType Name="ei_bus_place">
           <Key>
@@ -6584,6 +6590,10 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <ComplexType Name="GetLodDepSalarySum_Result">
+          <Property Type="String" Name="charge_type" Nullable="true" MaxLength="100" />
+          <Property Type="Decimal" Name="type_sum" Nullable="false" Precision="12" Scale="2" />
+        </ComplexType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -9104,6 +9114,9 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_bus_place_detail">
             <EntityTypeMapping TypeName="ICAuditModel.ei_bus_place_detail">
               <MappingFragment StoreEntitySet="ei_bus_place_detail">
+                <ScalarProperty Name="floor_sort_no" ColumnName="floor_sort_no" />
+                <ScalarProperty Name="produce_charger" ColumnName="produce_charger" />
+                <ScalarProperty Name="all_charger" ColumnName="all_charger" />
                 <ScalarProperty Name="is_empty" ColumnName="is_empty" />
                 <ScalarProperty Name="dep_charger" ColumnName="dep_charger" />
                 <ScalarProperty Name="pic_name" ColumnName="pic_name" />
@@ -9183,7 +9196,14 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="GetLodDepSalarySum" FunctionName="ICAuditModel.Store.GetLodDepSalarySum" />
+          <FunctionImportMapping FunctionImportName="GetLodDepSalarySum" FunctionName="ICAuditModel.Store.GetLodDepSalarySum">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ICAuditModel.GetLodDepSalarySum_Result">
+                <ScalarProperty Name="charge_type" ColumnName="charge_type" />
+                <ScalarProperty Name="type_sum" ColumnName="type_sum" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
           </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

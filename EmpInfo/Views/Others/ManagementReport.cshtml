@@ -1,0 +1,143 @@
+﻿@{
+    List<string> depList = ViewData["depList"] as List<string>;
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    }
+@section Scripts{
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/export/bootstrap-table-export.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/tableExport.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+        $(function () {
+            $("#searchReportBt").on("click", function () {
+                var self = this;
+                var depName = $("#depName").val();
+                var yearMonth = $("#yearMonthSt").val();
+                var currentMonth = parseInt(yearMonth.split("-")[1]) + "月";
+
+                if (depName == "") {
+                    toastr.error("请先选择部门再查询");
+                    reurn;
+                }
+                $(self).button("loading");
+                $.post("GetManagementReport", { depName: depName, yearMonth: yearMonth }, function (data) {
+                    $(self).button("reset");
+                    if (!data.suc) {
+                        toastr.error(data.msg);
+                        return;
+                    }
+                    $("#span_depName_yearMonth").html(depName + "(" + yearMonth + ")");
+                    //对数据进行处理，将全0的列删除
+                    var rows = JSON.parse(data.rows);
+                    var columns = JSON.parse(data.columns);
+                    var toDeleted = [];
+                    for (var i = 0; i < columns.length; i++) {
+                        var columnName = columns[i].field;
+
+                        if (rows.every(function (r) { return r[columnName] == 0 })) {
+                            toDeleted.push(columnName);
+                        }
+                    }
+                    toDeleted.push("seq");//seq的列不需要
+                    
+                    // 从后面开始删除列的元素和行的key-value对
+                    var del, cIndex;
+                    for (var i = toDeleted.length - 1; i >= 0; i--) {
+                        del = toDeleted[i];
+                        cIndex = columns.indexOf(columns.filter(function (c) { return c.field == del })[0]);
+                        if (cIndex >= 0) {
+                            columns.splice(cIndex, 1);
+                            for (var j = 0; j < rows.length; j++) {
+                                delete rows[j][del];
+                            }
+                        }
+                    }
+
+                    //加上千分位逗号， 将需要%的行加上
+                    for (var i = 0; i < rows.length; i++) {                        
+                        for (var key in rows[i]) {
+                            if (key != "经营项目") {                                
+                                rows[i][key] = utils.parseDecimalToThousandBit(rows[i][key]);
+                                if (rows[i].经营项目.indexOf("%") >= 0) {
+                                    rows[i][key] += "%";
+                                }                                
+                            }
+                        }                        
+                    }
+
+                    //将当前月的列变色
+                    var currentColumn = columns.filter(function (c) { return c.field == currentMonth });
+                    if (currentColumn.length > 0) {
+                        var currentColumnIndex = columns.indexOf(currentColumn[0]);
+                        columns[currentColumnIndex].cellStyle = function (value, row, index) {
+                            return { css: { color: "#428bca", "font-weight": "bold" } };
+                        };
+                    }
+                    $('#tb').bootstrapTable('destroy');
+                    $("#tb").bootstrapTable({
+                        striped: true,
+                        //mobileResponsive: true,
+                        search: true,
+                        showExport: true,
+                        exportDataType: "all",
+                        exportTypes: ['excel'],
+                        columns: columns,
+                        data: rows
+                    });
+                    
+                    //累计列名加上月份
+                    $("#tb").find("th .th-inner").each(function (idx, ele) {
+                        if ($(this).html() == "累计") {
+                            $(this).html("累计(1月~" + currentMonth + ")");
+                        }
+                    });
+
+
+                    toastr.success("查询完成");
+
+                });
+            });
+        });
+    </script>
+    }
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li class="active">经营报表查询</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-sm-3" style="margin-bottom:12px;">
+                <select class="form-control" id="depName">
+                    <option value="">---- 请选择部门 ----</option>
+                    @foreach (var d in depList) {
+                        <option value="@d">@d</option>
+                    }
+                </select>
+            </div>
+            <div class="col-xs-12 col-sm-3" style="margin-bottom:12px;">
+                <select class="form-control" id="yearMonthSt">
+                    @for (var i = 1; i <= 6; i++) {
+                        var yearMonth = DateTime.Now.AddMonths(-i).ToString("yyyy-MM");
+                        <option value="@yearMonth">@yearMonth</option>
+                    }
+                </select>
+            </div>
+            <div class="col-xs-12 col-sm-3" style="margin-bottom:12px;">
+                <button class="btn btn-primary" id="searchReportBt" data-loading-text="正在查询中..."><i class="fa fa-search"></i> 开始查询</button>
+            </div>
+        </div>
+
+        <button class="btn btn-block btn-success disabled" style="text-align:left;margin-bottom:2px;border-radius:0;font-style:italic;"><i class="fa fa-line-chart"></i> <span id="span_depName_yearMonth"></span> 统计结果</button>
+        <table id="tb"></table>
+
+    </div>
+</div>

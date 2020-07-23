@@ -474,6 +474,1008 @@ namespace EmpInfo.QywxWebSrv {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="WxApply", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class WxApply : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string creator_useridField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string template_idField;
+        
+        private int use_template_approverField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.WxApplyApprover[] approverField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.ArrayOfString notifyerField;
+        
+        private System.Nullable<int> notify_typeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.WxApplyData apply_dataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.SummaryListModel[] summary_listField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string creator_userid {
+            get {
+                return this.creator_useridField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.creator_useridField, value) != true)) {
+                    this.creator_useridField = value;
+                    this.RaisePropertyChanged("creator_userid");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string template_id {
+            get {
+                return this.template_idField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.template_idField, value) != true)) {
+                    this.template_idField = value;
+                    this.RaisePropertyChanged("template_id");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public int use_template_approver {
+            get {
+                return this.use_template_approverField;
+            }
+            set {
+                if ((this.use_template_approverField.Equals(value) != true)) {
+                    this.use_template_approverField = value;
+                    this.RaisePropertyChanged("use_template_approver");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public EmpInfo.QywxWebSrv.WxApplyApprover[] approver {
+            get {
+                return this.approverField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.approverField, value) != true)) {
+                    this.approverField = value;
+                    this.RaisePropertyChanged("approver");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        public EmpInfo.QywxWebSrv.ArrayOfString notifyer {
+            get {
+                return this.notifyerField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.notifyerField, value) != true)) {
+                    this.notifyerField = value;
+                    this.RaisePropertyChanged("notifyer");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=5)]
+        public System.Nullable<int> notify_type {
+            get {
+                return this.notify_typeField;
+            }
+            set {
+                if ((this.notify_typeField.Equals(value) != true)) {
+                    this.notify_typeField = value;
+                    this.RaisePropertyChanged("notify_type");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=6)]
+        public EmpInfo.QywxWebSrv.WxApplyData apply_data {
+            get {
+                return this.apply_dataField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.apply_dataField, value) != true)) {
+                    this.apply_dataField = value;
+                    this.RaisePropertyChanged("apply_data");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=7)]
+        public EmpInfo.QywxWebSrv.SummaryListModel[] summary_list {
+            get {
+                return this.summary_listField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.summary_listField, value) != true)) {
+                    this.summary_listField = value;
+                    this.RaisePropertyChanged("summary_list");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="WxApplyData", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class WxApplyData : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.WxApplyDataContent[] contentsField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public EmpInfo.QywxWebSrv.WxApplyDataContent[] contents {
+            get {
+                return this.contentsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.contentsField, value) != true)) {
+                    this.contentsField = value;
+                    this.RaisePropertyChanged("contents");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="WxApplyApprover", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class WxApplyApprover : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private int attrField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.ArrayOfString useridField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public int attr {
+            get {
+                return this.attrField;
+            }
+            set {
+                if ((this.attrField.Equals(value) != true)) {
+                    this.attrField = value;
+                    this.RaisePropertyChanged("attr");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public EmpInfo.QywxWebSrv.ArrayOfString userid {
+            get {
+                return this.useridField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.useridField, value) != true)) {
+                    this.useridField = value;
+                    this.RaisePropertyChanged("userid");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.CollectionDataContractAttribute(Name="ArrayOfString", Namespace="http://ic.truly.com.cn/", ItemName="string")]
+    [System.SerializableAttribute()]
+    public class ArrayOfString : System.Collections.Generic.List<string> {
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="SummaryListModel", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class SummaryListModel : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.SummaryInfoModel[] summary_infoField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public EmpInfo.QywxWebSrv.SummaryInfoModel[] summary_info {
+            get {
+                return this.summary_infoField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.summary_infoField, value) != true)) {
+                    this.summary_infoField = value;
+                    this.RaisePropertyChanged("summary_info");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="WxApplyDataContent", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class WxApplyDataContent : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string controlField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string idField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.ControValue valueField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string control {
+            get {
+                return this.controlField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.controlField, value) != true)) {
+                    this.controlField = value;
+                    this.RaisePropertyChanged("control");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string id {
+            get {
+                return this.idField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.idField, value) != true)) {
+                    this.idField = value;
+                    this.RaisePropertyChanged("id");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public EmpInfo.QywxWebSrv.ControValue value {
+            get {
+                return this.valueField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.valueField, value) != true)) {
+                    this.valueField = value;
+                    this.RaisePropertyChanged("value");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ControValue", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class ControValue : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string textField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string new_numberField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string new_moneyField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.DateValue dateField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.SelectorValue selectorField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.MembersValue[] membersField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.DepartmentsValue[] departmentsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.FilesValue[] filesField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.ChildrenValue[] childrenField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string text {
+            get {
+                return this.textField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.textField, value) != true)) {
+                    this.textField = value;
+                    this.RaisePropertyChanged("text");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string new_number {
+            get {
+                return this.new_numberField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.new_numberField, value) != true)) {
+                    this.new_numberField = value;
+                    this.RaisePropertyChanged("new_number");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public string new_money {
+            get {
+                return this.new_moneyField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.new_moneyField, value) != true)) {
+                    this.new_moneyField = value;
+                    this.RaisePropertyChanged("new_money");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public EmpInfo.QywxWebSrv.DateValue date {
+            get {
+                return this.dateField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.dateField, value) != true)) {
+                    this.dateField = value;
+                    this.RaisePropertyChanged("date");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        public EmpInfo.QywxWebSrv.SelectorValue selector {
+            get {
+                return this.selectorField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.selectorField, value) != true)) {
+                    this.selectorField = value;
+                    this.RaisePropertyChanged("selector");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=5)]
+        public EmpInfo.QywxWebSrv.MembersValue[] members {
+            get {
+                return this.membersField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.membersField, value) != true)) {
+                    this.membersField = value;
+                    this.RaisePropertyChanged("members");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=6)]
+        public EmpInfo.QywxWebSrv.DepartmentsValue[] departments {
+            get {
+                return this.departmentsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.departmentsField, value) != true)) {
+                    this.departmentsField = value;
+                    this.RaisePropertyChanged("departments");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=7)]
+        public EmpInfo.QywxWebSrv.FilesValue[] files {
+            get {
+                return this.filesField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.filesField, value) != true)) {
+                    this.filesField = value;
+                    this.RaisePropertyChanged("files");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=8)]
+        public EmpInfo.QywxWebSrv.ChildrenValue[] children {
+            get {
+                return this.childrenField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.childrenField, value) != true)) {
+                    this.childrenField = value;
+                    this.RaisePropertyChanged("children");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="DateValue", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class DateValue : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string typeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string s_timestampField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string type {
+            get {
+                return this.typeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.typeField, value) != true)) {
+                    this.typeField = value;
+                    this.RaisePropertyChanged("type");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string s_timestamp {
+            get {
+                return this.s_timestampField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.s_timestampField, value) != true)) {
+                    this.s_timestampField = value;
+                    this.RaisePropertyChanged("s_timestamp");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="SelectorValue", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class SelectorValue : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string typeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.SelectorOption[] optionsField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string type {
+            get {
+                return this.typeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.typeField, value) != true)) {
+                    this.typeField = value;
+                    this.RaisePropertyChanged("type");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public EmpInfo.QywxWebSrv.SelectorOption[] options {
+            get {
+                return this.optionsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.optionsField, value) != true)) {
+                    this.optionsField = value;
+                    this.RaisePropertyChanged("options");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="MembersValue", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class MembersValue : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string useridField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string nameField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string userid {
+            get {
+                return this.useridField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.useridField, value) != true)) {
+                    this.useridField = value;
+                    this.RaisePropertyChanged("userid");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.nameField, value) != true)) {
+                    this.nameField = value;
+                    this.RaisePropertyChanged("name");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="DepartmentsValue", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class DepartmentsValue : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string openapi_idField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string nameField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string openapi_id {
+            get {
+                return this.openapi_idField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.openapi_idField, value) != true)) {
+                    this.openapi_idField = value;
+                    this.RaisePropertyChanged("openapi_id");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.nameField, value) != true)) {
+                    this.nameField = value;
+                    this.RaisePropertyChanged("name");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="FilesValue", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class FilesValue : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string file_idField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string file_id {
+            get {
+                return this.file_idField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.file_idField, value) != true)) {
+                    this.file_idField = value;
+                    this.RaisePropertyChanged("file_id");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ChildrenValue", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class ChildrenValue : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.ControValue[] listField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public EmpInfo.QywxWebSrv.ControValue[] list {
+            get {
+                return this.listField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.listField, value) != true)) {
+                    this.listField = value;
+                    this.RaisePropertyChanged("list");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="SelectorOption", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class SelectorOption : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string keyField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string key {
+            get {
+                return this.keyField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.keyField, value) != true)) {
+                    this.keyField = value;
+                    this.RaisePropertyChanged("key");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="SummaryInfoModel", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class SummaryInfoModel : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string textField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string langField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string text {
+            get {
+                return this.textField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.textField, value) != true)) {
+                    this.textField = value;
+                    this.RaisePropertyChanged("text");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string lang {
+            get {
+                return this.langField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.langField, value) != true)) {
+                    this.langField = value;
+                    this.RaisePropertyChanged("lang");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(Namespace="http://ic.truly.com.cn/", ConfigurationName="QywxWebSrv.QywxApiSrvSoap")]
     public interface QywxApiSrvSoap {
@@ -529,6 +1531,14 @@ namespace EmpInfo.QywxWebSrv {
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 secret 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/PushTextCardMsg", ReplyAction="*")]
         EmpInfo.QywxWebSrv.PushTextCardMsgResponse PushTextCardMsg(EmpInfo.QywxWebSrv.PushTextCardMsgRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 apply 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/WxBeginApply", ReplyAction="*")]
+        EmpInfo.QywxWebSrv.WxBeginApplyResponse WxBeginApply(EmpInfo.QywxWebSrv.WxBeginApplyRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 TestApplyResult 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestApply", ReplyAction="*")]
+        EmpInfo.QywxWebSrv.TestApplyResponse TestApply(EmpInfo.QywxWebSrv.TestApplyRequest request);
         
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 content 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestPush", ReplyAction="*")]
@@ -1513,6 +2523,135 @@ namespace EmpInfo.QywxWebSrv {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class WxBeginApplyRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="WxBeginApply", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.WxBeginApplyRequestBody Body;
+        
+        public WxBeginApplyRequest() {
+        }
+        
+        public WxBeginApplyRequest(EmpInfo.QywxWebSrv.WxBeginApplyRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class WxBeginApplyRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public EmpInfo.QywxWebSrv.WxApply apply;
+        
+        public WxBeginApplyRequestBody() {
+        }
+        
+        public WxBeginApplyRequestBody(EmpInfo.QywxWebSrv.WxApply apply) {
+            this.apply = apply;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class WxBeginApplyResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="WxBeginApplyResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.WxBeginApplyResponseBody Body;
+        
+        public WxBeginApplyResponse() {
+        }
+        
+        public WxBeginApplyResponse(EmpInfo.QywxWebSrv.WxBeginApplyResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class WxBeginApplyResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string WxBeginApplyResult;
+        
+        public WxBeginApplyResponseBody() {
+        }
+        
+        public WxBeginApplyResponseBody(string WxBeginApplyResult) {
+            this.WxBeginApplyResult = WxBeginApplyResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class TestApplyRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="TestApply", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.TestApplyRequestBody Body;
+        
+        public TestApplyRequest() {
+        }
+        
+        public TestApplyRequest(EmpInfo.QywxWebSrv.TestApplyRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute()]
+    public partial class TestApplyRequestBody {
+        
+        public TestApplyRequestBody() {
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class TestApplyResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="TestApplyResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.TestApplyResponseBody Body;
+        
+        public TestApplyResponse() {
+        }
+        
+        public TestApplyResponse(EmpInfo.QywxWebSrv.TestApplyResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class TestApplyResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string TestApplyResult;
+        
+        public TestApplyResponseBody() {
+        }
+        
+        public TestApplyResponseBody(string TestApplyResult) {
+            this.TestApplyResult = TestApplyResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class TestPushRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="TestPush", Namespace="http://ic.truly.com.cn/", Order=0)]
@@ -1788,6 +2927,31 @@ namespace EmpInfo.QywxWebSrv {
             inValue.Body.textCardMsg = textCardMsg;
             inValue.Body.whenToPush = whenToPush;
             EmpInfo.QywxWebSrv.PushTextCardMsgResponse retVal = ((EmpInfo.QywxWebSrv.QywxApiSrvSoap)(this)).PushTextCardMsg(inValue);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.QywxWebSrv.WxBeginApplyResponse EmpInfo.QywxWebSrv.QywxApiSrvSoap.WxBeginApply(EmpInfo.QywxWebSrv.WxBeginApplyRequest request) {
+            return base.Channel.WxBeginApply(request);
+        }
+        
+        public string WxBeginApply(EmpInfo.QywxWebSrv.WxApply apply) {
+            EmpInfo.QywxWebSrv.WxBeginApplyRequest inValue = new EmpInfo.QywxWebSrv.WxBeginApplyRequest();
+            inValue.Body = new EmpInfo.QywxWebSrv.WxBeginApplyRequestBody();
+            inValue.Body.apply = apply;
+            EmpInfo.QywxWebSrv.WxBeginApplyResponse retVal = ((EmpInfo.QywxWebSrv.QywxApiSrvSoap)(this)).WxBeginApply(inValue);
+            return retVal.Body.WxBeginApplyResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.QywxWebSrv.TestApplyResponse EmpInfo.QywxWebSrv.QywxApiSrvSoap.TestApply(EmpInfo.QywxWebSrv.TestApplyRequest request) {
+            return base.Channel.TestApply(request);
+        }
+        
+        public string TestApply() {
+            EmpInfo.QywxWebSrv.TestApplyRequest inValue = new EmpInfo.QywxWebSrv.TestApplyRequest();
+            inValue.Body = new EmpInfo.QywxWebSrv.TestApplyRequestBody();
+            EmpInfo.QywxWebSrv.TestApplyResponse retVal = ((EmpInfo.QywxWebSrv.QywxApiSrvSoap)(this)).TestApply(inValue);
+            return retVal.Body.TestApplyResult;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
