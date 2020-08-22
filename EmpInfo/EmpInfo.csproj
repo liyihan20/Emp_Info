@@ -382,6 +382,9 @@
     <Compile Include="Models\ei_leaveDayExceedPushLog.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_mqApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_public_fund.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -644,6 +647,9 @@
     <Compile Include="Models\vw_leaving_days.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\vw_MQExcel.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\vw_push_users.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -707,6 +713,7 @@
     <Compile Include="Services\HRDBSv.cs" />
     <Compile Include="Services\IESv.cs" />
     <Compile Include="Services\ITSv.cs" />
+    <Compile Include="Services\MQSv.cs" />
     <Compile Include="Services\KSSv.cs" />
     <Compile Include="Services\SJSv.cs" />
     <Compile Include="Services\JQSv.cs" />
@@ -1307,6 +1314,7 @@
     <Content Include="Scripts\echarts.simple.min.js" />
     <Content Include="Scripts\html5shiv.min.js" />
     <Content Include="Scripts\icheck.js" />
+    <Content Include="Scripts\ICqywxJs.js" />
     <Content Include="Scripts\jweixin-1.2.0.js" />
     <Content Include="Scripts\myUploaderSim.js" />
     <Content Include="Scripts\myUserSelecter.js" />
@@ -1520,7 +1528,7 @@
     <Content Include="Views\Apply\BeginAuditSPApply.cshtml" />
     <Content Include="Views\Report\SPReport.cshtml" />
     <Content Include="Views\Admin\AuditorSetting.cshtml" />
-    <Content Include="Views\ApplyExtra\ChargerUpdateLeaveDay.cshtml" />
+    <Content Include="Views\ApplyExtra\ChargerUpdateJQLeaveDay.cshtml" />
     <Content Include="Views\ApplyExtra\CancelJQApply.cshtml" />
     <Content Include="Views\Report\PrintSP.cshtml" />
     <Content Include="Views\Apply\BeginApplyTI.cshtml" />
@@ -1565,6 +1573,13 @@
     <Content Include="Views\QYWX\JsInterface.cshtml" />
     <Content Include="Views\Others\DormFeeReport.cshtml" />
     <Content Include="Views\Others\ManagementReport.cshtml" />
+    <Content Include="Views\Test\Qywxjs.cshtml" />
+    <Content Include="Views\Apply\BeginApplyMQ.cshtml" />
+    <Content Include="Views\Apply\CheckMQApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditMQApply.cshtml" />
+    <Content Include="Views\ApplyExtra\ChargerUpdateMQLeaveDate.cshtml" />
+    <Content Include="Views\ApplyExtra\CancelMQApply.cshtml" />
+    <Content Include="Views\Report\MQReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

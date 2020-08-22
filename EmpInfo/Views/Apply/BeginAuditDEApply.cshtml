@@ -278,7 +278,7 @@
                 var nameSelect = $("#name").clone();
                 $(function(){
                     $("#back_bt").hide();
-                    $("#reject_bt").hide();
+                    //$("#reject_bt").hide();
 
                     $("#catalog").on("change", function () {
                         var v = $(this).val();
@@ -309,7 +309,7 @@
                             if(tax_rate){
                                 $("#total_with_tax").val((parseFloat(qty) * parseFloat(unit_price)*(1+(parseFloat(tax_rate)/100))).toFixed(2));
                             }
-0                        }
+                        }
 
                     });
 

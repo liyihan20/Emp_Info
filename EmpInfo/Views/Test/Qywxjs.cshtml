@@ -1,0 +1,20 @@
+﻿
+
+<script src="http://emp.truly.com.cn/Emp/Scripts/jweixin-1.2.0.js"></script>
+<script src="http://emp.truly.com.cn/Emp/Scripts/ICqywxJs.js"></script>
+<script>
+    $(function () {
+        var js = qywxJs(); //先注册企业微信扫描接口并进行签名验证
+        $("#btnScan").on("click", function () {
+            if (js) {
+                js.wx.ready(function () {
+                    js.ScanCode(function (code) {
+                        alert(code); //code就是扫描后的结果
+                    });
+                });
+            }
+        });
+    })
+</script>
+
+<button id="btnScan" class="btn btn-success">扫描</button>

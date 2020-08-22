@@ -17,8 +17,8 @@
                 }
                 var r = JSON.parse(data.extra);
                 var totalIn = 0.0, totalOut = 0.0; //总收入与总支出
-                var inNames = ["房租", "电费", "水费", "管理费", "其它费", "公司转账", "劳务抵扣", "现金收款", "扣款失败", "行政减免", "杂费收入", "未处理"]; //收入
-                var outNames = ["工程支出", "后勤水电费", "工资", "扣款失败", "行政减免", "劳务抵扣", "辅料类", "设备类"]; //支出
+                var inNames = ["工资代扣", "公司转账", "劳务抵扣", "现金收款", "扣款失败", "行政减免", "杂费收入", "未处理"]; //收入
+                var outNames = ["工程支出", "后勤水电费", "后勤工资", "扣款失败", "行政减免", "劳务抵扣", "辅料类", "设备类"]; //支出
                 $("table .r").each(function (i, ele) {
                     var self = this;
                     var id = $(self).attr("id");
@@ -85,20 +85,8 @@
         <button class="btn btn-block btn-success disabled" style="text-align:left;margin-bottom:2px;border-radius:0;font-style:italic;"><i class="fa fa-plus-square"></i> <span class="btn_yearmonth"></span> 收入统计</button>
         <table class="table table-bordered">
             <tr>
-                <td class="text-center" style="width:25%;"><span style="color:#666666"> 房租代扣</span></td>
-                <td style="width:25%;"><b class="pull-right text-primary r" id="房租"></b></td>
-                <td class="text-center" style="width:25%;"><span style="color:#666666"> 电费代扣</span></td>
-                <td style="width:25%;"><b class="pull-right text-primary r" id="电费"></b></td>
-            </tr>
-            <tr>
-                <td class="text-center" style="width:25%;"><span style="color:#666666"> 水费代扣</span></td>
-                <td style="width:25%;"><b class="pull-right text-primary r" id="水费"></b></td>
-                <td class="text-center" style="width:25%;"><span style="color:#666666"> 管理费代扣</span></td>
-                <td style="width:25%;"><b class="pull-right text-primary r" id="管理费"></b></td>
-            </tr>
-            <tr>
-                <td class="text-center" style="width:25%;"><span style="color:#666666"> 其它费用代扣</span></td>
-                <td style="width:25%;"><b class="pull-right text-primary r" id="其它费"></b></td>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 工资代扣</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="工资代扣"></b></td>
                 <td class="text-center" style="width:25%;"><span style="color:#666666"> 公司转账</span></td>
                 <td style="width:25%;"><b class="pull-right text-primary r d" id="公司转账"></b></td>
             </tr>
@@ -130,7 +118,7 @@
         <table class="table table-bordered">
             <tr>
                 <td class="text-center" style="width:25%;"><span style="color:#666666"> 后勤工资</span></td>
-                <td style="width:25%;"><b class="pull-right text-primary r" id="工资"></b></td>
+                <td style="width:25%;"><b class="pull-right text-primary r" id="后勤工资"></b></td>
                 <td class="text-center" style="width:25%;"><span style="color:#666666"> 后勤水电费</span></td>
                 <td style="width:25%;"><b class="pull-right text-primary r d" id="后勤水电费"></b></td>
             </tr>

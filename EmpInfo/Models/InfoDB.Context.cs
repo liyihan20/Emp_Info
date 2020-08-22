@@ -142,6 +142,8 @@ namespace EmpInfo.Models
         public DbSet<ei_bus_place> ei_bus_place { get; set; }
         public DbSet<flow_apply> flow_apply { get; set; }
         public DbSet<flow_applyEntry> flow_applyEntry { get; set; }
+        public DbSet<ei_mqApply> ei_mqApply { get; set; }
+        public DbSet<vw_MQExcel> vw_MQExcel { get; set; }
     
         public virtual ObjectResult<string> GetDormChargeMonth()
         {

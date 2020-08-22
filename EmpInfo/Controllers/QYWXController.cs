@@ -11,6 +11,7 @@ using System.Text;
 using System.Xml;
 using EmpInfo.Models;
 using EmpInfo.Interfaces;
+using Newtonsoft.Json;
 
 namespace EmpInfo.Controllers
 {
@@ -197,6 +198,25 @@ namespace EmpInfo.Controllers
                 return Content("二维码内容:" + result + ";提示信息:" + ex.Message);
             }
             return Content(result);
+        }
+
+        public JsonResult GetConfigParam(string url)
+        {
+            QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();
+
+            QywxJsConfigParam p = new QywxJsConfigParam();
+            p.timestamp = MyUtils.GetTimeStamp();
+            p.appId = APPID;
+            p.nonceStr = MyUtils.CreateValidateNumber(8);
+            //p.debug = "false";
+
+            try {
+                p.signature = wx.GetSignature(SECRET, p.nonceStr, p.timestamp, url);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(false, ex.Message));
+            }
+            return Json(new { suc = true, param = JsonConvert.SerializeObject(p) });
         }
 
         #endregion

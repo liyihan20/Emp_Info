@@ -12,11 +12,13 @@
                     if (type == 'radio') {
                         $(this).attr('checked', $(this).val() == value);
                     } else if (type == 'checkbox') {
-                        arr = value.split(',');
-                        for (var i = 0; i < arr.length; i++) {
-                            if ($(this).val() == arr[i]) {
-                                $(this).attr('checked', true);
-                                break;
+                        if (value) {
+                            arr = value.split(',');
+                            for (var i = 0; i < arr.length; i++) {
+                                if ($(this).val() == arr[i]) {
+                                    $(this).attr('checked', true);
+                                    break;
+                                }
                             }
                         }
                     } else {

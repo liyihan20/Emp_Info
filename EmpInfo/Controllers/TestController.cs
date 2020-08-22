@@ -151,6 +151,10 @@ namespace EmpInfo.Controllers
 
         }
 
+        public ActionResult Qywxjs()
+        {
+            return View();
+        }
         
 
     }

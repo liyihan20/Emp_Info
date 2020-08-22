@@ -28,6 +28,7 @@ namespace EmpInfo.Models
         public string ex_company { get; set; }
         public string comment { get; set; }
         public Nullable<System.DateTime> apply_time { get; set; }
+        public string dep_name { get; set; }
     
         public virtual ICollection<ei_TIApplyEntry> ei_TIApplyEntry { get; set; }
     }

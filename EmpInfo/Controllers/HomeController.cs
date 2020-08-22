@@ -473,7 +473,7 @@ namespace EmpInfo.Controllers
                 return View("Error");
             }
             var info = db.GetSalaryInfo_new(salaryNo).ToList();
-            if (info.First().salaryType.Equals("月薪")) {
+            if (new HRDBSv().GetHREmpInfo(userInfo.cardNo).salary_type.Equals("月薪")) {
                 ViewBag.tip = "此功能仅限计件人员查询，如有疑问，请联系行政部";
                 return View("Error");
             }

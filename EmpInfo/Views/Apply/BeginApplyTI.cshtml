@@ -3,7 +3,7 @@
     string sysNo = ViewData["infoBeforeApply"] as string;
     //华飞，正信达，百世，恒骏，顺展，荣鑫，捷易，顺丰，跨越，冠粤
     //List<string> exCompanyList = new List<string>() { "华飞","正信达","百世","恒骏","顺展","荣鑫","捷易","顺丰", "跨越","冠粤" };
-    List<string> carTypeList = new List<string>() { "小车","商务车","2.4米", "4.2米", "7.6米", "9.6米", "13.5米", "15.6米", "17.6米", "18.6米" };
+    List<string> carTypeList = new List<string>() { "5座小车","6座小车","7座小车","9座小车","2.4米", "4.2米", "7.6米", "9.6米", "13.5米", "15.6米", "17.6米", "18.6米" };
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
@@ -79,7 +79,8 @@
         function openDialog() {
             changeIdx = -1;
             $("#itemModal").modal("show");
-            $("#itemFm")[0].reset();            
+            $("#driver_name").val("");
+            $("#driver_no").val("");
         }
 
         function addChItem() {
@@ -91,7 +92,11 @@
             }
 
             var item = utils.getFormObj($("#itemFm"));
-                        
+            if (item.driver_no.length != 18 && item.driver_no.length != 15) {
+                toastr.error("身份证号码只能录入18位或15位数字，当前位数：" + item.driver_no.length);
+                return;
+            }
+
             if (changeIdx < 0) {
                 items.push(item);
 
@@ -244,14 +249,14 @@
                             <label for="driver_name" class="sr-only">司机姓名:</label>
                             <div class="input-group">
                                 <div class="input-group-addon">司机姓名:</div>
-                                <input type="text" class="form-control" name="driver_name" required />
+                                <input type="text" class="form-control" name="driver_name" id="driver_name" required />
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="driver_no" class="sr-only">身份证号:</label>
                             <div class="input-group">
                                 <div class="input-group-addon">身份证号:</div>
-                                <input type="text" class="form-control" name="driver_no" required />
+                                <input type="text" class="form-control" name="driver_no" id="driver_no" required />
                             </div>
                         </div>
                         <div class="form-group">

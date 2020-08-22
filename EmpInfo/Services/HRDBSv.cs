@@ -57,10 +57,9 @@ namespace EmpInfo.Services
             }
             catch {
                 return null;
-            }
-            
-           
+            }  
         }
+        
 
     }
 

@@ -1,0 +1,289 @@
+﻿@using EmpInfo.Models;
+@{
+    ei_mqApply m = ViewData["am"] as ei_mqApply;
+}
+@section CSS{    
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: top;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 4px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        $(function () {            
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.sys_no" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+
+            });
+        });
+    </script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="ApplyIndex?billType=MQ">计件员工辞职流程</a></li>
+            <li class="active">查看申请单详情</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+            <div>
+                <div class="b-div">
+                    <span class="b-label">
+                        流转记录:
+                    </span>
+                    <span class="b-input">
+                        <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+                    </span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请流水号:
+                        </span>
+                        <span class="b-input">
+                            @m.sys_no
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请人:
+                        </span>
+                        <span class="b-input">
+                            @m.applier_name
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请时间:
+                        </span>
+                        <span class="b-input">
+                            @(((DateTime)m.apply_time).ToString("yyyy-MM-dd HH:mm"))
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">离职员工人事信息</h4>
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            厂牌编码:
+                        </span>
+                        <div class="b-input">
+                            @m.card_number
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            姓名:
+                        </span>
+                        <div class="b-input">
+                            @m.name
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            性别:
+                        </span>
+                        <span class="b-input">
+                            @m.sex
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-8 col-sm-12 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            人事部门:
+                        </span>
+                        <span class="b-input">
+                            @m.dep_name
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            职位:
+                        </span>
+                        <span class="b-input">
+                            @m.position
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            账号:
+                        </span>
+                        <span class="b-input">
+                            @m.account
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            学历:
+                        </span>
+                        <span class="b-input">
+                            @m.education
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            籍贯:
+                        </span>
+                        <span class="b-input">
+                            @m.hometown
+                        </span>
+                    </div>
+                </div>
+            </div>            
+            
+            <div id="normalQuit">
+                <div class="b-div">
+                    <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">辞职调查</h4>
+                    <span class="b-label" style="vertical-align:top;">
+                        辞职原因:
+                    </span>
+                    <div class="b-input">
+                        @m.quit_reason
+                    </div>
+                </div>
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;">
+                        意见建议:
+                    </span>
+                    <div class="b-input">
+                        @m.quit_suggestion
+                    </div>
+                </div>
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;">
+                        工资发放要求:
+                    </span>
+                    <div class="b-input">
+                        @m.salary_clear_way
+                    </div>
+                </div>
+            </div>            
+            <div id="auditors1">
+                <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">计件员工离职审批人</h4>
+                <div class="row">
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                组长:
+                            </span>
+                            <span class="b-input">
+                                @m.group_leader_name
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                主管:
+                            </span>
+                            <span class="b-input">
+                                @m.charger_name
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                生产部长:
+                            </span>
+                            <span class="b-input">
+                                @m.produce_minister_name
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>            
+                        
+        @if (!string.IsNullOrEmpty(m.work_evaluation)) {
+            <div>
+                <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">处理人评价信息</h4>                
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;width:150px;">                        
+                         <span>批准离职时间:</span>
+                    </span>
+                    <span style="display:inline-block;width:70%">
+                        @(m.leave_date==null?"":((DateTime)m.leave_date).ToString("yyyy-MM-dd"))
+                    </span>
+                </div>                
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;width:150px;">
+                        工作评价:
+                    </span>
+                    <span style="display:inline-block;width:70%">
+                        @m.work_evaluation
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;width:150px;">
+                        工作评价描述:
+                    </span>
+                    <span style="display:inline-block;width:70%">
+                        @m.work_comment
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;width:150px;">
+                        本部是否再录用:
+                    </span>
+                    <span style="display:inline-block;width:70%">
+                        @m.wanna_employ
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label" style="vertical-align:top;width:150px;">
+                        是否再录用原因:
+                    </span>
+                    <span style="display:inline-block;width:70%">
+                        @m.employ_comment
+                    </span>
+                </div>
+            </div>
+        }
+            
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

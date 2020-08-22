@@ -198,7 +198,8 @@ namespace EmpInfo.Controllers
             result.Add(new DormReportModel() { charge_type = "工程支出", type_sum = deSum });
 
             //从工资系统查询的后勤工资、宿舍房租和水电等
-            result.AddRange(db.GetLodDepSalarySum(yearMonth.Replace("-", "")).ToList().Select(l => new DormReportModel() { charge_type = l.charge_type, type_sum = l.type_sum }));
+            result.Add(new DormReportModel() { charge_type = "后勤工资", type_sum = db.GetLodDepSalarySum(yearMonth.Replace("-", "")).ToList().Where(g => g.charge_type == "工资").Sum(g => g.type_sum) });
+            result.Add(new DormReportModel() { charge_type = "工资代扣", type_sum = db.GetLodDepSalarySum(yearMonth.Replace("-", "")).ToList().Where(g => g.charge_type != "工资").Sum(g => g.type_sum) });
 
             var k3Datas = db.Database.SqlQuery<k3ReportModel>("select [物料名称],[金额] from v_erp_po where [日期] >= '" + fromDate.ToString("yyyy-MM-dd") + "' and [日期] < '" + toDate.ToString("yyyy-MM-dd") + "'").ToList();
             //加入辅料支出和设备类支出,奇怪的使用参数传参的形式总是报日期转化错误，只能用拼接的方式
@@ -236,6 +237,12 @@ namespace EmpInfo.Controllers
                         [物料型号],[辅助属性],[采购数量],[含税单价],[金额],[摘要]
                         from v_erp_po ";
                 sqltext += string.Format("where [日期] >= '{0:yyyy-MM-dd}' and [日期] < '{1:yyyy-MM-dd}' and [物料名称] {3} '{2}' order by [日期]", fromDate, toDate, "设备维修备件", chargeType.Equals("设备类") ? "=" : "<>");
+            }
+            else if ("工资代扣".Equals(chargeType)) {
+                sqltext = @"declare @tb table(charge_type nvarchar(100), type_sum decimal(12,2))
+                    insert into @tb(charge_type,type_sum)
+                    exec [192.168.100.214].[truly_gz].dbo.tpro_getgzcost " + yearMonth.Replace("-", "") + @"
+                    select charge_type as '类别',isnull(type_sum,0) as '金额' from @tb where charge_type <> '工资'";
             }
             else {
                 cm = new ConnectionModel()

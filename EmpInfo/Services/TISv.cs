@@ -64,11 +64,17 @@ namespace EmpInfo.Services
             bill.applier_name = userInfo.name;
             bill.applier_num = userInfo.cardNo;
             bill.apply_time = DateTime.Now;
+            bill.dep_name = new HRDBSv().GetHREmpDetailInfo(userInfo.cardNo).dep_name;
 
             if (entry.Count() < 1) {
                 throw new Exception("至少需要录入1行司机信息才能保存");
             }
 
+            foreach (var e in entry) {
+                if (entry.Where(en => en.car_no == e.car_no && en.driver_no == e.driver_no).Count() > 1) {
+                    throw new Exception("同一张申请单内不允许出现重复的车牌号与身份证号，请分开申请。车牌：" + e.car_no + ";身份证：" + e.driver_no);
+                }
+            }
             FlowSvrSoapClient client = new FlowSvrSoapClient();
             var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.ex_company+"车辆放行", bill.ex_company+"车辆放行申请");
             if (result.suc) {
@@ -134,13 +140,7 @@ namespace EmpInfo.Services
                         GetUserEmailByCardNum(bill.applier_num),
                         ccEmails
                         );
-
-                    //SendWxMessageForCompleted(
-                    //    BillTypeName,
-                    //    bill.sys_no,
-                    //    (isSuc ? "批准" : "被拒绝"),
-                    //    pushUsers
-                    //    );
+                                        
                     SendQywxMessageForCompleted(
                         BillTypeName,
                         bill.sys_no,
@@ -162,16 +162,7 @@ namespace EmpInfo.Services
                         );
 
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    //SendWxMessageToNextAuditor(
-                    //    BillTypeName,
-                    //    bill.sys_no,
-                    //    result.step,
-                    //    result.stepName,
-                    //    bill.applier_name,
-                    //    ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
-                    //    string.Format("{0}的{1}", bill.applier_name, BillTypeName),
-                    //    db.vw_push_users.Where(p => nextAuditors.Contains(p.card_number)).ToList()
-                    //    );
+                    
                     SendQywxMessageToNextAuditor(
                         BillTypeName,
                         bill.sys_no,
@@ -189,14 +180,28 @@ namespace EmpInfo.Services
         public void ChangeStatus(int entryId, string status)
         {
             var entry = db.ei_TIApplyEntry.Single(s => s.id == entryId);
-            entry.t_status = status;
-            if (status == "已进厂") {
-                entry.in_time = DateTime.Now;
-            }
-            else if (status == "已出厂") {
-                entry.out_time = DateTime.Now;
+            var entrys = db.ei_TIApplyEntry.Where(s => s.ti_id == entry.ti_id && s.car_no == entry.car_no).ToList();
+            foreach (var e in entrys) {
+                e.t_status = status;
+                if (status == "已进厂") {
+                    e.in_time = DateTime.Now;
+                }
+                else if (status == "已出厂") {
+                    e.out_time = DateTime.Now;
+                }
             }
             db.SaveChanges();
+
+            //进厂发送消息给申请人
+            bill = entry.ei_TIApply;
+            if (status == "已进厂") {
+                var msg = new QywxWebSrv.TextMsg();
+                msg.touser = bill.applier_num;
+                msg.text = new QywxWebSrv.TextContent();
+                msg.text.content = string.Format("你申请的物流车辆放行单中，物流公司为【{0}】、车牌号为【{1}】、车型为【{2}】的车辆已于【{3}】进厂，请知悉。", bill.ex_company, entry.car_no, entry.car_type, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
+                SendQYWXMsg(msg);
+            }
+
         }
 
         public override bool CanAccessApply(UserInfo userInfo)

@@ -194,8 +194,9 @@
             toastr.error("[小时]必须填写大于0的数字");
             return false;
         }
-        if (parseFloat(hours) >= 24) {
-            toastr.error("[小时]必须少于24小时");
+        if (parseFloat(hours) >= 12) {
+            toastr.error("[小时]必须少于12小时,如果请假2天，写2天0小时即可，不需要写2天16小时");
+            return false
         }
         if ($($("input[name='leave_type']:checked")[0]).val() == "年假") {
             if (hours % 4 != 0) {

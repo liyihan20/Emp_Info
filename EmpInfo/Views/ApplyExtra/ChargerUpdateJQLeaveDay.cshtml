@@ -1,0 +1,173 @@
+﻿@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: top;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script>
+        var sysNo;
+        $(function () {
+            $(".datePicker").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd",
+                autoclose: true,
+                startView: 2,
+                minView: 2
+            });
+            $(".selectUser").on("click", function () {
+                var self = this;
+                openSelectUserDialog($(self).val(), 3, function (result) {
+                    $(self).val(result);
+                });
+            });
+            $("#get_info_btn").on("click", function () {
+                var sinfo = $.trim($("#searchContent").val());
+                if (!sinfo || sinfo.length < 6) {
+                    toastr.error("请输入正确的信息后再获取");
+                    return;
+                }
+                $.post("GetJQApply", { searchContent: sinfo }, function (data) {
+                    if (data.suc) {
+                        var jq = JSON.parse(data.extra);
+                        $("#empName").val(jq.name);
+                        $("#depName").val(jq.dep_name);
+                        $("#leaveDay").val(utils.parseTDate(jq.leave_date));
+                        sysNo = jq.sys_no;
+                    } else {
+                        sysNo = "";
+                        $("#empName").val("");
+                        $("#depName").val("");
+                        $("#leaveDay").val("");
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+            $("#apply_bt").on("click", function () {
+                var newDay = $("#newDay").val();
+                var notifier = $("#notifier").val();
+                if (!sysNo) {
+                    toastr.error("请先获取离职信息");
+                    return;
+                }
+                if (!newDay) {
+                    toastr.error("请先选择离职日期");
+                    return;
+                }
+                if (!notifier) {
+                    toastr.error("请先选择需要通知的文员");
+                    return;
+                }
+                openConfirmDialog("确定要修改离职日期吗？", function () {
+                    $.post("UpdateJQLeaveDay", { sysNo: sysNo, newDay: newDay, notifiers: notifier }, function (data) {
+                        if (!data.suc) {
+                            toastr.error(data.msg);
+                        } else {
+                            toastr.success("离职日期修改成功");
+                        }
+                    });
+                });
+
+            });
+
+        });
+    </script>
+}
+
+<div class="row" style="margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                    <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                    <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                    <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+                    <li><a href="../Apply/ApplyIndex?billType=JQ">辞职/自离申请</a></li>
+                    <li class="active">修改离职日期</li>
+                </ol>
+            </div>
+            <div class="panel-body">
+                <div class="b-div">
+                    <span class="b-label">
+                        输入信息:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control" id="searchContent" placeholder="请输入离职流水号或离职人厂牌" />
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        获取信息:
+                    </span>
+                    <span class="b-input">
+                        <button class="btn btn-success btn-sm" type="button" id="get_info_btn"><i class="fa fa-search"></i> 获取离职信息</button>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        离职人姓名:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control" id="empName" placeholder="由系统带出" readonly />
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        离职人部门:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control" id="depName" placeholder="由系统带出" readonly />
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        离职日期:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control" id="leaveDay" placeholder="由系统带出" readonly />
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        离职日期改为:
+                    </span>
+                    <span class="b-input">
+                        <span class="input-group date datePicker" id="dp1">
+                            <input class="form-control" type="text" id="newDay" autocomplete="off" />
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                        </span>
+                    </span>
+                </div>                
+                <div class="b-div">
+                    <span class="b-label">
+                        部门文员:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control selectUser" name="notifier" id="notifier" placeholder="请选择需要通知的部门文员" />
+                    </span>
+                </div>
+                <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..."><i class="fa fa-check-circle-o"></i> 确认修改离职日期</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_SelectUsers")
+}

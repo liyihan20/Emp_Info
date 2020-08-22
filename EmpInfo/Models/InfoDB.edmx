@@ -1002,6 +1002,43 @@
           <Property Name="book_date" Type="smalldatetime" />
           <Property Name="send_user" Type="varchar" MaxLength="100" />
         </EntityType>
+        <EntityType Name="ei_mqApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="apply_time" Type="datetime" />
+          <Property Name="card_number" Type="varchar" MaxLength="50" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" />
+          <Property Name="sex" Type="nvarchar" MaxLength="10" />
+          <Property Name="dep_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="position" Type="nvarchar" MaxLength="50" />
+          <Property Name="education" Type="nvarchar" MaxLength="50" />
+          <Property Name="hometown" Type="nvarchar" MaxLength="50" />
+          <Property Name="account" Type="varchar" MaxLength="50" />
+          <Property Name="quit_reason" Type="nvarchar" MaxLength="1000" />
+          <Property Name="quit_suggestion" Type="nvarchar" MaxLength="1000" />
+          <Property Name="work_evaluation" Type="nvarchar" MaxLength="50" />
+          <Property Name="work_comment" Type="nvarchar" MaxLength="500" />
+          <Property Name="wanna_employ" Type="nvarchar" MaxLength="50" />
+          <Property Name="employ_comment" Type="nvarchar" MaxLength="500" />
+          <Property Name="group_leader_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="group_leader_num" Type="varchar" MaxLength="50" />
+          <Property Name="charger_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="charger_num" Type="varchar" MaxLength="50" />
+          <Property Name="produce_minister_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="produce_minister_num" Type="varchar" MaxLength="50" />
+          <Property Name="salary_clear_way" Type="nvarchar" MaxLength="50" />
+          <Property Name="leave_date" Type="smalldatetime" />
+          <Property Name="group_leader_choise" Type="nvarchar" MaxLength="50" />
+          <Property Name="group_leader_talked" Type="bit" Nullable="false" />
+          <Property Name="charger_choise" Type="nvarchar" MaxLength="50" />
+          <Property Name="charger_talked" Type="bit" Nullable="false" />
+          <Property Name="check1" Type="bit" />
+        </EntityType>
         <EntityType Name="ei_public_fund">
           <Key>
             <PropertyRef Name="id" />
@@ -1235,6 +1272,7 @@
           <Property Name="ex_company" Type="nvarchar" MaxLength="50" />
           <Property Name="comment" Type="nvarchar" MaxLength="500" />
           <Property Name="apply_time" Type="datetime" />
+          <Property Name="dep_name" Type="nvarchar" MaxLength="500" />
         </EntityType>
         <EntityType Name="ei_TIApplyEntry">
           <Key>
@@ -1977,6 +2015,46 @@
           <Property Name="work_hours" Type="decimal" Precision="4" Scale="1" />
           <Property Name="apply_time" Type="datetime" />
           <Property Name="is_continue" Type="bit" Nullable="false" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“ICAudit.dbo.vw_MQExcel”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vw_MQExcel">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="group_leader_talked" />
+            <PropertyRef Name="charger_talked" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="apply_time" Type="datetime" />
+          <Property Name="card_number" Type="varchar" MaxLength="50" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" />
+          <Property Name="sex" Type="nvarchar" MaxLength="10" />
+          <Property Name="dep_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="position" Type="nvarchar" MaxLength="50" />
+          <Property Name="education" Type="nvarchar" MaxLength="50" />
+          <Property Name="hometown" Type="nvarchar" MaxLength="50" />
+          <Property Name="account" Type="varchar" MaxLength="50" />
+          <Property Name="quit_reason" Type="nvarchar" MaxLength="1000" />
+          <Property Name="quit_suggestion" Type="nvarchar" MaxLength="1000" />
+          <Property Name="work_evaluation" Type="nvarchar" MaxLength="50" />
+          <Property Name="work_comment" Type="nvarchar" MaxLength="500" />
+          <Property Name="wanna_employ" Type="nvarchar" MaxLength="50" />
+          <Property Name="employ_comment" Type="nvarchar" MaxLength="500" />
+          <Property Name="salary_clear_way" Type="nvarchar" MaxLength="50" />
+          <Property Name="leave_date" Type="smalldatetime" />
+          <Property Name="check1" Type="bit" />
+          <Property Name="group_leader_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="charger_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="produce_minister_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="group_leader_choise" Type="nvarchar" MaxLength="50" />
+          <Property Name="group_leader_talked" Type="bit" Nullable="false" />
+          <Property Name="charger_choise" Type="nvarchar" MaxLength="50" />
+          <Property Name="charger_talked" Type="bit" Nullable="false" />
+          <Property Name="audit_result" Type="varchar" MaxLength="50" />
+          <Property Name="finish_date" Type="datetime" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_push_users”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -2722,6 +2800,7 @@
           <EntitySet Name="ei_k3RestLog" EntityType="Self.ei_k3RestLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_ksApply" EntityType="Self.ei_ksApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_leaveDayExceedPushLog" EntityType="Self.ei_leaveDayExceedPushLog" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_mqApply" EntityType="Self.ei_mqApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_public_fund" EntityType="Self.ei_public_fund" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_pushMsg" EntityType="Self.ei_pushMsg" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_PushResponse" EntityType="Self.ei_PushResponse" Schema="dbo" store:Type="Tables" />
@@ -3151,6 +3230,41 @@ FROM [dbo].[vw_KSExcel] AS [vw_KSExcel]</DefiningQuery>
 [vw_leaving_days].[apply_time] AS [apply_time], 
 [vw_leaving_days].[is_continue] AS [is_continue]
 FROM [dbo].[vw_leaving_days] AS [vw_leaving_days]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_MQExcel" EntityType="Self.vw_MQExcel" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vw_MQExcel].[id] AS [id], 
+[vw_MQExcel].[sys_no] AS [sys_no], 
+[vw_MQExcel].[applier_num] AS [applier_num], 
+[vw_MQExcel].[applier_name] AS [applier_name], 
+[vw_MQExcel].[apply_time] AS [apply_time], 
+[vw_MQExcel].[card_number] AS [card_number], 
+[vw_MQExcel].[name] AS [name], 
+[vw_MQExcel].[sex] AS [sex], 
+[vw_MQExcel].[dep_name] AS [dep_name], 
+[vw_MQExcel].[position] AS [position], 
+[vw_MQExcel].[education] AS [education], 
+[vw_MQExcel].[hometown] AS [hometown], 
+[vw_MQExcel].[account] AS [account], 
+[vw_MQExcel].[quit_reason] AS [quit_reason], 
+[vw_MQExcel].[quit_suggestion] AS [quit_suggestion], 
+[vw_MQExcel].[work_evaluation] AS [work_evaluation], 
+[vw_MQExcel].[work_comment] AS [work_comment], 
+[vw_MQExcel].[wanna_employ] AS [wanna_employ], 
+[vw_MQExcel].[employ_comment] AS [employ_comment], 
+[vw_MQExcel].[salary_clear_way] AS [salary_clear_way], 
+[vw_MQExcel].[leave_date] AS [leave_date], 
+[vw_MQExcel].[check1] AS [check1], 
+[vw_MQExcel].[group_leader_name] AS [group_leader_name], 
+[vw_MQExcel].[charger_name] AS [charger_name], 
+[vw_MQExcel].[produce_minister_name] AS [produce_minister_name], 
+[vw_MQExcel].[group_leader_choise] AS [group_leader_choise], 
+[vw_MQExcel].[group_leader_talked] AS [group_leader_talked], 
+[vw_MQExcel].[charger_choise] AS [charger_choise], 
+[vw_MQExcel].[charger_talked] AS [charger_talked], 
+[vw_MQExcel].[audit_result] AS [audit_result], 
+[vw_MQExcel].[finish_date] AS [finish_date]
+FROM [dbo].[vw_MQExcel] AS [vw_MQExcel]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="vw_push_users" EntityType="Self.vw_push_users" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
@@ -3824,6 +3938,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <FunctionImport Name="GetLodDepSalarySum" ReturnType="Collection(ICAuditModel.GetLodDepSalarySum_Result)">
           <Parameter Name="yearMonth" Mode="In" Type="String" />
           </FunctionImport>
+          <EntitySet Name="ei_mqApply" EntityType="ICAuditModel.ei_mqApply" />
+          <EntitySet Name="vw_MQExcel" EntityType="ICAuditModel.vw_MQExcel" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -5896,6 +6012,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="apply_time" Type="DateTime" Precision="3" />
           <NavigationProperty Name="ei_TIApplyEntry" Relationship="ICAuditModel.FK_ei_TIApplyEntry_ei_TIApply" FromRole="ei_TIApply" ToRole="ei_TIApplyEntry" />
+          <Property Name="dep_name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ei_TIApplyEntry">
           <Key>
@@ -6594,6 +6711,81 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Type="String" Name="charge_type" Nullable="true" MaxLength="100" />
           <Property Type="Decimal" Name="type_sum" Nullable="false" Precision="12" Scale="2" />
         </ComplexType>
+        <EntityType Name="ei_mqApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="card_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="sex" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="dep_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="position" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="education" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="hometown" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="account" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="quit_reason" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="quit_suggestion" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="work_evaluation" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="work_comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="wanna_employ" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="employ_comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="group_leader_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="group_leader_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="charger_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="charger_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="produce_minister_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="produce_minister_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="salary_clear_way" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="leave_date" Type="DateTime" Precision="0" />
+          <Property Name="group_leader_choise" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="group_leader_talked" Type="Boolean" Nullable="false" />
+          <Property Name="charger_choise" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="charger_talked" Type="Boolean" Nullable="false" />
+          <Property Name="check1" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="vw_MQExcel">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="group_leader_talked" />
+            <PropertyRef Name="charger_talked" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="apply_time" Type="DateTime" Precision="3" />
+          <Property Name="card_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="sex" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="dep_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="position" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="education" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="hometown" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="account" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="quit_suggestion" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="work_evaluation" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="work_comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="wanna_employ" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="employ_comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="salary_clear_way" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="leave_date" Type="DateTime" Precision="0" />
+          <Property Name="check1" Type="Boolean" />
+          <Property Name="group_leader_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="charger_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="produce_minister_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="group_leader_choise" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="group_leader_talked" Type="Boolean" Nullable="false" />
+          <Property Name="charger_choise" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="charger_talked" Type="Boolean" Nullable="false" />
+          <Property Name="audit_result" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="finish_date" Type="DateTime" Precision="3" />
+          <Property Name="quit_reason" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -8516,6 +8708,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_TIApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_TIApply">
               <MappingFragment StoreEntitySet="ei_TIApply">
+                <ScalarProperty Name="dep_name" ColumnName="dep_name" />
                 <ScalarProperty Name="apply_time" ColumnName="apply_time" />
                 <ScalarProperty Name="comment" ColumnName="comment" />
                 <ScalarProperty Name="ex_company" ColumnName="ex_company" />
@@ -9204,6 +9397,81 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="ei_mqApply">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_mqApply">
+              <MappingFragment StoreEntitySet="ei_mqApply">
+                <ScalarProperty Name="check1" ColumnName="check1" />
+                <ScalarProperty Name="charger_talked" ColumnName="charger_talked" />
+                <ScalarProperty Name="charger_choise" ColumnName="charger_choise" />
+                <ScalarProperty Name="group_leader_talked" ColumnName="group_leader_talked" />
+                <ScalarProperty Name="group_leader_choise" ColumnName="group_leader_choise" />
+                <ScalarProperty Name="leave_date" ColumnName="leave_date" />
+                <ScalarProperty Name="salary_clear_way" ColumnName="salary_clear_way" />
+                <ScalarProperty Name="produce_minister_num" ColumnName="produce_minister_num" />
+                <ScalarProperty Name="produce_minister_name" ColumnName="produce_minister_name" />
+                <ScalarProperty Name="charger_num" ColumnName="charger_num" />
+                <ScalarProperty Name="charger_name" ColumnName="charger_name" />
+                <ScalarProperty Name="group_leader_num" ColumnName="group_leader_num" />
+                <ScalarProperty Name="group_leader_name" ColumnName="group_leader_name" />
+                <ScalarProperty Name="employ_comment" ColumnName="employ_comment" />
+                <ScalarProperty Name="wanna_employ" ColumnName="wanna_employ" />
+                <ScalarProperty Name="work_comment" ColumnName="work_comment" />
+                <ScalarProperty Name="work_evaluation" ColumnName="work_evaluation" />
+                <ScalarProperty Name="quit_suggestion" ColumnName="quit_suggestion" />
+                <ScalarProperty Name="quit_reason" ColumnName="quit_reason" />
+                <ScalarProperty Name="account" ColumnName="account" />
+                <ScalarProperty Name="hometown" ColumnName="hometown" />
+                <ScalarProperty Name="education" ColumnName="education" />
+                <ScalarProperty Name="position" ColumnName="position" />
+                <ScalarProperty Name="dep_name" ColumnName="dep_name" />
+                <ScalarProperty Name="sex" ColumnName="sex" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_MQExcel">
+            <EntityTypeMapping TypeName="ICAuditModel.vw_MQExcel">
+              <MappingFragment StoreEntitySet="vw_MQExcel">
+                <ScalarProperty Name="quit_reason" ColumnName="quit_reason" />
+                <ScalarProperty Name="finish_date" ColumnName="finish_date" />
+                <ScalarProperty Name="audit_result" ColumnName="audit_result" />
+                <ScalarProperty Name="charger_talked" ColumnName="charger_talked" />
+                <ScalarProperty Name="charger_choise" ColumnName="charger_choise" />
+                <ScalarProperty Name="group_leader_talked" ColumnName="group_leader_talked" />
+                <ScalarProperty Name="group_leader_choise" ColumnName="group_leader_choise" />
+                <ScalarProperty Name="produce_minister_name" ColumnName="produce_minister_name" />
+                <ScalarProperty Name="charger_name" ColumnName="charger_name" />
+                <ScalarProperty Name="group_leader_name" ColumnName="group_leader_name" />
+                <ScalarProperty Name="check1" ColumnName="check1" />
+                <ScalarProperty Name="leave_date" ColumnName="leave_date" />
+                <ScalarProperty Name="salary_clear_way" ColumnName="salary_clear_way" />
+                <ScalarProperty Name="employ_comment" ColumnName="employ_comment" />
+                <ScalarProperty Name="wanna_employ" ColumnName="wanna_employ" />
+                <ScalarProperty Name="work_comment" ColumnName="work_comment" />
+                <ScalarProperty Name="work_evaluation" ColumnName="work_evaluation" />
+                <ScalarProperty Name="quit_suggestion" ColumnName="quit_suggestion" />
+                <ScalarProperty Name="account" ColumnName="account" />
+                <ScalarProperty Name="hometown" ColumnName="hometown" />
+                <ScalarProperty Name="education" ColumnName="education" />
+                <ScalarProperty Name="position" ColumnName="position" />
+                <ScalarProperty Name="dep_name" ColumnName="dep_name" />
+                <ScalarProperty Name="sex" ColumnName="sex" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="card_number" ColumnName="card_number" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

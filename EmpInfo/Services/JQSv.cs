@@ -30,12 +30,12 @@ namespace EmpInfo.Services
         {
             get { return "员工辞职/自离申请单"; }
         }
-                
+        
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
             var menus = base.GetApplyMenuItems(userInfo);
             //离职报表权限
-            if (db.ei_flowAuthority.Where(f=>f.bill_type==BillType && f.relate_type=="查询报表" && f.relate_value==userInfo.cardNo).Count()>0) {
+            if (db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).Count() > 0) {
                 menus.Add(new ApplyMenuItemModel()
                 {
                     text = "查询报表",
@@ -52,7 +52,7 @@ namespace EmpInfo.Services
                 {
                     text = "修改离职日期",
                     iconFont = "fa-edit",
-                    url = "../ApplyExtra/ChargerUpdateLeaveDay"
+                    url = "../ApplyExtra/ChargerUpdateJQLeaveDay"
                 });
             }
 

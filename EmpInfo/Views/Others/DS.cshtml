@@ -29,7 +29,7 @@
         $(function () {
             //改为自适应全屏宽度
             $("#topContainer").removeClass("container").addClass("container-fluid");
-            $("#tb").bootstrapTable('refreshOptions', { height: window.innerHeight - 112 });
+            $("#tb").bootstrapTable('refreshOptions', { height: window.innerHeight - 110 });
             $("#stSpeed").val(rollSpeed);
 
             $("#btnStop").on("click", function () {
@@ -44,29 +44,24 @@
                 }
                 $.cookie("isRolling", isRolling);
             });
-            
+
             $("#stSpeed").on("change", function () {
                 rollSpeed = $(this).val();
                 setInter();
             });
-            
-            $(".pic_d").parent("td").on("click", function () {
-                var detail_id = $(this).find("span").html();
-                window.open("CheckDSPic?id=" + detail_id);
-            });
 
             //文档只有2个参数，实际上还有第一个参数e。。。自己误打误撞想出来的，保存隐藏列信息
-            $("#tb").on("column-switch.bs.table", function (e,field, checked) {
+            $("#tb").on("column-switch.bs.table", function (e, field, checked) {
                 $.cookie(field, checked, { expires: 400 });
             });
 
             //隐藏之前隐藏的列
-            $($("#tb").bootstrapTable("getVisibleColumns")).each(function (idx, ele) {                
+            $($("#tb").bootstrapTable("getVisibleColumns")).each(function (idx, ele) {
                 if ($.cookie(ele.field) == "false") {
                     $("#tb").bootstrapTable("hideColumn", ele.field);
-                }                
+                }
             });
-            
+
             //通过cookie记住上次的是否滚定设置
             if ($.cookie("isRolling") == "true" || $.cookie("isRolling") == undefined) {
                 setInter();
@@ -101,11 +96,11 @@
             }, rollSpeed);
         }
 
-        
+
 
     </script>
 
-        <script>
+    <script>
         @*搜索选项*@
         $(function () {
 
@@ -249,7 +244,7 @@
             //是否同一层楼，同一层的话要把图片合并
             string currentFloor = "";
             int currentFloorSpan = 1;
-            bool isSameFloorAsLast = false; 
+            bool isSameFloorAsLast = false;
         }
         @foreach (var p in dm.ps) {
             <tr>
@@ -271,7 +266,7 @@
                     isSameAsLast = true;
                     currentRowSpan = 1;
                 }
-                
+
 
                 @if (!isSameAsLast) {
                     <td rowspan="@currentRowSpan">@p.sort_no</td>
@@ -289,18 +284,20 @@
                 <td>@p.clear_level</td>
                 <td>@p.usage</td>
                 <td>@p.dep_plan</td>
-                @if (!isSameFloorAsLast) { 
-                <td rowspan="@currentFloorSpan">
-                    @if (string.IsNullOrEmpty(p.pic_name)) {
-                        <text>无</text>
-                    }
-                    else {
-                        <i class="fa fa-file-picture-o pic_d" style="color:#5cb85c;cursor:pointer;"></i>
-                        <span style="display:none;">@p.detail_id</span>
-                    }
-                </td>
+                @if (!isSameFloorAsLast) {
+                    <td rowspan="@currentFloorSpan">
+                        @if (string.IsNullOrEmpty(p.pic_name)) {
+                            <text>无</text>
+                        }
+                        else {
+                            <a href="@string.Concat("CheckDSPic?id=",p.detail_id)" target="_blank">
+                                <i class="fa fa-file-picture-o" style="color:#5cb85c;"></i>
+                            </a>
+                        }
+                    </td>
                 }
             </tr>
         }
     </tbody>
 </table>
+@*<div class="text-primary small text-center"><i class="fa fa-info-circle"></i> 如系统出现问题，请联系开发人员：李逸焊（3387006/3006）</div>*@

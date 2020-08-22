@@ -43,7 +43,7 @@
                     toastr.error("请输入正确的信息后再获取");
                     return;
                 }
-                $.post("GetJQApply", { searchContent: sinfo }, function (data) {
+                $.post("GetMQApply", { searchContent: sinfo }, function (data) {
                     if (data.suc) {
                         var jq = JSON.parse(data.extra);
                         $("#empName").val(jq.name);
@@ -75,7 +75,7 @@
                     return;
                 }
                 openConfirmDialog("确定要修改离职日期吗？", function () {
-                    $.post("UpdateLeaveDay", { sysNo: sysNo, newDay: newDay, notifiers: notifier }, function (data) {
+                    $.post("UpdateMQLeaveDay", { sysNo: sysNo, newDay: newDay, notifiers: notifier }, function (data) {
                         if (!data.suc) {
                             toastr.error(data.msg);
                         } else {
@@ -98,7 +98,7 @@
                     <li><span class="glyphicon glyphicon-hand-right"></span></li>
                     <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
                     <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-                    <li><a href="../Apply/ApplyIndex?billType=JQ">辞职/自离申请</a></li>
+                    <li><a href="../Apply/ApplyIndex?billType=MQ">计件员工辞职申请</a></li>
                     <li class="active">修改离职日期</li>
                 </ol>
             </div>
@@ -153,7 +153,7 @@
                             <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
                         </span>
                     </span>
-                </div>                
+                </div>
                 <div class="b-div">
                     <span class="b-label">
                         部门文员:

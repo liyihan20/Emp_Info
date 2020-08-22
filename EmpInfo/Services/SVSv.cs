@@ -43,14 +43,11 @@ namespace EmpInfo.Services
         }
 
         public override object GetInfoBeforeApply(UserInfo userInfo, UserInfoDetail userInfoDetail)
-        {
-            try {
-                var hrInfo = new HRDBSv().GetHREmpInfo(userInfo.cardNo);
-                if ("计件".Equals(hrInfo.salary_type)) {
-                    throw new Exception("计件员工不能申请调休");
-                }
-            }
-            catch {}
+        {           
+            var hrInfo = new HRDBSv().GetHREmpInfo(userInfo.cardNo);
+            if ("计件".Equals(hrInfo.salary_type)) {
+                throw new Exception("计件员工不能申请调休");
+            }            
 
             CRSVBeforeApplyModel m = new CRSVBeforeApplyModel();
             var appliedBill = db.ei_SVApply.Where(a => a.applier_num == userInfo.cardNo).OrderByDescending(a => a.id).FirstOrDefault();

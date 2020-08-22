@@ -1767,7 +1767,7 @@ namespace EmpInfo.Controllers
 
             //保存到cookie
             JQSearchParam p = new JQSearchParam();
-            p.fromDate = fromDate==null?"":((DateTime)fromDate).ToString("yyyy-MM-dd");
+            p.fromDate = fromDate == null ? "" : ((DateTime)fromDate).ToString("yyyy-MM-dd");
             p.toDate = toDate==null?"":((DateTime)toDate).ToString("yyyy-MM-dd");
             p.qFromDate = qFromDate == null ? "" : ((DateTime)qFromDate).ToString("yyyy-MM-dd");
             p.qToDate = qToDate == null ? "" : ((DateTime)qToDate).ToString("yyyy-MM-dd");
@@ -1949,6 +1949,218 @@ namespace EmpInfo.Controllers
         }
 
         #endregion
+
+        #region 计件辞职新流程
+
+        [SessionTimeOutFilter]
+        public ActionResult MQReport()
+        {
+            JQSearchParam sm;
+            var cookie = Request.Cookies["mqReport"];
+            if (cookie == null) {
+                sm = new JQSearchParam();
+                sm.fromDate = DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd");
+                sm.toDate = DateTime.Now.ToString("yyyy-MM-dd");
+                sm.depName = "";
+            }
+            else {
+                sm = JsonConvert.DeserializeObject<JQSearchParam>(MyUtils.DecodeToUTF8(cookie.Values.Get("sm")));
+            }
+
+            var aut = db.ei_flowAuthority.Where(f => f.bill_type == "JQ" && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).FirstOrDefault();
+            if (aut == null) {
+                ViewBag.tip = "没有报表查询权限";
+                return View("Error");
+            }
+
+            ViewData["canCheckDep"] = string.IsNullOrEmpty(aut.cond1) ? "所有" : aut.cond1;
+            ViewData["sm"] = sm;
+            return View();
+        }
+
+        public IQueryable<vw_MQExcel> SearchMQData(DateTime? fromDate, DateTime? toDate, DateTime? qFromDate, DateTime? qToDate, string depName, string empName, string sysNum)
+        {
+            depName = depName.Trim();
+
+            //保存到cookie
+            JQSearchParam p = new JQSearchParam();
+            p.fromDate = fromDate == null ? "" : ((DateTime)fromDate).ToString("yyyy-MM-dd");
+            p.toDate = toDate == null ? "" : ((DateTime)toDate).ToString("yyyy-MM-dd");
+            p.qFromDate = qFromDate == null ? "" : ((DateTime)qFromDate).ToString("yyyy-MM-dd");
+            p.qToDate = qToDate == null ? "" : ((DateTime)qToDate).ToString("yyyy-MM-dd");
+            p.depName = depName;
+            p.empName = empName;
+            p.sysNum = sysNum;
+            var cookie = new HttpCookie("mqReport");
+            cookie.Values.Add("sm", MyUtils.EncodeToUTF8(JsonConvert.SerializeObject(p)));
+            cookie.Expires = DateTime.Now.AddDays(30);
+            Response.AppendCookie(cookie);
+
+            IQueryable<vw_MQExcel> result = db.vw_MQExcel.Where(v => v.id > 0);
+            if (fromDate != null) result = result.Where(r => r.apply_time >= fromDate);
+            if (toDate != null) {
+                toDate = ((DateTime)toDate).AddDays(1);
+                result = result.Where(r => r.apply_time <= toDate);
+            }
+            if (!string.IsNullOrWhiteSpace(depName)) result = result.Where(r => r.dep_name.Contains(depName));
+            if (!string.IsNullOrWhiteSpace(empName)) result = result.Where(r => r.name.Contains(empName));
+            if (!string.IsNullOrWhiteSpace(sysNum)) result = result.Where(r => r.sys_no.Contains(sysNum));
+            if (qFromDate != null) result = result.Where(r => r.leave_date >= qFromDate);
+            if (qToDate != null) {
+                qToDate = ((DateTime)qToDate).AddDays(1);
+                result = result.Where(r => r.leave_date <= qToDate);
+            }
+
+            //加上部门查询权限
+            IQueryable<vw_MQExcel> datas = null;
+            var depNames = db.ei_flowAuthority.Where(f => f.bill_type == "JQ" && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).Select(f => f.cond1).FirstOrDefault();
+            if (!string.IsNullOrEmpty(depNames)) {
+                var names = depNames.Split(new char[] { ';', '；' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var name in names) {
+                    if (datas == null) {
+                        datas = result.Where(r => r.dep_name.Contains(name));
+                    }
+                    else {
+                        datas = datas.Union(result.Where(r => r.dep_name.Contains(name)));
+                    }
+                }
+            }
+            else {
+                datas = result;
+            }
+
+            return datas;
+        }
+
+        public JsonResult ToggleMQCheck1(string sysNo)
+        {
+            string check1 = "";
+            try {
+                var mq = db.ei_mqApply.Where(j => j.sys_no == sysNo).FirstOrDefault();
+                if (mq != null) {
+                    check1 = (!(mq.check1 ?? false)).ToString();
+                    mq.check1 = !(mq.check1 ?? false);
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+            }
+            WriteEventLog("离职报表", "切换标志1：" + sysNo + ">" + check1);
+            return Json(new SimpleResultModel() { suc = true });
+        }
+
+        public JsonResult CheckMQReport(DateTime? fromDate, DateTime? toDate, DateTime? qFromDate, DateTime? qToDate, string depName = "", string empName = "", string sysNum = "")
+        {
+            var result = SearchMQData(fromDate, toDate, qFromDate, qToDate, depName, empName, sysNum)
+                .Select(u => new
+                {
+                    u.sys_no,
+                    u.dep_name,
+                    u.name,
+                    u.account,
+                    u.apply_time,
+                    u.audit_result,
+                    u.check1,
+                    u.leave_date
+                }).OrderBy(u => u.apply_time).ToList();
+
+            return Json(result);
+        }
+
+        public void BeginExportMQReport(DateTime? fromDate, DateTime? toDate, DateTime? qFromDate, DateTime? qToDate, string depName = "", string empName = "", string sysNum = "")
+        {
+            var result = SearchMQData(fromDate, toDate, qFromDate, qToDate, depName, empName, sysNum).OrderBy(s => s.apply_time).ToList();
+
+            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "申请时间","完成时间", "账号", "人事部门","离职原因","离职建议","工资发放方式",
+                                        "入职时间","离职时间","标识1", "组长","组长是否已谈","组长处理方式","主管","主管是否已谈","主管处理方式","生产部长","综合表现" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "计件员工辞职申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("辞职申请详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result) {
+                colIndex = 1;
+                string inDate = ""; //入职日期
+                if (d.card_number != null && d.card_number.Length > 6) {
+                    var yearSpan = d.card_number.Substring(0, 2);
+                    int year;
+                    if (Int32.TryParse(yearSpan, out year)) {
+                        if (year < 80) {
+                            inDate = "20" + yearSpan + "-" + d.card_number.Substring(2, 2) + "-" + d.card_number.Substring(4, 2);
+                        }
+                        else {
+                            inDate = "19" + yearSpan + "-" + d.card_number.Substring(2, 2) + "-" + d.card_number.Substring(4, 2);
+                        }
+                    }
+
+                }
+
+                //"处理结果","申请流水号", "申请人", "申请时间","完成时间", "账号", "人事部门","离职原因","离职建议","工资发放方式",
+                //"入职时间","离职时间","标识1", "组长","组长是否已面谈","组长处理方式","主管","主管是否已面谈","主管处理方式","生产部长","综合表现"
+                cells.Add(++rowIndex, colIndex, d.audit_result);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.applier_name);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.finish_date == null ? "" : ((DateTime)d.finish_date).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.account);
+                cells.Add(rowIndex, ++colIndex, d.dep_name);
+                cells.Add(rowIndex, ++colIndex, d.quit_reason);
+                cells.Add(rowIndex, ++colIndex, d.quit_suggestion);
+                cells.Add(rowIndex, ++colIndex, d.salary_clear_way);
+
+                cells.Add(rowIndex, ++colIndex, inDate);
+                cells.Add(rowIndex, ++colIndex, d.leave_date == null ? "" : ((DateTime)d.leave_date).ToString("yyyy-MM-dd"));
+                cells.Add(rowIndex, ++colIndex, d.check1 == true ? "Y" : "");
+                cells.Add(rowIndex, ++colIndex, d.group_leader_name);
+                cells.Add(rowIndex, ++colIndex, d.group_leader_talked?"是":"否");
+                cells.Add(rowIndex, ++colIndex, d.group_leader_choise);
+                cells.Add(rowIndex, ++colIndex, d.charger_name);
+                cells.Add(rowIndex, ++colIndex, d.charger_talked?"是":"否");
+                cells.Add(rowIndex, ++colIndex, d.charger_choise);
+                cells.Add(rowIndex, ++colIndex, d.produce_minister_name);
+                cells.Add(rowIndex, ++colIndex, string.Format("工作评价:{0},{1};是否再录用：{2},{3}", d.work_evaluation, d.work_comment, d.wanna_employ, d.employ_comment));
+            }
+
+            xls.Send();
+        }
+
+        #endregion
+
 
         #region 调动流程
 
