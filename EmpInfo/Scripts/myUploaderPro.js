@@ -34,14 +34,14 @@
         var fileListEle = target.find(".list-group");
         $(pbar).hide(); //一开始隐藏进度条
 
-        var addFileEle = function (fileName, fileSize) {
+        var addFileEle = function (fileName, fileSize,fileId) {
             var shortName = fileName;
             if (shortName.length > 25) {
                 var ext = shortName.substr(shortName.lastIndexOf("."));
                 shortName = shortName.substr(0, 20) + ".." + ext;
             }
             $(fileListEle).append('<li class="list-group-item">\
-                                    <a href="#" data-fd="' + fileName + '"><i class="fa fa-download"></i> ' + shortName + '(' + (fileSize > 1000000 ? ((fileSize / 1000000).toFixed(1) + 'M') : ((fileSize / 1000).toFixed(1) + 'K')) + ')</a>\
+                                    <a href="#" data-fd="' + fileName + '" data-id="' + fileId + '"><i class="fa fa-download"></i> ' + shortName + '(' + (fileSize > 1000000 ? ((fileSize / 1000000).toFixed(1) + 'M') : ((fileSize / 1000).toFixed(1) + 'K')) + ')</a>\
                                     <span class="text-danger" style="padding-left:16px;cursor:pointer;"><i class="fa fa-close" title="删除"></i> </span>\
                                     </li>');
         };
@@ -70,7 +70,7 @@
                 console.log(file.name + ":上传出错，原因：" + res);
                 return;
             }
-            addFileEle(file.name, file.size);
+            addFileEle(file.name, file.size,file.id);
         });
 
         uploader.on('uploadComplete', function (file) {
@@ -112,11 +112,13 @@
         $(fileListEle).on("click", ".fa-close", function () {
             var file = $(this).parents("li").find("a")[0];
             var fileName = $(file).attr("data-fd");
+            var fileId = $(file).attr("data-id");
             openConfirmDialog("确定要删除此文件吗？", function () {
                 $.post("../File/RemoveUploadedFile", { sysNum: sysNum, fileName: fileName }, function (data) {
                     if (data.suc) {
                         toastr.success("文件移除成功");
                         $(file).parents("li").remove();
+                        uploader.removeFile(fileId, true);
                     } else {
                         toastr.error("移除失败：" + data.msg);
                     }
