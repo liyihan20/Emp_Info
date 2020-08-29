@@ -1,0 +1,719 @@
+﻿@using EmpInfo.Models
+@using Newtonsoft.Json;
+@{
+    JsonSerializerSettings setting = new JsonSerializerSettings();
+    setting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+    BeginAuditModel bam = (BeginAuditModel)ViewData["bam"];
+    HHCheckApplyModel m = bam.otherInfo as HHCheckApplyModel;
+    var h = m.head;
+    var es = m.entrys;
+    var rs = m.rs;
+    var entryJson = JsonConvert.SerializeObject(es, setting);
+    var returnJson = JsonConvert.SerializeObject(rs, setting);
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
+
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: top;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+
+    <script>
+        $("#tb").bootstrapTable({
+            striped: true,
+            pagination: false,
+            data:@Html.Raw(entryJson),
+            clickToSelect: true,
+            idField: "id", 
+            uniqueId: "id",
+            columns: [
+                {
+                    radio: true
+                },
+                {
+                    field: "order_no",
+                    title: "订单号"
+                }, {
+                    field: "moduel",
+                    title: "规格型号"
+                }, {
+                    field: "return_qty",
+                    title: "退货数量"
+                }, {
+                    field: "real_return_qty",
+                    title: "实退数量"
+                }, {
+                    field: "is_on_line",
+                    title: "是否已上线"
+                }, {
+                    field: "fill_qty",
+                    title: "补货数量"
+                }, {
+                    field: "send_qty",
+                    title: "实发数量"
+                }, {
+                    field: "sender_name",
+                    title: "发货人"
+                }
+            ]
+        });
+
+        $("#tb2").bootstrapTable({
+            striped: true,
+            pagination: false,
+            data:@Html.Raw(returnJson),
+            clickToSelect: true,
+            idField: "id",
+            uniqueId: "id",
+            columns: [
+                {
+                    radio: true
+                },
+                {
+                    field: "moduel",
+                    title: "规格型号"
+                }, {
+                    field: "return_qty",
+                    title: "退货数量"
+                }, {
+                    field: "return_time",
+                    title: "到货时间",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(row.return_time);
+                    }
+                }, {
+                    field: "fetch_name",
+                    title: "接收人"
+                }
+            ]
+        });
+
+    </script>
+    <script>
+        $(function () {
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@h.sys_no" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+
+            });
+        });
+    </script>
+    <script>
+        var whoIsSaving = "";
+        $(function(){
+            $(".editBt").on("click",function(){
+                var rows = $('#tb').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再修改");
+                    return;
+                }
+                var row = rows[0];
+                whoIsSaving = $(this).attr("data-role");
+                utils.loadObjData($("#itemFm"), row);
+                $("#itemModal .modal-title").html(whoIsSaving+"录入信息");
+                $("#itemModal").modal("show");
+            });
+
+            $("#saveBt").on("click",function(){
+                var validateMsg=utils.validateRequiredField($("#itemFm"));
+                if(!validateMsg.suc){
+                    toastr.error(validateMsg.msg);
+                    return;
+                }
+                var obj=utils.getFormObj($("#itemFm"));
+                console.log(obj);
+
+                $.post("../ApplyExtra/UpdateHHEntry",{whoIsSaving:whoIsSaving,obj:JSON.stringify(obj)},function(data){
+                    if(!data.suc){
+                        toastr.error(data.msg);
+                        return;
+                    }
+                    toastr.success("保存成功");
+                    if(whoIsSaving == "品质经理"){
+                        $('#tb').bootstrapTable('updateByUniqueId',{
+                            id:obj.id,
+                            row:{real_return_qty:obj.real_return_qty,is_on_line:obj.is_on_line}
+                        });
+                    }else if(whoIsSaving == "生产主管"){
+                        $('#tb').bootstrapTable('updateByUniqueId',{
+                            id:obj.id,
+                            row:{fill_qty:obj.fill_qty}
+                        });
+                    }else if(whoIsSaving == "物流"){
+                        $('#tb').bootstrapTable('updateByUniqueId',{
+                            id:obj.id,
+                            row:{send_qty:obj.send_qty,sender_name:obj.sender_name}
+                        });
+                    }
+
+                    $("#itemModal").modal("hide");
+                });
+            });
+
+            $("#printBt").on("click",function(){
+                window.open("../Report/PrintHH?sysNo=@h.sys_no");
+            });
+
+            if ($("#attList")) {
+                $.post("../Item/GetAttachments", { sysNo: "@h.sys_no" }, function (data) {
+                    if (data.length > 0) {
+                        for (var i = 0; i < data.length; i++) {
+                            var shortName = data[i].fileName;
+                            if (shortName.length > 25) {
+                                var ext = shortName.substr(shortName.lastIndexOf("."));
+                                shortName = shortName.substr(0, 20) + ".." + ext;
+                            }
+                            $(attList).append('<li class="list-group-item">\
+                                    <a href="#" data-fd="' + data[i].fileName + '"><i class="fa fa-download"></i> ' + shortName + '('+(data[i].fileSize > 1000000 ? ((data[i].fileSize / 1000000).toFixed(1) + 'M') : ((data[i].fileSize / 1000).toFixed(1) + 'K')) + ')</a>\
+                                    </li>');
+                        }
+                    }
+                });
+            }
+
+            $("#attList").on("click", "a", function () {
+                var fileName = $(this).attr("data-fd");
+                var url = utils.GetDownloadRoute("@h.sys_no") + fileName;
+                window.open(url);
+            });
+
+        })
+    </script>
+    <script>
+        function audit(isPass) {
+            if(isPass && "@bam.stepName".indexOf("品质经理")>=0){
+                if(parseInt($("#myUploader").getMyUploaderFilesNum()) < 1){
+                    toastr.error("请上传复检报告复检再确认");
+                    return;
+                }
+            }
+            openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此换货申请吗？", function () {
+                $.post("HandleApply", {
+                    sysNo: "@bam.sysNum",
+                    step: "@bam.step",
+                    stepName:"@bam.stepName",
+                    isPass: isPass
+                }, function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+        }
+    </script>
+
+    @if (bam.stepName.Contains("品质经理") && bam.isPass==null) {
+        <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
+        <script src="@Url.Content("~/Scripts/myUploaderPro.js")"></script>
+        <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
+        <script>
+            $(function(){
+                $("#myUploader").myUploader({
+                    sysNum: "@h.sys_no",
+                    fileNumLimit: 10,
+                    accept: {
+                        title: '*',
+                        extensions: '*',
+                        mimeTypes: '*'
+                    }
+                });
+            });
+        </script>
+    }
+
+    @if (bam.stepName.Contains("物流") && bam.isPass == null) {
+        <script>
+            $(function(){
+                $(".datePicker").datetimepicker({
+                    language: 'zh-CN',
+                    format: "yyyy-mm-dd",
+                    autoclose: true,
+                    todayBtn: "linked",
+                    startView: 2,
+                    minView: 2,
+                    initialDate: "@DateTime.Now.ToString("yyyy-MM-dd")"
+                });
+
+                $("#addBt2").on("click",function(){
+                    utils.resetForm($("#itemFm2"));
+                    $("#itemModal2").modal("show");
+                });
+
+                $("#editBt2").on("click",function(){
+                    var rows = $('#tb2').bootstrapTable('getSelections');
+                    if (rows.length == 0) {
+                        toastr.error("请先选择一行后再修改");
+                        return;
+                    }
+                    var row = rows[0];
+                    row.return_time = utils.parseTDate(row.return_time);
+                    utils.loadObjData($("#itemFm2"), row);
+                    $("#itemModal2 .modal-title").html("修改退货记录");
+                    $("#itemModal2").modal("show");
+
+                });
+
+                $("#saveBt2").on("click",function(){
+                    var validateMsg=utils.validateRequiredField($("#itemFm2"));
+                    if(!validateMsg.suc){
+                        toastr.error(validateMsg.msg);
+                        return;
+                    }
+                    var obj=utils.getFormObj($("#itemFm2"));
+                    if(obj.return_time==""){
+                        toastr.error("到货时间必须选择");
+                        return;
+                    }
+                    obj.hh_id="@h.id";
+                    
+                    $.post("../ApplyExtra/SaveHHReturnDetail",{obj:JSON.stringify(obj)},function(data){
+                        if(!data.suc){
+                            toastr.error(data.msg);
+                            return;
+                        }
+                        toastr.success(data.msg);
+                        if(obj.id==0){
+                            $("#tb2").bootstrapTable('append', JSON.parse(data.extra));
+                        }else{
+                            $("#tb2").bootstrapTable('updateByUniqueId', { id: obj.id, row: JSON.parse(data.extra) });
+                        }
+                        $("#itemModal2").modal("hide");
+                    });
+                });
+
+                $("#removeBt2").on("click",function(){
+                    var rows = $('#tb2').bootstrapTable('getSelections');
+                    if (rows.length == 0) {
+                        toastr.error("请先选择一行后再删除");
+                        return;
+                    }
+                    openConfirmDialog("确定要删除选中的行吗？", function () {
+                        console.log(rows[0].id);
+                        $.post("../ApplyExtra/RemoveHHReturnDetail",{id:rows[0].id},function(data){
+                            if(data.suc){
+                                toastr.success("删除成功");
+                                $("#tb2").bootstrapTable('removeByUniqueId', rows[0].id);
+                            }else{
+                                toastr.error(data.msg);
+                            }
+                        });
+                    });
+                });
+
+            })
+
+        </script>
+    }
+
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="ApplyIndex?billType=HH">换货申请</a></li>
+            <li class="active">处理申请单</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div>
+            <div class="b-div">
+                <span class="b-label">
+                    流转记录:
+                </span>
+                <span class="b-input">
+                    <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请流水号:
+                    </span>
+                    <span class="b-input">
+                        @h.sys_no
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请人:
+                    </span>
+                    <div class="b-input">
+                        @h.applier_name
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请日期:
+                    </span>
+                    <div class="b-input">
+                        @h.apply_time.ToString("yyyy-MM-dd")
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        退货日期:
+                    </span>
+                    <div class="b-input">
+                        @h.return_date.ToString("yyyy-MM-dd")
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        市场部:
+                    </span>
+                    <div class="b-input">
+                        @h.agency_name
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        出货公司:
+                    </span>
+                    <div class="b-input">
+                        @h.company
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        事业部:
+                    </span>
+                    <div class="b-input">
+                        @h.return_dep
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        客户编码:
+                    </span>
+                    <span class="b-input">
+                        @h.customer_no
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        客户名称:
+                    </span>
+                    <span class="b-input">
+                        @h.customer_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        实物是否已收:
+                    </span>
+                    <span class="b-input">
+                        @(h.cargo_has_return ? "是" : "否")
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        品质经理:
+                    </span>
+                    <span class="b-input">
+                        @string.Format("{0}({1})", h.quality_manager_name, h.quality_manager_no)
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                收货地址:
+            </span>
+            <span class="b-input">
+                @h.return_addr
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                换货原因:
+            </span>
+            <span class="b-input">
+                @h.return_reason
+            </span>
+        </div>
+        @if (bam.stepName.Contains("品质经理") && bam.isPass==null) {
+            <div style="margin-top:8px;">
+                <div style="display:inline-block;">
+                    <div id="picker"> <i class="fa fa-upload"></i> 上传复检报告 </div>
+                </div>
+            </div>
+            <div id="myUploader">
+                @*这里生成上传文件插件*@
+            </div>
+        }
+        else if (h.has_attachment) {
+            <div>
+                <div style="margin-bottom:6px;" class="b-label">复检报告：</div>
+                <ul class="list-group" id="attList"></ul>
+            </div>
+        }
+        <div class="b-div" style="margin-top:16px;">
+            <span class="b-label">
+                换货详情:
+            </span>
+            <div class="b-input">
+                @if (bam.isPass == null) {
+                    if (bam.stepName.Contains("品质经理")) {
+                        <button class="btn btn-primary btn-sm editBt" type="button" data-role="品质经理"> <i class="fa fa-edit"></i> 录入实退数量/是否已上线 </button>
+                    }
+                    else if (bam.stepName.Contains("生产主管")) {
+                        <button class="btn btn-primary btn-sm editBt" type="button" data-role="生产主管"> <i class="fa fa-edit"></i> 录入补货数量 </button>
+                    }
+                    else if (bam.stepName.Contains("物流")) {
+                        <button class="btn btn-primary btn-sm editBt" type="button" data-role="物流"> <i class="fa fa-edit"></i> 录入实发数量/发货人 </button>
+                        <button class="btn btn-success btn-sm" type="button" id="printBt"> <i class="fa fa-print"></i> 打印放行条 </button>
+                    }
+                }
+            </div>
+        </div>
+        <table data-toggle="table" id="tb"></table>
+        
+        @if (bam.stepName.Contains("物流") || rs.Count() > 0) {
+            <div class="b-div" style="margin-top:16px;">
+                <span class="b-label">
+                    退货记录:
+                </span>
+                <div class="b-input">
+                    @if (bam.isPass == null && bam.stepName.Contains("物流")) {
+                    <button class="btn btn-success btn-sm" type="button" id="addBt2"> <i class="fa fa-plus"></i> 新增</button>
+                    <button class="btn btn-primary btn-sm" type="button" id="editBt2"> <i class="fa fa-edit"></i> 修改 </button>
+                    <button class="btn btn-danger btn-sm" type="button" id="removeBt2"> <i class="fa fa-th"></i> 删除</button>
+                    }
+                </div>
+            </div>
+            <table data-toggle="table" id="tb2"></table>        
+        }
+        
+        <div style="margin:16px 0">
+            @if (bam.isPass == null) {
+                <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
+                    </div>
+                </div>
+            }
+            else if ((bool)bam.isPass) {
+                <button type="button" class="btn btn-block btn-success disabled">已同意此申请</button>
+            }
+            else {
+                <button type="button" class="btn btn-block btn-danger disabled">已拒绝此申请</button>
+            }
+        </div>
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_MessageDialog")
+    <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">新增明细</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="itemFm">
+                        <input type="hidden" name="id" />
+                        <div class="b-div">
+                            <span class="b-label">
+                                订单号:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="order_no" readonly />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                规格型号:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="moduel" readonly />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                退货数量:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="return_qty" readonly />
+                            </span>
+                        </div>
+                        @if (bam.stepName.Contains("品质经理")) {
+                            <div class="b-div">
+                                <span class="b-label">
+                                    实退数量:
+                                </span>
+                                <span class="b-input">
+                                    <input type="number" class="form-control" name="real_return_qty" required/>
+                                </span>
+                            </div>
+                            <div class="b-div">
+                                <span class="b-label">
+                                    是否已上线:
+                                </span>
+                                <span class="b-input">
+                                    <select class="form-control" name="is_on_line" required>
+                                        <option value="">---- 选择是否已上线 ----</option>
+                                        <option value="已上线">已上线</option>
+                                        <option value="未上线">未上线</option>
+                                    </select>
+                                </span>
+                            </div>
+                        }
+                        else if (bam.stepName.Contains("生产主管")) {
+                            <div class="b-div">
+                                <span class="b-label">
+                                    补货数量:
+                                </span>
+                                <span class="b-input">
+                                    <input type="number" class="form-control" name="fill_qty" required/>
+                                </span>
+                            </div>
+                        }
+                        else if (bam.stepName.Contains("物流")) {
+                            <div class="b-div">
+                                <span class="b-label">
+                                    实发数量:
+                                </span>
+                                <span class="b-input">
+                                    <input type="number" class="form-control" name="send_qty" required/>
+                                </span>
+                            </div>
+                            <div class="b-div">
+                                <span class="b-label">
+                                    发货人:
+                                </span>
+                                <span class="b-input">
+                                    <input type="text" class="form-control" name="sender_name" />
+                                </span>
+                            </div>
+                        }
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 取消</button>
+                    <button type="button" class="btn btn-success" id="saveBt"><span class="fa fa-check-circle"></span> 确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="itemModal2" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">新增退货记录</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="itemFm2">
+                        <input type="hidden" name="id" data-value="0" />
+                        <div class="b-div">
+                            <span class="b-label">
+                                规格型号:
+                            </span>
+                            <span class="b-input">
+                                <select class="form-control" name="moduel" required>
+                                    <option value="">---- 选择规格型号 ----</option>
+                                    @foreach (var moduel in es.Select(i=>i.moduel).Distinct().ToList()) {
+                                        <option value="@moduel">@moduel</option>
+                                    }
+                                </select>
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                退货日期:
+                            </span>
+                            <div class="b-input">
+                                <div class="form-group" style="margin:0;">
+                                    <div class="input-group date datePicker" id="datePicker1">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                                        <input class="form-control" type="text" id="return_time" name="return_time" autocomplete="off" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                    
+                        <div class="b-div">
+                            <span class="b-label">
+                                退货数量:
+                            </span>
+                            <span class="b-input">
+                                <input type="number" class="form-control" name="return_qty" required />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                接收人:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="fetch_name" />
+                            </span>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 取消</button>
+                    <button type="button" class="btn btn-success" id="saveBt2"><span class="fa fa-check-circle"></span> 确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}

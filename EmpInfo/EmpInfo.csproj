@@ -358,6 +358,15 @@
     <Compile Include="Models\ei_groupUser.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_hhApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_hhApplyEntry.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_hhReturnDetail.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_ieApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -710,6 +719,7 @@
     <Compile Include="Services\DPSv.cs" />
     <Compile Include="Services\EPSv.cs" />
     <Compile Include="Services\ETSv.cs" />
+    <Compile Include="Services\HHSv.cs" />
     <Compile Include="Services\HRDBSv.cs" />
     <Compile Include="Services\IESv.cs" />
     <Compile Include="Services\ITSv.cs" />
@@ -938,6 +948,7 @@
     <Content Include="Content\images\fee_report.png" />
     <Content Include="Content\images\file.png" />
     <Content Include="Content\images\gear.png" />
+    <Content Include="Content\images\hh.png" />
     <Content Include="Content\images\house.png" />
     <Content Include="Content\images\it.png" />
     <Content Include="Content\images\ks.png" />
@@ -1580,6 +1591,11 @@
     <Content Include="Views\ApplyExtra\ChargerUpdateMQLeaveDate.cshtml" />
     <Content Include="Views\ApplyExtra\CancelMQApply.cshtml" />
     <Content Include="Views\Report\MQReport.cshtml" />
+    <Content Include="Views\Apply\BeginApplyHH.cshtml" />
+    <Content Include="Views\Apply\CheckHHApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditHHApply.cshtml" />
+    <Content Include="Views\Report\PrintHH.cshtml" />
+    <Content Include="Views\Report\HHReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

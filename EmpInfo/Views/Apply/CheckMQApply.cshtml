@@ -279,6 +279,42 @@
                         @m.employ_comment
                     </span>
                 </div>
+                @if (!string.IsNullOrEmpty(m.group_leader_choise)) {
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;width:150px;">
+                            组长是否已谈:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            @(m.group_leader_talked?"是":"否")
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;width:150px;">
+                            组长处理方式:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            @m.group_leader_choise
+                        </span>
+                    </div>
+                }
+                 @if (!string.IsNullOrEmpty(m.charger_choise)) {
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;width:150px;">
+                            主管是否已谈:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            @(m.charger_talked?"是":"否")
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;width:150px;">
+                            主管处理方式:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            @m.charger_choise
+                        </span>
+                    </div>
+                }
             </div>
         }
             

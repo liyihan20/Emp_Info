@@ -509,5 +509,76 @@ namespace EmpInfo.Controllers
 
         #endregion
 
+        #region 换货申请
+
+        public JsonResult GetOrderModual(string company, string orderNo)
+        {
+            try {
+                var result = new HHSv().GetOrderModuel(company, orderNo);
+                return Json(new SimpleResultModel(true, "", JsonConvert.SerializeObject(result)));
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+        }
+
+        public JsonResult UpdateHHEntry(FormCollection fc)
+        {
+            string whoIsSaving = fc.Get("whoIsSaving");
+            ei_hhApplyEntry entry;
+            try {
+                entry = JsonConvert.DeserializeObject<ei_hhApplyEntry>(fc.Get("obj"));
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(false,"json转换失败："+ ex.Message));
+            }
+            var svr = new HHSv();
+            try {
+                switch (whoIsSaving) {
+                    case "品质经理":
+                        svr.SaveEntryByQuality(entry.id, entry.real_return_qty, entry.is_on_line);
+                        break;
+                    case "生产主管":
+                        svr.SaveEntryByCharger(entry.id, entry.fill_qty);
+                        break;
+                    case "物流":
+                        svr.SaveEntryByLogistics(entry.id, entry.send_qty, entry.sender_name);
+                        break;
+                    default:
+                        return Json(new SimpleResultModel(false, "审核步骤不存在"));
+                }
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(false, "保存失败：" + ex.Message));
+            }
+
+            return Json(new SimpleResultModel(true));
+        }
+
+        public JsonResult SaveHHReturnDetail(string obj)
+        {
+            try {
+                ei_hhReturnDetail detail = JsonConvert.DeserializeObject<ei_hhReturnDetail>(obj);
+                var result = new HHSv().SaveReturnDetail(detail);
+                return Json(new SimpleResultModel(true, "保存成功", JsonConvert.SerializeObject(result, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, NullValueHandling = NullValueHandling.Ignore })));
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+        }
+
+        public JsonResult RemoveHHReturnDetail(int id)
+        {
+            try {
+                new HHSv().RemoveReturnDetail(id);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+        #endregion
+
     }
 }

@@ -33,20 +33,7 @@ namespace EmpInfo.Services
         {
             return "BeginAuditAPApply";
         }
-
-        public override List<ApplyNavigatorModel> GetApplyNavigatorLinks()
-        {
-            var list = base.GetApplyNavigatorLinks();
-            list.Add(
-                new ApplyNavigatorModel()
-                {
-                    text = "无纸化流程",
-                    url = "Home/NoPaperProcess"
-                }
-            );
-            return list;
-        }
-
+        
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
             var menus = base.GetApplyMenuItems(userInfo);

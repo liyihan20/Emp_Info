@@ -1,0 +1,297 @@
+﻿@using EmpInfo.Models
+@using Newtonsoft.Json;
+@{
+    JsonSerializerSettings setting = new JsonSerializerSettings();
+    setting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+    HHCheckApplyModel m = ViewData["am"] as HHCheckApplyModel;
+    var h = m.head;
+    var es = m.entrys;
+    var rs = m.rs;
+    var entryJson = JsonConvert.SerializeObject(es, setting);
+    var returnJson = JsonConvert.SerializeObject(rs, setting);
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: top;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+
+    <script>
+    $("#tb").bootstrapTable({
+        striped: true,
+        pagination: false,
+        data:@Html.Raw(entryJson),
+            columns: [
+                {
+                    field: "order_no",
+                    title: "订单号"
+                }, {
+                    field: "moduel",
+                    title: "规格型号"
+                }, {
+                    field: "return_qty",
+                    title: "退货数量"
+                }, {
+                    field: "real_return_qty",
+                    title: "实退数量"
+                }, {
+                    field: "is_on_line",
+                    title: "是否已上线"
+                }, {
+                    field: "fill_qty",
+                    title: "补货数量"
+                }, {
+                    field: "send_qty",
+                    title: "实发数量"
+                }, {
+                    field: "sender_name",
+                    title: "发货人"
+                }
+            ]
+        });
+
+        $("#tb2").bootstrapTable({
+            striped: true,
+            pagination: false,
+            data:@Html.Raw(returnJson),
+            columns: [                
+                {
+                    field: "moduel",
+                    title: "规格型号"
+                }, {
+                    field: "return_qty",
+                    title: "退货数量"
+                }, {
+                    field: "return_time",
+                    title: "到货时间",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(row.return_time);
+                    }
+                }, {
+                    field: "fetch_name",
+                    title: "接收人"
+                }
+            ]
+        });
+
+    </script>
+    <script>
+        $(function () {
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@h.sys_no" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+
+            });
+        });
+    </script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="ApplyIndex?billType=HH">换货申请</a></li>
+            <li class="active">查看申请单</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div>
+            <div class="b-div">
+                <span class="b-label">
+                    流转记录:
+                </span>
+                <span class="b-input">
+                    <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+                </span>
+            </div>
+        </div>
+        <div class="row">            
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        审核状态:
+                    </span>
+                    <span class="b-input">
+                        @ViewData["auditStatus"]
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请流水号:
+                    </span>
+                    <span class="b-input">
+                        @h.sys_no
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请人:
+                    </span>
+                    <div class="b-input">
+                        @h.applier_name
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请日期:
+                    </span>
+                    <div class="b-input">
+                        @h.apply_time.ToString("yyyy-MM-dd")
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        退货日期:
+                    </span>
+                    <div class="b-input">
+                        @h.return_date.ToString("yyyy-MM-dd")
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        市场部:
+                    </span>
+                    <div class="b-input">
+                        @h.agency_name
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        出货公司:
+                    </span>
+                    <div class="b-input">
+                        @h.company
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        事业部:
+                    </span>
+                    <div class="b-input">
+                        @h.return_dep
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        客户编码:
+                    </span>
+                    <span class="b-input">
+                        @h.customer_no
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        客户名称:
+                    </span>
+                    <span class="b-input">
+                        @h.customer_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        实物是否已收:
+                    </span>
+                    <span class="b-input">
+                        @(h.cargo_has_return ? "是" : "否")
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        品质经理:
+                    </span>
+                    <span class="b-input">
+                        @string.Format("{0}({1})", h.quality_manager_name, h.quality_manager_no)
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                收货地址:
+            </span>
+            <span class="b-input">
+                @h.return_addr
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                换货原因:
+            </span>
+            <span class="b-input">
+                @h.return_reason
+            </span>
+        </div>
+
+
+        <div class="b-div" style="margin-top:16px;">
+            <span class="b-label">
+                换货详情:
+            </span>
+            <div class="b-input">
+            </div>
+        </div>
+        <table data-toggle="table" id="tb"></table>
+
+        @if (rs.Count() > 0) {
+            <div class="b-div" style="margin-top:16px;">
+                <span class="b-label">
+                    退货记录:
+                </span>
+                <div class="b-input">
+                </div>
+            </div>
+            <table data-toggle="table" id="tb2"></table>        
+        }
+
+
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

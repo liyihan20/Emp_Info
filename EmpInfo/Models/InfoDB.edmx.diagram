@@ -147,6 +147,11 @@
         <AssociationConnector Association="ICAuditModel.FK_flow_applyEntry_flow_apply" />
         <EntityTypeShape EntityType="ICAuditModel.ei_mqApply" Width="1.5" PointX="2.375" PointY="17.25" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_MQExcel" Width="1.5" PointX="10.375" PointY="15.875" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_hhApply" Width="1.5" PointX="6" PointY="18" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_hhReturnDetail" Width="1.5" PointX="6" PointY="17.25" IsExpanded="false" />
+        <AssociationConnector Association="ICAuditModel.FK_ei_hhReturnDetail_ei_hhApply" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_hhApplyEntry" Width="1.5" PointX="6" PointY="18.875" IsExpanded="false" />
+        <AssociationConnector Association="ICAuditModel.FK_Table_1_ei_hhApply" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

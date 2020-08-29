@@ -799,6 +799,62 @@
           <Property Name="group_id" Type="int" />
           <Property Name="user_id" Type="int" />
         </EntityType>
+        <EntityType Name="ei_hhApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="apply_time" Type="datetime" Nullable="false" />
+          <Property Name="agency_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="customer_no" Type="varchar" MaxLength="50" />
+          <Property Name="customer_name" Type="nvarchar" MaxLength="100" />
+          <Property Name="return_dep" Type="nvarchar" MaxLength="50" />
+          <Property Name="quality_manager_no" Type="varchar" MaxLength="50" />
+          <Property Name="quality_manager_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="return_date" Type="smalldatetime" Nullable="false" />
+          <Property Name="return_reason" Type="nvarchar" MaxLength="500" />
+          <Property Name="return_addr" Type="nvarchar" MaxLength="500" />
+          <Property Name="cargo_has_return" Type="bit" Nullable="false" />
+          <Property Name="company" Type="nvarchar" MaxLength="50" />
+          <Property Name="has_attachment" Type="bit" Nullable="false" />
+          <Property Name="out_time" Type="datetime" />
+          <Property Name="out_guard" Type="nvarchar" MaxLength="50" />
+          <Property Name="out_status" Type="nvarchar" MaxLength="50" />
+          <Property Name="print_time" Type="varchar" MaxLength="4000" />
+        </EntityType>
+        <EntityType Name="ei_hhApplyEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="hh_id" Type="int" Nullable="false" />
+          <Property Name="order_no" Type="varchar" MaxLength="50" />
+          <Property Name="moduel" Type="varchar" MaxLength="200" />
+          <Property Name="return_qty" Type="int" />
+          <Property Name="real_return_qty" Type="int" />
+          <Property Name="is_on_line" Type="nvarchar" MaxLength="20" />
+          <Property Name="fill_qty" Type="int" />
+          <Property Name="send_qty" Type="int" />
+          <Property Name="sender_name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="ei_hhReturnDetail">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="hh_id" Type="int" />
+          <Property Name="moduel" Type="varchar" MaxLength="200" />
+          <Property Name="return_qty" Type="int" />
+          <Property Name="return_time" Type="datetime" />
+          <Property Name="ex_company" Type="nvarchar" MaxLength="50" />
+          <Property Name="ex_no" Type="varchar" MaxLength="50" />
+          <Property Name="ex_to_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="fetch_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="op_time" Type="datetime" />
+        </EntityType>
         <EntityType Name="ei_ieApply">
           <Key>
             <PropertyRef Name="id" />
@@ -2223,6 +2279,7 @@
           <Property Name="ex_company" Type="nvarchar" MaxLength="50" />
           <Property Name="comment" Type="nvarchar" MaxLength="500" />
           <Property Name="apply_time" Type="datetime" />
+          <Property Name="dep_name" Type="nvarchar" MaxLength="500" />
           <Property Name="entry_id" Type="int" Nullable="false" />
           <Property Name="driver_name" Type="nvarchar" MaxLength="50" />
           <Property Name="driver_no" Type="varchar" MaxLength="50" />
@@ -2525,6 +2582,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ei_hhReturnDetail_ei_hhApply">
+          <End Role="ei_hhApply" Type="Self.ei_hhApply" Multiplicity="0..1" />
+          <End Role="ei_hhReturnDetail" Type="Self.ei_hhReturnDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_hhApply">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_hhReturnDetail">
+              <PropertyRef Name="hh_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ei_PushResponse_ei_pushMsg">
           <End Role="ei_pushMsg" Type="Self.ei_pushMsg" Multiplicity="0..1" />
           <End Role="ei_PushResponse" Type="Self.ei_PushResponse" Multiplicity="*" />
@@ -2594,6 +2663,18 @@
             </Principal>
             <Dependent Role="flow_applyEntry">
               <PropertyRef Name="apply_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Table_1_ei_hhApply">
+          <End Role="ei_hhApply" Type="Self.ei_hhApply" Multiplicity="1" />
+          <End Role="ei_hhApplyEntry" Type="Self.ei_hhApplyEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_hhApply">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_hhApplyEntry">
+              <PropertyRef Name="hh_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -2792,6 +2873,9 @@
           <EntitySet Name="ei_groupAuthority" EntityType="Self.ei_groupAuthority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groups" EntityType="Self.ei_groups" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groupUser" EntityType="Self.ei_groupUser" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_hhApply" EntityType="Self.ei_hhApply" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_hhApplyEntry" EntityType="Self.ei_hhApplyEntry" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_hhReturnDetail" EntityType="Self.ei_hhReturnDetail" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_ieApply" EntityType="Self.ei_ieApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_ieAuditors" EntityType="Self.ei_ieAuditors" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_itApply" EntityType="Self.ei_itApply" Schema="dbo" store:Type="Tables" />
@@ -3407,6 +3491,7 @@ FROM [dbo].[vw_svReport] AS [vw_svReport]</DefiningQuery>
 [vw_TIExcel].[ex_company] AS [ex_company], 
 [vw_TIExcel].[comment] AS [comment], 
 [vw_TIExcel].[apply_time] AS [apply_time], 
+[vw_TIExcel].[dep_name] AS [dep_name], 
 [vw_TIExcel].[entry_id] AS [entry_id], 
 [vw_TIExcel].[driver_name] AS [driver_name], 
 [vw_TIExcel].[driver_no] AS [driver_no], 
@@ -3542,6 +3627,10 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <End Role="ei_users" EntitySet="ei_users" />
             <End Role="ei_groupUser" EntitySet="ei_groupUser" />
           </AssociationSet>
+          <AssociationSet Name="FK_ei_hhReturnDetail_ei_hhApply" Association="Self.FK_ei_hhReturnDetail_ei_hhApply">
+            <End Role="ei_hhApply" EntitySet="ei_hhApply" />
+            <End Role="ei_hhReturnDetail" EntitySet="ei_hhReturnDetail" />
+          </AssociationSet>
           <AssociationSet Name="FK_ei_PushResponse_ei_pushMsg" Association="Self.FK_ei_PushResponse_ei_pushMsg">
             <End Role="ei_pushMsg" EntitySet="ei_pushMsg" />
             <End Role="ei_PushResponse" EntitySet="ei_PushResponse" />
@@ -3565,6 +3654,10 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <AssociationSet Name="FK_flow_applyEntry_flow_apply" Association="Self.FK_flow_applyEntry_flow_apply">
             <End Role="flow_apply" EntitySet="flow_apply" />
             <End Role="flow_applyEntry" EntitySet="flow_applyEntry" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Table_1_ei_hhApply" Association="Self.FK_Table_1_ei_hhApply">
+            <End Role="ei_hhApply" EntitySet="ei_hhApply" />
+            <End Role="ei_hhApplyEntry" EntitySet="ei_hhApplyEntry" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -3940,6 +4033,17 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           </FunctionImport>
           <EntitySet Name="ei_mqApply" EntityType="ICAuditModel.ei_mqApply" />
           <EntitySet Name="vw_MQExcel" EntityType="ICAuditModel.vw_MQExcel" />
+          <EntitySet Name="ei_hhApply" EntityType="ICAuditModel.ei_hhApply" />
+          <EntitySet Name="ei_hhReturnDetail" EntityType="ICAuditModel.ei_hhReturnDetail" />
+          <AssociationSet Name="FK_ei_hhReturnDetail_ei_hhApply" Association="ICAuditModel.FK_ei_hhReturnDetail_ei_hhApply">
+            <End Role="ei_hhApply" EntitySet="ei_hhApply" />
+            <End Role="ei_hhReturnDetail" EntitySet="ei_hhReturnDetail" />
+          </AssociationSet>
+          <EntitySet Name="ei_hhApplyEntry" EntityType="ICAuditModel.ei_hhApplyEntry" />
+          <AssociationSet Name="FK_Table_1_ei_hhApply" Association="ICAuditModel.FK_Table_1_ei_hhApply">
+            <End Role="ei_hhApply" EntitySet="ei_hhApply" />
+            <End Role="ei_hhApplyEntry" EntitySet="ei_hhApplyEntry" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -6065,6 +6169,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="in_time" Type="DateTime" Precision="3" />
           <Property Name="out_time" Type="DateTime" Precision="3" />
           <Property Name="audit_result" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="dep_name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ei_sjApply">
           <Key>
@@ -6786,6 +6891,90 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="finish_date" Type="DateTime" Precision="3" />
           <Property Name="quit_reason" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
         </EntityType>
+        <EntityType Name="ei_hhApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="apply_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="agency_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="customer_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="customer_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="return_dep" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="quality_manager_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="quality_manager_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="return_date" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="return_reason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="return_addr" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="cargo_has_return" Type="Boolean" Nullable="false" />
+          <Property Name="company" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="has_attachment" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="ei_hhReturnDetail" Relationship="ICAuditModel.FK_ei_hhReturnDetail_ei_hhApply" FromRole="ei_hhApply" ToRole="ei_hhReturnDetail" />
+          <NavigationProperty Name="ei_hhApplyEntry" Relationship="ICAuditModel.FK_Table_1_ei_hhApply" FromRole="ei_hhApply" ToRole="ei_hhApplyEntry" />
+          <Property Name="out_time" Type="DateTime" Precision="3" />
+          <Property Name="out_guard" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="out_status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="print_time" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ei_hhReturnDetail">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="hh_id" Type="Int32" />
+          <Property Name="moduel" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="return_qty" Type="Int32" />
+          <Property Name="return_time" Type="DateTime" Precision="3" />
+          <Property Name="ex_company" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ex_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ex_to_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="fetch_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="op_time" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="ei_hhApply" Relationship="ICAuditModel.FK_ei_hhReturnDetail_ei_hhApply" FromRole="ei_hhReturnDetail" ToRole="ei_hhApply" />
+        </EntityType>
+        <Association Name="FK_ei_hhReturnDetail_ei_hhApply">
+          <End Type="ICAuditModel.ei_hhApply" Role="ei_hhApply" Multiplicity="0..1" />
+          <End Type="ICAuditModel.ei_hhReturnDetail" Role="ei_hhReturnDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_hhApply">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_hhReturnDetail">
+              <PropertyRef Name="hh_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ei_hhApplyEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="hh_id" Type="Int32" Nullable="false" />
+          <Property Name="order_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="moduel" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="return_qty" Type="Int32" />
+          <Property Name="real_return_qty" Type="Int32" />
+          <Property Name="is_on_line" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="fill_qty" Type="Int32" />
+          <Property Name="send_qty" Type="Int32" />
+          <Property Name="sender_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ei_hhApply" Relationship="ICAuditModel.FK_Table_1_ei_hhApply" FromRole="ei_hhApplyEntry" ToRole="ei_hhApply" />
+        </EntityType>
+        <Association Name="FK_Table_1_ei_hhApply">
+          <End Type="ICAuditModel.ei_hhApply" Role="ei_hhApply" Multiplicity="1" />
+          <End Type="ICAuditModel.ei_hhApplyEntry" Role="ei_hhApplyEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ei_hhApply">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ei_hhApplyEntry">
+              <PropertyRef Name="hh_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -8739,6 +8928,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="vw_TIExcel">
             <EntityTypeMapping TypeName="ICAuditModel.vw_TIExcel">
               <MappingFragment StoreEntitySet="vw_TIExcel">
+                <ScalarProperty Name="dep_name" ColumnName="dep_name" />
                 <ScalarProperty Name="audit_result" ColumnName="audit_result" />
                 <ScalarProperty Name="out_time" ColumnName="out_time" />
                 <ScalarProperty Name="in_time" ColumnName="in_time" />
@@ -9468,6 +9658,65 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="applier_name" ColumnName="applier_name" />
                 <ScalarProperty Name="applier_num" ColumnName="applier_num" />
                 <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_hhApply">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_hhApply">
+              <MappingFragment StoreEntitySet="ei_hhApply">
+                <ScalarProperty Name="print_time" ColumnName="print_time" />
+                <ScalarProperty Name="out_status" ColumnName="out_status" />
+                <ScalarProperty Name="out_guard" ColumnName="out_guard" />
+                <ScalarProperty Name="out_time" ColumnName="out_time" />
+                <ScalarProperty Name="has_attachment" ColumnName="has_attachment" />
+                <ScalarProperty Name="company" ColumnName="company" />
+                <ScalarProperty Name="cargo_has_return" ColumnName="cargo_has_return" />
+                <ScalarProperty Name="return_addr" ColumnName="return_addr" />
+                <ScalarProperty Name="return_reason" ColumnName="return_reason" />
+                <ScalarProperty Name="return_date" ColumnName="return_date" />
+                <ScalarProperty Name="quality_manager_name" ColumnName="quality_manager_name" />
+                <ScalarProperty Name="quality_manager_no" ColumnName="quality_manager_no" />
+                <ScalarProperty Name="return_dep" ColumnName="return_dep" />
+                <ScalarProperty Name="customer_name" ColumnName="customer_name" />
+                <ScalarProperty Name="customer_no" ColumnName="customer_no" />
+                <ScalarProperty Name="agency_name" ColumnName="agency_name" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_hhReturnDetail">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_hhReturnDetail">
+              <MappingFragment StoreEntitySet="ei_hhReturnDetail">
+                <ScalarProperty Name="op_time" ColumnName="op_time" />
+                <ScalarProperty Name="fetch_name" ColumnName="fetch_name" />
+                <ScalarProperty Name="ex_to_name" ColumnName="ex_to_name" />
+                <ScalarProperty Name="ex_no" ColumnName="ex_no" />
+                <ScalarProperty Name="ex_company" ColumnName="ex_company" />
+                <ScalarProperty Name="return_time" ColumnName="return_time" />
+                <ScalarProperty Name="return_qty" ColumnName="return_qty" />
+                <ScalarProperty Name="moduel" ColumnName="moduel" />
+                <ScalarProperty Name="hh_id" ColumnName="hh_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_hhApplyEntry">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_hhApplyEntry">
+              <MappingFragment StoreEntitySet="ei_hhApplyEntry">
+                <ScalarProperty Name="sender_name" ColumnName="sender_name" />
+                <ScalarProperty Name="send_qty" ColumnName="send_qty" />
+                <ScalarProperty Name="fill_qty" ColumnName="fill_qty" />
+                <ScalarProperty Name="is_on_line" ColumnName="is_on_line" />
+                <ScalarProperty Name="real_return_qty" ColumnName="real_return_qty" />
+                <ScalarProperty Name="return_qty" ColumnName="return_qty" />
+                <ScalarProperty Name="moduel" ColumnName="moduel" />
+                <ScalarProperty Name="order_no" ColumnName="order_no" />
+                <ScalarProperty Name="hh_id" ColumnName="hh_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

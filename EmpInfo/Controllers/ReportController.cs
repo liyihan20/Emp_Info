@@ -2160,8 +2160,7 @@ namespace EmpInfo.Controllers
         }
 
         #endregion
-
-
+        
         #region 调动流程
 
         [SessionTimeOutFilter]
@@ -2471,7 +2470,7 @@ namespace EmpInfo.Controllers
         public void BeginExportTIExcel(DateTime fromDate, DateTime toDate)
         {
             var result = GetTIData(fromDate, toDate).ToList();
-            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "申请时间","进厂日期", "进厂时间", "司机姓名", "身份证号","车辆类型", "车牌号码",
+            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "申请时间","进厂日期", "进厂时间", "货运公司", "司机姓名", "身份证号","车辆类型", "车牌号码",
                                               "备注","状态" };
             ushort[] colWidth = new ushort[colName.Length];
 
@@ -2523,6 +2522,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, ((DateTime)d.in_day).ToString("yyyy-MM-dd"));
                 cells.Add(rowIndex, ++colIndex, d.in_timespan);
+                cells.Add(rowIndex, ++colIndex, d.ex_company);
                 cells.Add(rowIndex, ++colIndex, d.driver_name);
                 cells.Add(rowIndex, ++colIndex, d.driver_no);
                 cells.Add(rowIndex, ++colIndex, d.car_type);
@@ -2929,6 +2929,204 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.group_members);
                 cells.Add(rowIndex, ++colIndex, d.result_description);
                 cells.Add(rowIndex, ++colIndex, d.operation_dep_summary);
+            }
+
+            xls.Send();
+        }
+
+        #endregion
+
+        #region 换货申请
+
+        public ActionResult PrintHH(string sysNo)
+        {
+            var hs = from h in db.ei_hhApply
+                     join e in db.ei_hhApplyEntry on h.id equals e.hh_id
+                     where h.sys_no == sysNo
+                     select new { h, e };
+            if (hs.Count() < 1) {
+                ViewBag.tip = "单据不存在，不能打印放行条";
+                return View("Error");
+            }
+            if (hs.Where(i => i.e.send_qty == null).Count() > 0) {
+                ViewBag.tip = "存在未录入的实发数量，不能打印放行条";
+                return View("Error");
+            }
+            var auditorList = (from a in db.flow_apply
+                               join ad in db.flow_applyEntry on a.id equals ad.apply_id
+                               join u in db.ei_users on ad.final_auditor equals u.card_number
+                               where a.sys_no == sysNo && ad.final_auditor != null
+                               select new StepNameAndAuditor()
+                               {
+                                   stepName = ad.step_name,
+                                   auditorName = u.name
+                               }).ToList();
+            var result = new HHCheckApplyModel()
+            {
+                head = hs.First().h,
+                entrys = hs.Select(i => i.e).ToList(),
+                auditorList = auditorList
+            };
+
+            new HHSv(sysNo).UpdatePrintStatus();
+
+            ViewData["m"] = result;
+            return View();
+        }
+
+        public ActionResult HHReport()
+        {
+            return View();
+        }
+
+        public JsonResult SearchHHReport(string obj)
+        {
+            HHSearchReportModel m = JsonConvert.DeserializeObject<HHSearchReportModel>(obj);
+
+            var result = from h in db.ei_hhApply
+                         join e in db.ei_hhApplyEntry on h.id equals e.hh_id
+                         join a in db.flow_apply on h.sys_no equals a.sys_no
+                         where h.return_date >= m.beginDate && h.return_date <= m.endDate
+                         select new
+                         {
+                             h.sys_no,
+                             h.applier_name,
+                             h.return_date,
+                             h.company,
+                             h.customer_name,
+                             h.return_dep,
+                             e.order_no,
+                             e.moduel,
+                             e.return_qty,
+                             audit_result = a.success == true ? "已结案" : (a.success == false ? "已拒绝" : "审批中")
+                         };
+            if (!string.IsNullOrWhiteSpace(m.sysNo)) {
+                result = result.Where(r => r.sys_no.Contains(m.sysNo));
+            }
+            if (!"所有".Equals(m.auditResult)) {
+                result = result.Where(r => r.audit_result == m.auditResult);
+            }
+            if (!string.IsNullOrWhiteSpace(m.applierName)) {
+                result = result.Where(r => r.applier_name == m.applierName);
+            }
+            if (!string.IsNullOrWhiteSpace(m.returnDep)) {
+                result = result.Where(r => r.return_dep.Contains(m.returnDep));
+            }
+            if (!string.IsNullOrWhiteSpace(m.customerName)) {
+                result = result.Where(r => r.customer_name.Contains(m.customerName));
+            }
+            if (!string.IsNullOrWhiteSpace(m.orderNo)) {
+                result = result.Where(r => r.order_no.Contains(m.orderNo));
+            }
+            if (!string.IsNullOrWhiteSpace(m.moduel)) {
+                result = result.Where(r => r.moduel.Contains(m.moduel));
+            }
+
+            return Json(result.ToList());
+        }
+
+        public void ExportHHExcel(string obj)
+        {
+            HHSearchReportModel m = JsonConvert.DeserializeObject<HHSearchReportModel>(obj);
+
+            var result = from h in db.ei_hhApply
+                         join e in db.ei_hhApplyEntry on h.id equals e.hh_id
+                         join a in db.flow_apply on h.sys_no equals a.sys_no
+                         where h.return_date >= m.beginDate && h.return_date <= m.endDate
+                         select new
+                         {
+                             h,
+                             e,
+                             audit_result = a.success == true ? "已结案" : (a.success == false ? "已拒绝" : "审批中")
+                         };
+            if (!string.IsNullOrWhiteSpace(m.sysNo)) {
+                result = result.Where(r => r.h.sys_no.Contains(m.sysNo));
+            }
+            if (!"所有".Equals(m.auditResult)) {
+                result = result.Where(r => r.audit_result == m.auditResult);
+            }
+            if (!string.IsNullOrWhiteSpace(m.applierName)) {
+                result = result.Where(r => r.h.applier_name == m.applierName);
+            }
+            if (!string.IsNullOrWhiteSpace(m.returnDep)) {
+                result = result.Where(r => r.h.return_dep.Contains(m.returnDep));
+            }
+            if (!string.IsNullOrWhiteSpace(m.customerName)) {
+                result = result.Where(r => r.h.customer_name.Contains(m.customerName));
+            }
+            if (!string.IsNullOrWhiteSpace(m.orderNo)) {
+                result = result.Where(r => r.e.order_no.Contains(m.orderNo));
+            }
+            if (!string.IsNullOrWhiteSpace(m.moduel)) {
+                result = result.Where(r => r.e.moduel.Contains(m.moduel));
+            }
+
+            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "申请时间", "出货公司", "事业部", "市场部", "客户名称","品质经理", "收货地址",
+                                              "换货原因", "订单号", "规格型号", "退货数量","实退数量","是否已上线", "补货数量","实发数量", "发货人" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "换货申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("申请详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result.ToList()) {
+                colIndex = 1;
+
+                //"处理结果","申请流水号", "申请人", "申请时间", "出货公司", "事业部", "市场部", "客户名称","品质经理", "收货地址",
+                //"换货原因", "订单号", "规格型号", "退货数量","实退数量","是否已上线", "补货数量","实发数量", "发货人"
+                cells.Add(++rowIndex, colIndex, d.audit_result);
+                cells.Add(rowIndex, ++colIndex, d.h.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.h.applier_name);
+                cells.Add(rowIndex, ++colIndex, d.h.apply_time.ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.h.company);
+                cells.Add(rowIndex, ++colIndex, d.h.return_dep);
+                cells.Add(rowIndex, ++colIndex, d.h.agency_name);
+                cells.Add(rowIndex, ++colIndex, d.h.customer_name);
+                cells.Add(rowIndex, ++colIndex, d.h.quality_manager_name);
+                cells.Add(rowIndex, ++colIndex, d.h.return_addr);
+
+                cells.Add(rowIndex, ++colIndex, d.h.return_reason);
+                cells.Add(rowIndex, ++colIndex, d.e.order_no);
+                cells.Add(rowIndex, ++colIndex, d.e.moduel);
+                cells.Add(rowIndex, ++colIndex, d.e.return_qty);
+                cells.Add(rowIndex, ++colIndex, d.e.real_return_qty);
+                cells.Add(rowIndex, ++colIndex, d.e.is_on_line);
+                cells.Add(rowIndex, ++colIndex, d.e.fill_qty);
+                cells.Add(rowIndex, ++colIndex, d.e.send_qty);
+                cells.Add(rowIndex, ++colIndex, d.e.sender_name);
             }
 
             xls.Send();

@@ -93,9 +93,9 @@ namespace EmpInfo.Services
                 throw new Exception("请选择生产事业部！");
             }
 
-            if (string.IsNullOrEmpty(bill.delivery_company)) {
-                throw new Exception("请填写货运公司！" );
-            }
+            //if (string.IsNullOrEmpty(bill.delivery_company)) {
+            //    throw new Exception("请填写货运公司！" );
+            //}
 
             if (string.IsNullOrEmpty(bill.delivery_addr)) {
                 throw new Exception("请填写送货地址！");

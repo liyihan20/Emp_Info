@@ -32,5 +32,6 @@ namespace EmpInfo.Models
         public Nullable<System.DateTime> in_time { get; set; }
         public Nullable<System.DateTime> out_time { get; set; }
         public string audit_result { get; set; }
+        public string dep_name { get; set; }
     }
 }

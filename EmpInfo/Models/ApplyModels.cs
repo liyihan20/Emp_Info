@@ -267,4 +267,39 @@ namespace EmpInfo.Models
         public int level_reward { get; set; }
     }
 
+    public class HHBeforeApplyModel
+    {
+        public string sys_no { get; set; }
+        public List<string> agencyList { get; set; }
+        public List<string> depNameList { get; set; }
+    }
+
+    public class HHCheckApplyModel
+    {
+        public ei_hhApply head { get; set; }
+        public List<ei_hhApplyEntry> entrys { get; set; }
+        public List<ei_hhReturnDetail> rs { get; set; }
+        public List<StepNameAndAuditor> auditorList { get; set; }
+
+    }
+
+    public class HHSearchReportModel
+    {
+        public string sysNo { get; set; }
+        public DateTime beginDate { get; set; }
+        public DateTime endDate { get; set; }
+        public string applierName { get; set; }
+        public string moduel { get; set; }
+        public string orderNo { get; set; }
+        public string customerName { get; set; }
+        public string returnDep { get; set; }
+        public string auditResult { get; set; }
+    }
+
+    public class StepNameAndAuditor
+    {
+        public string stepName { get; set; }
+        public string auditorName { get; set; }
+    }
+
 }
