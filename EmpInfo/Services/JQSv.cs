@@ -172,10 +172,17 @@ namespace EmpInfo.Services
                 if (stepName.Contains("组长")) {
                     if (string.IsNullOrEmpty(bill.charger_name)) return new SimpleResultModel() { suc = false, msg = "请选择主管审核人" };
                     if(string.IsNullOrEmpty(bill.charger_num)) bill.charger_num = GetUserCardByNameAndCardNum(bill.charger_name);
+                    if (!new HRDBSv().EmpIsNotQuit(bill.charger_num)) {
+                        return new SimpleResultModel(false, "主管审批人现已离职，请重新选择");
+                    }
                 }
                 if (stepName.Contains("主管")) {
                     if (string.IsNullOrEmpty(bill.produce_minister_name)) return new SimpleResultModel() { suc = false, msg = "请选择生产部长审核人" };
                     if (string.IsNullOrEmpty(bill.produce_minister_num)) bill.produce_minister_num = GetUserCardByNameAndCardNum(bill.produce_minister_name);
+                    if (!new HRDBSv().EmpIsNotQuit(bill.produce_minister_num)) {
+                        return new SimpleResultModel(false, "生产部长审批人现已离职，请重新选择");
+                    }
+
                     //加入到主管修改离职日期的表
                     if (db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "修改离职日期" && f.relate_value == userInfo.cardNo).Count() < 1) {
                         db.ei_flowAuthority.Add(new ei_flowAuthority()
@@ -189,6 +196,9 @@ namespace EmpInfo.Services
                 if (stepName.Contains("部门负责人")) {
                     if (string.IsNullOrEmpty(bill.highest_charger_name)) return new SimpleResultModel() { suc = false, msg = "请选择部门最高审核人" };
                     if (string.IsNullOrEmpty(bill.highest_charger_num)) bill.highest_charger_num = GetUserCardByNameAndCardNum(bill.highest_charger_name);
+                    if (!new HRDBSv().EmpIsNotQuit(bill.highest_charger_num)) {
+                        return new SimpleResultModel(false, "部门最高审批人现已离职，请重新选择");
+                    }
                     //部门负责人加入修改离职日期的表
                     if (db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "修改离职日期" && f.relate_value == userInfo.cardNo).Count() < 1) {
                         db.ei_flowAuthority.Add(new ei_flowAuthority()

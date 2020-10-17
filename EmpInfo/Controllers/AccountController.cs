@@ -384,7 +384,7 @@ namespace EmpInfo.Controllers
                 if (!string.IsNullOrWhiteSpace(email) && email.Contains("@")) {
                     return Json(new SimpleResultModel() { suc = true, extra = email });
                 }
-            }            
+            }
             WriteEventLogWithoutLogin(card_no, "重置密码-没有邮箱", -1);
             return Json(new SimpleResultModel() { suc = false, msg = "你没有在此系统登记邮箱，不能自助解禁或重置密码；请将【厂牌】、【姓名】和【身份证号码】(三者缺一不可，否则不予处理)发给系统管理员处理！" });
         }

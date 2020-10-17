@@ -53,6 +53,7 @@ namespace EmpInfo.Services
             }
             DormRepairBeginApplyModel model = new DormRepairBeginApplyModel();
 
+            model.sysNo = GetNextSysNum(BillType);
             model.areaName = info.First().area;
             model.dormNumber = info.First().dorm_number;
 
@@ -73,7 +74,6 @@ namespace EmpInfo.Services
         {
             bill = new ei_dormRepair();
             MyUtils.SetFieldValueToModel(fc, bill);
-            bill.sys_no = GetNextSysNum(BillType);
             bill.applier_name = userInfo.name;
             bill.applier_num = userInfo.cardNo;
             bill.apply_time = DateTime.Now;

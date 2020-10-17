@@ -7,6 +7,7 @@ using EmpInfo.Models;
 using EmpInfo.Util;
 using System.Configuration;
 using EmpInfo.Services;
+using EmpInfo.QywxWebSrv;
 
 namespace EmpInfo.Controllers
 {
@@ -47,13 +48,13 @@ namespace EmpInfo.Controllers
         {
             get
             {
-                _userInfo = (UserInfo)Session["userInfo"];
+                _userInfo = (EmpInfo.Models.UserInfo)Session["userInfo"];
                 if (_userInfo == null)
                 {
                     var cookie = Request.Cookies[ConfigurationManager.AppSettings["cookieName"]];
                     if (cookie != null)
                     {
-                        _userInfo = new UserInfo();
+                        _userInfo = new EmpInfo.Models.UserInfo();
                         _userInfo.id = Int32.Parse(cookie.Values.Get("userid"));
                         _userInfo.name = MyUtils.DecodeToUTF8(cookie.Values.Get("username"));
                         _userInfo.cardNo = cookie.Values.Get("cardno");
@@ -77,7 +78,7 @@ namespace EmpInfo.Controllers
                         _userInfoDetail = new UserInfoDetail();
                         var user = db.ei_users.Single(u => u.id == userInfo.id);
                         _userInfoDetail.name = user.name;
-                        _userInfoDetail.email = user.email;
+                        _userInfoDetail.email = string.IsNullOrEmpty(user.email) ? GetEmailFromQywx(user.card_number) : user.email;
                         _userInfoDetail.sex = user.sex;
                         _userInfoDetail.shortPhone = user.short_phone;
                         _userInfoDetail.phone = user.phone;
@@ -85,7 +86,7 @@ namespace EmpInfo.Controllers
                         _userInfoDetail.salaryNo = user.salary_no;
                         _userInfoDetail.depNum = user.dep_no;
                         _userInfoDetail.depLongName = user.dep_long_name;
-                        _userInfoDetail.AesOpenId = string.IsNullOrEmpty(user.wx_openid) ? null : Uri.EscapeDataString(MyUtils.AESEncrypt(user.wx_openid));
+                        //_userInfoDetail.AesOpenId = string.IsNullOrEmpty(user.wx_openid) ? null : Uri.EscapeDataString(MyUtils.AESEncrypt(user.wx_openid));
                     }
                     Session["userInfoDetail"] = _userInfoDetail;
                 }
@@ -366,6 +367,19 @@ namespace EmpInfo.Controllers
             }
 
             return depName;
+        }
+
+        //获取企业微信中登记的邮箱
+        private string GetEmailFromQywx(string cardNumber)
+        {
+            QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();
+            var result = wx.GetUserInfo(cardNumber);
+            if (result.errcode == 0) {
+                return result.email;
+            }
+            else {
+                return "";
+            }
         }
 
         /// <summary>

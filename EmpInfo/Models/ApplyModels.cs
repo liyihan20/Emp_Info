@@ -234,6 +234,7 @@ namespace EmpInfo.Models
         public string faultyItems { get; set; }
         public string loginName { get; set; }
         public string loginPassword { get; set; }
+        public int qty { get; set; }
     }
 
     public class DEBeforeApplyModel

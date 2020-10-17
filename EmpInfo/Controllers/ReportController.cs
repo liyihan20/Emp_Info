@@ -317,9 +317,9 @@ namespace EmpInfo.Controllers
             
             WriteEventLog("已办Excel", "导出请假已办记录");
 
-            ushort[] colWidth = new ushort[] { 20, 16, 40, 12, 18, 16 };
+            ushort[] colWidth = new ushort[] { 20, 16, 40, 12, 18, 16, 24 };
 
-            string[] colName = new string[] { "申请人", "申请时间", "请假时间", "类型", "流水号", "审批结果" };
+            string[] colName = new string[] { "申请人", "申请时间", "请假时间", "类型", "流水号", "审批结果","意见" };
 
             //設置excel文件名和sheet名
             XlsDocument xls = new XlsDocument();
@@ -363,7 +363,8 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.subTitle);
                 cells.Add(rowIndex, ++colIndex, d.title);
                 cells.Add(rowIndex, ++colIndex, d.sysNo);
-                cells.Add(rowIndex, ++colIndex, d.auditResult);                
+                cells.Add(rowIndex, ++colIndex, d.auditResult);
+                cells.Add(rowIndex, ++colIndex, d.opinion);
             }
 
             xls.Send();
@@ -1923,7 +1924,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.applier_name);
                 cells.Add(rowIndex, ++colIndex, ((DateTime)d.apply_time).ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, d.finish_date == null ? "" : ((DateTime)d.finish_date).ToString("yyyy-MM-dd HH:mm"));
-                cells.Add(rowIndex, ++colIndex, d.quit_type);
+                cells.Add(rowIndex, ++colIndex, d.quit_type.Equals("自离") ? "自动离职" : d.quit_type);
                 cells.Add(rowIndex, ++colIndex, d.name);
                 cells.Add(rowIndex, ++colIndex, d.account);
                 cells.Add(rowIndex, ++colIndex, d.card_number);
@@ -2938,6 +2939,7 @@ namespace EmpInfo.Controllers
 
         #region 换货申请
 
+        //放行条
         public ActionResult PrintHH(string sysNo)
         {
             var hs = from h in db.ei_hhApply
@@ -2952,6 +2954,10 @@ namespace EmpInfo.Controllers
                 ViewBag.tip = "存在未录入的实发数量，不能打印放行条";
                 return View("Error");
             }
+            if (hs.First().h.out_time != null) {
+                ViewBag.tip = "此放行条已放行，不能再打印";
+                return View("Error");
+            }
             var auditorList = (from a in db.flow_apply
                                join ad in db.flow_applyEntry on a.id equals ad.apply_id
                                join u in db.ei_users on ad.final_auditor equals u.card_number
@@ -2961,6 +2967,45 @@ namespace EmpInfo.Controllers
                                    stepName = ad.step_name,
                                    auditorName = u.name
                                }).ToList();
+            var result = new HHCheckApplyModel()
+            {
+                head = hs.First().h,
+                entrys = hs.Select(i => i.e).ToList(),
+                auditorList = auditorList
+            };
+
+            new HHSv(sysNo).UpdatePrintStatus();
+
+            ViewData["m"] = result;
+            return View();
+        }
+
+        //打印申请单给事业部留底
+        public ActionResult PrintHHForBus(string sysNo)
+        {
+            var hs = from h in db.ei_hhApply
+                     join e in db.ei_hhApplyEntry on h.id equals e.hh_id
+                     where h.sys_no == sysNo
+                     select new { h, e };
+            if (hs.Count() < 1) {
+                ViewBag.tip = "单据不存在，不能打印";
+                return View("Error");
+            }            
+            var auditorList = (from a in db.flow_apply
+                               join ad in db.flow_applyEntry on a.id equals ad.apply_id
+                               join u in db.ei_users on ad.final_auditor equals u.card_number
+                               where a.sys_no == sysNo && ad.final_auditor != null
+                               select new StepNameAndAuditor()
+                               {
+                                   stepName = ad.step_name,
+                                   auditorName = u.name
+                               }).ToList();
+
+            if (auditorList.Where(a => a.stepName.Contains("总经理")).Count() < 1) {
+                ViewBag.tip = "事业部总经理还未审批，不能打印";
+                return View("Error");
+            }
+
             var result = new HHCheckApplyModel()
             {
                 head = hs.First().h,
@@ -2995,7 +3040,7 @@ namespace EmpInfo.Controllers
                              h.company,
                              h.customer_name,
                              h.return_dep,
-                             e.order_no,
+                             //e.order_no,
                              e.moduel,
                              e.return_qty,
                              audit_result = a.success == true ? "已结案" : (a.success == false ? "已拒绝" : "审批中")
@@ -3015,9 +3060,9 @@ namespace EmpInfo.Controllers
             if (!string.IsNullOrWhiteSpace(m.customerName)) {
                 result = result.Where(r => r.customer_name.Contains(m.customerName));
             }
-            if (!string.IsNullOrWhiteSpace(m.orderNo)) {
-                result = result.Where(r => r.order_no.Contains(m.orderNo));
-            }
+            //if (!string.IsNullOrWhiteSpace(m.orderNo)) {
+            //    result = result.Where(r => r.order_no.Contains(m.orderNo));
+            //}
             if (!string.IsNullOrWhiteSpace(m.moduel)) {
                 result = result.Where(r => r.moduel.Contains(m.moduel));
             }

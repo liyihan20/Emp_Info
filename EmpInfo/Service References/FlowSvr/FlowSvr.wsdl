@@ -193,6 +193,7 @@
           <s:element minOccurs="0" maxOccurs="1" name="auditors" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="finalAuditors" type="s:string" />
           <s:element minOccurs="1" maxOccurs="1" name="isUserAobrt" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="opinion" type="s:string" />
         </s:sequence>
       </s:complexType>
       <s:element name="GetMyApplyCount">
@@ -393,7 +394,11 @@
         </s:complexType>
       </s:element>
       <s:element name="TestStarFlow">
-        <s:complexType />
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
       </s:element>
       <s:element name="TestStarFlowResponse">
         <s:complexType>
@@ -407,6 +412,7 @@
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
             <s:element minOccurs="1" maxOccurs="1" name="step" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="auditor" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -414,6 +420,23 @@
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="TestAuditResult" type="tns:FlowResultModel" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestReturnToStep">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="cardNumber" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="currentStepName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="returnToStepName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestReturnToStepResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TestReturnToStepResult" type="tns:FlowResultModel" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -456,11 +479,7 @@
         </s:complexType>
       </s:element>
       <s:element name="TestGetAuditQueue">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="salaryType" type="s:string" />
-          </s:sequence>
-        </s:complexType>
+        <s:complexType />
       </s:element>
       <s:element name="TestGetAuditQueueResponse">
         <s:complexType>
@@ -597,6 +616,12 @@
   <wsdl:message name="TestAuditSoapOut">
     <wsdl:part name="parameters" element="tns:TestAuditResponse" />
   </wsdl:message>
+  <wsdl:message name="TestReturnToStepSoapIn">
+    <wsdl:part name="parameters" element="tns:TestReturnToStep" />
+  </wsdl:message>
+  <wsdl:message name="TestReturnToStepSoapOut">
+    <wsdl:part name="parameters" element="tns:TestReturnToStepResponse" />
+  </wsdl:message>
   <wsdl:message name="TestFlowRecordSoapIn">
     <wsdl:part name="parameters" element="tns:TestFlowRecord" />
   </wsdl:message>
@@ -705,6 +730,10 @@
     <wsdl:operation name="TestAudit">
       <wsdl:input message="tns:TestAuditSoapIn" />
       <wsdl:output message="tns:TestAuditSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TestReturnToStep">
+      <wsdl:input message="tns:TestReturnToStepSoapIn" />
+      <wsdl:output message="tns:TestReturnToStepSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="TestFlowRecord">
       <wsdl:input message="tns:TestFlowRecordSoapIn" />
@@ -907,6 +936,15 @@
     </wsdl:operation>
     <wsdl:operation name="TestAudit">
       <soap:operation soapAction="http://ic.truly.com.cn/TestAudit" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestReturnToStep">
+      <soap:operation soapAction="http://ic.truly.com.cn/TestReturnToStep" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -1135,6 +1173,15 @@
     </wsdl:operation>
     <wsdl:operation name="TestAudit">
       <soap12:operation soapAction="http://ic.truly.com.cn/TestAudit" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestReturnToStep">
+      <soap12:operation soapAction="http://ic.truly.com.cn/TestReturnToStep" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

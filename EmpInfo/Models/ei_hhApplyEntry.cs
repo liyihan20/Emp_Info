@@ -24,6 +24,9 @@ namespace EmpInfo.Models
         public Nullable<int> fill_qty { get; set; }
         public Nullable<int> send_qty { get; set; }
         public string sender_name { get; set; }
+        public string c_moduel { get; set; }
+        public Nullable<int> real_fill_qty { get; set; }
+        public Nullable<int> other_qty { get; set; }
     
         public virtual ei_hhApply ei_hhApply { get; set; }
     }

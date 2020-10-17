@@ -45,6 +45,10 @@
                 });
             });            
 
+            $("#qty").on("change",function(){
+                updateItemUI();
+            });
+
             $("#selectBtn").on("click",function(){
                 if(hasFetchItems){
                     openMessageDialog("","",true);
@@ -170,6 +174,7 @@
                 $("#itemList").append("<li><i class='fa-li fa fa-circle'></i> "+selectedItems[i].n + " : " +selectedItems[i].v + "</li>");
                 sumFee += parseInt(selectedItems[i].v);
             }
+            sumFee=sumFee*parseInt($("#qty").val());
             $("#itemList").append("<li><i class='fa-li fa fa-cny'></i> 预计产生IT费用" + " : " + sumFee + "</li>");
         }
 
@@ -260,7 +265,7 @@
                             数量:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="qty" placeholder="需要申请或修理的设备数量" value="1" />
+                            <input type="text" class="form-control" name="qty" id="qty" placeholder="需要申请或修理的设备数量" value="1" />
                         </span>
                     </div>
                 </div>

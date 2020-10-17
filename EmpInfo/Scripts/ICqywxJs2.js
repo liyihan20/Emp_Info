@@ -3,6 +3,8 @@
     var debug = false;
     $.ajax({
         type: "post",
+        dataType: 'json',
+        crossDomain: true,
         url: "http://emp.truly.com.cn/Emp/QYWX/GetConfigParam",
         data: "url=" + encodeURIComponent(window.location.href.split("#")[0]),
         cache: false,

@@ -34,31 +34,47 @@
 @section Scripts {
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myDownloaderPro.js")"></script>
 
     <script>
-    $("#tb").bootstrapTable({
-        striped: true,
-        pagination: false,
-        data:@Html.Raw(entryJson),
+        $("#tb").bootstrapTable({
+            striped: true,
+            pagination: false,
+            data:@Html.Raw(entryJson),
             columns: [
+                //{
+                //    field: "order_no",
+                //    title: "订单号",
+                //    footerFormatter:function(){
+                //        return "汇总:";
+                //    }
+                //},
                 {
-                    field: "order_no",
-                    title: "订单号"
-                }, {
                     field: "moduel",
                     title: "规格型号"
+                }, {
+                    field: "c_moduel",
+                    title: "子型号"
                 }, {
                     field: "return_qty",
                     title: "退货数量"
                 }, {
-                    field: "real_return_qty",
-                    title: "实退数量"
+                    field: "fill_qty",
+                    title: "补货数量"
                 }, {
+                    field: "other_qty",
+                    title: "其它数量"
+                },
+                //{
+                //    field: "real_return_qty",
+                //    title: "实退数量"
+                //},
+                {
                     field: "is_on_line",
                     title: "是否已上线"
                 }, {
-                    field: "fill_qty",
-                    title: "补货数量"
+                    field: "real_fill_qty",
+                    title: "实补数量"
                 }, {
                     field: "send_qty",
                     title: "实发数量"
@@ -73,7 +89,7 @@
             striped: true,
             pagination: false,
             data:@Html.Raw(returnJson),
-            columns: [                
+            columns: [
                 {
                     field: "moduel",
                     title: "规格型号"
@@ -92,7 +108,10 @@
                 }
             ]
         });
-
+        function qtySum(data){
+            var field = this.field;
+            return data.map(function(d){return d[field]}).reduce(function(sum,i){return sum+i},0);
+        }
     </script>
     <script>
         $(function () {
@@ -101,8 +120,21 @@
                 $(box).load("CheckFlowRecord .list-group", { sysNo: "@h.sys_no" }, function () {
                     openMessageDialog($(box).html(), "查看流转记录");
                 });
-
             });
+
+            if ($("#attList")) {
+                $("#attList").myDownloader({sysNum:"@h.sys_no"});
+            }
+
+
+            $("#printBt").on("click",function(){
+                window.open("../Report/PrintHH?sysNo=@h.sys_no");
+            });
+
+            $("#printForBusBt").on("click",function(){
+                window.open("../Report/PrintHHForBus?sysNo=@h.sys_no");
+            });
+
         });
     </script>
 }
@@ -118,17 +150,39 @@
         </ol>
     </div>
     <div class="panel-body">
-        <div>
-            <div class="b-div">
-                <span class="b-label">
-                    流转记录:
-                </span>
-                <span class="b-input">
-                    <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
-                </span>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        流转记录:
+                    </span>
+                    <span class="b-input">
+                        <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请单:
+                    </span>
+                    <span class="b-input">
+                        <button type="button" class="btn btn-default btn-sm" id="printForBusBt"><i class="fa fa-print"></i> 打印</button>
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        放行条:
+                    </span>
+                    <span class="b-input">
+                        <button type="button" class="btn btn-default btn-sm" id="printBt"><i class="fa fa-print"></i> 打印</button>
+                    </span>
+                </div>
             </div>
         </div>
-        <div class="row">            
+        <div class="row">
             <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="b-div">
                     <span class="b-label">
@@ -179,16 +233,16 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 col-sm-6 col-xs-12">
-                <div class="b-div">
-                    <span class="b-label">
-                        市场部:
-                    </span>
-                    <div class="b-input">
-                        @h.agency_name
+            @*<div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            市场部:
+                        </span>
+                        <div class="b-input">
+                            @h.agency_name
+                        </div>
                     </div>
-                </div>
-            </div>
+                </div>*@
             <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="b-div">
                     <span class="b-label">
@@ -249,6 +303,16 @@
                     </span>
                 </div>
             </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        营业员:
+                    </span>
+                    <span class="b-input">
+                        @string.Format("{0}({1})", h.notify_clerk_name, h.notify_clerk_no)
+                    </span>
+                </div>
+            </div>
         </div>
         <div class="b-div">
             <span class="b-label">
@@ -266,7 +330,12 @@
                 @h.return_reason
             </span>
         </div>
-
+        @if (h.has_attachment) {
+            <div>
+                <div style="margin-bottom:6px;" class="b-label">复检报告：</div>
+                <div id="attList"></div>
+            </div>
+        }
 
         <div class="b-div" style="margin-top:16px;">
             <span class="b-label">
@@ -285,7 +354,7 @@
                 <div class="b-input">
                 </div>
             </div>
-            <table data-toggle="table" id="tb2"></table>        
+            <table data-toggle="table" id="tb2"></table>
         }
 
 

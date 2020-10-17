@@ -30,6 +30,7 @@ namespace EmpInfo.Models
 
     public class DormRepairBeginApplyModel
     {
+        public string sysNo { get; set; }
         public string areaName { get; set; }
         public string dormNumber { get; set; }
         public string roomMaleList { get; set; }

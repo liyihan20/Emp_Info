@@ -824,6 +824,9 @@
           <Property Name="out_guard" Type="nvarchar" MaxLength="50" />
           <Property Name="out_status" Type="nvarchar" MaxLength="50" />
           <Property Name="print_time" Type="varchar" MaxLength="4000" />
+          <Property Name="notify_clerk_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="notify_clerk_no" Type="nvarchar" MaxLength="50" />
+          <Property Name="charge_customers" Type="nvarchar" MaxLength="200" />
         </EntityType>
         <EntityType Name="ei_hhApplyEntry">
           <Key>
@@ -839,6 +842,9 @@
           <Property Name="fill_qty" Type="int" />
           <Property Name="send_qty" Type="int" />
           <Property Name="sender_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="c_moduel" Type="varchar" MaxLength="200" />
+          <Property Name="real_fill_qty" Type="int" />
+          <Property Name="other_qty" Type="int" />
         </EntityType>
         <EntityType Name="ei_hhReturnDetail">
           <Key>
@@ -1329,6 +1335,7 @@
           <Property Name="comment" Type="nvarchar" MaxLength="500" />
           <Property Name="apply_time" Type="datetime" />
           <Property Name="dep_name" Type="nvarchar" MaxLength="500" />
+          <Property Name="is_fetch_by_self" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="ei_TIApplyEntry">
           <Key>
@@ -1574,30 +1581,6 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="FJsApiTicket" Type="varchar" MaxLength="500" Nullable="false" />
           <Property Name="FExpireDate" Type="datetime" Nullable="false" />
-        </EntityType>
-        <EntityType Name="wx_pushMsg">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="FPushType" Type="varchar" MaxLength="100" />
-          <Property Name="FOpenId" Type="varchar" MaxLength="200" />
-          <Property Name="FCardNumber" Type="nvarchar" MaxLength="50" />
-          <Property Name="FInTime" Type="datetime" />
-          <Property Name="FHasSend" Type="bit" />
-          <Property Name="FPushTime" Type="datetime" />
-          <Property Name="FPushResult" Type="varchar" MaxLength="500" />
-          <Property Name="FFirst" Type="nvarchar" MaxLength="200" />
-          <Property Name="FkeyWord1" Type="nvarchar" MaxLength="200" />
-          <Property Name="FKeyWord2" Type="nvarchar" MaxLength="200" />
-          <Property Name="FKeyWord3" Type="nvarchar" MaxLength="200" />
-          <Property Name="FKeyWord4" Type="nvarchar" MaxLength="200" />
-          <Property Name="FKeyWord5" Type="nvarchar" MaxLength="200" />
-          <Property Name="FKeyWord6" Type="nvarchar" MaxLength="200" />
-          <Property Name="FKeyWord7" Type="nvarchar" MaxLength="200" />
-          <Property Name="FKeyWord8" Type="nvarchar" MaxLength="200" />
-          <Property Name="FRemark" Type="nvarchar" MaxLength="200" />
-          <Property Name="FUrl" Type="varchar" MaxLength="500" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_APExcel”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -2916,7 +2899,6 @@
           <EntitySet Name="qywx_secondeValify" EntityType="Self.qywx_secondeValify" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="wx_accessToken" EntityType="Self.wx_accessToken" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="wx_jsApiTicket" EntityType="Self.wx_jsApiTicket" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="wx_pushMsg" EntityType="Self.wx_pushMsg" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="vw_APExcel" EntityType="Self.vw_APExcel" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
 [vw_APExcel].[ap_id] AS [ap_id], 
@@ -3794,7 +3776,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <End Role="ei_departmentAuditNode" EntitySet="ei_departmentAuditNode" />
             <End Role="ei_departmentAuditUser" EntitySet="ei_departmentAuditUser" />
           </AssociationSet>
-          <EntitySet Name="wx_pushMsg" EntityType="ICAuditModel.wx_pushMsg" />
           <EntitySet Name="ei_leaveDayExceedPushLog" EntityType="ICAuditModel.ei_leaveDayExceedPushLog" />
           <EntitySet Name="vw_leaving_days" EntityType="ICAuditModel.vw_leaving_days" />
           <FunctionImport Name="GetSalaryBankCard" ReturnType="Collection(String)">
@@ -4813,30 +4794,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="wx_pushMsg">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="FPushType" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="FOpenId" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="FCardNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="FInTime" Type="DateTime" Precision="3" />
-          <Property Name="FHasSend" Type="Boolean" />
-          <Property Name="FPushTime" Type="DateTime" Precision="3" />
-          <Property Name="FPushResult" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="FFirst" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="FkeyWord1" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="FKeyWord2" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="FKeyWord3" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="FKeyWord4" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="FKeyWord5" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="FKeyWord6" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="FKeyWord7" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="FKeyWord8" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="FRemark" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="FUrl" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-        </EntityType>
         <EntityType Name="ei_leaveDayExceedPushLog">
           <Key>
             <PropertyRef Name="id" />
@@ -6117,6 +6074,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="apply_time" Type="DateTime" Precision="3" />
           <NavigationProperty Name="ei_TIApplyEntry" Relationship="ICAuditModel.FK_ei_TIApplyEntry_ei_TIApply" FromRole="ei_TIApply" ToRole="ei_TIApplyEntry" />
           <Property Name="dep_name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="is_fetch_by_self" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="ei_TIApplyEntry">
           <Key>
@@ -6918,6 +6876,9 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="out_guard" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="out_status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="print_time" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="notify_clerk_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="notify_clerk_no" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="charge_customers" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ei_hhReturnDetail">
           <Key>
@@ -6962,6 +6923,9 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="send_qty" Type="Int32" />
           <Property Name="sender_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="ei_hhApply" Relationship="ICAuditModel.FK_Table_1_ei_hhApply" FromRole="ei_hhApplyEntry" ToRole="ei_hhApply" />
+          <Property Name="c_moduel" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="real_fill_qty" Type="Int32" />
+          <Property Name="other_qty" Type="Int32" />
         </EntityType>
         <Association Name="FK_Table_1_ei_hhApply">
           <End Type="ICAuditModel.ei_hhApply" Role="ei_hhApply" Multiplicity="1" />
@@ -7604,31 +7568,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="FAuditNodeName" ColumnName="FAuditNodeName" />
                 <ScalarProperty Name="FIsCounterSign" ColumnName="FIsCounterSign" />
                 <ScalarProperty Name="FDepartmentId" ColumnName="FDepartmentId" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="wx_pushMsg">
-            <EntityTypeMapping TypeName="ICAuditModel.wx_pushMsg">
-              <MappingFragment StoreEntitySet="wx_pushMsg">
-                <ScalarProperty Name="FUrl" ColumnName="FUrl" />
-                <ScalarProperty Name="FRemark" ColumnName="FRemark" />
-                <ScalarProperty Name="FKeyWord8" ColumnName="FKeyWord8" />
-                <ScalarProperty Name="FKeyWord7" ColumnName="FKeyWord7" />
-                <ScalarProperty Name="FKeyWord6" ColumnName="FKeyWord6" />
-                <ScalarProperty Name="FKeyWord5" ColumnName="FKeyWord5" />
-                <ScalarProperty Name="FKeyWord4" ColumnName="FKeyWord4" />
-                <ScalarProperty Name="FKeyWord3" ColumnName="FKeyWord3" />
-                <ScalarProperty Name="FKeyWord2" ColumnName="FKeyWord2" />
-                <ScalarProperty Name="FkeyWord1" ColumnName="FkeyWord1" />
-                <ScalarProperty Name="FFirst" ColumnName="FFirst" />
-                <ScalarProperty Name="FPushResult" ColumnName="FPushResult" />
-                <ScalarProperty Name="FPushTime" ColumnName="FPushTime" />
-                <ScalarProperty Name="FHasSend" ColumnName="FHasSend" />
-                <ScalarProperty Name="FInTime" ColumnName="FInTime" />
-                <ScalarProperty Name="FCardNumber" ColumnName="FCardNumber" />
-                <ScalarProperty Name="FOpenId" ColumnName="FOpenId" />
-                <ScalarProperty Name="FPushType" ColumnName="FPushType" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -8897,6 +8836,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_TIApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_TIApply">
               <MappingFragment StoreEntitySet="ei_TIApply">
+                <ScalarProperty Name="is_fetch_by_self" ColumnName="is_fetch_by_self" />
                 <ScalarProperty Name="dep_name" ColumnName="dep_name" />
                 <ScalarProperty Name="apply_time" ColumnName="apply_time" />
                 <ScalarProperty Name="comment" ColumnName="comment" />
@@ -9665,6 +9605,9 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_hhApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_hhApply">
               <MappingFragment StoreEntitySet="ei_hhApply">
+                <ScalarProperty Name="charge_customers" ColumnName="charge_customers" />
+                <ScalarProperty Name="notify_clerk_no" ColumnName="notify_clerk_no" />
+                <ScalarProperty Name="notify_clerk_name" ColumnName="notify_clerk_name" />
                 <ScalarProperty Name="print_time" ColumnName="print_time" />
                 <ScalarProperty Name="out_status" ColumnName="out_status" />
                 <ScalarProperty Name="out_guard" ColumnName="out_guard" />
@@ -9708,6 +9651,9 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_hhApplyEntry">
             <EntityTypeMapping TypeName="ICAuditModel.ei_hhApplyEntry">
               <MappingFragment StoreEntitySet="ei_hhApplyEntry">
+                <ScalarProperty Name="other_qty" ColumnName="other_qty" />
+                <ScalarProperty Name="real_fill_qty" ColumnName="real_fill_qty" />
+                <ScalarProperty Name="c_moduel" ColumnName="c_moduel" />
                 <ScalarProperty Name="sender_name" ColumnName="sender_name" />
                 <ScalarProperty Name="send_qty" ColumnName="send_qty" />
                 <ScalarProperty Name="fill_qty" ColumnName="fill_qty" />

@@ -29,7 +29,6 @@
                 $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.sys_no" }, function () {
                     openMessageDialog($(box).html(), "查看流转记录");
                 });
-
             });
         });
     </script>
@@ -282,7 +281,7 @@
                 @if (!string.IsNullOrEmpty(m.group_leader_choise)) {
                     <div class="b-div">
                         <span class="b-label" style="vertical-align:top;width:150px;">
-                            组长是否已谈:
+                            组长是否已面谈:
                         </span>
                         <span style="display:inline-block;width:70%">
                             @(m.group_leader_talked?"是":"否")
@@ -300,7 +299,7 @@
                  @if (!string.IsNullOrEmpty(m.charger_choise)) {
                     <div class="b-div">
                         <span class="b-label" style="vertical-align:top;width:150px;">
-                            主管是否已谈:
+                            主管是否已面谈:
                         </span>
                         <span style="display:inline-block;width:70%">
                             @(m.charger_talked?"是":"否")

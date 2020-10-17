@@ -296,29 +296,34 @@ namespace EmpInfo.Services
             }
         }
 
-        public override IComparer<FlowAuditListModel> GetAuditListComparer()
+        public override List<FlowAuditListModel> OrderAuditList(List<FlowAuditListModel> list)
         {
-            return new BillComparer();
+            return list.OrderByDescending(l => l.title).ThenBy(l => l.applyTime).ToList();
         }
 
-        private class BillComparer : IComparer<FlowAuditListModel>
-        {
-            public int Compare(FlowAuditListModel x, FlowAuditListModel y)
-            {
-                if (x == null && y == null) return 0;
-                if (x == null) return -1;
-                if (y == null) return 1;
-                //这里的title字段要保存优先级别，1~5，数字大的优先级大，排在前面
-                if(!x.title.Equals(y.title)){
-                    return -string.Compare(x.title,y.title);
-                }
-                else {
-                    if (x.applyTime == null) return 1;
-                    if (y.applyTime == null) return -1;
-                    return x.applyTime > y.applyTime ? 1 : -1;
-                }
-            }
-        }
+        //public override IComparer<FlowAuditListModel> GetAuditListComparer()
+        //{
+        //    return new BillComparer();
+        //}
+
+        //private class BillComparer : IComparer<FlowAuditListModel>
+        //{
+        //    public int Compare(FlowAuditListModel x, FlowAuditListModel y)
+        //    {
+        //        if (x == null && y == null) return 0;
+        //        if (x == null) return -1;
+        //        if (y == null) return 1;
+        //        //这里的title字段要保存优先级别，1~5，数字大的优先级大，排在前面
+        //        if(!x.title.Equals(y.title)){
+        //            return -string.Compare(x.title,y.title);
+        //        }
+        //        else {
+        //            if (x.applyTime == null) return 1;
+        //            if (y.applyTime == null) return -1;
+        //            return x.applyTime > y.applyTime ? 1 : -1;
+        //        }
+        //    }
+        //}
 
         #region IT维修项目管理
 
@@ -354,8 +359,9 @@ namespace EmpInfo.Services
             {
                 faultyItems = bill.faulty_items,
                 loginName = bill.login_name,
-                loginPassword = bill.login_password
-            };            
+                loginPassword = bill.login_password,
+                qty = (int)bill.qty
+            }; 
         }
 
         public void UpdatePrintTime()

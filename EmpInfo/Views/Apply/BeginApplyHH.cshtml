@@ -1,11 +1,12 @@
 ﻿@using EmpInfo.Models
 @{
     HHBeforeApplyModel m = ViewData["infoBeforeApply"] as HHBeforeApplyModel;
-    List<string> companyList = new List<string>() { "光电", "半导体" };
+    List<string> companyList = new List<string>() { "光电", "半导体", "仁寿" };
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
 
     <style type="text/css">
         .b-label {
@@ -30,6 +31,22 @@
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUploaderPro.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
+    <script>
+        $(function(){
+            $("#myUploader").myUploader({
+                sysNum: "@m.sys_no",
+                fileNumLimit: 10,
+                accept: {
+                    title: '*',
+                    extensions: '*',
+                    mimeTypes: '*'
+                }
+            });
+        });
+    </script>
 
     <script>
         $("#tb").bootstrapTable({
@@ -44,15 +61,29 @@
                 }, {
                     field: "idx",
                     visible: false
-                }, {
-                    field: "order_no",
-                    title: "订单号"
-                }, {
+                },
+                //{
+                //    field: "order_no",
+                //    title: "订单号"
+                //},
+                {
                     field: "moduel",
                     title: "规格型号"
                 }, {
+                    field: "c_moduel",
+                    title: "子型号"
+                }, {
                     field: "return_qty",
                     title: "退货数量"
+                }, {
+                    field: "fill_qty",
+                    title: "补货数量"
+                }, {
+                    field: "other_qty",
+                    title: "其它数量"
+                }, {
+                    field: "is_on_line",
+                    title: "是否已上线"
                 }
             ],
             onDblClickRow: function (row, $element, field) {
@@ -74,11 +105,14 @@
                 minView: 2,
                 initialDate: "@DateTime.Now.ToString("yyyy-MM-dd")"
             });
-
-            $(".selectUser").on("click", function () {
+            
+            $(".selectUser").on("focus", function () {
                 var self = this;
-                openSelectUserDialog($(self).val(), 1, function (result) {
-                    $(self).val(result);
+                $.selectUsers({
+                    userHasSelected: $(self).val(),
+                    callback: function (result) {
+                        $(self).val(result);
+                    }
                 });
             });
 
@@ -132,6 +166,17 @@
                     toastr.error("退货数量必须输入整数数字");
                     return;
                 }
+                if (!utils.testIsInt(obj.fill_qty)) {
+                    toastr.error("补货数量必须输入整数数字");
+                    return;
+                }
+                if (!obj.other_qty) {
+                    obj.other_qty = 0;
+                }
+                if (!utils.testIsInt(obj.other_qty)) {
+                    toastr.error("其它数量必须输入整数数字");
+                    return;
+                }
                 if (updateIndex < 0) {
                     //新增
                     obj.idx = addIndex++;
@@ -167,12 +212,17 @@
                     toastr.error("退货日期必须选择");
                     return;
                 }
+                if (parseInt($("#myUploader").getMyUploaderFilesNum()) < 1) {
+                    toastr.error("请上传复检报告复检再确认");
+                    return;
+                }
+                head.has_attachment = true;
                 var entrys = $("#tb").bootstrapTable('getData');
                 
                 if (entrys.length < 1) {
                     toastr.error("请至少填写一行换货明细再提交");
                     return;
-                }
+                }                
 
                 openConfirmDialog("确定要提交申请吗？", function () {
                     $("#apply_bt").button("loading");
@@ -241,7 +291,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
+                @*<div class="col-md-4 col-sm-6 col-xs-12">
                     <div class="b-div">
                         <span class="b-label">
                             市场部:
@@ -255,7 +305,7 @@
                             </select>
                         </div>
                     </div>
-                </div>
+                </div>*@
                 <div class="col-md-4 col-sm-6 col-xs-12">
                     <div class="b-div">
                         <span class="b-label">
@@ -326,7 +376,17 @@
                             品质经理:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control selectUser" name="quality_manager_no" placeholder="请选择品质经理（客服）审批人" required />
+                            <input type="text" class="form-control selectUser" name="quality_manager_no" placeholder="请选择品质经理审核人" required />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            营业员:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control selectUser" name="notify_clerk_no" placeholder="请选择抄送的营业员" required />
                         </span>
                     </div>
                 </div>
@@ -346,6 +406,14 @@
                 <span class="b-input">
                     <textarea type="text" class="form-control" rows="2" id="return_reason" name="return_reason" placeholder="在此填写换货原因" required></textarea>
                 </span>
+            </div>
+            <div class="b-div">
+                <div style="display:inline-block;">
+                    <div id="picker"> <i class="fa fa-upload"></i> 上传复检报告 </div>
+                </div>
+            </div>
+            <div id="myUploader">
+                @*这里生成上传文件插件*@
             </div>
         </form>
 
@@ -370,7 +438,7 @@
         <h4 class="text-danger"><i class="fa fa-info-circle"></i> 操作说明 </h4>
         <div style="margin-left:18px;padding-top:6px;" class="text-danger">
             <p>
-                1. 流程步骤：流程开始--->营业提交换货申请--->办事处负责人审批--->品质经理审批---> 生产主管审批--->部门总经理审批--->物流处理--->市场管理部结案--->流程结束。
+                1. 流程步骤：流程开始--->客服提交换货申请---[抄送给营业员]--->品质经理审批--->计划经理审批--->生产主管审批--->部门总经理审批--->物流处理--->市场管理部结案--->流程结束。
             </p>
             <p>
                 2. 此流程只适合纯换货，不走K3红字单的场景。
@@ -378,10 +446,9 @@
             <p>
                 3. 各级审核人需填写并处理的事项：
                 <div style="margin-left:24px">
-                    <div> [1]. 品质经理：填写每行实退数量与是否已上线，并上传复检报告文件 </div>
-                    <div> [2]. 生产主管：填写每行补货数量</div>
-                    <div> [3]. 物流部：填写每行实发数量和发货人；并维护每笔收到的退货详情，包括规格型号、退货数量、到货时间、接收人等</div>
-                    <div> [4]. 市场管理部：核对订单数据、退货数据和补货数据，确认无误后结案</div>
+                    <div> [1]. 生产主管：填写每行实补数量</div>
+                    <div> [2]. 物流部：填写每行实发数量和发货人；并维护每笔收到的退货详情，包括规格型号、退货数量、到货时间、接收人等</div>
+                    <div> [3]. 市场管理部：核对订单数据、退货数据和补货数据，确认无误后结案</div>
                 </div>
             </p>
         </div>
@@ -390,7 +457,6 @@
 
 @section Modal {
     @Html.Partial("_ConfirmDialog")
-    @Html.Partial("_SelectUsers")
     <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -400,21 +466,30 @@
                 </div>
                 <div class="modal-body">
                     <form id="itemFm">
-                        <div class="b-div">
+                        @*<div class="b-div">
                             <span class="b-label">
                                 订单号:
                             </span>
                             <span class="b-input">
                                 <input type="text" class="form-control" id="order_no" name="order_no" required />
                             </span>
-                        </div>
+                        </div>*@
                         <div class="b-div">
                             <span class="b-label">
                                 规格型号:
                             </span>
                             <span class="b-input">
-                                <input type="text" class="form-control" id="order_no" name="moduel" required />
+                                <input type="text" class="form-control" id="moduel" name="moduel" required />
                             </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                子型号:
+                            </span>
+                            <div class="b-input">
+                                <input type="text" class="form-control" id="c_moduel" name="c_moduel" />
+                                <div class="small text-danger"><i class="fa fa-info-circle"></i> 本属同一型号，但因供应商物料区别内部进行区分，没有可不填</div>
+                            </div>
                         </div>
                         <div class="b-div">
                             <span class="b-label">
@@ -424,6 +499,35 @@
                                 <input type="number" class="form-control" id="return_qty" name="return_qty" required />
                             </span>
                         </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                补货数量:
+                            </span>
+                            <span class="b-input">
+                                <input type="number" class="form-control" id="fill_qty" name="fill_qty" required />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                其它数量:
+                            </span>
+                            <div class="b-input">
+                                <input type="number" class="form-control" id="other_qty" name="other_qty" />
+                                <div class="small text-danger"><i class="fa fa-info-circle"></i> 客户试产，测试等使用的数量，没有可不填</div>
+                            </div>
+                        </div>
+                        <div class="b-div">
+                                <span class="b-label">
+                                    是否已上线:
+                                </span>
+                                <span class="b-input">
+                                    <select class="form-control" name="is_on_line" required>
+                                        <option value="">---- 选择是否已上线 ----</option>
+                                        <option value="已上线">已上线</option>
+                                        <option value="未上线">未上线</option>
+                                    </select>
+                                </span>
+                            </div>
                     </form>
                 </div>
                 <div class="modal-footer">

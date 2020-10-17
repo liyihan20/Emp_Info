@@ -207,6 +207,18 @@
       <s:element name="PushTextMsgResponse">
         <s:complexType />
       </s:element>
+      <s:element name="PushTextMsgImmediately">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="secret" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="opUserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="textMsg" type="tns:TextMsg" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PushTextMsgImmediatelyResponse">
+        <s:complexType />
+      </s:element>
       <s:element name="PushTextCardMsg">
         <s:complexType>
           <s:sequence>
@@ -289,7 +301,19 @@
         <s:sequence>
           <s:element minOccurs="0" maxOccurs="1" name="control" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="id" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="title" type="tns:ArrayOfTextLangValue" />
           <s:element minOccurs="0" maxOccurs="1" name="value" type="tns:ControValue" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfTextLangValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="TextLangValue" nillable="true" type="tns:TextLangValue" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="TextLangValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="text" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="lang" type="s:string" />
         </s:sequence>
       </s:complexType>
       <s:complexType name="ControValue">
@@ -325,6 +349,7 @@
       <s:complexType name="SelectorOption">
         <s:sequence>
           <s:element minOccurs="0" maxOccurs="1" name="key" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="value" type="tns:ArrayOfTextLangValue" />
         </s:sequence>
       </s:complexType>
       <s:complexType name="ArrayOfMembersValue">
@@ -366,12 +391,7 @@
       </s:complexType>
       <s:complexType name="ChildrenValue">
         <s:sequence>
-          <s:element minOccurs="0" maxOccurs="1" name="list" type="tns:ArrayOfControValue" />
-        </s:sequence>
-      </s:complexType>
-      <s:complexType name="ArrayOfControValue">
-        <s:sequence>
-          <s:element minOccurs="0" maxOccurs="unbounded" name="ControValue" nillable="true" type="tns:ControValue" />
+          <s:element minOccurs="0" maxOccurs="1" name="list" type="tns:ArrayOfWxApplyDataContent" />
         </s:sequence>
       </s:complexType>
       <s:complexType name="ArrayOfSummaryListModel">
@@ -402,6 +422,105 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="GetApprovalDetail">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="spNo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetApprovalDetailResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetApprovalDetailResult" type="tns:ArrayOfControlValue" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfControlValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="ControlValue" nillable="true" type="tns:ControlValue" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ControlValue">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="control" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="id" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="title" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="value" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="type" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetTagUsers">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="tagId" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTagUsersResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetTagUsersResult" type="tns:TagUsers" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="TagUsers">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="errcode" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="errmsg" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="tagname" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="userlist" type="tns:ArrayOfUser" />
+          <s:element minOccurs="0" maxOccurs="1" name="partylist" type="tns:ArrayOfInt" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfUser">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="User" nillable="true" type="tns:User" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="User">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="userid" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfInt">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="int" type="s:int" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetUserInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userId" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetUserInfoResult" type="tns:WxUserInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="WxUserInfo">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="errcode" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="errmsg" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="userid" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="mobile" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="department" type="tns:ArrayOfInt" />
+          <s:element minOccurs="0" maxOccurs="1" name="position" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="gender" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="telephone" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="alias" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="address" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="open_userid" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="main_department" type="s:int" />
+        </s:sequence>
+      </s:complexType>
       <s:element name="TestApply">
         <s:complexType />
       </s:element>
@@ -496,6 +615,12 @@
   <wsdl:message name="PushTextMsgSoapOut">
     <wsdl:part name="parameters" element="tns:PushTextMsgResponse" />
   </wsdl:message>
+  <wsdl:message name="PushTextMsgImmediatelySoapIn">
+    <wsdl:part name="parameters" element="tns:PushTextMsgImmediately" />
+  </wsdl:message>
+  <wsdl:message name="PushTextMsgImmediatelySoapOut">
+    <wsdl:part name="parameters" element="tns:PushTextMsgImmediatelyResponse" />
+  </wsdl:message>
   <wsdl:message name="PushTextCardMsgSoapIn">
     <wsdl:part name="parameters" element="tns:PushTextCardMsg" />
   </wsdl:message>
@@ -507,6 +632,24 @@
   </wsdl:message>
   <wsdl:message name="WxBeginApplySoapOut">
     <wsdl:part name="parameters" element="tns:WxBeginApplyResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetApprovalDetailSoapIn">
+    <wsdl:part name="parameters" element="tns:GetApprovalDetail" />
+  </wsdl:message>
+  <wsdl:message name="GetApprovalDetailSoapOut">
+    <wsdl:part name="parameters" element="tns:GetApprovalDetailResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetTagUsersSoapIn">
+    <wsdl:part name="parameters" element="tns:GetTagUsers" />
+  </wsdl:message>
+  <wsdl:message name="GetTagUsersSoapOut">
+    <wsdl:part name="parameters" element="tns:GetTagUsersResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetUserInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetUserInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserInfoResponse" />
   </wsdl:message>
   <wsdl:message name="TestApplySoapIn">
     <wsdl:part name="parameters" element="tns:TestApply" />
@@ -570,6 +713,10 @@
       <wsdl:input message="tns:PushTextMsgSoapIn" />
       <wsdl:output message="tns:PushTextMsgSoapOut" />
     </wsdl:operation>
+    <wsdl:operation name="PushTextMsgImmediately">
+      <wsdl:input message="tns:PushTextMsgImmediatelySoapIn" />
+      <wsdl:output message="tns:PushTextMsgImmediatelySoapOut" />
+    </wsdl:operation>
     <wsdl:operation name="PushTextCardMsg">
       <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">发送文本卡片消息</wsdl:documentation>
       <wsdl:input message="tns:PushTextCardMsgSoapIn" />
@@ -579,6 +726,21 @@
       <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">提交审批申请</wsdl:documentation>
       <wsdl:input message="tns:WxBeginApplySoapIn" />
       <wsdl:output message="tns:WxBeginApplySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetApprovalDetail">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">获取审批详情</wsdl:documentation>
+      <wsdl:input message="tns:GetApprovalDetailSoapIn" />
+      <wsdl:output message="tns:GetApprovalDetailSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTagUsers">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">获取标签成员</wsdl:documentation>
+      <wsdl:input message="tns:GetTagUsersSoapIn" />
+      <wsdl:output message="tns:GetTagUsersSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserInfo">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">获取用户信息</wsdl:documentation>
+      <wsdl:input message="tns:GetUserInfoSoapIn" />
+      <wsdl:output message="tns:GetUserInfoSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="TestApply">
       <wsdl:input message="tns:TestApplySoapIn" />
@@ -699,6 +861,15 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="PushTextMsgImmediately">
+      <soap:operation soapAction="http://ic.truly.com.cn/PushTextMsgImmediately" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="PushTextCardMsg">
       <soap:operation soapAction="http://ic.truly.com.cn/PushTextCardMsg" style="document" />
       <wsdl:input>
@@ -710,6 +881,33 @@
     </wsdl:operation>
     <wsdl:operation name="WxBeginApply">
       <soap:operation soapAction="http://ic.truly.com.cn/WxBeginApply" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetApprovalDetail">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetApprovalDetail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTagUsers">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetTagUsers" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserInfo">
+      <soap:operation soapAction="http://ic.truly.com.cn/GetUserInfo" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -846,6 +1044,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="PushTextMsgImmediately">
+      <soap12:operation soapAction="http://ic.truly.com.cn/PushTextMsgImmediately" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="PushTextCardMsg">
       <soap12:operation soapAction="http://ic.truly.com.cn/PushTextCardMsg" style="document" />
       <wsdl:input>
@@ -857,6 +1064,33 @@
     </wsdl:operation>
     <wsdl:operation name="WxBeginApply">
       <soap12:operation soapAction="http://ic.truly.com.cn/WxBeginApply" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetApprovalDetail">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetApprovalDetail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTagUsers">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetTagUsers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserInfo">
+      <soap12:operation soapAction="http://ic.truly.com.cn/GetUserInfo" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

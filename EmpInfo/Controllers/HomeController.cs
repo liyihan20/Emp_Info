@@ -621,13 +621,13 @@ namespace EmpInfo.Controllers
                         select a.en_name).Distinct().ToArray();
             string autStr = string.Join(",", auts);
             ViewData["autStr"] = autStr;
-            ViewData["aesOpenId"] = userInfoDetail.AesOpenId;
             return View();
         }
 
         [SessionTimeOutFilter]
         public ActionResult WorkGroupIndex()
         {
+            ViewData["testVisible"] = HasGotPower("ModuelTest");
             return View();
         }
 

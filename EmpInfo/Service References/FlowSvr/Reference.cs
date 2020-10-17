@@ -426,6 +426,9 @@ namespace EmpInfo.FlowSvr {
         
         private bool isUserAobrtField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string opinionField;
+        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -601,6 +604,19 @@ namespace EmpInfo.FlowSvr {
                 if ((this.isUserAobrtField.Equals(value) != true)) {
                     this.isUserAobrtField = value;
                     this.RaisePropertyChanged("isUserAobrt");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=13)]
+        public string opinion {
+            get {
+                return this.opinionField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.opinionField, value) != true)) {
+                    this.opinionField = value;
+                    this.RaisePropertyChanged("opinion");
                 }
             }
         }
@@ -878,13 +894,17 @@ namespace EmpInfo.FlowSvr {
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/AbortAfterFinish", ReplyAction="*")]
         EmpInfo.FlowSvr.AbortAfterFinishResponse AbortAfterFinish(EmpInfo.FlowSvr.AbortAfterFinishRequest request);
         
-        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 TestStarFlowResult 以后生成的消息协定未标记为 nillable
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestStarFlow", ReplyAction="*")]
         EmpInfo.FlowSvr.TestStarFlowResponse TestStarFlow(EmpInfo.FlowSvr.TestStarFlowRequest request);
         
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestAudit", ReplyAction="*")]
         EmpInfo.FlowSvr.TestAuditResponse TestAudit(EmpInfo.FlowSvr.TestAuditRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 cardNumber 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestReturnToStep", ReplyAction="*")]
+        EmpInfo.FlowSvr.TestReturnToStepResponse TestReturnToStep(EmpInfo.FlowSvr.TestReturnToStepRequest request);
         
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestFlowRecord", ReplyAction="*")]
@@ -898,7 +918,7 @@ namespace EmpInfo.FlowSvr {
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestMyFlowList", ReplyAction="*")]
         EmpInfo.FlowSvr.TestMyFlowListResponse TestMyFlowList(EmpInfo.FlowSvr.TestMyFlowListRequest request);
         
-        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 salaryType 以后生成的消息协定未标记为 nillable
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 TestGetAuditQueueResult 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestGetAuditQueue", ReplyAction="*")]
         EmpInfo.FlowSvr.TestGetAuditQueueResponse TestGetAuditQueue(EmpInfo.FlowSvr.TestGetAuditQueueRequest request);
     }
@@ -2372,10 +2392,17 @@ namespace EmpInfo.FlowSvr {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute()]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
     public partial class TestStarFlowRequestBody {
         
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string sysNo;
+        
         public TestStarFlowRequestBody() {
+        }
+        
+        public TestStarFlowRequestBody(string sysNo) {
+            this.sysNo = sysNo;
         }
     }
     
@@ -2442,12 +2469,16 @@ namespace EmpInfo.FlowSvr {
         [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
         public int step;
         
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public string auditor;
+        
         public TestAuditRequestBody() {
         }
         
-        public TestAuditRequestBody(string sysNo, int step) {
+        public TestAuditRequestBody(string sysNo, int step, string auditor) {
             this.sysNo = sysNo;
             this.step = step;
+            this.auditor = auditor;
         }
     }
     
@@ -2482,6 +2513,86 @@ namespace EmpInfo.FlowSvr {
         
         public TestAuditResponseBody(EmpInfo.FlowSvr.FlowResultModel TestAuditResult) {
             this.TestAuditResult = TestAuditResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class TestReturnToStepRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="TestReturnToStep", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.TestReturnToStepRequestBody Body;
+        
+        public TestReturnToStepRequest() {
+        }
+        
+        public TestReturnToStepRequest(EmpInfo.FlowSvr.TestReturnToStepRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class TestReturnToStepRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string cardNumber;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string sysNo;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public string currentStepName;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string returnToStepName;
+        
+        public TestReturnToStepRequestBody() {
+        }
+        
+        public TestReturnToStepRequestBody(string cardNumber, string sysNo, string currentStepName, string returnToStepName) {
+            this.cardNumber = cardNumber;
+            this.sysNo = sysNo;
+            this.currentStepName = currentStepName;
+            this.returnToStepName = returnToStepName;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class TestReturnToStepResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="TestReturnToStepResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.TestReturnToStepResponseBody Body;
+        
+        public TestReturnToStepResponse() {
+        }
+        
+        public TestReturnToStepResponse(EmpInfo.FlowSvr.TestReturnToStepResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class TestReturnToStepResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public EmpInfo.FlowSvr.FlowResultModel TestReturnToStepResult;
+        
+        public TestReturnToStepResponseBody() {
+        }
+        
+        public TestReturnToStepResponseBody(EmpInfo.FlowSvr.FlowResultModel TestReturnToStepResult) {
+            this.TestReturnToStepResult = TestReturnToStepResult;
         }
     }
     
@@ -2702,17 +2813,10 @@ namespace EmpInfo.FlowSvr {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    [System.Runtime.Serialization.DataContractAttribute()]
     public partial class TestGetAuditQueueRequestBody {
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public string salaryType;
-        
         public TestGetAuditQueueRequestBody() {
-        }
-        
-        public TestGetAuditQueueRequestBody(string salaryType) {
-            this.salaryType = salaryType;
         }
     }
     
@@ -3069,9 +3173,10 @@ namespace EmpInfo.FlowSvr {
             return base.Channel.TestStarFlow(request);
         }
         
-        public EmpInfo.FlowSvr.FlowResultModel TestStarFlow() {
+        public EmpInfo.FlowSvr.FlowResultModel TestStarFlow(string sysNo) {
             EmpInfo.FlowSvr.TestStarFlowRequest inValue = new EmpInfo.FlowSvr.TestStarFlowRequest();
             inValue.Body = new EmpInfo.FlowSvr.TestStarFlowRequestBody();
+            inValue.Body.sysNo = sysNo;
             EmpInfo.FlowSvr.TestStarFlowResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).TestStarFlow(inValue);
             return retVal.Body.TestStarFlowResult;
         }
@@ -3081,13 +3186,30 @@ namespace EmpInfo.FlowSvr {
             return base.Channel.TestAudit(request);
         }
         
-        public EmpInfo.FlowSvr.FlowResultModel TestAudit(string sysNo, int step) {
+        public EmpInfo.FlowSvr.FlowResultModel TestAudit(string sysNo, int step, string auditor) {
             EmpInfo.FlowSvr.TestAuditRequest inValue = new EmpInfo.FlowSvr.TestAuditRequest();
             inValue.Body = new EmpInfo.FlowSvr.TestAuditRequestBody();
             inValue.Body.sysNo = sysNo;
             inValue.Body.step = step;
+            inValue.Body.auditor = auditor;
             EmpInfo.FlowSvr.TestAuditResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).TestAudit(inValue);
             return retVal.Body.TestAuditResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.FlowSvr.TestReturnToStepResponse EmpInfo.FlowSvr.FlowSvrSoap.TestReturnToStep(EmpInfo.FlowSvr.TestReturnToStepRequest request) {
+            return base.Channel.TestReturnToStep(request);
+        }
+        
+        public EmpInfo.FlowSvr.FlowResultModel TestReturnToStep(string cardNumber, string sysNo, string currentStepName, string returnToStepName) {
+            EmpInfo.FlowSvr.TestReturnToStepRequest inValue = new EmpInfo.FlowSvr.TestReturnToStepRequest();
+            inValue.Body = new EmpInfo.FlowSvr.TestReturnToStepRequestBody();
+            inValue.Body.cardNumber = cardNumber;
+            inValue.Body.sysNo = sysNo;
+            inValue.Body.currentStepName = currentStepName;
+            inValue.Body.returnToStepName = returnToStepName;
+            EmpInfo.FlowSvr.TestReturnToStepResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).TestReturnToStep(inValue);
+            return retVal.Body.TestReturnToStepResult;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -3133,10 +3255,9 @@ namespace EmpInfo.FlowSvr {
             return base.Channel.TestGetAuditQueue(request);
         }
         
-        public EmpInfo.FlowSvr.FlowResultModel TestGetAuditQueue(string salaryType) {
+        public EmpInfo.FlowSvr.FlowResultModel TestGetAuditQueue() {
             EmpInfo.FlowSvr.TestGetAuditQueueRequest inValue = new EmpInfo.FlowSvr.TestGetAuditQueueRequest();
             inValue.Body = new EmpInfo.FlowSvr.TestGetAuditQueueRequestBody();
-            inValue.Body.salaryType = salaryType;
             EmpInfo.FlowSvr.TestGetAuditQueueResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).TestGetAuditQueue(inValue);
             return retVal.Body.TestGetAuditQueueResult;
         }

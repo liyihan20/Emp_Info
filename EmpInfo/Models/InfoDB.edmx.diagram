@@ -55,7 +55,6 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_departmentAuditNode" Width="1.5" PointX="8.125" PointY="4.5" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_departmentAuditNode_ei_department" />
         <AssociationConnector Association="ICAuditModel.FK_ei_departmentAuditUser_ei_departmentAuditNode" />
-        <EntityTypeShape EntityType="ICAuditModel.wx_pushMsg" Width="1.5" PointX="10.75" PointY="0.5" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_leaveDayExceedPushLog" Width="1.5" PointX="2.25" PointY="8.75" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.vw_leaving_days" Width="1.5" PointX="12.625" PointY="2" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_stockAdminApply" Width="1.5" PointX="2.375" PointY="9.625" IsExpanded="false" />

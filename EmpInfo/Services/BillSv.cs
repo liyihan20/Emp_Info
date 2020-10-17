@@ -231,31 +231,35 @@ namespace EmpInfo.Services
             return new FlowSvrSoapClient().GetApplyResult(sysNo);
         }
 
+        public virtual List<FlowAuditListModel> OrderAuditList(List<FlowAuditListModel> list){
+            return list.OrderBy(l => l.applyTime).ToList();
+        }
+
         /// <summary>
         /// 获取审核列表比较器
         /// </summary>
         /// <returns></returns>
-        public virtual IComparer<FlowAuditListModel> GetAuditListComparer()
-        {
-            return new BillComparer();
-        }
+        //public virtual IComparer<FlowAuditListModel> GetAuditListComparer()
+        //{
+        //    return new BillComparer();
+        //}
 
         /// <summary>
         /// 自定义审核列表比较器
         /// </summary>
-        private class BillComparer : IComparer<FlowAuditListModel>
-        {
+        //private class BillComparer : IComparer<FlowAuditListModel>
+        //{
 
-            public int Compare(FlowAuditListModel x, FlowAuditListModel y)
-            {
-                if (x == null && y == null) return 0;
-                if (x == null) return -1;
-                if (y == null) return 1;
-                if (x.applyTime == null) return -1;
-                if (y.applyTime == null) return -1;
-                return x.applyTime > y.applyTime ? 1 : -1;
-            }
-        }
+        //    public int Compare(FlowAuditListModel x, FlowAuditListModel y)
+        //    {
+        //        if (x == null && y == null) return 0;
+        //        if (x == null) return -1;
+        //        if (y == null) return 1;
+        //        if (x.applyTime == null) return -1;
+        //        if (y.applyTime == null) return -1;
+        //        return x.applyTime > y.applyTime ? 1 : -1;
+        //    }
+        //}
 
         /// <summary>
         /// 能否访问这个功能
@@ -430,6 +434,35 @@ namespace EmpInfo.Services
         }
 
         /// <summary>
+        /// 抄送给某人，流程未结束时
+        /// </summary>
+        /// <param name="processName"></param>
+        /// <param name="sysNo"></param>
+        /// <param name="applierName"></param>
+        /// <param name="applierTime"></param>
+        /// <param name="applyContent"></param>
+        /// <param name="cardNumberList"></param>
+        public void SendQywxMessageToCC(string processName, string sysNo, string applierName, string applierTime, string applyContent, List<string> cardNumberList)
+        {
+            string cardNumber = string.Join("|", cardNumberList);
+            string url = "";
+            TextCardMsg msg = new TextCardMsg();
+            msg.touser = cardNumber;
+            msg.textcard = new TextCardContent();
+            msg.textcard.title = "你有一张抄送给你的申请单";
+            msg.textcard.description = " <div class=\"highlight\">流程名称：" + processName + "</div>";
+            msg.textcard.description += "<div class=\"highlight\">流程编号：" + sysNo + "</div>";
+            msg.textcard.description += "<div class=\"highlight\">申请人：" + applierName + "</div>";
+            msg.textcard.description += "<div class=\"highlight\">申请时间：" + applierTime + "</div>";
+            msg.textcard.description += "<div class=\"highlight\">申请内容：" + applyContent + "</div>";
+            url = "http://emp.truly.com.cn/emp/QYWX/Login?returnUrl=" + Uri.EscapeDataString("http://emp.truly.com.cn/emp/Apply/CheckApply?sysNo=" + sysNo);
+
+            msg.textcard.url = GetQYWXOAthLink(url);
+
+            SendQYWXCardMsg(msg);
+        }
+
+        /// <summary>
         /// 行政部发送约谈信息
         /// </summary>
         /// <param name="sysNo"></param>
@@ -525,7 +558,7 @@ namespace EmpInfo.Services
         public void SendQYWXCardMsg(TextCardMsg msg, DateTime? whenToPush = null)
         {
             msg.agentid = "1000007";
-            QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();
+            QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();           
             wx.PushTextCardMsg("wZRxdsuqeFAqJDG7VLaCTkImfsuce0qwyLO3ksBUkMY", "李逸焊", msg, whenToPush);
         }
 

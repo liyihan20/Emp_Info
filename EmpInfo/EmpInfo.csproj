@@ -690,9 +690,6 @@
     <Compile Include="Models\wx_jsApiTicket.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\wx_pushMsg.cs">
-      <DependentUpon>InfoDB.tt</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\EmpWebSvr\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -955,6 +952,7 @@
     <Content Include="Content\images\kw.png" />
     <Content Include="Content\images\leave.png" />
     <Content Include="Content\images\managemen_report.png" />
+    <Content Include="Content\images\mq.png" />
     <Content Include="Content\images\office.png" />
     <Content Include="Content\images\paint.png" />
     <Content Include="Content\images\paper.png" />
@@ -1325,8 +1323,10 @@
     <Content Include="Scripts\echarts.simple.min.js" />
     <Content Include="Scripts\html5shiv.min.js" />
     <Content Include="Scripts\icheck.js" />
+    <Content Include="Scripts\ICqywxJs2.js" />
     <Content Include="Scripts\ICqywxJs.js" />
     <Content Include="Scripts\jweixin-1.2.0.js" />
+    <Content Include="Scripts\myDownloaderPro.js" />
     <Content Include="Scripts\myUploaderSim.js" />
     <Content Include="Scripts\myUserSelecter.js" />
     <Content Include="Scripts\myUploaderPro.js" />
@@ -1403,6 +1403,15 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <Content Include="Service References\QywxWebSrv\EmpInfo.QywxWebSrv.ControlValue.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
+    <Content Include="Service References\QywxWebSrv\EmpInfo.QywxWebSrv.TagUsers.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
+    <Content Include="Service References\QywxWebSrv\EmpInfo.QywxWebSrv.WxUserInfo.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
     <None Include="Service References\QywxWebSrv\QywxApiSrv.disco" />
     <None Include="Service References\QywxWebSrv\configuration91.svcinfo" />
     <None Include="Service References\QywxWebSrv\configuration.svcinfo" />
@@ -1596,6 +1605,7 @@
     <Content Include="Views\Apply\BeginAuditHHApply.cshtml" />
     <Content Include="Views\Report\PrintHH.cshtml" />
     <Content Include="Views\Report\HHReport.cshtml" />
+    <Content Include="Views\Report\PrintHHForBus.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

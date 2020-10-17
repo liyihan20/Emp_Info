@@ -17,7 +17,7 @@
                 }
                 var r = JSON.parse(data.extra);
                 var totalIn = 0.0, totalOut = 0.0; //总收入与总支出
-                var inNames = ["工资代扣", "公司转账", "劳务抵扣", "现金收款", "扣款失败", "行政减免", "杂费收入", "未处理"]; //收入
+                var inNames = ["工资代扣", "公司转账", "劳务抵扣", "现金收款", "扣款失败", "行政减免", "杂费收入", "出租收入", "未处理"]; //收入
                 var outNames = ["工程支出", "后勤水电费", "后勤工资", "扣款失败", "行政减免", "劳务抵扣", "辅料类", "设备类"]; //支出
                 $("table .r").each(function (i, ele) {
                     var self = this;
@@ -107,6 +107,12 @@
                 <td style="width:25%;"><b class="pull-right text-primary r d" id="行政减免"></b></td>
                 <td class="text-center" style="width:25%;"><span style="color:#666666"> 劳务抵扣</span></td>
                 <td style="width:25%;"><b class="pull-right text-primary r d" id="劳务抵扣"></b></td>
+            </tr>
+            <tr>
+                <td class="text-center" style="width:25%;"><span style="color:#666666"> 出租收入</span></td>
+                <td style="width:25%;"><b class="pull-right text-primary r d" id="出租收入"></b></td>
+                <td></td>
+                <td></td>
             </tr>
             <tr>
                 <td class="text-center" style="width:25%;"><b style="color:#5cb85c;"> 收入汇总</b></td>

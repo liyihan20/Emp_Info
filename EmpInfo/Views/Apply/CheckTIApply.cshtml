@@ -102,7 +102,15 @@
                     <div class="b-input">
                         @m.in_timespan
                     </div>
-                </div>                       
+                </div>                     
+                <div class="b-div">
+                    <span class="b-label">
+                        客户自提:
+                    </span>
+                    <div class="b-input">
+                        @(m.is_fetch_by_self?"是":"否")
+                    </div>
+                </div>             
                 <div class="b-div">
                     <span class="b-label">
                         备注:

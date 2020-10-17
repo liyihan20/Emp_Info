@@ -133,10 +133,10 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <td>申请单号 /<span class="subTitle">申请日期</span></td>
-                        <td>申请人 /<span class="subTitle">申请内容</span></td>
-                        <td>审批结果 / <span class="subTitle">审批节点</span></td>
-                        <td>操作</td>
+                        <th data-width="20%">申请单号 /<span class="subTitle">申请日期</span></th>
+                        <th data-width="40%">申请人 /<span class="subTitle">申请内容</span></th>
+                        <th data-width="20%">审批结果 / <span class="subTitle">审批节点</span></th>
+                        <th data-width="20%">操作</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -150,21 +150,6 @@
                     }
                 </tbody>
             </table>
-            @*if ((string)ViewData["billType"] == "AL") {
-                var group = (from l in list
-                             where l.finalResult == "成功"
-                             group l by l.title into g
-                             select new
-                             {
-                                 title = g.Key,
-                                 count = g.Count()
-                             }).ToList();
-                string groupInfo = "";
-                foreach (var g in group) {
-                    groupInfo += g.title + "：" + g.count + "例； ";
-                }
-                <div class="text-success" style="padding-left:8px;font-size:16px;">汇总信息： @groupInfo</div>
-            }*@
         }
 
     </div>

@@ -29,6 +29,7 @@ namespace EmpInfo.Models
         public string comment { get; set; }
         public Nullable<System.DateTime> apply_time { get; set; }
         public string dep_name { get; set; }
+        public bool is_fetch_by_self { get; set; }
     
         public virtual ICollection<ei_TIApplyEntry> ei_TIApplyEntry { get; set; }
     }

@@ -32,7 +32,15 @@
         }
     </style>
 }
-
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/myDownloaderPro.js")"></script>
+    <script>
+        $(function () {            
+            $("#attList1").myDownloader({ sysNum: "@form.sys_no", prefix:"1^" });
+            $("#attList2").myDownloader({ sysNum: "@form.sys_no", prefix: "2^" });
+        });
+    </script>
+}
 <div class="panel panel-success">
     @if (!isFromDormSys) { 
     <div class="panel-heading">
@@ -136,7 +144,6 @@
                         <span>
                             @form.contact_phone
                         </span>
-
                     </div>
                     <div class="col-xs-12 col-md-4 col-sm-6">
                         <span class="b-label">
@@ -145,12 +152,15 @@
                         <span>
                             @form.contact_short_phone
                         </span>
-
                     </div>
                     <div class="col-xs-12">
                         <span class="b-label">维修内容:</span>
                         <span>@form.repair_content</span>
                     </div>
+                </div>
+                <div style="margin-top:6px;">
+                    <div class="b-label">故障图片:</div>
+                    <div id="attList1"></div>
                 </div>
             </div>
 
@@ -308,6 +318,10 @@
                                 </span>
                                 <span>@form.charge_fee 元</span>
                             </div>
+                        </div>
+                        <div style="margin-top:6px;">
+                            <div class="b-label">修复图片:</div>
+                            <div id="attList2"></div>
                         </div>
                     }                    
                 </div>

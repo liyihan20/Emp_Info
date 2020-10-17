@@ -802,6 +802,9 @@ namespace EmpInfo.QywxWebSrv {
         private string idField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.TextLangValue[] titleField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private EmpInfo.QywxWebSrv.ControValue valueField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
@@ -836,6 +839,19 @@ namespace EmpInfo.QywxWebSrv {
                 if ((object.ReferenceEquals(this.idField, value) != true)) {
                     this.idField = value;
                     this.RaisePropertyChanged("id");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public EmpInfo.QywxWebSrv.TextLangValue[] title {
+            get {
+                return this.titleField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.titleField, value) != true)) {
+                    this.titleField = value;
+                    this.RaisePropertyChanged("title");
                 }
             }
         }
@@ -1022,6 +1038,67 @@ namespace EmpInfo.QywxWebSrv {
                 if ((object.ReferenceEquals(this.childrenField, value) != true)) {
                     this.childrenField = value;
                     this.RaisePropertyChanged("children");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="TextLangValue", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class TextLangValue : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string textField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string langField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string text {
+            get {
+                return this.textField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.textField, value) != true)) {
+                    this.textField = value;
+                    this.RaisePropertyChanged("text");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string lang {
+            get {
+                return this.langField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.langField, value) != true)) {
+                    this.langField = value;
+                    this.RaisePropertyChanged("lang");
                 }
             }
         }
@@ -1335,7 +1412,7 @@ namespace EmpInfo.QywxWebSrv {
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private EmpInfo.QywxWebSrv.ControValue[] listField;
+        private EmpInfo.QywxWebSrv.WxApplyDataContent[] listField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -1348,7 +1425,7 @@ namespace EmpInfo.QywxWebSrv {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public EmpInfo.QywxWebSrv.ControValue[] list {
+        public EmpInfo.QywxWebSrv.WxApplyDataContent[] list {
             get {
                 return this.listField;
             }
@@ -1382,6 +1459,9 @@ namespace EmpInfo.QywxWebSrv {
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string keyField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.TextLangValue[] valueField;
+        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -1401,6 +1481,19 @@ namespace EmpInfo.QywxWebSrv {
                 if ((object.ReferenceEquals(this.keyField, value) != true)) {
                     this.keyField = value;
                     this.RaisePropertyChanged("key");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public EmpInfo.QywxWebSrv.TextLangValue[] value {
+            get {
+                return this.valueField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.valueField, value) != true)) {
+                    this.valueField = value;
+                    this.RaisePropertyChanged("value");
                 }
             }
         }
@@ -1476,6 +1569,542 @@ namespace EmpInfo.QywxWebSrv {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ControlValue", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class ControlValue : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string controlField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string idField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string titleField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string valueField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string typeField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string control {
+            get {
+                return this.controlField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.controlField, value) != true)) {
+                    this.controlField = value;
+                    this.RaisePropertyChanged("control");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string id {
+            get {
+                return this.idField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.idField, value) != true)) {
+                    this.idField = value;
+                    this.RaisePropertyChanged("id");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string title {
+            get {
+                return this.titleField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.titleField, value) != true)) {
+                    this.titleField = value;
+                    this.RaisePropertyChanged("title");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string value {
+            get {
+                return this.valueField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.valueField, value) != true)) {
+                    this.valueField = value;
+                    this.RaisePropertyChanged("value");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        public string type {
+            get {
+                return this.typeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.typeField, value) != true)) {
+                    this.typeField = value;
+                    this.RaisePropertyChanged("type");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="TagUsers", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class TagUsers : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private int errcodeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string errmsgField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string tagnameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.User[] userlistField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.ArrayOfInt partylistField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public int errcode {
+            get {
+                return this.errcodeField;
+            }
+            set {
+                if ((this.errcodeField.Equals(value) != true)) {
+                    this.errcodeField = value;
+                    this.RaisePropertyChanged("errcode");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string errmsg {
+            get {
+                return this.errmsgField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.errmsgField, value) != true)) {
+                    this.errmsgField = value;
+                    this.RaisePropertyChanged("errmsg");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string tagname {
+            get {
+                return this.tagnameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.tagnameField, value) != true)) {
+                    this.tagnameField = value;
+                    this.RaisePropertyChanged("tagname");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public EmpInfo.QywxWebSrv.User[] userlist {
+            get {
+                return this.userlistField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.userlistField, value) != true)) {
+                    this.userlistField = value;
+                    this.RaisePropertyChanged("userlist");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        public EmpInfo.QywxWebSrv.ArrayOfInt partylist {
+            get {
+                return this.partylistField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.partylistField, value) != true)) {
+                    this.partylistField = value;
+                    this.RaisePropertyChanged("partylist");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="User", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class User : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string useridField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string nameField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string userid {
+            get {
+                return this.useridField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.useridField, value) != true)) {
+                    this.useridField = value;
+                    this.RaisePropertyChanged("userid");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.nameField, value) != true)) {
+                    this.nameField = value;
+                    this.RaisePropertyChanged("name");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.CollectionDataContractAttribute(Name="ArrayOfInt", Namespace="http://ic.truly.com.cn/", ItemName="int")]
+    [System.SerializableAttribute()]
+    public class ArrayOfInt : System.Collections.Generic.List<int> {
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="WxUserInfo", Namespace="http://ic.truly.com.cn/")]
+    [System.SerializableAttribute()]
+    public partial class WxUserInfo : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private int errcodeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string errmsgField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string useridField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string nameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string mobileField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private EmpInfo.QywxWebSrv.ArrayOfInt departmentField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string positionField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string genderField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string emailField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string telephoneField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string aliasField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string addressField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string open_useridField;
+        
+        private int main_departmentField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public int errcode {
+            get {
+                return this.errcodeField;
+            }
+            set {
+                if ((this.errcodeField.Equals(value) != true)) {
+                    this.errcodeField = value;
+                    this.RaisePropertyChanged("errcode");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string errmsg {
+            get {
+                return this.errmsgField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.errmsgField, value) != true)) {
+                    this.errmsgField = value;
+                    this.RaisePropertyChanged("errmsg");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string userid {
+            get {
+                return this.useridField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.useridField, value) != true)) {
+                    this.useridField = value;
+                    this.RaisePropertyChanged("userid");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.nameField, value) != true)) {
+                    this.nameField = value;
+                    this.RaisePropertyChanged("name");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        public string mobile {
+            get {
+                return this.mobileField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.mobileField, value) != true)) {
+                    this.mobileField = value;
+                    this.RaisePropertyChanged("mobile");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=5)]
+        public EmpInfo.QywxWebSrv.ArrayOfInt department {
+            get {
+                return this.departmentField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.departmentField, value) != true)) {
+                    this.departmentField = value;
+                    this.RaisePropertyChanged("department");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=6)]
+        public string position {
+            get {
+                return this.positionField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.positionField, value) != true)) {
+                    this.positionField = value;
+                    this.RaisePropertyChanged("position");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=7)]
+        public string gender {
+            get {
+                return this.genderField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.genderField, value) != true)) {
+                    this.genderField = value;
+                    this.RaisePropertyChanged("gender");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=8)]
+        public string email {
+            get {
+                return this.emailField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.emailField, value) != true)) {
+                    this.emailField = value;
+                    this.RaisePropertyChanged("email");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=9)]
+        public string telephone {
+            get {
+                return this.telephoneField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.telephoneField, value) != true)) {
+                    this.telephoneField = value;
+                    this.RaisePropertyChanged("telephone");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=10)]
+        public string alias {
+            get {
+                return this.aliasField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.aliasField, value) != true)) {
+                    this.aliasField = value;
+                    this.RaisePropertyChanged("alias");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=11)]
+        public string address {
+            get {
+                return this.addressField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.addressField, value) != true)) {
+                    this.addressField = value;
+                    this.RaisePropertyChanged("address");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=12)]
+        public string open_userid {
+            get {
+                return this.open_useridField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.open_useridField, value) != true)) {
+                    this.open_useridField = value;
+                    this.RaisePropertyChanged("open_userid");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=13)]
+        public int main_department {
+            get {
+                return this.main_departmentField;
+            }
+            set {
+                if ((this.main_departmentField.Equals(value) != true)) {
+                    this.main_departmentField = value;
+                    this.RaisePropertyChanged("main_department");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(Namespace="http://ic.truly.com.cn/", ConfigurationName="QywxWebSrv.QywxApiSrvSoap")]
     public interface QywxApiSrvSoap {
@@ -1529,12 +2158,28 @@ namespace EmpInfo.QywxWebSrv {
         EmpInfo.QywxWebSrv.PushTextMsgResponse PushTextMsg(EmpInfo.QywxWebSrv.PushTextMsgRequest request);
         
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 secret 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/PushTextMsgImmediately", ReplyAction="*")]
+        EmpInfo.QywxWebSrv.PushTextMsgImmediatelyResponse PushTextMsgImmediately(EmpInfo.QywxWebSrv.PushTextMsgImmediatelyRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 secret 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/PushTextCardMsg", ReplyAction="*")]
         EmpInfo.QywxWebSrv.PushTextCardMsgResponse PushTextCardMsg(EmpInfo.QywxWebSrv.PushTextCardMsgRequest request);
         
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 apply 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/WxBeginApply", ReplyAction="*")]
         EmpInfo.QywxWebSrv.WxBeginApplyResponse WxBeginApply(EmpInfo.QywxWebSrv.WxBeginApplyRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 spNo 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetApprovalDetail", ReplyAction="*")]
+        EmpInfo.QywxWebSrv.GetApprovalDetailResponse GetApprovalDetail(EmpInfo.QywxWebSrv.GetApprovalDetailRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 tagId 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetTagUsers", ReplyAction="*")]
+        EmpInfo.QywxWebSrv.GetTagUsersResponse GetTagUsers(EmpInfo.QywxWebSrv.GetTagUsersRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 userId 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/GetUserInfo", ReplyAction="*")]
+        EmpInfo.QywxWebSrv.GetUserInfoResponse GetUserInfo(EmpInfo.QywxWebSrv.GetUserInfoRequest request);
         
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 TestApplyResult 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestApply", ReplyAction="*")]
@@ -2450,6 +3095,75 @@ namespace EmpInfo.QywxWebSrv {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class PushTextMsgImmediatelyRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="PushTextMsgImmediately", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.PushTextMsgImmediatelyRequestBody Body;
+        
+        public PushTextMsgImmediatelyRequest() {
+        }
+        
+        public PushTextMsgImmediatelyRequest(EmpInfo.QywxWebSrv.PushTextMsgImmediatelyRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class PushTextMsgImmediatelyRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string secret;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
+        public string opUserName;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public EmpInfo.QywxWebSrv.TextMsg textMsg;
+        
+        public PushTextMsgImmediatelyRequestBody() {
+        }
+        
+        public PushTextMsgImmediatelyRequestBody(string secret, string opUserName, EmpInfo.QywxWebSrv.TextMsg textMsg) {
+            this.secret = secret;
+            this.opUserName = opUserName;
+            this.textMsg = textMsg;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class PushTextMsgImmediatelyResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="PushTextMsgImmediatelyResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.PushTextMsgImmediatelyResponseBody Body;
+        
+        public PushTextMsgImmediatelyResponse() {
+        }
+        
+        public PushTextMsgImmediatelyResponse(EmpInfo.QywxWebSrv.PushTextMsgImmediatelyResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute()]
+    public partial class PushTextMsgImmediatelyResponseBody {
+        
+        public PushTextMsgImmediatelyResponseBody() {
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class PushTextCardMsgRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="PushTextCardMsg", Namespace="http://ic.truly.com.cn/", Order=0)]
@@ -2584,6 +3298,210 @@ namespace EmpInfo.QywxWebSrv {
         
         public WxBeginApplyResponseBody(string WxBeginApplyResult) {
             this.WxBeginApplyResult = WxBeginApplyResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetApprovalDetailRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetApprovalDetail", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.GetApprovalDetailRequestBody Body;
+        
+        public GetApprovalDetailRequest() {
+        }
+        
+        public GetApprovalDetailRequest(EmpInfo.QywxWebSrv.GetApprovalDetailRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetApprovalDetailRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string spNo;
+        
+        public GetApprovalDetailRequestBody() {
+        }
+        
+        public GetApprovalDetailRequestBody(string spNo) {
+            this.spNo = spNo;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetApprovalDetailResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetApprovalDetailResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.GetApprovalDetailResponseBody Body;
+        
+        public GetApprovalDetailResponse() {
+        }
+        
+        public GetApprovalDetailResponse(EmpInfo.QywxWebSrv.GetApprovalDetailResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetApprovalDetailResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public EmpInfo.QywxWebSrv.ControlValue[] GetApprovalDetailResult;
+        
+        public GetApprovalDetailResponseBody() {
+        }
+        
+        public GetApprovalDetailResponseBody(EmpInfo.QywxWebSrv.ControlValue[] GetApprovalDetailResult) {
+            this.GetApprovalDetailResult = GetApprovalDetailResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetTagUsersRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetTagUsers", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.GetTagUsersRequestBody Body;
+        
+        public GetTagUsersRequest() {
+        }
+        
+        public GetTagUsersRequest(EmpInfo.QywxWebSrv.GetTagUsersRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetTagUsersRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string tagId;
+        
+        public GetTagUsersRequestBody() {
+        }
+        
+        public GetTagUsersRequestBody(string tagId) {
+            this.tagId = tagId;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetTagUsersResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetTagUsersResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.GetTagUsersResponseBody Body;
+        
+        public GetTagUsersResponse() {
+        }
+        
+        public GetTagUsersResponse(EmpInfo.QywxWebSrv.GetTagUsersResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetTagUsersResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public EmpInfo.QywxWebSrv.TagUsers GetTagUsersResult;
+        
+        public GetTagUsersResponseBody() {
+        }
+        
+        public GetTagUsersResponseBody(EmpInfo.QywxWebSrv.TagUsers GetTagUsersResult) {
+            this.GetTagUsersResult = GetTagUsersResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetUserInfoRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetUserInfo", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.GetUserInfoRequestBody Body;
+        
+        public GetUserInfoRequest() {
+        }
+        
+        public GetUserInfoRequest(EmpInfo.QywxWebSrv.GetUserInfoRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetUserInfoRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string userId;
+        
+        public GetUserInfoRequestBody() {
+        }
+        
+        public GetUserInfoRequestBody(string userId) {
+            this.userId = userId;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetUserInfoResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetUserInfoResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.QywxWebSrv.GetUserInfoResponseBody Body;
+        
+        public GetUserInfoResponse() {
+        }
+        
+        public GetUserInfoResponse(EmpInfo.QywxWebSrv.GetUserInfoResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class GetUserInfoResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public EmpInfo.QywxWebSrv.WxUserInfo GetUserInfoResult;
+        
+        public GetUserInfoResponseBody() {
+        }
+        
+        public GetUserInfoResponseBody(EmpInfo.QywxWebSrv.WxUserInfo GetUserInfoResult) {
+            this.GetUserInfoResult = GetUserInfoResult;
         }
     }
     
@@ -2915,6 +3833,20 @@ namespace EmpInfo.QywxWebSrv {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.QywxWebSrv.PushTextMsgImmediatelyResponse EmpInfo.QywxWebSrv.QywxApiSrvSoap.PushTextMsgImmediately(EmpInfo.QywxWebSrv.PushTextMsgImmediatelyRequest request) {
+            return base.Channel.PushTextMsgImmediately(request);
+        }
+        
+        public void PushTextMsgImmediately(string secret, string opUserName, EmpInfo.QywxWebSrv.TextMsg textMsg) {
+            EmpInfo.QywxWebSrv.PushTextMsgImmediatelyRequest inValue = new EmpInfo.QywxWebSrv.PushTextMsgImmediatelyRequest();
+            inValue.Body = new EmpInfo.QywxWebSrv.PushTextMsgImmediatelyRequestBody();
+            inValue.Body.secret = secret;
+            inValue.Body.opUserName = opUserName;
+            inValue.Body.textMsg = textMsg;
+            EmpInfo.QywxWebSrv.PushTextMsgImmediatelyResponse retVal = ((EmpInfo.QywxWebSrv.QywxApiSrvSoap)(this)).PushTextMsgImmediately(inValue);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         EmpInfo.QywxWebSrv.PushTextCardMsgResponse EmpInfo.QywxWebSrv.QywxApiSrvSoap.PushTextCardMsg(EmpInfo.QywxWebSrv.PushTextCardMsgRequest request) {
             return base.Channel.PushTextCardMsg(request);
         }
@@ -2940,6 +3872,45 @@ namespace EmpInfo.QywxWebSrv {
             inValue.Body.apply = apply;
             EmpInfo.QywxWebSrv.WxBeginApplyResponse retVal = ((EmpInfo.QywxWebSrv.QywxApiSrvSoap)(this)).WxBeginApply(inValue);
             return retVal.Body.WxBeginApplyResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.QywxWebSrv.GetApprovalDetailResponse EmpInfo.QywxWebSrv.QywxApiSrvSoap.GetApprovalDetail(EmpInfo.QywxWebSrv.GetApprovalDetailRequest request) {
+            return base.Channel.GetApprovalDetail(request);
+        }
+        
+        public EmpInfo.QywxWebSrv.ControlValue[] GetApprovalDetail(string spNo) {
+            EmpInfo.QywxWebSrv.GetApprovalDetailRequest inValue = new EmpInfo.QywxWebSrv.GetApprovalDetailRequest();
+            inValue.Body = new EmpInfo.QywxWebSrv.GetApprovalDetailRequestBody();
+            inValue.Body.spNo = spNo;
+            EmpInfo.QywxWebSrv.GetApprovalDetailResponse retVal = ((EmpInfo.QywxWebSrv.QywxApiSrvSoap)(this)).GetApprovalDetail(inValue);
+            return retVal.Body.GetApprovalDetailResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.QywxWebSrv.GetTagUsersResponse EmpInfo.QywxWebSrv.QywxApiSrvSoap.GetTagUsers(EmpInfo.QywxWebSrv.GetTagUsersRequest request) {
+            return base.Channel.GetTagUsers(request);
+        }
+        
+        public EmpInfo.QywxWebSrv.TagUsers GetTagUsers(string tagId) {
+            EmpInfo.QywxWebSrv.GetTagUsersRequest inValue = new EmpInfo.QywxWebSrv.GetTagUsersRequest();
+            inValue.Body = new EmpInfo.QywxWebSrv.GetTagUsersRequestBody();
+            inValue.Body.tagId = tagId;
+            EmpInfo.QywxWebSrv.GetTagUsersResponse retVal = ((EmpInfo.QywxWebSrv.QywxApiSrvSoap)(this)).GetTagUsers(inValue);
+            return retVal.Body.GetTagUsersResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.QywxWebSrv.GetUserInfoResponse EmpInfo.QywxWebSrv.QywxApiSrvSoap.GetUserInfo(EmpInfo.QywxWebSrv.GetUserInfoRequest request) {
+            return base.Channel.GetUserInfo(request);
+        }
+        
+        public EmpInfo.QywxWebSrv.WxUserInfo GetUserInfo(string userId) {
+            EmpInfo.QywxWebSrv.GetUserInfoRequest inValue = new EmpInfo.QywxWebSrv.GetUserInfoRequest();
+            inValue.Body = new EmpInfo.QywxWebSrv.GetUserInfoRequestBody();
+            inValue.Body.userId = userId;
+            EmpInfo.QywxWebSrv.GetUserInfoResponse retVal = ((EmpInfo.QywxWebSrv.QywxApiSrvSoap)(this)).GetUserInfo(inValue);
+            return retVal.Body.GetUserInfoResult;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]

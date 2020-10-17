@@ -192,6 +192,7 @@
                         $("#fixItemList").append("<li><i class='fa-li fa fa-check-square'></i> " + fixedItems[i].n + " : " + fixedItems[i].v + "</li>");
                         sumFee += parseInt(fixedItems[i].v);
                     }
+                    sumFee=sumFee * parseInt("@other.qty");
                     $("#fixItemList").append("<li><i class='fa-li fa fa-cny'></i> 实际产生IT费用" + " : " + sumFee + "</li>");
                 }
 

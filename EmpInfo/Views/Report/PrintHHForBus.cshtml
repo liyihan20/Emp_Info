@@ -32,39 +32,19 @@
     </style>
 }
 
-@section Scripts {
-    <script src="@Url.Content("~/Scripts/JsBarcode.code128.min.js")"></script>
-    <script>
-        $(function () {
-            $(".bar").each(function (index, ele) {
-                JsBarcode(ele, "@h.sys_no", {
-                    width: 1,//设置条之间的宽度
-                    margin: 4,
-                    height: 28,//高度
-                    //text: "@h.sys_no",
-                    displayValue: false,
-                    fontSize: 12,
-                    font: '黑体'
-                });
-            });
-        })
-
-    </script>
-}
 
 <div class="text-center noPrint" style="margin-bottom:8px;">
     <button type="button" class="btn btn-default btn-sm" onclick="javascript: window.print();"><i class="fa fa-print"></i> 开始打印</button>
 </div>
 @for (var p = 1; p <= pageNum; p++) {
     <div><img src="@Url.Content("~/Content/images/Truly.gif")" /></div>
-    <div style="text-align:right;padding-right:8px;font-size:10px;">
-        <img class="bar" />
+    <div style="text-align:right;padding-right:8px;font-size:10px;">        
         <div>申请单号：@h.sys_no</div>
     </div>
     <table style="width:100%;" id="reportTb">
         <tr>
             <td colspan="4">
-                <div style="font-size:22px;font-weight:bold;padding:6px 2px;">换货放行条</div>
+                <div style="font-size:22px;font-weight:bold;padding:6px 2px;">换货申请单</div>
             </td>
         </tr>
         <tr>
@@ -94,15 +74,17 @@
                 <table style="width:100%;" id="itemTb">
                     <tr>
                         <td style="font-weight:bold;width:10%;">行号</td>
-                        <td style="font-weight:bold;width:60%;">规格型号</td>
-                        <td style="font-weight:bold;width:30%;">实发数量</td>
+                        <td style="font-weight:bold;width:35%;">规格型号</td>
+                        <td style="font-weight:bold;width:35%;">子型号</td>
+                        <td style="font-weight:bold;width:20%;">补货数量</td>
                     </tr>
                     @for (int i = (p - 1) * numPerPage; i < p * numPerPage; i++) {
                         if (i < m.entrys.Count()) {
-                            <tr>                                
-                                <td>@(i+1)</td>
+                            <tr>
+                                <td>@(i + 1)</td>
                                 <td>@m.entrys[i].moduel</td>
-                                <td>@(((int)m.entrys[i].send_qty).ToString("###,###"))</td>
+                                <td>@m.entrys[i].c_moduel</td>
+                                <td>@(((int)m.entrys[i].real_fill_qty).ToString("###,###"))</td>
                             </tr>
                         }
                     }

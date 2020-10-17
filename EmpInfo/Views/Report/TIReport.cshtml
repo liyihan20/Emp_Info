@@ -64,7 +64,7 @@
                 return;
             }
 
-            $.post("SearchTIDataForGuard", {
+            $.post("SearchTIDataForReport", {
                 fromDate: $("#fromDate").val(),
                 toDate: $("#toDate").val()
             }, function (data) {
@@ -100,8 +100,12 @@
             pagination: true,
             pageSize: 20,
             pageList: [20, 40, 60, 100],
-            search: true,
-            columns: [                
+            search: true,          
+            columns: [
+                {
+                    field: "audit_result",
+                    title: "审批状态"
+                },
                 {
                     field: "sys_no",
                     title: "流水号"
@@ -133,6 +137,12 @@
                 }, {
                     field: "t_status",
                     title: "状态"
+                }, {
+                    field: "buttons",
+                    title: "操作",
+                    formatter: function (value, row, index) {
+                        return '<button class="btn btn-sm btn-warning" style="margin-right:6px;" onclick="CancelApply(\'' + row.sys_no + '\')"> 作废</button>';
+                    }
                 }
                 //{
                 //    field: "in_time",
@@ -149,7 +159,7 @@
                 //    }
                 //}
             ],
-            onClickRow: function (row, $element, field) {
+            onDblClickRow: function (row, $element, field) {
                 if (row.sys_no) {
                     window.open("@Url.Content("~/Apply/CheckApply?sysNo=")" + row.sys_no);
                 }
@@ -159,6 +169,17 @@
             }
         });
 
+        function CancelApply(sysNo) {
+            openConfirmDialog("确认要作废此申请吗？", function () {
+                $.post("../ApplyExtra/CancelTIApply", { sysNo: sysNo }, function (data) {
+                    if (!data.suc) {
+                        toastr.error(data.msg);
+                    } else {
+                        toastr.success("作废成功");                        
+                    }
+                });
+            });
+        }
 
     </script>
 
@@ -206,3 +227,6 @@
     </div>
 </div>
 
+    @section modal{
+        @Html.Partial("_ConfirmDialog")
+    }

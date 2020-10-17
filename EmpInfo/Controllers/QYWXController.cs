@@ -22,6 +22,7 @@ namespace EmpInfo.Controllers
     {
         private const string APPID = "wwd136c62daa97a189"; //企业ID
         private const string SECRET = "wZRxdsuqeFAqJDG7VLaCTkImfsuce0qwyLO3ksBUkMY"; //应用secret
+        private const string AUDITSECRET = "z10aWUHXHrkPhJi7Cd42Xdw3shNak5n-vQBJPsQVfOY"; //审批secret
         private const string AGENTID = "1000007"; //应用id
         private const string LOGIN_URL = "http://emp.truly.com.cn/emp/QYWX/Login";
 
@@ -52,7 +53,9 @@ namespace EmpInfo.Controllers
             }
 
             string userID;
+            
             if (userInfo == null) {
+                //session或cookie过期时，通过code到企业微信获取userid
                 if(string.IsNullOrEmpty(code)){
                     ViewBag.tip="获取不到code，授权失败";
                     return View("Error");
@@ -62,6 +65,7 @@ namespace EmpInfo.Controllers
                 QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();
                 try {
                     userID = wx.GetUserIdFromCode(SECRET, code);
+                    
                 }
                 catch (Exception ex) {
                     ViewBag.tip = ex.Message;
@@ -75,6 +79,7 @@ namespace EmpInfo.Controllers
 
             }
             else {
+                //session或cookie未过期时，不需要再到企业微信获取userid，直接获取
                 userID = userInfo.cardNo;
             }
             var user = db.ei_users.Where(u => u.card_number == userID).FirstOrDefault();
@@ -199,7 +204,8 @@ namespace EmpInfo.Controllers
             }
             return Content(result);
         }
-
+                
+        
         public JsonResult GetConfigParam(string url)
         {
             QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();

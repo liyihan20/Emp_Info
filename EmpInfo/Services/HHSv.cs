@@ -37,17 +37,45 @@ namespace EmpInfo.Services
 
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
-            var menus = base.GetApplyMenuItems(userInfo);
+            var list = new List<ApplyMenuItemModel>();
+
+            if (db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "提交申请" && f.relate_value == userInfo.cardNo).Count() > 0) {
+                list.Add(new ApplyMenuItemModel()
+                {
+                    url = "BeginApply?billType=" + BillType,
+                    text = "开始申请",
+                    iconFont = "fa-pencil",
+                    colorClass = "text-danger"
+                });
+                list.Add(new ApplyMenuItemModel()
+                {
+                    url = "GetMyApplyList?billType=" + BillType,
+                    text = "我申请的",
+                    iconFont = "fa-th"
+                });
+            }
+            list.Add(new ApplyMenuItemModel()
+            {
+                url = "GetMyAuditingList?billType=" + BillType,
+                text = "我的待办",
+                iconFont = "fa-th-list"
+            });
+            list.Add(new ApplyMenuItemModel()
+            {
+                url = "GetMyAuditedList?billType=" + BillType,
+                text = "我的已办",
+                iconFont = "fa-th-large"
+            });
 
             if (db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).Count() > 0) {
-                menus.Add(new ApplyMenuItemModel()
+                list.Add(new ApplyMenuItemModel()
                 {
                     text = "查询报表",
                     iconFont = "fa-file-text-o",
                     url = "../Report/HHReport"
                 });
             }
-            return menus;
+            return list;
         }
 
         public override object GetInfoBeforeApply(Models.UserInfo userInfo, Models.UserInfoDetail userInfoDetail)
@@ -57,7 +85,7 @@ namespace EmpInfo.Services
             return new HHBeforeApplyModel()
             {
                 sys_no = GetNextSysNum(BillType),
-                agencyList = list.Where(l => l.relate_name == "办事处审批人").Select(l => l.relate_text).Distinct().ToList(),
+                //agencyList = list.Where(l => l.relate_name == "办事处审批人").Select(l => l.relate_text).Distinct().ToList(),
                 depNameList = list.Where(l => l.relate_name == "生产主管").Select(l => l.relate_text).Distinct().ToList()
             };
         }
@@ -72,6 +100,10 @@ namespace EmpInfo.Services
             bill.apply_time = DateTime.Now;
             bill.quality_manager_name = GetUserNameByNameAndCardNum(bill.quality_manager_no);
             bill.quality_manager_no = GetUserCardByNameAndCardNum(bill.quality_manager_no);
+            bill.notify_clerk_name = GetUserNameByNameAndCardNum(bill.notify_clerk_no);
+            bill.notify_clerk_no = GetUserCardByNameAndCardNum(bill.notify_clerk_no);
+            bill.charge_customers = db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "提交申请" && f.relate_value == userInfo.cardNo).First().cond1;
+
 
             db.ei_hhApply.Add(bill);
             foreach (var entry in entrys) {
@@ -129,30 +161,38 @@ namespace EmpInfo.Services
             //验证
             if (isPass) {
                 var entrys = bill.ei_hhApplyEntry.ToList();
-                if (stepName.Contains("品质经理")) {
-                    if (entrys.Where(e => e.real_return_qty == null || e.is_on_line == null).Count() > 0) {
-                        return new SimpleResultModel(false, "存在未填写的实退数量或是否已上线，填写完整后才能继续流转");
-                    }
-                    bill.has_attachment = true;
-                }
-                else if (stepName.Contains("生产主管")) {
-                    if (entrys.Where(e => e.fill_qty == null).Count() > 0) {
-                        return new SimpleResultModel(false, "存在未填写的补货数量，填写完整后才能继续流转");
+                if (stepName.Contains("生产主管")) {
+                    if (entrys.Where(e => e.real_fill_qty == null).Count() > 0) {
+                        return new SimpleResultModel(false, "存在未填写的实补数量，填写完整后才能继续流转");
                     }
                 }
                 else if (stepName.Contains("物流")) {
                     if (entrys.Where(e => e.send_qty == null).Count() > 0) {
                         return new SimpleResultModel(false, "存在未填写的实发数量，填写完整后才能继续流转");
                     }
-                    var returnList=bill.ei_hhReturnDetail.ToList();
-                    if(returnList.Count()<1){
+                    var returnList = bill.ei_hhReturnDetail.ToList();
+                    if (returnList.Count() < 1) {
                         return new SimpleResultModel(false, "必须填写退货明细，才能继续流转");
                     }
-                    foreach (var moduel in entrys.Select(e => e.moduel).Distinct().ToList()) {
-                        if (entrys.Where(e => e.moduel == moduel).Sum(e => e.send_qty) != returnList.Where(r => r.moduel == moduel).Sum(r => r.return_qty)) {
-                            return new SimpleResultModel(false, "实发数量与退货数量不一致，不能继续流转，型号：" + moduel);
+                    if (entrys.Sum(e => e.send_qty) != returnList.Sum(r => r.return_qty)) {
+                        return new SimpleResultModel(false, "实发数量总数与退货明细数量总数不一致，不能继续流转");
+                    }
+                    foreach (var moduel in returnList.Select(r => r.moduel).Distinct().ToList()) {
+                        if (returnList.Where(r => r.moduel == moduel).Sum(r => r.return_qty) > entrys.Where(e => e.moduel == moduel || e.c_moduel == moduel).Sum(e => e.send_qty)) {
+                            return new SimpleResultModel(false, "退货明细数量不能大于实发数量，型号：" + moduel);
                         }
                     }
+                    foreach (var en in entrys) {
+                        if (en.send_qty > returnList.Where(r => r.moduel == en.moduel || r.moduel == en.c_moduel).Sum(r => r.return_qty)) {
+                            return new SimpleResultModel(false, "实发数量不能大于退货数量明细，型号：" + en.moduel);
+                        }
+                    }
+                    //foreach (var moduel in entrys.Select(e => e.moduel).Distinct().ToList()) {
+                    //    if (entrys.Where(e => e.moduel == moduel).Sum(e => e.send_qty) != returnList.Where(r => r.moduel == moduel).Sum(r => r.return_qty)) {
+                    //        return new SimpleResultModel(false, "实发数量与退货数量不一致，不能继续流转，型号：" + moduel);
+                    //    }
+                    //}
+                    
                 }
             }
             var setting = new JsonSerializerSettings();
@@ -170,7 +210,7 @@ namespace EmpInfo.Services
         }
 
         public override void SendNotification(FlowSvr.FlowResultModel model)
-        {
+        {            
             if (model.suc) {
                 if (model.msg.Contains("完成") || model.msg.Contains("NG")) {
                     bool isSuc = model.msg.Contains("NG") ? false : true;
@@ -194,6 +234,19 @@ namespace EmpInfo.Services
                     FlowSvrSoapClient flow = new FlowSvrSoapClient();
                     var result = flow.GetCurrentStep(bill.sys_no);
 
+                    //到达品质经理这一步时，需抄送给营业员,到达物流这一步时，需抄送给计划经理,2020-10-16 取消抄送给计划经理，计划经理改为需要审核
+                    if (result.stepName.Contains("品质经理")) {
+                        List<string> ccUsers = new List<string>() { bill.notify_clerk_no };                        
+                        SendQywxMessageToCC(
+                            BillTypeName,
+                            bill.sys_no,
+                            bill.applier_name,
+                            ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                            string.Format("客户：{0}；事业部：{1}；规格型号：{2}等{3}项", bill.customer_name, bill.return_dep, bill.ei_hhApplyEntry.First().moduel, bill.ei_hhApplyEntry.Count()),
+                            ccUsers
+                        );
+                    }
+
                     SendEmailToNextAuditor(
                         bill.sys_no,
                         result.step,
@@ -204,7 +257,6 @@ namespace EmpInfo.Services
                         );
 
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-
                     SendQywxMessageToNextAuditor(
                         BillTypeName,
                         bill.sys_no,
@@ -240,10 +292,14 @@ namespace EmpInfo.Services
         }
 
         //生产主管录入补货数量
-        public void SaveEntryByCharger(int id, int? fillQty)
+        public void SaveEntryByCharger(int id, int? realFillQty)
         {
             var entry = GetEntry(id);
-            entry.fill_qty = fillQty;
+            if (entry.ei_hhApply.out_time != null) {
+                throw new Exception("此放行条已放行，不能再修改实出数量");
+            }
+
+            entry.real_fill_qty = realFillQty;
             db.SaveChanges();
         }
 

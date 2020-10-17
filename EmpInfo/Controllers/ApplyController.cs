@@ -181,7 +181,8 @@ namespace EmpInfo.Controllers
             List<FlowAuditListModel> list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { billType }, 600).ToList();
             list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
             SetBillByType(billType);
-            list.Sort(bill.GetAuditListComparer());
+            //list.Sort(bill.GetAuditListComparer()); //自定义排序的结果有问题，改为直接orderby
+            list = bill.OrderAuditList(list);
             ViewData["list"] = list;
             ViewData["billType"] = billType;
             ViewData["billTypeName"] = bill.BillTypeName;
@@ -375,7 +376,9 @@ namespace EmpInfo.Controllers
                 }
             }
             return RedirectToAction("CheckApply", new { sysNo = sysNo });
-        }
+        }               
+
+        #endregion
 
         public ActionResult CheckDPApplyInDormSys(string sysNo)
         {
@@ -387,8 +390,5 @@ namespace EmpInfo.Controllers
 
             return View(bill.CheckViewName());
         }
-
-        #endregion
-
     }
 }

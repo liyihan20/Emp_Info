@@ -44,6 +44,7 @@
             $("#itemList").append("<li><i class='fa-li fa fa-circle'></i> " + selectedItems[i].n + " : " + selectedItems[i].v + "</li>");
             sumFee += parseInt(selectedItems[i].v);
         }
+        sumFee=sumFee * parseInt("@m.qty");
         $("#itemList").append("<li><i class='fa-li fa fa-cny'></i> 预计产生IT费用" + " : " + sumFee + "</li>");
 
         
@@ -55,6 +56,7 @@
             $("#fixedItemList").append("<li><i class='fa-li fa fa-check-square'></i> " + fixedItems[i].n + " : " + fixedItems[i].v + "</li>");
             sumFixedFee += parseInt(fixedItems[i].v);
         }
+        sumFixedFee=sumFixedFee * parseInt("@m.qty");
         $("#fixedItemList").append("<li><i class='fa-li fa fa-cny'></i> 实际产生IT费用" + " : " + sumFixedFee + "</li>");
 
     }

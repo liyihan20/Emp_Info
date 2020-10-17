@@ -18,9 +18,8 @@
             }
         };
         var opts = $.extend(defaults, options);
+        var prefix = opts.prefix || ""; //文件名前缀，同一表单有多个上传控件时，需要在文件名前面加上前缀以区分是哪部分上传的，并且需分开显示文件列表
         var target = $(item);
-        
-
 
         var uploader = WebUploader.create(defaults);
         var html = '<div class="progress">\
@@ -34,7 +33,7 @@
         var fileListEle = target.find(".list-group");
         $(pbar).hide(); //一开始隐藏进度条
 
-        var addFileEle = function (fileName, fileSize,fileId) {
+        var addFileEle = function (fileName, fileSize, fileId) {            
             var shortName = fileName;
             if (shortName.length > 25) {
                 var ext = shortName.substr(shortName.lastIndexOf("."));
@@ -50,13 +49,16 @@
         $.post("../Item/GetAttachments", { sysNo: sysNum }, function (data) {
             if (data.length > 0) {
                 for (var i = 0; i < data.length; i++) {
-                    addFileEle(data[i].fileName, data[i].fileSize);
+                    if (data[i].fileName.indexOf(prefix) == 0) { //符合前缀的才显示出来
+                        addFileEle(data[i].fileName, data[i].fileSize);
+                    }
                 }
             }
         });
 
         uploader.on('fileQueued', function (file) {
             console.log(file);
+            file.name = prefix + file.name; //先加上前缀
             file.name = file.name.replace(/&/g, "_").replace(/ /g,""); //将文件名中的&转化为_，空格去掉
         });
 

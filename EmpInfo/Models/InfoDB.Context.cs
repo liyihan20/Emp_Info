@@ -64,7 +64,6 @@ namespace EmpInfo.Models
         public DbSet<vw_push_users> vw_push_users { get; set; }
         public DbSet<ei_users_android> ei_users_android { get; set; }
         public DbSet<ei_departmentAuditNode> ei_departmentAuditNode { get; set; }
-        public DbSet<wx_pushMsg> wx_pushMsg { get; set; }
         public DbSet<ei_leaveDayExceedPushLog> ei_leaveDayExceedPushLog { get; set; }
         public DbSet<vw_leaving_days> vw_leaving_days { get; set; }
         public DbSet<ei_stockAdminApply> ei_stockAdminApply { get; set; }

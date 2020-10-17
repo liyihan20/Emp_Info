@@ -392,25 +392,25 @@ namespace EmpInfo.Services
             return bill;
         }
 
-        public override IComparer<FlowAuditListModel> GetAuditListComparer()
-        {
-            return new BillComparer();
-        }
+        //public override IComparer<FlowAuditListModel> GetAuditListComparer()
+        //{
+        //    return new BillComparer();
+        //}
 
-        private class BillComparer : IComparer<FlowAuditListModel>
-        {
-            public int Compare(FlowAuditListModel x, FlowAuditListModel y)
-            {
-                if (x == null && y == null) return 0;
-                if (x == null) return -1;
-                if (y == null) return 1;
+        //private class BillComparer : IComparer<FlowAuditListModel>
+        //{
+        //    public int Compare(FlowAuditListModel x, FlowAuditListModel y)
+        //    {
+        //        if (x == null && y == null) return 0;
+        //        if (x == null) return -1;
+        //        if (y == null) return 1;
                 
-                if (x.applyTime == null) return -1;
-                if (y.applyTime == null) return 1;
-                return x.applyTime > y.applyTime ? -1 : 1;
+        //        if (x.applyTime == null) return -1;
+        //        if (y.applyTime == null) return 1;
+        //        return x.applyTime > y.applyTime ? -1 : 1;
                 
-            }
-        }
+        //    }
+        //}
 
     }
 }

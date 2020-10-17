@@ -134,7 +134,7 @@ namespace EmpInfo.Services
 
             MyUtils.SetFieldValueToModel(fc, bill);
 
-            if (bill.leave_date == null) return new SimpleResultModel() { suc = false, msg = "离职时间必须填写" };
+            if (dealWay.Contains("挽留失败") && bill.leave_date == null) return new SimpleResultModel() { suc = false, msg = "挽留失败时离职时间必须填写" };
             if (string.IsNullOrEmpty(bill.work_evaluation)) return new SimpleResultModel() { suc = false, msg = "工作评价必须选择" };
             if (string.IsNullOrEmpty(bill.wanna_employ)) return new SimpleResultModel() { suc = false, msg = "是否再录用必须选择" };
             if (stepName.Contains("组长")) {
@@ -157,7 +157,12 @@ namespace EmpInfo.Services
                 }
                 bill.charger_choise = dealWay;
                 bill.charger_talked = hasTalked;
-            }            
+            }
+            if (stepName.Contains("申请人再确认") && "坚持辞职".Equals(dealWay)) {
+                if (bill.leave_date == null) {
+                    bill.leave_date = DateTime.Parse(((DateTime)bill.apply_time).AddDays(30).ToShortDateString());
+                }
+            }
 
             if (bill.work_comment != null && bill.work_comment.Length > 500) return new SimpleResultModel() { suc = false, msg = "工作评价描述内容长度太多，请删减" };
             if (bill.employ_comment != null && bill.employ_comment.Length > 500) return new SimpleResultModel() { suc = false, msg = "是否再录用描述内容长度太多，请删减" };
@@ -167,7 +172,7 @@ namespace EmpInfo.Services
             FlowResultModel result;
             if (stepName.Contains("申请人") && "撤销辞职".Equals(dealWay)) {
                 result = flow.AbortFlow(userInfo.cardNo, bill.sys_no);
-            }
+            } 
             else {
                 result = flow.BeginAudit(bill.sys_no, step, userInfo.cardNo, true, dealWay + ";" + opinion, formJson);
             }
@@ -315,6 +320,11 @@ namespace EmpInfo.Services
         {
             bill.dep_name = newDepName;
             db.SaveChanges();
+        }
+
+        public override bool CanAccessApply(UserInfo userInfo)
+        {
+            return HasGotPower("ModuelTest", userInfo.id);
         }
     }
 }

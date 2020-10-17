@@ -5,6 +5,7 @@
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/autocomplete.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
 
     <style type="text/css">
         .list-group-item .media img {
@@ -31,6 +32,8 @@
     <script src="@Url.Content("~/Scripts/knockout-3.4.0.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUploaderPro.js?v=2")"></script>
     <script>
 
         $(function () {
@@ -42,6 +45,16 @@
                 minuteStep: 10,
                 startDate: new Date("@DateTime.Now.ToString("yyyy-MM-dd HH:mm")"),
                 endDate: new Date("@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd 20:00")")
+            });
+            $("#myUploader").myUploader({
+                accept: {
+                    title: 'Images',
+                    extensions: 'gif,jpg,jpeg,bmp,png',
+                    mimeTypes: 'image/*'
+                },
+                sysNum: "@dr.sysNo",
+                fileNumLimit: 3,
+                prefix: "1^" //申请人的前缀
             });
         });
 
@@ -137,7 +150,7 @@
 
                 $("#applyBt").button("loading");
                 $.post("SaveApply", {
-                    sys_no:"DP",//具体的流水号等到保存时再生成
+                    sys_no:"@dr.sysNo",//具体的流水号等到保存时再生成
                     area_name: self.areaName,
                     dorm_num: self.dormNumber,
                     repair_type: self.repairType(),
@@ -262,6 +275,13 @@
                         <textarea class="form-control" rows="3" data-bind="value:repairContent"></textarea>
                     </span>
                 </div>
+                <div style="display:inline-block;">
+                    <div id="picker"> <i class="fa fa-upload"></i> 上传故障图片 </div>
+                </div>
+                <div id="myUploader">
+                    @*这里生成上传文件插件*@
+                </div>
+
                 <button class="btn btn-danger btn-block" type="button" data-bind="click:submitApply" data-loading-text="正在提交..."><i class="fa fa-check-circle-o"></i> 提交宿舍维修申请</button>
             </div>
         </div>

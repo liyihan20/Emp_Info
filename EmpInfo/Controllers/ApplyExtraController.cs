@@ -539,7 +539,7 @@ namespace EmpInfo.Controllers
                         svr.SaveEntryByQuality(entry.id, entry.real_return_qty, entry.is_on_line);
                         break;
                     case "生产主管":
-                        svr.SaveEntryByCharger(entry.id, entry.fill_qty);
+                        svr.SaveEntryByCharger(entry.id, entry.real_fill_qty);
                         break;
                     case "物流":
                         svr.SaveEntryByLogistics(entry.id, entry.send_qty, entry.sender_name);
@@ -580,5 +580,19 @@ namespace EmpInfo.Controllers
 
         #endregion
 
+        #region 物流车辆预约
+
+        public JsonResult CancelTIApply(string sysNo)
+        {
+            try {
+                new TISv(sysNo).CancelTIApply(userInfo.cardNo);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+        #endregion
     }
 }

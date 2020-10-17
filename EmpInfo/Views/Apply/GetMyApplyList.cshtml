@@ -5,96 +5,87 @@
     string json = JsonConvert.SerializeObject(list);
 }
     @section CSS{
-    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
-        @*<style type="text/css">
-            #applyDiv img {
-                opacity: 1;
-            }
-
-                #applyDiv img:hover {
-                    opacity: 0.6;
-                }
-        </style>*@
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />    
     }
     @section Scripts{
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
-        <script>
-    $("#applyTb").bootstrapTable({
-        data:@Html.Raw(json),
-        striped: true,
-        mobileResponsive: true,
-        pagination: true,
-        pageSize: 40,
-        pageList: [20, 40, 60, 100],
-        search: true,
-        uniqueId: "sys_no",
-        columns: [
-            {
-                field: "sysNo",
-                title: "申请流水号"
-            }, {
-                field: "applyTime",
-                title: "申请时间",
-                formatter: function (value, row, index, field) {
-                    return utils.parseTDate(row.applyTime,true);
-                }
-            }, {
-                field: "subTitle",
-                title: "申请信息"
-            }, {
-                field: "auditResult",
-                title: "审核结果",
-                cellStyle: function (value, row, index) {
-                    var textColor = "#333";
-                    if (value == "成功") {
-                        textColor = "#5cb85c";
-                    } else if (value == "失败") {
-                        textColor = "#d9534f";
+    <script>
+        $("#applyTb").bootstrapTable({
+            data:@Html.Raw(json),
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 40,
+            pageList: [20, 40, 60, 100],
+            search: true,
+            uniqueId: "sys_no",
+            columns: [
+                {
+                    field: "sysNo",
+                    title: "申请流水号"
+                }, {
+                    field: "applyTime",
+                    title: "申请时间",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(row.applyTime,true);
                     }
-                    return { css: { color: textColor } };
-                }
-            }, {
-                field: "opButtons",
-                title: "操作按钮",
-                formatter: function (value, row, index) {
-                    var html='<button class="btn btn-sm btn-primary" style="margin-right:6px;" onclick="CheckDetail(\''+row.sysNo+'\')"><i class="fa fa-search"></i> 查看详情</button>';
-                    if("@ViewData["billType"]"=="AL" && row.auditResult=="成功"){
-                        var leaveDateFrom=$.trim(row.subTitle.split("~")[0]);
-                        var now="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")";
-                        if(leaveDateFrom > now){
-                            html+='<button class="btn btn-danger btn-sm" onclick="AbortApplyAfterFinish(\''+row.sysNo+'\')"><i class="fa fa-reply"></i> 撤销申请</button>';
+                }, {
+                    field: "subTitle",
+                    title: "申请信息"
+                }, {
+                    field: "auditResult",
+                    title: "审核结果",
+                    cellStyle: function (value, row, index) {
+                        var textColor = "#333";
+                        if (value == "成功") {
+                            textColor = "#5cb85c";
+                        } else if (value == "失败") {
+                            textColor = "#d9534f";
                         }
-                    }else if(row.auditResult=="审批中"){
-                        html+='<button class="btn btn-danger btn-sm" onclick="AbortApply(\''+row.sysNo+'\')"><i class="fa fa-reply"></i> 撤销申请</button>';
+                        return { css: { color: textColor } };
                     }
-                    return html;
-                }
-            }]
-            });
-
-        function CheckDetail(sysNo) {
-            window.location.href = "CheckApply?sysNo=" + sysNo;
-        }
-        function AbortApply(sysNo, reason) {
-            if (!reason) reason = "";
-            openConfirmDialog("确认要撤销此申请吗？", function () {
-                $.post("AbortApply", { sysNo: sysNo, reason: reason }, function (data) {
-                    if (data.suc) {
-                        toastr.success(data.msg);
-                        setTimeout(function () { location.reload(true); }, 2000);
-                    } else {
-                        toastr.error(data.msg);
+                }, {
+                    field: "opButtons",
+                    title: "操作按钮",
+                    formatter: function (value, row, index) {
+                        var html='<button class="btn btn-sm btn-primary" style="margin-right:6px;" onclick="CheckDetail(\''+row.sysNo+'\')"><i class="fa fa-search"></i> 查看详情</button>';
+                        if("@ViewData["billType"]"=="AL" && row.auditResult=="成功"){
+                            var leaveDateFrom=$.trim(row.subTitle.split("~")[0]);
+                            var now="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")";
+                            if(leaveDateFrom > now){
+                                html+='<button class="btn btn-danger btn-sm" onclick="AbortApplyAfterFinish(\''+row.sysNo+'\')"><i class="fa fa-reply"></i> 撤销申请</button>';
+                            }
+                        }else if(row.auditResult=="审批中"){
+                            html+='<button class="btn btn-danger btn-sm" onclick="AbortApply(\''+row.sysNo+'\')"><i class="fa fa-reply"></i> 撤销申请</button>';
+                        }
+                        return html;
                     }
+                }]
                 });
-            });
-        }
-        function AbortApplyAfterFinish(sysNo) {
-            openInputDialog("请输入撤销请假申请的原因：", function (reason) {
-                AbortApply(sysNo, reason);
-            },"撤销原因输入");
-        }
+
+            function CheckDetail(sysNo) {
+                window.location.href = "CheckApply?sysNo=" + sysNo;
+            }
+            function AbortApply(sysNo, reason) {
+                if (!reason) reason = "";
+                openConfirmDialog("确认要撤销此申请吗？", function () {
+                    $.post("AbortApply", { sysNo: sysNo, reason: reason }, function (data) {
+                        if (data.suc) {
+                            toastr.success(data.msg);
+                            setTimeout(function () { location.reload(true); }, 2000);
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                });
+            }
+            function AbortApplyAfterFinish(sysNo) {
+                openInputDialog("请输入撤销请假申请的原因：", function (reason) {
+                    AbortApply(sysNo, reason);
+                },"撤销原因输入");
+            }
         </script>
     }
     <div class="panel panel-success" id="applyDiv">
@@ -112,41 +103,7 @@
         <div class="panel-body">            
             <h4 class="text-danger"><i>可以查看到最近一年内的<text>@ViewData["billTypeName"]</text>记录:</i> </h4>
             <hr />
-            <table id="applyTb"></table>
-            
-           @* <div class="row">
-                @foreach (var i in list) {
-                    <div class="col-xs-12 col-md-3 col-sm-4">
-                        <div class="thumbnail">
-                            <img src="@Url.Content("~/Content/images/leave.png")" alt="leave">
-                            <div class="caption">
-                                <h3>@i.sysNo</h3>
-                                <p>申请时间：@(((DateTime)i.applyTime).ToString("yyyy-MM-dd HH:mm:ss"))</p>
-                                <p>申请信息：@i.subTitle</p> 
-                                @{var textColor = "text-default";
-                                if (i.auditResult == "成功") { textColor = "text-success"; }
-                                if (i.auditResult == "失败") { textColor = "text-danger"; }
-                                }
-                                <p>审核结果：<b class="@textColor">@i.auditResult</b></p>
-                                <p><button class="btn btn-primary btn-block" onclick="CheckDetail('@i.sysNo')"><i class="fa fa-search"></i> 查看详情</button></p>
-                                @if (i.auditResult == "成功" && (string)ViewData["billType"] == "AL") {
-                                    DateTime fromDate = DateTime.Parse(i.subTitle.Split(new char[] { '~' })[0].Trim());                                    
-                                    if (DateTime.Now < fromDate) {
-                                        <p><button class="btn btn-danger btn-block" onclick="AbortApplyAfterFinish('@i.sysNo')"><i class="fa fa-reply"></i> 撤销申请</button></p>
-                                    }
-                                }
-                                else if (i.auditResult == "审批中") {
-                                    <p><button class="btn btn-danger btn-block" onclick="AbortApply('@i.sysNo')"><i class="fa fa-reply"></i> 撤销申请</button></p>
-                                }
-                                
-
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>*@
-
-
+            <table id="applyTb"></table>            
         </div>
     </div>
     @section modal{

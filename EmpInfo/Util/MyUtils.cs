@@ -475,7 +475,7 @@ namespace EmpInfo.Util
             ICryptoTransform cTransform = rDel.CreateDecryptor();
 
             byte[] resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
-            return UTF8Encoding.UTF8.GetString(resultArray);            
+            return UTF8Encoding.UTF8.GetString(resultArray);
 
         }
 

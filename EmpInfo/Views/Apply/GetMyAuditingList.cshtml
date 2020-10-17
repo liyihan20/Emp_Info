@@ -26,8 +26,9 @@
             striped: true,
             mobileResponsive: true,
             pagination: true,
+            pageSize: 30,
+            pageList: [10,30, 50, 100],
             search: true,
-            //searchOnEnterKey: true,
             rowStyle:function(){
                 return {
                     css: {"cursor":"pointer"}
@@ -71,12 +72,12 @@
         <table data-toggle="table" id="tb">
             <thead>
                 <tr>
-                    <th>申请流水号</th>
+                    <th data-width="15%">申请流水号</th>
                     <th data-visible="false">step</th>
-                    <th>申请人</th>
-                    <th>申请时间</th>
-                    <th>申请信息</th>
-                    <th>审核节点</th>
+                    <th data-width="10%">申请人</th>
+                    <th data-width="15%">申请时间</th>
+                    <th data-width="45%">申请信息</th>
+                    <th data-width="15%">审核节点</th>
                 </tr>
             </thead>
             <tbody>

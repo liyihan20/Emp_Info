@@ -92,7 +92,19 @@ namespace EmpInfo.Services
                     client.DeleteApplyForFailure(bill.sys_no);
                     throw new Exception("申请提交失败，原因：" + ex.Message);
                 }
-                SendNotification(result);
+                if (!bill.is_fetch_by_self) {
+                    //不是客户自提的，提交后就自动同意，不需行政部审核
+                    try {
+                        System.Threading.Thread.Sleep(100);
+                        client.BeginAudit(bill.sys_no, 1, "080705015", true, "", "{}");
+                    }
+                    catch (Exception ex) {
+                        throw new Exception("提交成功，但自动审批失败，原因：" + ex.Message);
+                    }
+                }
+                else {
+                    SendNotification(result);
+                }
             }
             else {
                 throw new Exception("申请提交失败，原因：" + result.msg);
@@ -207,6 +219,22 @@ namespace EmpInfo.Services
         public override bool CanAccessApply(UserInfo userInfo)
         {
             return HasGotPower("BeginApplyTI", userInfo.id);
+        }
+
+        public void CancelTIApply(string cardNumber)
+        {
+            if (!cardNumber.Equals(bill.applier_num)) {
+                throw new Exception("你不是此单的申请人，不能作废");
+            }
+
+            if (bill.ei_TIApplyEntry.Where(e => e.in_time != null).Count() > 0) {
+                throw new Exception("司机已进厂，不能作废");
+            }
+
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            var result = flow.CancelFlowAfterFinish(bill.sys_no, cardNumber);
+            if (!result.suc) throw new Exception(result.msg);
+
         }
 
     }
