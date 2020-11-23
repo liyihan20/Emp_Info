@@ -157,17 +157,43 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 col-sm-6 col-xs-12">
-                <div class="b-div">
-                    <span class="b-label">
-                        是否退补货:
-                    </span>
-                    <div class="b-input">
-                        @m.isReturnBack
+            
+            
+            @if (m.content_type == "产品" || m.content_type == "原材料") {
+                if (m.content_type == "产品") { 
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                是否退补货:
+                            </span>
+                            <div class="b-input">
+                                @m.isReturnBack
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            @if (m.content_type == "产品") {                
+                }
+                else {
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                品质审批人:
+                            </span>
+                            <div class="b-input">
+                                @m.quality_audior_name
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                仓库地址:
+                            </span>
+                            <div class="b-input">
+                                @m.stock_addr
+                            </div>
+                        </div>
+                    </div>
+                }
                 <div class="col-md-4 col-sm-6 col-xs-12 product_extra_info">
                     <div class="b-div">
                         <span class="b-label">
@@ -349,12 +375,12 @@
         @if (m.content_type == "产品") { 
         <div class="b-div">
             <div class="panel panel-default">
-                <div class="panel-heading">产品明细</div>
+                <div class="panel-heading">物品明细</div>
                 <div class="panel-body" style="padding:0 8px;">
                     <table class="table table-condensed table-hover" style="margin:10px 0;" id="al_file_tb">
                         <thead>
                             <tr>
-                                <th style="width:40%;">产品名称</th>
+                                <th style="width:40%;">物品名称</th>
                                 <th style="width:40%;">规格型号</th>
                                 <th style="width:20%;">数量</th>
                             </tr>

@@ -1,8 +1,11 @@
 ﻿@using EmpInfo.Models;
+@using Newtonsoft.Json;
 @{
     DPCheckApplyModel m = ViewData["am"] as DPCheckApplyModel;
     List<EmpInfo.FlowSvr.FlowRecordModels> records = m.records;
     ei_dormRepair form = m.bill;
+    var totalCost = m.items.Count() == 0 ? 0 : m.items.Sum(i => i.price * i.qty);
+    var itemsJson = JsonConvert.SerializeObject(m.items);
 
     bool isFromDormSys = false;
     if (ViewData["fromDormSys"] != null) {
@@ -12,6 +15,7 @@
 }
 
 @section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
     <style type="text/css">
         .b-div {
             margin: 10px;
@@ -34,7 +38,29 @@
 }
 @section Scripts {
     <script src="@Url.Content("~/Scripts/myDownloaderPro.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
     <script>
+        $("#tb").bootstrapTable({
+            striped: true,
+            pagination: false,
+            data:@Html.Raw(itemsJson),
+            clickToSelect: true,
+            idField: "id",
+            uniqueId: "id",
+            columns: [
+                {
+                    field: "item_name",
+                    title: "配件名称"
+                }, {
+                    field: "qty",
+                    title: "使用数量"
+                }, {
+                    field: "price",
+                    title: "单价"
+                }
+            ]
+        });
         $(function () {            
             $("#attList1").myDownloader({ sysNum: "@form.sys_no", prefix:"1^" });
             $("#attList2").myDownloader({ sysNum: "@form.sys_no", prefix: "2^" });
@@ -319,6 +345,8 @@
                                 <span>@form.charge_fee 元</span>
                             </div>
                         </div>
+                        @*<div>使用配件清单：</div>
+                        <div><table id="tb"></table></div>*@
                         <div style="margin-top:6px;">
                             <div class="b-label">修复图片:</div>
                             <div id="attList2"></div>

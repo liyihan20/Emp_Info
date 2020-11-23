@@ -1,13 +1,13 @@
 ﻿@using EmpInfo.Models;
 @{
-    JQSearchParam sm = ViewData["sm"] as JQSearchParam; 
+    JMSearchParam sm = ViewData["sm"] as JMSearchParam;
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
     <style type="text/css">
-        .lbText{
-            font-style:italic;
+        .lbText {
+            font-style: italic;
         }
     </style>
 }
@@ -49,23 +49,17 @@
             todayBtn: true,
             startView: 2,
             minView: 2
-        });        
+        });
 
         $("#reportBt").on("click", function () {
             if ($("#fromDate").val() == "" && $("#qFromDate").val() == "") {
                 toastr.error("提交开始日期和离职开始日期至少应填写一个");
                 return;
             }
+            var obj = utils.getFormObj($("#fm"));
             toastr.info("数据正在导出，请稍等...");
-            window.location.href = "@Url.Content("~/Report/BeginExportMQReport?")"
-                + "fromDate=" + $("#fromDate").val()
-                + "&toDate=" + $("#toDate").val()
-                + "&qFromDate=" + $("#qFromDate").val()
-                + "&qToDate=" + $("#qToDate").val()
-                + "&depName=" + $("#depName").val()
-                + "&empName=" + $("#empName").val()
-                + "&sysNum=" + $("#sysNum").val()
-            ;
+            window.location.href = "@Url.Content("~/Report/BeginExportJMReport?")"
+                + "searchJmJson=" + encodeURIComponent(JSON.stringify(obj));
             });
 
         $("#checkBt").on("click", function () {
@@ -73,14 +67,10 @@
                 toastr.error("提交开始日期和离职开始日期至少应填写一个");
                 return;
             }
-            $.post("@Url.Content("~/Report/CheckMQReport")", {
-                fromDate: $("#fromDate").val(),
-                toDate: $("#toDate").val(),
-                qFromDate: $("#qFromDate").val(),
-                qToDate: $("#qToDate").val(),
-                depName: $("#depName").val(),
-                empName: $("#empName").val(),
-                sysNum:$("#sysNum").val()
+            var obj = utils.getFormObj($("#fm"));
+            
+            $.post("@Url.Content("~/Report/CheckJMReport")", {
+                searchJmJson: JSON.stringify(obj)
             }, function (data) {
                 $('#check_tb').bootstrapTable('load', data);
                 if (data.length == 0) {
@@ -97,7 +87,7 @@
                 return;
             }
             openConfirmDialog("确定要修改部门吗？", function () {
-                $.post("@Url.Content("~/ApplyExtra/UpdateMQDepName")", { sysNo: sysNo, newDepName: newDepName }, function (data) {
+                $.post("@Url.Content("~/ApplyExtra/UpdateJMDepName")", { sysNo: sysNo, newDepName: newDepName }, function (data) {
                     if (data.suc) {
                         $("#check_tb").bootstrapTable("updateCellById", { id: sysNo, field: "dep_name", value: newDepName });
                         $("#depModal").modal("hide");
@@ -106,9 +96,12 @@
                         toastr.error(data.msg);
                     }
                 });
-                
+
             });
         });
+
+        $("#quitType").val("@sm.quitType");
+        $("#salaryType").val("@sm.salaryType");
 
     });
 
@@ -129,13 +122,19 @@
                 }, {
                     field: "dep_name",
                     title: "人事部门",
-                    width: "30%"
+                    width: "25%"
+                }, {
+                    field: "quit_type",
+                    title: "离职类型"
                 }, {
                     field: "name",
                     title: "离职人"
                 }, {
                     field: "account",
                     title: "离职账号"
+                }, {
+                    field: "salary_type",
+                    title: "工资类别"
                 },
                 {
                     field: "leave_date",
@@ -148,14 +147,14 @@
                     field: "apply_time",
                     title: "申请时间",
                     formatter: function (value, row, index, field) {
-                        return utils.parseTDate(value,true);
+                        return utils.parseTDate(value,false);
                     }
                 }, {
                     field: "audit_result",
                     title: "处理结果"
                 }, {
                     showSelectTitle: true,
-                    field: "check1",                    
+                    field: "check1",
                     title: "标识1",
                     checkbox: true
                 }, {
@@ -185,7 +184,7 @@
         });
 
         function toggleCheck1(sysNo) {
-            $.post("ToggleMQCheck1", { sysNo: sysNo }, function (data) {
+            $.post("ToggleJMCheck1", { sysNo: sysNo }, function (data) {
                 if (!data.suc) {
                     toastr.error(data.msg);
                 }
@@ -196,7 +195,7 @@
             console.log(sysNo + ":" + depName);
             $("#depModal").modal("show");
             $("#m_sysNo").val(sysNo);
-            $("#m_depName").val(depName);            
+            $("#m_depName").val(depName);
         }
 
 
@@ -211,53 +210,79 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=MQ")">计件员工辞职流程</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=JM")">员工离职流程</a></li>
             <li class="active">查询报表</li>
         </ol>
     </div>
     <div class="panel-body">
-        <div class="row" style="margin-bottom:6px;">
-            <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="lbText">提交日期从：</div>
-                <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    <input class="form-control" type="text" id="fromDate" name="fromDate" value="@sm.fromDate" autocomplete="off" />
+        <form id="fm">
+            <div class="row" style="margin-bottom:6px;">
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">提交日期从：</div>
+                    <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" id="fromDate" name="fromDate" value="@sm.fromDate" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">提交日期到：</div>
+                    <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" id="toDate" name="toDate" value="@sm.toDate" autocomplete="off" />
+                    </div>
+                </div>            
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">人事部门名称：</div>
+                    <input type="text" class="form-control" name="depName" id="depName" style="margin:6px 0;" value="@sm.depName" />
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">离职日期从：</div>
+                    <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker2">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" id="qFromDate" name="qFromDate" value="@sm.qFromDate" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">离职日期到：</div>
+                    <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker2">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" id="qToDate" name="qToDate" value="@sm.qToDate" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">流水号：</div>
+                    <input type="text" class="form-control" name="sysNum" id="sysNum" style="margin:6px 0;" value="@sm.sysNum" />
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">员工姓名：</div>
+                    <input type="text" class="form-control" name="empName" id="empName" style="margin:6px 0;" value="@sm.empName" />
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">员工厂牌：</div>
+                    <input type="text" class="form-control" name="cardNumber" id="cardNumber" style="margin:6px 0;" value="@sm.cardNumber" />
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">工资编号：</div>
+                    <input type="text" class="form-control" name="salaryNumber" id="salaryNumber" style="margin:6px 0;" value="@sm.salaryNumber" />
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4" style="margin:6px 0;">
+                    <div class="lbText">离职类型：</div>
+                    <select  class="form-control"  name="quitType" id="quitType">
+                        <option value="">所有</option>
+                        <option value="辞职">辞职</option>
+                        <option value="自离">自离</option>
+                    </select>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4" style="margin:6px 0;">
+                    <div class="lbText">工资类型：</div>
+                    <select  class="form-control"  name="salaryType" id="salaryType">
+                        <option value="">所有</option>
+                        <option value="计件">计件</option>
+                        <option value="月薪">月薪</option>
+                    </select>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="lbText">提交日期到：</div>
-                <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    <input class="form-control" type="text" id="toDate" name="toDate" value="@sm.toDate" autocomplete="off" />
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="lbText">员工姓名：</div>
-                <input type="text" class="form-control" name="empName" id="empName" style="margin:6px 0;" value="@sm.empName" />
-            </div>            
-            <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="lbText">离职日期从：</div>
-                <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker2">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    <input class="form-control" type="text" id="qFromDate" name="qFromDate" value="@sm.qFromDate" autocomplete="off" />
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="lbText">离职日期到：</div>
-                <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker2">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    <input class="form-control" type="text" id="qToDate" name="qToDate" value="@sm.qToDate" autocomplete="off" />
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">                
-                <div class="lbText">人事部门名称：</div>
-                <input type="text" class="form-control" name="depName" id="depName" style="margin:6px 0;" value="@sm.depName" />                
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="lbText">流水号：</div>
-                <input type="text" class="form-control" name="sysNum" id="sysNum" style="margin:6px 0;" value="@sm.sysNum" />                
-            </div>
-        </div>
+        </form>
         <div class="small text-danger"><i class="fa fa-info-circle"></i> 可查询到人事部门名称包含这些关键字的离职申请：@ViewData["canCheckDep"] </div>
         <div class="btn-group btn-group-justified" role="group" style="margin-bottom:20px;margin-top:4px;">
             <div class="btn-group" role="group">
@@ -272,7 +297,7 @@
 
     </div>
 </div>
-@section Modal {    
+@section Modal {
     @Html.Partial("_ConfirmDialog")
     <div class="modal fade" id="depModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
         <div class="modal-dialog">

@@ -81,67 +81,67 @@ namespace EmpInfo.Controllers
 
         #region 离职
 
-        public ActionResult ChargerUpdateJQLeaveDay()
-        {
-            return View();
-        }
+        //public ActionResult ChargerUpdateJQLeaveDay()
+        //{
+        //    return View();
+        //}
 
-        public JsonResult GetJQApply(string searchContent)
-        {
-            var jq = new JQSv().GetJQApply(searchContent);
-            if (jq == null) return Json(new SimpleResultModel() { suc = false, msg = "查询不到离职申请单" });
+        //public JsonResult GetJQApply(string searchContent)
+        //{
+        //    var jq = new JQSv().GetJQApply(searchContent);
+        //    if (jq == null) return Json(new SimpleResultModel() { suc = false, msg = "查询不到离职申请单" });
 
-            return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(jq) });
-        }
+        //    return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(jq) });
+        //}
 
-        public JsonResult UpdateJQLeaveDay(string sysNo, string newDay, string notifiers)
-        {
-            DateTime newDayDt;
-            if (!DateTime.TryParse(newDay, out newDayDt)) {
-                return Json(new SimpleResultModel() { suc = false, msg = "离职日期不正确" });
-            }
-            if (string.IsNullOrEmpty(notifiers)) {
-                return Json(new SimpleResultModel() { suc = false, msg = "请先选择需通知的文员" });
-            }
-            try {
-                new JQSv(sysNo).UpdateLeaveDay(newDayDt, notifiers, userInfo.cardNo);
-            }
-            catch (Exception ex) {
-                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
-            }
-            WriteEventLog("修改离职日期", sysNo + ":" + newDay + ";" + notifiers);
-            return Json(new SimpleResultModel() { suc = true });
-        }
+        //public JsonResult UpdateJQLeaveDay(string sysNo, string newDay, string notifiers)
+        //{
+        //    DateTime newDayDt;
+        //    if (!DateTime.TryParse(newDay, out newDayDt)) {
+        //        return Json(new SimpleResultModel() { suc = false, msg = "离职日期不正确" });
+        //    }
+        //    if (string.IsNullOrEmpty(notifiers)) {
+        //        return Json(new SimpleResultModel() { suc = false, msg = "请先选择需通知的文员" });
+        //    }
+        //    try {
+        //        new JQSv(sysNo).UpdateLeaveDay(newDayDt, notifiers, userInfo.cardNo);
+        //    }
+        //    catch (Exception ex) {
+        //        return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+        //    }
+        //    WriteEventLog("修改离职日期", sysNo + ":" + newDay + ";" + notifiers);
+        //    return Json(new SimpleResultModel() { suc = true });
+        //}
 
-        public ActionResult CancelJQApply()
-        {
-            return View();
-        }
+        //public ActionResult CancelJQApply()
+        //{
+        //    return View();
+        //}
 
-        public JsonResult BeginCancelJqApply(string sysNo)
-        {
-            try {
-                new JQSv(sysNo).CancelApply(userInfo.cardNo);
-            }
-            catch (Exception ex) {
-                return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
-            }
+        //public JsonResult BeginCancelJqApply(string sysNo)
+        //{
+        //    try {
+        //        new JQSv(sysNo).CancelApply(userInfo.cardNo);
+        //    }
+        //    catch (Exception ex) {
+        //        return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+        //    }
 
-            WriteEventLog("作废离职单", sysNo);
-            return Json(new SimpleResultModel() { suc = true });
-        }
+        //    WriteEventLog("作废离职单", sysNo);
+        //    return Json(new SimpleResultModel() { suc = true });
+        //}
 
-        public JsonResult UpdateJQDepName(string sysNo, string newDepName)
-        {
-            try {
-                new JQSv(sysNo).UpdateDepName(newDepName);
-            }
-            catch (Exception ex) {
-                return Json(new SimpleResultModel(ex));
-            }
-            WriteEventLog("离职流程", "修改部门：" + sysNo + ":" + newDepName);
-            return Json(new SimpleResultModel(true));
-        }
+        //public JsonResult UpdateJQDepName(string sysNo, string newDepName)
+        //{
+        //    try {
+        //        new JQSv(sysNo).UpdateDepName(newDepName);
+        //    }
+        //    catch (Exception ex) {
+        //        return Json(new SimpleResultModel(ex));
+        //    }
+        //    WriteEventLog("离职流程", "修改部门：" + sysNo + ":" + newDepName);
+        //    return Json(new SimpleResultModel(true));
+        //}
 
         //行政部发送约谈信息
         public JsonResult AHPushJQMsg(string sysNo, string bookTime)
@@ -164,20 +164,109 @@ namespace EmpInfo.Controllers
 
         #region 新计件辞职
 
-        public ActionResult ChargerUpdateMQLeaveDate()
+        //public ActionResult ChargerUpdateMQLeaveDate()
+        //{
+        //    return View();
+        //}
+
+        //public JsonResult GetMQApply(string searchContent)
+        //{
+        //    var mq = new MQSv().GetMQApply(searchContent);
+        //    if (mq == null) return Json(new SimpleResultModel() { suc = false, msg = "查询不到计件辞职申请单" });
+
+        //    return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(mq) });
+        //}
+
+        //public JsonResult UpdateMQLeaveDay(string sysNo, string newDay, string notifiers)
+        //{
+        //    DateTime newDayDt;
+        //    if (!DateTime.TryParse(newDay, out newDayDt)) {
+        //        return Json(new SimpleResultModel() { suc = false, msg = "离职日期不正确" });
+        //    }
+        //    if (string.IsNullOrEmpty(notifiers)) {
+        //        return Json(new SimpleResultModel() { suc = false, msg = "请先选择需通知的文员" });
+        //    }
+        //    try {
+        //        new MQSv(sysNo).UpdateLeaveDay(newDayDt, notifiers, userInfo.cardNo,userInfo.name);
+        //    }
+        //    catch (Exception ex) {
+        //        return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+        //    }
+        //    WriteEventLog("修改离职日期", sysNo + ":" + newDay + ";" + notifiers);
+        //    return Json(new SimpleResultModel() { suc = true });
+        //}
+
+        //public ActionResult CancelMQApply()
+        //{
+        //    return View();
+        //}
+
+        //public JsonResult BeginCancelMqApply(string sysNo)
+        //{
+        //    try {
+        //        new MQSv(sysNo).CancelApply(userInfo.cardNo);
+        //    }
+        //    catch (Exception ex) {
+        //        return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
+        //    }
+
+        //    WriteEventLog("作废离职单", sysNo);
+        //    return Json(new SimpleResultModel() { suc = true });
+        //}
+
+        //public JsonResult UpdateMQDepName(string sysNo, string newDepName)
+        //{
+        //    try {
+        //        new MQSv(sysNo).UpdateDepName(newDepName);
+        //    }
+        //    catch (Exception ex) {
+        //        return Json(new SimpleResultModel(ex));
+        //    }
+        //    WriteEventLog("离职流程", "修改部门：" + sysNo + ":" + newDepName);
+        //    return Json(new SimpleResultModel(true));
+        //}
+
+        public JsonResult NeedHRTalk(string sysNo)
+        {
+            try {
+                new MQSv(sysNo).NeedHRTalk();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+        #endregion
+
+        #region 整合离职流程，新旧整合在一起
+
+        public ActionResult ChargerUpdateJMLeaveDay()
         {
             return View();
         }
 
-        public JsonResult GetMQApply(string searchContent)
+        public JsonResult GetJMApply(string searchContent)
         {
+            var jq = new JQSv().GetJQApply(searchContent);
             var mq = new MQSv().GetMQApply(searchContent);
-            if (mq == null) return Json(new SimpleResultModel() { suc = false, msg = "查询不到计件辞职申请单" });
+            if (jq == null && mq == null) return Json(new SimpleResultModel() { suc = false, msg = "查询不到离职申请单" });
 
-            return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(mq) });
+            if (mq == null) {
+                return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(jq) });
+            }
+            if (jq == null) {
+                return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(mq) });
+            }
+            if (mq.apply_time > jq.apply_time) {
+                return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(mq) });
+            }
+            else {
+                return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(jq) });
+            }
         }
 
-        public JsonResult UpdateMQLeaveDay(string sysNo, string newDay, string notifiers)
+        public JsonResult UpdateJMLeaveDay(string sysNo, string newDay, string notifiers)
         {
             DateTime newDayDt;
             if (!DateTime.TryParse(newDay, out newDayDt)) {
@@ -187,7 +276,12 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = false, msg = "请先选择需通知的文员" });
             }
             try {
-                new MQSv(sysNo).UpdateLeaveDay(newDayDt, notifiers, userInfo.cardNo,userInfo.name);
+                if (sysNo.StartsWith("JQ")) {
+                    new JQSv(sysNo).UpdateLeaveDay(newDayDt, notifiers, userInfo.cardNo);
+                }
+                if (sysNo.StartsWith("MQ")) {
+                    new MQSv(sysNo).UpdateLeaveDay(newDayDt, notifiers, userInfo.cardNo, userInfo.name);
+                }
             }
             catch (Exception ex) {
                 return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
@@ -196,15 +290,21 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel() { suc = true });
         }
 
-        public ActionResult CancelMQApply()
+        public ActionResult CancelJMApply()
         {
             return View();
         }
 
-        public JsonResult BeginCancelMqApply(string sysNo)
+        public JsonResult BeginCancelJMApply(string sysNo)
         {
             try {
-                new MQSv(sysNo).CancelApply(userInfo.cardNo);
+                if (sysNo.StartsWith("JQ")) {
+                    new JQSv(sysNo).CancelApply(userInfo.cardNo);
+                }
+                if (sysNo.StartsWith("MQ")) {
+                    new MQSv(sysNo).CancelApply(userInfo.cardNo);
+                }
+                
             }
             catch (Exception ex) {
                 return Json(new SimpleResultModel() { suc = false, msg = ex.Message });
@@ -214,10 +314,15 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel() { suc = true });
         }
 
-        public JsonResult UpdateMQDepName(string sysNo, string newDepName)
+        public JsonResult UpdateJMDepName(string sysNo, string newDepName)
         {
             try {
-                new MQSv(sysNo).UpdateDepName(newDepName);
+                if (sysNo.StartsWith("JQ")) {
+                    new JQSv(sysNo).UpdateDepName(newDepName);
+                }
+                if (sysNo.StartsWith("MQ")) {
+                    new MQSv(sysNo).UpdateDepName(newDepName);
+                }
             }
             catch (Exception ex) {
                 return Json(new SimpleResultModel(ex));
@@ -594,5 +699,65 @@ namespace EmpInfo.Controllers
         }
 
         #endregion
+
+        #region 宿舍维修
+
+        public JsonResult SearchDPRepairItem(string itemName)
+        {
+            var result = new DPSv().SearchRepairItems(itemName, userInfo.name);
+            if (result.Count() < 1) {
+                return Json(new SimpleResultModel(false, "查询不到维修配件的信息"));
+            }
+            return Json(new SimpleResultModel(true, "", JsonConvert.SerializeObject(result.OrderByDescending(r=>r.inventory).ToList())));
+        }
+
+        public JsonResult SaveDPRepairItem(string obj)
+        {
+            try {
+                var im = JsonConvert.DeserializeObject<DormRepairItemModel>(obj);
+                var result = new DPSv().SaveRepairItem(im, userInfo.name);
+
+                return Json(new SimpleResultModel(true, "", JsonConvert.SerializeObject(result)));
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+        }
+
+        public JsonResult UpdateDPRepairItemQty(int id, int qty)
+        {
+            try {
+                new DPSv().UpdateRepairItemQty(id, qty);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true, "保存成功"));
+        }
+
+        public JsonResult RemoveDPRepairItem(int id)
+        {
+            try {
+                new DPSv().RemoveRepairItem(id);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true, "删除成功"));
+        }
+
+        public JsonResult UpdateDPRepairItemPublicFee(int id)
+        {
+            try {
+                var result = new DPSv().UpdateRepairItemPublicFee(id);
+                return Json(new SimpleResultModel(true, "", result ? "1" : "0"));
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+        }
+
+        #endregion
+
     }
 }

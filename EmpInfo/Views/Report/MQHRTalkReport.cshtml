@@ -1,0 +1,195 @@
+﻿@using EmpInfo.Models;
+@{
+    JQSearchParam sm = ViewData["sm"] as JQSearchParam;
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        .lbText {
+            font-style: italic;
+        }
+    </style>
+}
+@section Scripts {
+    @*加入以下js，使IE8支持datetimepicker组件*@
+    <script>
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function (elt /*, from*/) {
+                var len = this.length >>> 0;
+
+                var from = Number(arguments[1]) || 0;
+                from = (from < 0)
+                     ? Math.ceil(from)
+                     : Math.floor(from);
+                if (from < 0)
+                    from += len;
+
+                for (; from < len; from++) {
+                    if (from in this &&
+                        this[from] === elt)
+                        return from;
+                }
+                return -1;
+            };
+        }
+    </script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+    var currentTr;
+    $(function () {
+        $(".form_date").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            todayBtn: true,
+            startView: 2,
+            minView: 2
+        });
+
+        $("#checkBt").on("click", function () {            
+            $.post("GetMQHRTalkReport", {
+                fromDate: $("#fromDate").val(),
+                toDate: $("#toDate").val(),
+                empName: $("#empName").val(),
+                status: $("#status").val()
+            }, function (data) {
+                if (!data.suc) {
+                    toastr.error(data.msg);
+                    return;
+                };
+                var result = JSON.parse(data.extra);                
+                if (result.length == 0) {
+                    toastr.error("当前时间段查无面谈记录");
+                }
+                $('#check_tb').bootstrapTable('load', result);
+            });
+        });
+
+    });
+
+        $("#check_tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 40,
+            pageList: [20, 40, 60, 100],
+            search: true,
+            uniqueId: "id",
+            columns: [
+                {
+                    field: "id",
+                    visible:false
+                },
+                {
+                    field: "sys_no",
+                    title: "流水号"
+                }, {
+                    field: "dep_name",
+                    title: "人事部门",
+                    width: "30%"
+                }, {
+                    field: "name",
+                    title: "离职人"
+                }, 
+                {
+                    field: "leave_date",
+                    title: "离职时间",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(row.leave_date);
+                    }
+                }, {
+                    field: "audit_result",
+                    title: "处理结果"
+                },
+                {
+                    field: "in_time",
+                    title: "预约时间",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value);
+                    }
+                }, {
+                    field: "t_status",
+                    title: "面谈状态"
+                },
+                {
+                    field: "opButtons",
+                    title: "操作按钮",
+                    formatter: function (value, row, index) {
+                        return '<button class="btn btn-sm btn-primary" style="margin-right:6px;" onclick="UpdateTalkStatus(\'' + row.id + '\')"><i class="fa fa-check"></i> 已面谈</button>';
+                    }
+                }
+            ],
+            onClickCell: function (field, value, row, $element) {
+                if (field != "opButtons") {
+                    if (row.sys_no) {
+                        window.open("@Url.Content("~/Apply/CheckApply?sysNo=")" + row.sys_no);
+                    }
+                }
+            },
+            rowStyle: function (row, index) {
+                return { css: { cursor: 'pointer' } };
+            }
+        });
+        
+        function UpdateTalkStatus(id) {
+            $.post("SetHRHasTalked", { id: id }, function (data) {
+                $("#check_tb").bootstrapTable("updateCellById", { id: id, field: "t_status", value: "面谈完成" });
+            });
+        }
+
+    </script>
+
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=JM")">员工离职流程</a></li>
+            <li class="active">人事面谈报表</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row" style="margin-bottom:6px;">
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">预约日期从：</div>
+                <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    <input class="form-control" type="text" id="fromDate" name="fromDate" value="@DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")" autocomplete="off" />
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">预约日期到：</div>
+                <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    <input class="form-control" type="text" id="toDate" name="toDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" autocomplete="off" />
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">员工姓名：</div>
+                <input type="text" class="form-control" name="empName" id="empName" style="margin:6px 0;" />
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">面谈状态：</div>
+                <select  class="form-control"  name="status" id="status">
+                        <option value="">所有</option>
+                        <option value="已预约">已预约</option>
+                        <option value="逾期取消">逾期取消</option>
+                        <option value="面谈完成">面谈完成</option>
+                    </select>
+            </div>
+        </div>
+        
+        <button class="btn btn-block btn-primary" id="checkBt" data-loading-text="搜索中..." style="margin:8px 0;"><i class="fa fa-search"></i> 搜索</button>
+
+        <table id="check_tb"></table>
+
+    </div>
+</div>

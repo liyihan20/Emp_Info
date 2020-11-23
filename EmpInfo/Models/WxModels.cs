@@ -29,6 +29,6 @@ namespace EmpInfo.Models
         public string actionType { get; set; }
     }
 
-    
+
 
 }

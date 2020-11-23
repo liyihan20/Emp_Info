@@ -1,0 +1,148 @@
+﻿@using EmpInfo.Models;
+@using Newtonsoft.Json;
+@{
+    var m = ViewData["am"] as PPCheckApplyModel;
+    var itemsJson = JsonConvert.SerializeObject(m.items);
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 100px;
+            vertical-align: top;
+            color: gray;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myDownloaderPro.js")"></script>
+
+    <script>
+        $("#tb").bootstrapTable({
+            data:@Html.Raw(itemsJson),
+            striped: true,
+            pagination: false,
+            clickToSelect: true,
+            columns: [                
+                {
+                    field: "item_name",
+                    title: "配件名称"
+                }, {
+                    field: "qty",
+                    title: "使用数量"
+                }, {
+                    field: "price",
+                    title: "单价"
+                }
+            ]
+        });
+
+
+
+        $(function () {
+            $("#attList").myDownloader({ sysNum: "@m.bill.sys_no" });
+
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.bill.sys_no" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+            });
+        })
+
+
+    </script>
+
+}
+
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/DormGroupIndex")">后勤事务</a></li>
+            <li><a href="ApplyIndex?billType=PP">宿舍公共区域维修</a></li>
+            <li class="active">查看申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="b-div">
+            <span class="b-label">
+                流转记录:
+            </span>
+            <span class="b-input">
+                <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请流水号:
+            </span>
+            <span class="b-input">
+                @m.bill.sys_no
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">维修日期:</span>
+            <span class="b-input">
+                @(((DateTime)m.bill.repair_day).ToString("yyyy-MM-dd"))
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                维修地点:
+            </span>
+            <span class="b-input">
+                @m.bill.addr
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                维修内容:
+            </span>
+            <span class="b-input">
+                @m.bill.repair_content
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                备注:
+            </span>
+            <span class="b-input">
+                @m.bill.comment
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                使用配件清单:
+            </span>
+        </div>
+        <div>
+            <table id="tb"></table>
+        </div>
+        <div style="margin-top:6px;">
+            <div class="b-label">上传的图片:</div>
+            <div id="attList"></div>
+        </div>
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

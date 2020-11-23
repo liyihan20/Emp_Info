@@ -186,6 +186,7 @@
     <Compile Include="Interfaces\IApplyEntryQueue.cs" />
     <Compile Include="Interfaces\IBeginAuditOtherInfo.cs" />
     <Compile Include="Interfaces\IJsInterface.cs" />
+    <Compile Include="Interfaces\IRealBillType.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AdminModels.cs" />
     <Compile Include="Models\all_maxNum.cs">
@@ -258,6 +259,11 @@
     <Compile Include="Models\dn_shoppingCar.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\DormDB.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DormDB.dbml</DependentUpon>
+    </Compile>
     <Compile Include="Models\DormModels.cs" />
     <Compile Include="Models\ei_ALModifyLog.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
@@ -311,6 +317,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_dormRepair.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_dormRepairIems.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_empInfo.cs">
@@ -392,6 +401,12 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_mqApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_mqHRTalkRecord.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_PPApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_public_fund.cs">
@@ -647,6 +662,9 @@
     <Compile Include="Models\vw_ITExcel.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\vw_JMExcel.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\vw_JQExcel.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -713,6 +731,7 @@
     <Compile Include="Services\BillSv.cs" />
     <Compile Include="Services\CRSv.cs" />
     <Compile Include="Services\DESv.cs" />
+    <Compile Include="Services\DormSv.cs" />
     <Compile Include="Services\DPSv.cs" />
     <Compile Include="Services\EPSv.cs" />
     <Compile Include="Services\ETSv.cs" />
@@ -720,8 +739,10 @@
     <Compile Include="Services\HRDBSv.cs" />
     <Compile Include="Services\IESv.cs" />
     <Compile Include="Services\ITSv.cs" />
+    <Compile Include="Services\JMSv.cs" />
     <Compile Include="Services\MQSv.cs" />
     <Compile Include="Services\KSSv.cs" />
+    <Compile Include="Services\PPSv.cs" />
     <Compile Include="Services\SJSv.cs" />
     <Compile Include="Services\JQSv.cs" />
     <Compile Include="Services\SASv.cs" />
@@ -972,6 +993,7 @@
     <Content Include="Content\images\meal.png" />
     <Content Include="Content\images\index_bg.jpg" />
     <Content Include="Content\images\index_bg2.jpg" />
+    <Content Include="Content\images\pp.png" />
     <Content Include="Content\images\public_fund.png" />
     <Content Include="Content\images\purchase.png" />
     <Content Include="Content\images\quit.png" />
@@ -1309,6 +1331,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\doc\宿舍维修申请流程操作指引.pdf" />
+    <Content Include="Models\DormDB.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>DormDB.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Properties\PublishProfiles\EmpInfo.pubxml" />
     <Content Include="Scripts\bootstrap-select.js.map" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
@@ -1606,6 +1633,13 @@
     <Content Include="Views\Report\PrintHH.cshtml" />
     <Content Include="Views\Report\HHReport.cshtml" />
     <Content Include="Views\Report\PrintHHForBus.cshtml" />
+    <Content Include="Views\WX\DormRepairOutside.cshtml" />
+    <Content Include="Views\ApplyExtra\ChargerUpdateJMLeaveDay.cshtml" />
+    <Content Include="Views\ApplyExtra\CancelJMApply.cshtml" />
+    <Content Include="Views\Report\JMReport.cshtml" />
+    <Content Include="Views\Report\MQHRTalkReport.cshtml" />
+    <Content Include="Views\Apply\BeginApplyPP.cshtml" />
+    <Content Include="Views\Apply\CheckPPApply.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1625,6 +1659,11 @@
     <WCFMetadataStorage Include="Service References\EmpWebSvr\" />
     <WCFMetadataStorage Include="Service References\FlowSvr\" />
     <WCFMetadataStorage Include="Service References\QywxWebSrv\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Models\DormDB.dbml.layout">
+      <DependentUpon>DormDB.dbml</DependentUpon>
+    </None>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

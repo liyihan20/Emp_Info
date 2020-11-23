@@ -42,5 +42,7 @@ namespace EmpInfo.Models
         public Nullable<System.DateTime> applier_confirm_time { get; set; }
         public string applier_evaluation { get; set; }
         public Nullable<int> applier_evaluation_score { get; set; }
+        public bool is_outside { get; set; }
+        public string emp_id_should_pay { get; set; }
     }
 }

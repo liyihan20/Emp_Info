@@ -77,10 +77,17 @@ namespace EmpInfo.Services
             bill.applier_name = userInfo.name;
             bill.applier_num = userInfo.cardNo;
             bill.apply_time = DateTime.Now;
+            bill.is_outside = false;
 
             if (!"舍友分摊".Equals(bill.fee_share_type)) {
                 bill.fee_share_peple = null;
+
+                //独自承担时，要验证是否7天内新入住的，如果是且有舍友的情况下，必须选择舍友分摊
+                if (!new DormSv().validateWhileSelfPay((DateTime)bill.apply_time, bill.dorm_num, bill.applier_num)) {
+                    throw new Exception("系统检测到你是7天内新入住多人房的职员，费用承担方式必须选择舍友分摊才能提交");
+                }
             }
+
             if (!"预约维修".Equals(bill.repair_type)) {
                 bill.repair_time = null;
             }
@@ -117,6 +124,8 @@ namespace EmpInfo.Services
 
             bill.fee_share_peple = bill.fee_share_peple == null ? "" : GetUserNameByCardNum(bill.fee_share_peple);
             m.bill = bill;
+
+            m.items = db.ei_dormRepairIems.Where(d => d.sys_no == bill.sys_no).ToList();
 
             return m;
         }
@@ -169,6 +178,7 @@ namespace EmpInfo.Services
 
                 bill.repaire_subject = repairSubject;
                 bill.charge_fee = decimal.Parse(repairFee);
+                bill.emp_id_should_pay = new DormSv().GetEmpIdShouldPay((DateTime)bill.apply_time, bill.applier_num, bill.fee_share_peple);
             }
             else if (stepName.Contains("评价")) {
                 string rateScore = fc.Get("rateScore");
@@ -260,6 +270,53 @@ namespace EmpInfo.Services
         public object GetBeginAuditOtherInfo(string sysNo, int step)
         {
             return new DPSv(sysNo).GetBill();
+        }
+
+        public List<DormRepairItemModel> SearchRepairItems(string itemName, string opUser)
+        {
+            return db.Database.SqlQuery<DormRepairItemModel>("exec DP_SearchInventory @itemName = {0},@opUser = {1}", itemName, opUser).ToList();
+        }
+
+        public ei_dormRepairIems SaveRepairItem(DormRepairItemModel im,string opUser){
+
+            if (db.ei_dormRepairIems.Where(d => d.sys_no == im.sys_no && d.item_id == im.item_id).Count() > 0) {
+                throw new Exception("不能选择重复的配件，如果多个请直接修改数量");
+            }
+
+            ei_dormRepairIems item = new ei_dormRepairIems();
+            MyUtils.CopyPropertyValue(im, item);
+            item.op_user = opUser;
+            item.qty = 1;
+
+            db.ei_dormRepairIems.Add(item);
+            db.SaveChanges();
+
+            return item;
+        }
+
+        public void UpdateRepairItemQty(int id, int qty)
+        {
+            var item = db.ei_dormRepairIems.Single(r => r.id == id);
+            if (item.inventory < qty) {
+                throw new Exception("使用数量不能大于库存数量，当前库存数是：" + item.inventory);
+            }
+            item.qty = qty;
+            db.SaveChanges();
+        }
+
+        public void RemoveRepairItem(int id)
+        {
+            var item = db.ei_dormRepairIems.Single(r => r.id == id);
+            db.ei_dormRepairIems.Remove(item);
+            db.SaveChanges();
+        }
+
+        public bool UpdateRepairItemPublicFee(int id)
+        {
+            var item = db.ei_dormRepairIems.Single(r => r.id == id);
+            item.is_public_fee = !item.is_public_fee;
+            db.SaveChanges();
+            return item.is_public_fee;
         }
     }
 }

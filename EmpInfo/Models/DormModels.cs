@@ -39,6 +39,17 @@ namespace EmpInfo.Models
         public string contactName { get; set; }
     }
 
-    
+    public class DormRepairItemModel
+    {
+        public int item_id { get; set; }
+        public string item_type { get; set; }
+        public string item_name { get; set; }
+        public decimal price { get; set; }
+        public int inventory { get; set; }
+        public int stock_id { get; set; }
+        public string stock_name { get; set; }
+        public string sys_no { get; set; }
+        public bool is_public_fee { get; set; }
+    }
 
 }

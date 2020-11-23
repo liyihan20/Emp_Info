@@ -104,6 +104,7 @@
         });
 
         $("#apply_bt").on("click", function () {
+            $("#quit_type").removeAttr("disabled");
             var obj = utils.getFormObj($("#fm"));
             var attNum = $("#myUploader").getMyUploaderFilesNum();
 
@@ -129,6 +130,10 @@
                 if (obj.salary_clear_way == "离职当天现金结算") {
                     toastr.error("请确认薪资发放形式");
                     return;
+                }
+                if (obj.salary_type == "计件") {
+                    alert("计件员工辞职请走新流程，点击确定后将进入计件员工辞职申请流程申请界面");
+                    window.location.href = "BeginApply?billType=MQ";
                 }
             } else {
                 if (!obj.absent_from || obj.absent_from == "") {
@@ -215,11 +220,29 @@
                 beginApply();
             });
 
+            //读取url参数，如果带有quitType的，就取出来，并设置离职类型,2020-11-13 整合新旧离职流程
+            {
+                if (location.search) {
+                    var param = location.search.split("quitType=");
+                    if (param.length>1) {
+                        var quitType = param[1].split("&")[0];
+                        console.log(quitType);
+                        if ("1" == quitType) {
+                            $("#quit_type").val("辞职");
+                        } else {
+                            $("#quit_type").val("自离");
+                        }
+                        $("#quit_type").trigger("change");
+                        $("#quit_type").attr("disabled", "disabled");
+                    }
+                }
+            }
         });
 
         function beginApply() {
             openConfirmDialog("确定要提交申请吗？", function () {
                 $("#apply_bt").button("loading");
+                
                 $.ajax({
                     type: 'post',
                     url: 'SaveApply',
@@ -248,6 +271,10 @@
                 var info = JSON.parse(data.extra);
                 utils.loadObjData($("#fm"), info);
                 if (info.salary_type == "计件") {
+                    if ($("#quit_type").val() == "辞职") {
+                        alert("计件员工辞职请走新流程，请到相邻的流程名为【计件员工辞职】中申请");
+                        return;
+                    }
                     $("#auditors1").show();
                     $("#auditors2").hide();
                 } else if (info.salary_type == "月薪") {
@@ -272,7 +299,7 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-            <li><a href="ApplyIndex?billType=JQ">员工辞职/自离流程</a></li>
+            <li><a href="ApplyIndex?billType=JM">员工离职流程</a></li>
             <li class="active">开始申请</li>
         </ol>
     </div>
@@ -295,7 +322,7 @@
                             离职类型:
                         </span>
                         <div class="b-input">
-                            <select class="form-control" name="quit_type" id="quit_type">
+                            <select class="form-control" name="quit_type" id="quit_type" >
                                 <option value="">---- 下拉选择离职类型 ----</option>
                                 @foreach (var d in new string[] { "辞职", "自离" }) {
                                     <option value="@d">@d</option>
@@ -310,7 +337,7 @@
                             厂牌编码:
                         </span>
                         <div class="b-input">
-                            <input type="text" class="form-control" name="card_number" id="card_number" placeholder="辞职/自离员工厂牌编码" />
+                            <input type="text" class="form-control" name="card_number" id="card_number" placeholder="离职员工厂牌编码" />
                         </div>
                     </div>
                 </div>

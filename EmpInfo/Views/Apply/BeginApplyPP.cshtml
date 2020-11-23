@@ -1,0 +1,349 @@
+﻿@using EmpInfo.Models;
+@{
+    string sysNo = ViewData["infoBeforeApply"] as string;
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 100px;
+            vertical-align: top;
+            color: gray;
+        }
+        .b-input{
+            display:inline-block;
+            width:70%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+
+        #al_file_tb th {
+            font-size: small;
+            text-align: center;
+        }
+
+        #al_file_tb td {
+            font-size: small;
+            text-align: center;
+        }
+
+        #al_file_list i {
+            cursor: pointer;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUploaderPro.js?v=2")"></script>
+
+    <script>
+        $("#tb").bootstrapTable({
+            striped: true,
+            pagination: false,
+            clickToSelect: true,
+            idField: "item_id",
+            uniqueId: "item_id",
+            columns: [
+                {
+                    radio: true
+                },
+                {
+                    field: "item_name",
+                    title: "配件名称"
+                }, {
+                    field: "qty",
+                    title: "使用数量"
+                }, {
+                    field: "price",
+                    title: "单价"
+                }
+            ]
+        });
+
+        $("#tb2").bootstrapTable({
+            striped: true,
+            pagination: false,
+            clickToSelect: true,
+            height: 300,
+            idField: "item_id",
+            uniqueId: "item_id",
+            columns: [
+                {
+                    radio: true
+                },
+                {
+                    field: "is_public_fee",
+                    visible: false
+                },
+                {
+                    field: "item_name",
+                    title: "配件名称"
+                }, {
+                    field: "inventory",
+                    title: "库存数量"
+                }, {
+                    field: "price",
+                    title: "单价"
+                }
+            ]
+        });
+
+        $(function () {
+
+            $("#myUploader").myUploader({
+                accept: {
+                    title: 'Images',
+                    extensions: 'gif,jpg,jpeg,bmp,png',
+                    mimeTypes: 'image/*'
+                },
+                sysNum: "@sysNo",
+                fileNumLimit: 10
+            });
+
+            $("#addBt").on("click", function () {
+                $("#itemModal").modal("show");
+            });
+
+            $("#searchBt").on("click", function () {
+                $.post("../ApplyExtra/SearchDPRepairItem", { itemName: $.trim($("#searchText").val()) }, function (data) {
+                    if (!data.suc) {
+                        toastr.error(data.msg);
+                        return;
+                    }
+                    $("#tb2").bootstrapTable("load", JSON.parse(data.extra));
+                });
+            });
+
+            $("#saveBt").on("click", function () {
+                var rows = $('#tb2').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再保存");
+                    return;
+                }
+                var row = rows[0];
+                if (parseInt(row.inventory) <= 0) {
+                    toastr.error("库存数量不足，不能选择");
+                    return;
+                }
+                rows[0].qty = 1;
+                $("#tb").bootstrapTable('append', rows[0]);
+                $("#itemModal").modal("hide");
+            });
+
+            $("#editBt").on("click", function () {
+                var rows = $('#tb').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再修改");
+                    return;
+                }
+                var row = rows[0];
+
+                openInputDialog("请输入需要修改的数量",
+                    function (content) {
+                        if (!utils.testIsInt(content)) {
+                            toastr.error("数量请输入整数");
+                            return;
+                        }
+                        if (parseInt(content) > row.inventory) {
+                            toastr.error("数量不能大于库存数："+row.inventory);
+                            return;
+                        }
+                        updateItemQty(row.item_id, content);
+                    }, "修改数量", "取消", "确认", row.qty);
+
+            });
+
+            $("#removeBt").on("click", function () {
+                var rows = $('#tb').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                var row = rows[0];                
+                $("#tb").bootstrapTable('removeByUniqueId', row.item_id);
+            });
+        })
+
+        function updateItemQty(id, qty) {
+            console.log(id);
+            console.log(qty);
+            $("#tb").bootstrapTable('updateByUniqueId', {
+                id: id,
+                row: { qty: qty }
+            });
+
+        }
+
+    </script>
+
+    <script>
+        $(function () {
+            $("#datePicker").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd",
+                autoclose: true,
+                startView: 2,
+                maxView: 2,
+                minView: 2
+            });
+
+            //提交申请
+            $("#apply_bt").on("click", function () {
+                var result = utils.validateRequiredField($("#fm"));
+                if (!result.suc) {
+                    toastr.error(result.msg);
+                    return;
+                }
+                var head = utils.getFormObj($("#fm"));
+                var entrys = $("#tb").bootstrapTable('getData');
+
+                console.log(head);
+                console.log(entrys);
+                
+                openConfirmDialog("确定要提交申请吗？", function () {
+                    $("#apply_bt").button("loading");
+                    $.ajax({
+                        type: 'post',
+                        url: 'SaveApply',
+                        data: "sys_no=" + head.sys_no + "&head=" + utils.StringifyAndParseCharacter(head) + "&entrys=" + utils.StringifyAndParseCharacter(entrys),
+                        cache: false,
+                        dataType: 'json',
+                        success: function (data) {
+                            $("#apply_bt").button("reset");
+                            if (data.suc) {
+                                toastr.success("提交成功:" + data.msg);
+                                setTimeout(function () { window.location.href = "CheckApply?sysNo=" + head.sys_no; }, 2000);
+                            } else {
+                                toastr.error("提交失败：" + data.msg);
+                                $("#apply_bt").button("reset");
+                            }
+
+                        }
+                    });
+                });
+
+            });
+
+        });
+
+
+    </script>
+}
+
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/DormGroupIndex")">后勤事务</a></li>
+            <li><a href="ApplyIndex?billType=PP">宿舍公共区域维修</a></li>
+            <li class="active">开始申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <form id="fm" style="margin-top:-12px;">
+            <div class="b-div">
+                <span class="b-label">
+                    申请流水号:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="sys_no" id="sysNum" value="@sysNo" readonly />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">维修日期:</span>
+                <span style="vertical-align:top;">
+                    <span class="input-group date" style="display:inline-table;width:70%;" id="datePicker">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span> </span>
+                        <input class="form-control" type="text" readonly id="repair_day" name="repair_day" required>
+                    </span>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    维修地点:
+                </span>
+                <span class="b-input">
+                    <textarea type="text" class="form-control" rows="2" id="addr" name="addr" required></textarea>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    维修内容:
+                </span>
+                <span class="b-input">
+                    <textarea type="text" class="form-control" rows="2" id="repair_content" name="repair_content" required></textarea>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    备注:
+                </span>
+                <span class="b-input">
+                    <textarea type="text" class="form-control" rows="2" id="comment" name="comment"></textarea>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    使用配件清单:
+                </span>
+                <div class="b-input">
+                    <button class="btn btn-success btn-sm" type="button" id="addBt"> <i class="fa fa-plus"></i> 新增配件</button>
+                    <button class="btn btn-primary btn-sm" type="button" id="editBt"> <i class="fa fa-edit"></i> 修改数量 </button>
+                    <button class="btn btn-danger btn-sm" type="button" id="removeBt"> <i class="fa fa-remove"></i> 删除配件 </button>
+                </div>
+            </div>
+            <div>
+                <table id="tb"></table>
+            </div>
+            <div style="display:inline-block;margin-top:12px;">
+                <div id="picker"> <i class="fa fa-upload"></i> 上传图片 </div>
+            </div>
+            <div id="myUploader">
+
+            </div>
+        </form>
+        <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:16px;"><i class="fa fa-check-circle-o"></i> 提交申请单</button>
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_MessageDialog")
+    @Html.Partial("_InputDialog")
+    <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">新增配件</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="searchText" placeholder="请输入配件名称搜索">
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" id="searchBt" data-loading-text="查询中..."><span class="fa fa-search"></span> 搜索</button>
+                        </span>
+                    </div>
+                    <div><table id="tb2"></table></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 取消</button>
+                    <button type="button" class="btn btn-success" id="saveBt"><span class="fa fa-check-circle"></span> 确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

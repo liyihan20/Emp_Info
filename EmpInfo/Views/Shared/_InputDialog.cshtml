@@ -24,12 +24,12 @@
 <script>
     //打开信息输入对话框，content是提示内容，callback是点击确认之后的回调方法
     var itcb;
-    function openInputDialog(inputTip, callback, title, cancelText, confirmText) {
+    function openInputDialog(inputTip, callback, title, cancelText, confirmText,content) {
         $("#it_text_title").html(title ? title : "信息输入");
         $("#it_text_cancel").html(cancelText ? cancelText : "取消");
         $("#it_text_confirm").html(confirmText ? confirmText : "确定");
 
-        $("#it_input_content").val("");
+        $("#it_input_content").val(content ? content : "");
         $("#inputModal").modal("show");
         $("#input_tip").html(inputTip);
         itcb = callback;

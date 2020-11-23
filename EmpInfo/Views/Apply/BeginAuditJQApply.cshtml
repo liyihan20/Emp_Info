@@ -107,7 +107,7 @@
                 success: function (data) {
                     if (data.suc) {
                         toastr.success(data.msg);
-                        setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
+                        setTimeout(function () { window.location.href = "GetMyAuditingList?billType=JM"; }, 2000);
                     } else {
                         toastr.error(data.msg);
                     }

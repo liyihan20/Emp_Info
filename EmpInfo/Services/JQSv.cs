@@ -80,7 +80,7 @@ namespace EmpInfo.Services
         }
 
         public override void SaveApply(System.Web.Mvc.FormCollection fc, UserInfo userInfo)
-        {            
+        {   
             bill = new ei_jqApply();
             MyUtils.SetFieldValueToModel(fc, bill);
 
@@ -364,5 +364,15 @@ namespace EmpInfo.Services
             bill.dep_name = newDepName;
             db.SaveChanges();
         }
+
+        public string ToggleCheck1()
+        {
+            bill.check1 = !(bill.check1 ?? false);
+            db.SaveChanges();
+            return bill.check1.ToString();
+        }
+
+        
+
     }
 }

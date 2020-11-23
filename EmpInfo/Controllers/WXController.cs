@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Web.Mvc;
 using EmpInfo.Interfaces;
+using EmpInfo.FlowSvr;
 
 namespace EmpInfo.Controllers
 {
@@ -384,6 +385,108 @@ namespace EmpInfo.Controllers
                 return Content("二维码内容:" + result + ";提示信息:" + ex.Message);
             }
             return Content(result);
+        }
+
+        #endregion
+
+        #region 厂外宿舍维修流程
+
+        //测试地址：http://localhost/emp/WX/DormRepairOutside?openId=72G4jHFXZ7QVQcUVz0cnLMIaTjDeQHVdkUr2aHcx76U%3D
+        public ActionResult DormRepairOutside(string openId)
+        {
+            try {
+                openId = AESD(openId);
+            }
+            catch (Exception ex) {
+                ViewData["tip"] = ex.Message;
+                return View("Error");
+            }
+
+            ei_users user = new ei_users();//厂外的没有用户表信息，模拟一个
+            user.card_number = openId;
+            user.id = 0;
+
+            var apply = db.flow_apply.Where(f => f.create_user == openId && f.success == null).FirstOrDefault();
+            if (apply != null) {
+                user.name = db.ei_dormRepair.Where(d => d.sys_no == apply.sys_no).First().applier_name;
+                setcookie(user, 3);
+
+                //存在已申请未结束的流程
+                var isMyStep = apply.flow_applyEntry.Where(f => f.auditors == openId && f.pass == null).FirstOrDefault();
+                if (isMyStep != null) {
+                    //之前的申请是未评价的，直接跳到评价界面
+                    return RedirectToAction("BeginAuditApply", "Apply", new { sysNo = apply.sys_no, step = isMyStep.step });
+                }
+                else {
+                    //跳到查询界面
+                    return RedirectToAction("CheckDPApplyInDormSys", "Apply", new { sysNo = apply.sys_no });
+                }
+            }
+
+            setcookie(user, 3);
+
+            //需要新增的
+            DormRepairBeginApplyModel m = new DormRepairBeginApplyModel();
+            m.sysNo = GetNextSysNum("DP");
+            m.roomMaleList = "";
+
+            ViewData["infoBeforeApply"] = m;
+
+            return View();
+        }
+
+        public JsonResult BeginApplyDPOutside(FormCollection fc)
+        {
+            var bill = new ei_dormRepair();
+            MyUtils.SetFieldValueToModel(fc, bill);
+
+            bill.is_outside = true;
+            bill.apply_time = DateTime.Now;
+            bill.applier_num = userInfo.cardNo;
+            bill.applier_name = bill.contact_name;
+            bill.is_outside = true;
+
+            if (!"预约维修".Equals(bill.repair_type)) {
+                bill.repair_time = null;
+            }
+
+            if (bill.area_name.Contains("红草") && !bill.dorm_num.Contains("HC")) {
+                bill.dorm_num = "HC" + bill.dorm_num;
+            }
+
+            if (bill.contact_name.Length < 2) {
+                return Json(new SimpleResultModel(false, "联系人姓名至少要有2个字符"));
+            }
+
+            //验证宿舍区、宿舍和房主是否匹配,并通过引用方式带回费用承担方式和需要扣费的empid
+            try {
+                new DormSv().validateDPOutside(bill);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+
+            FlowSvrSoapClient client = new FlowSvrSoapClient();
+            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), "DP", userInfo.cardNo, bill.sys_no, bill.repair_content, bill.area_name + "_" + bill.dorm_num);
+            if (result.suc) {
+                try {
+                    db.ei_dormRepair.Add(bill);
+                    db.SaveChanges();
+                }
+                catch (Exception ex) {
+                    //将生成的流程表记录删除
+                    client.DeleteApplyForFailure(bill.sys_no);
+                    return Json(new SimpleResultModel(false,"申请提交失败，原因：" + ex.Message));
+                }
+
+                //发送通知到下一环节                
+                new DPSv().SendNotification(result);
+            }
+            else {
+                return Json(new SimpleResultModel(false,"申请提交失败，原因：" + result.msg));
+            }
+
+            return Json(new SimpleResultModel(true, "流水号：" + bill.sys_no));
         }
 
         #endregion

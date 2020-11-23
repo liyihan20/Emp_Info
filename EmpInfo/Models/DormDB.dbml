@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="LogisticsDB" Class="DormDBDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=192.168.100.205;Initial Catalog=LogisticsDB;Persist Security Info=True;User ID=Logistics" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="LogisticsDBConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.dormitory_area" Member="dormitory_area">
+    <Type Name="dormitory_area">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="name" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="comment" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Association Name="dormitory_area_dormitory_dorm" Member="dormitory_dorm" ThisKey="id" OtherKey="area_number" Type="dormitory_dorm" />
+    </Type>
+  </Table>
+  <Table Name="dbo.dormitory_dorm" Member="dormitory_dorm">
+    <Type Name="dormitory_dorm">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="number" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="area_number" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="type_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="available" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="comment" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="dorm_sex" Type="System.String" DbType="VarChar(8)" CanBeNull="true" />
+      <Column Name="rent" Type="System.Decimal" DbType="Decimal(6,2)" CanBeNull="true" />
+      <Column Name="manage_cost" Type="System.Decimal" DbType="Decimal(6,2)" CanBeNull="true" />
+      <Column Name="for_order" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Association Name="dormitory_dorm_dormitory_lodging" Member="dormitory_lodging" ThisKey="id" OtherKey="dorm_id" Type="dormitory_lodging" />
+      <Association Name="dormitory_dorm_dormitory_other_fee" Member="dormitory_other_fee" ThisKey="id" OtherKey="dorm_id" Type="dormitory_other_fee" />
+      <Association Name="dormitory_area_dormitory_dorm" Member="dormitory_area" ThisKey="area_number" OtherKey="id" Type="dormitory_area" IsForeignKey="true" />
+      <Association Name="dormitory_type_dormitory_dorm" Member="dormitory_type" ThisKey="type_id" OtherKey="id" Type="dormitory_type" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.dormitory_employee" Member="dormitory_employee">
+    <Type Name="dormitory_employee">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="name" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
+      <Column Name="card_number" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="account_number" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="identify_number" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="sex" Type="System.String" DbType="VarChar(2)" CanBeNull="true" />
+      <Column Name="degree" Type="System.String" DbType="VarChar(10)" CanBeNull="true" />
+      <Column Name="department" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="household" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="salary_type" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="phone" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="family_address" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="family_phone" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="family_connector" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="comment" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="picture" Type="System.Data.Linq.Binary" DbType="Image" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="old_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="identify_info" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="key_num" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
+      <Association Name="dormitory_employee_dormitory_lodging" Member="dormitory_lodging" ThisKey="id" OtherKey="emp_id" Type="dormitory_lodging" />
+      <Association Name="dormitory_employee_dormitory_other_fee" Member="dormitory_other_fee" ThisKey="id" OtherKey="emp_id" Type="dormitory_other_fee" />
+    </Type>
+  </Table>
+  <Table Name="dbo.dormitory_event_log" Member="dormitory_event_log">
+    <Type Name="dormitory_event_log">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="model" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="area" Type="System.String" DbType="VarChar(10)" CanBeNull="true" />
+      <Column Name="dorm" Type="System.String" DbType="VarChar(10)" CanBeNull="true" />
+      <Column Name="emp" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="event" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="operator" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="operate_time" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="is_normal" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.dormitory_lodging" Member="dormitory_lodging">
+    <Type Name="dormitory_lodging">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="dorm_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="emp_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="in_date" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="out_date" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="real_rent" Type="System.Decimal" DbType="Decimal(10,2)" CanBeNull="true" />
+      <Column Name="real_manage" Type="System.Decimal" DbType="Decimal(10,2)" CanBeNull="true" />
+      <Column Name="guarantee" Type="System.Decimal" DbType="Decimal(10,2)" CanBeNull="true" />
+      <Column Name="situation" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="classify_property" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="is_quit" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="not_to_salary" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Association Name="dormitory_dorm_dormitory_lodging" Member="dormitory_dorm" ThisKey="dorm_id" OtherKey="id" Type="dormitory_dorm" IsForeignKey="true" />
+      <Association Name="dormitory_employee_dormitory_lodging" Member="dormitory_employee" ThisKey="emp_id" OtherKey="id" Type="dormitory_employee" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.dormitory_other_fee" Member="dormitory_other_fee">
+    <Type Name="dormitory_other_fee">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="emp_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="dorm_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="year_month" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="repair_cost" Type="System.Decimal" DbType="Decimal(8,2)" CanBeNull="true" />
+      <Column Name="fine" Type="System.Decimal" DbType="Decimal(8,2)" CanBeNull="true" />
+      <Column Name="guesthouse_cost" Type="System.Decimal" DbType="Decimal(8,2)" CanBeNull="true" />
+      <Column Name="other_cost" Type="System.Decimal" DbType="Decimal(8,2)" CanBeNull="true" />
+      <Column Name="out_share_water" Type="System.Decimal" DbType="Decimal(8,2)" CanBeNull="true" />
+      <Column Name="out_share_eletricity" Type="System.Decimal" DbType="Decimal(8,2)" CanBeNull="true" />
+      <Column Name="comment" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="date" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Association Name="dormitory_dorm_dormitory_other_fee" Member="dormitory_dorm" ThisKey="dorm_id" OtherKey="id" Type="dormitory_dorm" IsForeignKey="true" />
+      <Association Name="dormitory_employee_dormitory_other_fee" Member="dormitory_employee" ThisKey="emp_id" OtherKey="id" Type="dormitory_employee" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.dormitory_type" Member="dormitory_type">
+    <Type Name="dormitory_type">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="name" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="area" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="rent" Type="System.Decimal" DbType="Decimal(10,2)" CanBeNull="true" />
+      <Column Name="manage_cost" Type="System.Decimal" DbType="Decimal(8,2)" CanBeNull="true" />
+      <Column Name="charge_mode" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="max_number" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="date" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Association Name="dormitory_type_dormitory_dorm" Member="dormitory_dorm" ThisKey="id" OtherKey="type_id" Type="dormitory_dorm" />
+    </Type>
+  </Table>
+</Database>

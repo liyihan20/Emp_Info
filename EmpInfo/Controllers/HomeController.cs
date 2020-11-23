@@ -653,5 +653,16 @@ namespace EmpInfo.Controllers
             return "ok";
         }
 
+        public string dpTest()
+        {
+            return new DormSv().GetEmpIdShouldPay(DateTime.Parse("2020-10-25 10:11:08.877"), "100621054", null);
+        }
+
+        public string hrTest()
+        {
+            new MQSv("MQ201104056").NeedHRTalk();
+            return "OK";
+        }
+
     }
 }

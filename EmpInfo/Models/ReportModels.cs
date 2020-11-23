@@ -71,6 +71,21 @@ namespace EmpInfo.Models
         public string sysNum { get; set; }
     }
 
+    public class JMSearchParam
+    {
+        public string fromDate { get; set; }
+        public string toDate { get; set; }
+        public string qFromDate { get; set; }
+        public string qToDate { get; set; }
+        public string depName { get; set; }
+        public string empName { get; set; }
+        public string sysNum { get; set; }
+        public string cardNumber { get; set; }
+        public string salaryNumber { get; set; }
+        public string quitType { get; set; }
+        public string salaryType { get; set; }
+    }
+
     public class SJSearchParam
     {
         public string fromDate { get; set; }

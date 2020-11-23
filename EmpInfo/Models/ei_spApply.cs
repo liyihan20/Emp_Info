@@ -54,6 +54,9 @@ namespace EmpInfo.Models
         public string out_status { get; set; }
         public string out_reason { get; set; }
         public string isReturnBack { get; set; }
+        public string quality_audior_no { get; set; }
+        public string quality_audior_name { get; set; }
+        public string stock_addr { get; set; }
     
         public virtual ICollection<ei_spApplyEntry> ei_spApplyEntry { get; set; }
     }

@@ -1,0 +1,128 @@
+﻿@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: top;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        var sysNo;
+        $(function () {
+            $("#get_info_btn").on("click", function () {
+                var sinfo = $.trim($("#searchContent").val());
+                if (!sinfo || sinfo.length < 6) {
+                    toastr.error("请输入正确的信息后再获取");
+                    return;
+                }
+                $.post("GetJMApply", { searchContent: sinfo }, function (data) {
+                    if (data.suc) {
+                        var jm = JSON.parse(data.extra);
+                        $("#empName").val(jm.name);
+                        $("#depName").val(jm.dep_name);
+                        $("#leaveDay").val(utils.parseTDate(jm.leave_date));
+                        sysNo = jm.sys_no;
+                    } else {
+                        sysNo = "";
+                        $("#empName").val("");
+                        $("#depName").val("");
+                        $("#leaveDay").val("");
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+            $("#apply_bt").on("click", function () {
+                if (!sysNo) {
+                    toastr.error("请先获取离职信息");
+                    return;
+                }
+                openConfirmDialog("确定要作废此离职申请单吗？", function () {
+                    $.post("BeginCancelJMApply", { sysNo: sysNo }, function (data) {
+                        if (!data.suc) {
+                            toastr.error(data.msg);
+                        } else {
+                            toastr.success("作废成功");
+                        }
+                    });
+                });
+
+            });
+
+        });
+    </script>
+}
+
+<div class="row" style="margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                    <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                    <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                    <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+                    <li><a href="../Apply/ApplyIndex?billType=JM">员工离职申请</a></li>
+                    <li class="active">作废离职申请</li>
+                </ol>
+            </div>
+            <div class="panel-body">
+                <div class="b-div">
+                    <span class="b-label">
+                        输入信息:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control" id="searchContent" placeholder="请输入离职流水号或离职人厂牌" />
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        获取信息:
+                    </span>
+                    <span class="b-input">
+                        <button class="btn btn-success btn-sm" type="button" id="get_info_btn"><i class="fa fa-search"></i> 获取离职信息</button>
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        离职人姓名:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control" id="empName" placeholder="由系统带出" readonly />
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        离职人部门:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control" id="depName" placeholder="由系统带出" readonly />
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        离职日期:
+                    </span>
+                    <span class="b-input">
+                        <input type="text" class="form-control" id="leaveDay" placeholder="由系统带出" readonly />
+                    </span>
+                </div>
+
+                <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..."><i class="fa fa-check-circle-o"></i> 确认作废</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+}

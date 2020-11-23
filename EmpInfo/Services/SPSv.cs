@@ -82,6 +82,11 @@ namespace EmpInfo.Services
             string sysNo = GetNextSysNum(BillType);
             var sp = db.ei_spApply.Where(s => s.applier_num == userInfo.cardNo).OrderByDescending(s => s.id).FirstOrDefault();
             var busDepList = db.flow_auditorRelation.Where(f => f.bill_type == BillType && f.relate_name == "事业部审批").Select(f => f.relate_text).Distinct().ToList();
+
+            var stockAddrList = (from f in db.flow_auditorRelation
+                                    join u in db.ei_users on f.relate_value equals u.card_number
+                                    where f.bill_type == BillType && f.relate_name == "仓管审批"
+                                    select f.relate_text).Distinct().ToList();
             if (sp == null) {
                 return new SPBeforeApplyModel()
                 {
@@ -104,7 +109,8 @@ namespace EmpInfo.Services
                 to_addr = sp.to_addr,
                 aging = sp.aging,
                 scope = sp.scope,
-                busDepList = busDepList
+                busDepList = busDepList,
+                stockAddrList = stockAddrList
             };
         }
 
@@ -141,10 +147,20 @@ namespace EmpInfo.Services
             }
             else {
                 if (entry.Count() < 1) {
-                    throw new Exception("请至少填写一项产品明细");
+                    throw new Exception("请至少填写一项产品或原材料明细");
                 }
-            }
+                if (bill.content_type == "原材料") {
+                    if (string.IsNullOrEmpty(bill.quality_audior_name)) {
+                        throw new Exception("品质审核人或仓管审核人不能为空");
+                    }
+                    bill.quality_audior_no = GetUserCardByNameAndCardNum(bill.quality_audior_name);
+                    if (string.IsNullOrEmpty(bill.stock_addr)) {
+                        throw new Exception("请选择仓库地址");
+                    }
+                }
+            }            
             
+
             FlowSvrSoapClient client = new FlowSvrSoapClient();            
             var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.bus_name, bill.content_type + bill.send_or_receive + "申请");
             if (result.suc) {
@@ -206,7 +222,7 @@ namespace EmpInfo.Services
                         bill.ex_price = decimal.Parse(exPriceStr);
                     }
                 }
-                if (stepName.Contains("行政")) {
+                if (stepName.Contains("行政部")) {
                     bill.can_print = true; //可打印放行条并可被扫描
                     bill.out_status = "已打印";
                 }

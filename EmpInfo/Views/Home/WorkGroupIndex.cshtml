@@ -74,19 +74,17 @@
                     <img src="@Url.Content("~/Content/images/leave.png")" class="center-block" />
                     <p class="text-center" data-key="休假,年假">请假申请</p>
                 </a>
-            </div>
-            @if (testVisible) {
-                <div class="col-xs-4 col-sm-3 col-md-2">
-                    <a href="@Url.Content("~/Apply/ApplyIndex?billType=MQ")">
-                        <img src="@Url.Content("~/Content/images/mq.png")" alt="计件员工辞职(测试)" class="center-block" />
-                        <p class="text-center">计件员工辞职(测试)</p>
-                    </a>
-                </div>
-            }
+            </div>            
+            @*<div class="col-xs-4 col-sm-3 col-md-2">
+                <a href="@Url.Content("~/Apply/ApplyIndex?billType=MQ")">
+                    <img src="@Url.Content("~/Content/images/mq.png")" alt="计件员工辞职" class="center-block" />
+                    <p class="text-center">计件员工辞职</p>
+                </a>
+            </div>*@            
             <div class="col-xs-4 col-sm-3 col-md-2">
-                <a href="@Url.Content("~/Apply/ApplyIndex?billType=JQ")">
+                <a href="@Url.Content("~/Apply/ApplyIndex?billType=JM")">
                     <img src="@Url.Content("~/Content/images/quit.png")" alt="员工辞职/自离申请" class="center-block" />
-                    <p class="text-center">员工辞职自离</p>
+                    <p class="text-center">员工离职</p>
                 </a>
             </div>
             @*<div class="col-xs-4 col-sm-3 col-md-2">
@@ -183,6 +181,12 @@
                 <a href="@Url.Content("~/Apply/ApplyIndex?billType=IT")">
                     <img src="@Url.Content("~/Content/images/it.png")" class="center-block" />
                     <p class="text-center">电脑维修申请</p>
+                </a>
+            </div>
+            <div class="col-xs-4 col-sm-3 col-md-2">
+                <a href="@Url.Content("~/Apply/ApplyIndex?billType=PP")">
+                    <img src="@Url.Content("~/Content/images/pp.png")" class="center-block" />
+                    <p class="text-center">后勤公共维修</p>
                 </a>
             </div>
 

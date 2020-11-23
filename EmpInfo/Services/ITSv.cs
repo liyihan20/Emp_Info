@@ -168,21 +168,21 @@ namespace EmpInfo.Services
             string opinion = fc.Get("opinion");
 
             if (stepName.Equals("IT部接单")) {
-                if (bill.priority < 6) {
-                    // 优先级少于6的，接单之前，判断是否有7天未处理完成的单，如有，不允许接，给提示
-                    var exceedBills = (from i in db.vw_ITExcel
-                                       where i.accept_man_number == userInfo.cardNo
-                                       && i.repair_time == null
-                                       && i.audit_result != "被拒绝"
-                                       && ((i.repair_way == "现场维修" && EntityFunctions.DiffDays(i.print_time, DateTime.Now) >= 7)
-                                       || (i.repair_way == "远程维修" && EntityFunctions.DiffDays(i.accept_time, DateTime.Now) >= 7)
-                                       )
-                                       orderby i.accept_time
-                                       select i.sys_no).Take(1).ToList();
-                    if (exceedBills.Count() > 0) {
-                        throw new Exception("存在超过7天接单后未维修的申请，请先处理后再接单，5秒后将跳转到需处理的页面>" + exceedBills.First());
-                    }
-                }
+                //if (bill.priority < 6) {
+                //    // 优先级少于6的，接单之前，判断是否有7天未处理完成的单，如有，不允许接，给提示
+                //    var exceedBills = (from i in db.vw_ITExcel
+                //                       where i.accept_man_number == userInfo.cardNo
+                //                       && i.repair_time == null
+                //                       && i.audit_result != "被拒绝"
+                //                       && ((i.repair_way == "现场维修" && EntityFunctions.DiffDays(i.print_time, DateTime.Now) >= 7)
+                //                       || (i.repair_way == "远程维修" && EntityFunctions.DiffDays(i.accept_time, DateTime.Now) >= 7)
+                //                       )
+                //                       orderby i.accept_time
+                //                       select i.sys_no).Take(1).ToList();
+                //    if (exceedBills.Count() > 0) {
+                //        throw new Exception("存在超过7天接单后未维修的申请，请先处理后再接单，5秒后将跳转到需处理的页面>" + exceedBills.First());
+                //    }
+                //}
                 MyUtils.SetFieldValueToModel(fc, bill);
                 bill.accept_man_name = userInfo.name;
                 bill.accept_man_number = userInfo.cardNo;
@@ -264,7 +264,7 @@ namespace EmpInfo.Services
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     string wxPushContent = "";
                     if (result.stepName == "搬电脑到IT部") {
-                        wxPushContent = "请在3天内将故障电脑搬到IT部（地址：4栋2楼），并在IT部打印维修标签粘贴在机箱上，等待维修人员" + bill.accept_man_name + "处理，如超时未处理将会被自动NG。";
+                        wxPushContent = "请在5天内将故障电脑搬到IT部（地址：4栋2楼），并在IT部打印维修标签粘贴在机箱上，等待维修人员" + bill.accept_man_name + "处理，如超时未处理将会被自动NG。";
                     }
                     else if (result.stepName == "服务评价") {
                         wxPushContent = "电脑维修单已完成，请对此次维修服务进行评价";

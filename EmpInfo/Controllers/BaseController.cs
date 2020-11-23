@@ -285,6 +285,10 @@ namespace EmpInfo.Controllers
                         if (!string.IsNullOrEmpty(names)) names += ";";
                         names += emp.First().emp_name;
                     }
+                    else {
+                        if (!string.IsNullOrEmpty(names)) names += ";";
+                        names += num;
+                    }
                 }
             }
             return names;

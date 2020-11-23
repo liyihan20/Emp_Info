@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5" name="DormDB">
+  <DataContextMoniker Name="/DormDBDataContext" />
+  <nestedChildShapes>
+    <classShape Id="3edaa162-0e61-4dfe-bac6-d8de1283fe11" isExpanded="false" absoluteBounds="5.5, 3.875, 2, 0.45">
+      <DataClassMoniker Name="/DormDBDataContext/dormitory_area" />
+      <nestedChildShapes>
+        <elementListCompartment Id="4b67df3d-edcb-4282-939b-7e0b8983556c" absoluteBounds="5.515, 4.335, 1.9700000000000002, 0.820526123046875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="7b92cf29-8dd5-4404-9996-558e18d53c88" isExpanded="false" absoluteBounds="5.375, 2.25, 2, 0.45">
+      <DataClassMoniker Name="/DormDBDataContext/dormitory_dorm" />
+      <nestedChildShapes>
+        <elementListCompartment Id="905af033-b0fa-467f-81c3-6a21d78f17d6" absoluteBounds="5.39, 2.71, 1.9700000000000002, 2.1576639811197915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(6.4375 : 3.875); (6.4375 : 2.7)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/DormDBDataContext/dormitory_area/dormitory_area_dormitory_dorm" />
+      <nodes>
+        <classShapeMoniker Id="3edaa162-0e61-4dfe-bac6-d8de1283fe11" />
+        <classShapeMoniker Id="7b92cf29-8dd5-4404-9996-558e18d53c88" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="f9b4c02e-70f6-41a4-8391-831b790489f2" isExpanded="false" absoluteBounds="2.625, 1.875, 2, 0.45">
+      <DataClassMoniker Name="/DormDBDataContext/dormitory_employee" />
+      <nestedChildShapes>
+        <elementListCompartment Id="5a6d4b3b-548a-46cc-9280-b1c63e19195d" absoluteBounds="2.64, 2.335, 1.9700000000000002, 3.876841227213542" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="12e2997c-a7f2-4fca-8fb8-b92ab1812172" isExpanded="false" absoluteBounds="2.625, 0.875, 2, 0.45">
+      <DataClassMoniker Name="/DormDBDataContext/dormitory_event_log" />
+      <nestedChildShapes>
+        <elementListCompartment Id="c4f1551b-3836-4a65-9664-b2d8bdc3d078" absoluteBounds="2.64, 1.335, 1.9700000000000002, 1.966644287109375" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="ded47fd5-20de-4109-8de3-983d0fc069ce" isExpanded="false" absoluteBounds="2.625, 2.875, 2, 0.45">
+      <DataClassMoniker Name="/DormDBDataContext/dormitory_lodging" />
+      <nestedChildShapes>
+        <elementListCompartment Id="a7b70e07-d6d3-4d58-b7df-1da1157e41e1" absoluteBounds="2.64, 3.335, 1.9700000000000002, 2.539703369140625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(5.375 : 2.7); (4.625 : 2.875)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/DormDBDataContext/dormitory_dorm/dormitory_dorm_dormitory_lodging" />
+      <nodes>
+        <classShapeMoniker Id="7b92cf29-8dd5-4404-9996-558e18d53c88" />
+        <classShapeMoniker Id="ded47fd5-20de-4109-8de3-983d0fc069ce" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(3.625 : 2.325); (3.625 : 2.875)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/DormDBDataContext/dormitory_employee/dormitory_employee_dormitory_lodging" />
+      <nodes>
+        <classShapeMoniker Id="f9b4c02e-70f6-41a4-8391-831b790489f2" />
+        <classShapeMoniker Id="ded47fd5-20de-4109-8de3-983d0fc069ce" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="130f4905-46f8-47b6-8e32-55e4b3de8ce8" isExpanded="false" absoluteBounds="5.25, 0.875, 2, 0.45">
+      <DataClassMoniker Name="/DormDBDataContext/dormitory_other_fee" />
+      <nestedChildShapes>
+        <elementListCompartment Id="acb882ce-202f-4dc2-9233-f9d4767f0af2" absoluteBounds="5.2650000000000006, 1.335, 1.9700000000000002, 2.539703369140625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(6.3125 : 2.25); (6.3125 : 1.325)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/DormDBDataContext/dormitory_dorm/dormitory_dorm_dormitory_other_fee" />
+      <nodes>
+        <classShapeMoniker Id="7b92cf29-8dd5-4404-9996-558e18d53c88" />
+        <classShapeMoniker Id="130f4905-46f8-47b6-8e32-55e4b3de8ce8" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(4.625 : 1.875); (5.25 : 1.325)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/DormDBDataContext/dormitory_employee/dormitory_employee_dormitory_other_fee" />
+      <nodes>
+        <classShapeMoniker Id="f9b4c02e-70f6-41a4-8391-831b790489f2" />
+        <classShapeMoniker Id="130f4905-46f8-47b6-8e32-55e4b3de8ce8" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="352b0eaa-61ba-47af-90f4-87c45ca53c9b" isExpanded="false" absoluteBounds="2.625, 3.875, 2, 0.45">
+      <DataClassMoniker Name="/DormDBDataContext/dormitory_type" />
+      <nestedChildShapes>
+        <elementListCompartment Id="99a02f68-ba18-4868-930c-50c4f6fc7e28" absoluteBounds="2.64, 4.335, 1.9700000000000002, 1.7756245930989585" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(4.625 : 4.1); (5.25 : 4.1); (5.25 : 3.625); (5.91666666666667 : 3.625); (5.91666666666667 : 2.7)]" fixedFrom="Algorithm" fixedTo="Caller">
+      <AssociationMoniker Name="/DormDBDataContext/dormitory_type/dormitory_type_dormitory_dorm" />
+      <nodes>
+        <classShapeMoniker Id="352b0eaa-61ba-47af-90f4-87c45ca53c9b" />
+        <classShapeMoniker Id="7b92cf29-8dd5-4404-9996-558e18d53c88" />
+      </nodes>
+    </associationConnector>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

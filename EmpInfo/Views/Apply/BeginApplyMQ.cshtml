@@ -126,11 +126,11 @@
             $.post("@Url.Content("~/Item/GetHREmpInfoDetail")", { cardNumber: num }, function (data) {
                 if (data.suc) {
                     var info = JSON.parse(data.extra);
-                    //if (info.salary_type != "计件") {
-                    //    alert("此流程限定只能由计件员工使用，月薪员工辞职请到相邻【员工离职申请】中申请,点击确定后会自动跳转");
-                    //    window.location.href = "BeginApply?billType=JQ";
-                    //    return;
-                    //}
+                    if (info.salary_type != "计件") {
+                        alert("此流程限定只能由计件员工使用，月薪员工辞职请到相邻【员工离职申请】中申请,点击确定后会自动跳转");
+                        window.location.href = "BeginApply?billType=JQ";
+                        return;
+                    }
                     utils.loadObjData($("#fm"), info);
                 } else {
                     toastr.error(data.msg);
@@ -149,7 +149,7 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-            <li><a href="ApplyIndex?billType=MQ">计件员工辞职流程</a></li>
+            <li><a href="ApplyIndex?billType=JM">员工离职流程</a></li>
             <li class="active">开始申请</li>
         </ol>
     </div>
@@ -157,18 +157,18 @@
         <div class="panel panel-default">
             <div class="panel-body">
                 <h4 class="text-danger" style="margin-top:4px;"><i class="fa fa-info-circle"></i> 流程说明 </h4>
-                <div style="margin-left:18px;padding-top:2px;" class="text-danger">
+                <div style="margin-left:18px;padding-top:2px;" class="text-danger">                    
                     <p>
-                        1. 此流程仅限计件员工辞职申请用，其它如月薪员工辞职/自离、计件员工自离流程，请到《员工辞职自离》流程申请。
+                        1. 为维护员工辞职权利，组长和主管不能拒绝辞职申请，只能和员工面谈后选择【挽留成功】选项，并由员工确认是否撤销申请或坚持辞职。
                     </p>
                     <p>
-                        2. 为维护员工辞职权利，组长和主管不能拒绝辞职申请，只能和员工面谈后选择【挽留成功】选项，并由员工确认是否撤销申请或坚持辞职。
+                        2. 如果审核人超过30天还未审批完成，系统在第30天会自动同意辞职。
                     </p>
                     <p>
-                        3. 如果审核人超过30天还未审批完成，系统在第30天会自动同意辞职。
+                        3. 组长填写的批准离职时间不能超过申请时间30天后，所以如果员工不想太快辞职，可等到意愿离职时间前30天再申请。
                     </p>
                     <p>
-                        4. 组长填写的批准离职时间不能超过申请时间30天后，所以如果不想太快辞职，可等到意愿离职时间前30天再申请。
+                        4. 如对本流程有问题，可与行政部刘长青联系。
                     </p>
                 </div>
             </div>

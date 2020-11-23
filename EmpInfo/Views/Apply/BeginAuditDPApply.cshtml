@@ -1,14 +1,20 @@
 ﻿@using EmpInfo.Models;
+@using Newtonsoft.Json;
 @{
     BeginAuditModel bam = ViewData["bam"] as BeginAuditModel;
     DPCheckApplyModel cam = (DPCheckApplyModel)bam.otherInfo;
     List<EmpInfo.FlowSvr.FlowRecordModels> records = cam.records;
     ei_dormRepair form = cam.bill;
+    var totalCost = cam.items.Count() == 0 ? 0 : cam.items.Where(i=>!i.is_public_fee).Sum(i => i.price * i.qty);
+    var itemsJson = JsonConvert.SerializeObject(cam.items);
+    
 }
 
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/star-rating.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
     <style type="text/css">
         .b-div {
             margin: 10px;
@@ -34,10 +40,203 @@
 @section Scripts{
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
     <script src="@Url.Content("~/Scripts/star-rating.min.js")"></script>
     <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
     <script src="@Url.Content("~/Scripts/myUploaderPro.js?v=2")"></script>
     <script src="@Url.Content("~/Scripts/myDownloaderPro.js")"></script>
+    <script>
+    $("#tb").bootstrapTable({
+        striped: true,
+        pagination: false,
+        data:@Html.Raw(itemsJson),
+            clickToSelect: true,
+            idField: "id",
+            uniqueId: "id",
+            columns: [
+                {
+                    radio: true
+                },
+                {
+                    field: "item_name",
+                    title: "配件名称"
+                }, {
+                    field: "qty",
+                    title: "使用数量"
+                }, {
+                    field: "price",
+                    title: "单价",
+                    formatter: function (value, row, index, field) {
+                        if(row.is_public_fee){
+                            return value+"(公费)";
+                        }else{
+                            return value;
+                        }
+                    }
+                }
+            ]
+        });
+
+        $("#tb2").bootstrapTable({
+            striped: true,
+            pagination: false,
+            clickToSelect: true,
+            height:300,
+            idField: "id",
+            uniqueId: "id",
+            columns: [
+                {
+                    radio: true
+                },
+                {
+                    field:"is_public_fee",
+                    visible:false
+                },
+                {
+                    field: "item_name",
+                    title: "配件名称"
+                }, {
+                    field: "inventory",
+                    title: "库存数量"
+                }, {
+                    field: "price",
+                    title: "单价"
+                }
+            ]
+        });
+
+        $(function(){
+
+            $("#addBt").on("click",function(){
+                $("#itemModal").modal("show");
+            });
+
+            $("#searchBt").on("click",function(){
+                $.post("../ApplyExtra/SearchDPRepairItem",{itemName:$.trim($("#searchText").val())},function(data){
+                    if(!data.suc){
+                        toastr.error(data.msg);
+                        return;
+                    }
+                    $("#tb2").bootstrapTable("load",JSON.parse(data.extra));
+                });
+            });
+
+            $("#saveBt").on("click",function(){
+                var rows = $('#tb2').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再保存");
+                    return;
+                }
+                var row=rows[0];
+                if(parseInt(row.inventory)<=0){
+                    toastr.error("库存数量不足，不能选择");
+                    return;
+                }
+                
+                row.sys_no="@form.sys_no";
+                $.post("../ApplyExtra/SaveDPRepairItem",{obj:JSON.stringify(row)},function(data){
+                    if(!data.suc){
+                        toastr.error(data.msg);
+                        return;
+                    }
+                    $("#tb").bootstrapTable('append', JSON.parse(data.extra));
+                    $("#itemModal").modal("hide");
+                    updateTotalCost();
+                });
+
+            });
+
+            $("#editBt").on("click",function(){
+                var rows = $('#tb').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再修改");
+                    return;
+                }
+                var row=rows[0];
+
+                openInputDialog("请输入需要修改的数量", 
+                    function(content){
+                        if(!utils.testIsInt(content)){
+                            toastr.error("数量请输入整数");
+                            return;
+                        }
+                        updateItemQty(row.id,content);
+                    }, "修改数量", "取消", "确认",row.qty);
+
+            });
+
+            $("#removeBt").on("click",function(){
+                var rows = $('#tb').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                var row=rows[0];
+                openConfirmDialog("确认要删除此配件吗?", function () {
+                    $.post("../ApplyExtra/RemoveDPRepairItem",{id:row.id},function(data){
+                        if(!data.suc){
+                            toastr.error(data.msg);
+                            return;
+                        }
+                        $("#tb").bootstrapTable('removeByUniqueId',row.id);
+                        updateTotalCost();
+                    });
+                });
+            });
+
+            $("#isPublicBt").on("click",function(){
+                var rows = $('#tb').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                var row=rows[0];
+                openConfirmDialog("确认要切换是否公费吗?", function () {
+                    $.post("../ApplyExtra/UpdateDPRepairItemPublicFee",{id:row.id},function(data){
+                        if(!data.suc){
+                            toastr.error(data.msg);
+                            return;
+                        }
+                        var isPublicFee=data.extra=="1"?true:false;
+                        $("#tb").bootstrapTable('updateByUniqueId',{
+                            id:row.id,
+                            row:{is_public_fee:isPublicFee}
+                        });
+                        updateTotalCost();
+                    });
+                });
+            });
+
+        });
+
+        function updateTotalCost(){
+            var rows=$("#tb").bootstrapTable("getData");
+            var total=0;
+            console.log(rows);
+            for(var i=0;i<rows.length;i++){
+                if(!rows[i].is_public_fee){
+                    total+=rows[i].price * rows[i].qty;
+                }
+            }
+            $("#repairFee").val(total);
+        }
+
+        function updateItemQty(id,qty){
+            $.post("../ApplyExtra/UpdateDPRepairItemQty",{id:id,qty:qty},function(data){
+                if(!data.suc){
+                    toastr.error(data.msg);
+                    return;
+                }
+                $("#tb").bootstrapTable('updateByUniqueId',{
+                    id:id,
+                    row:{qty:qty}
+                });
+                updateTotalCost();
+            });
+        }        
+
+    </script>
     <script>
     $(function () {
         $("#accepterTimePicker").datetimepicker({
@@ -180,10 +379,10 @@
             function (data) {
                 if (data.suc) {
                     toastr.success(data.msg + ",请等待页面跳转...");
+                    setTimeout(function () { window.location.href = "CheckApply?sysNo=" + "@bam.sysNum"; }, 1000);
                 } else {
                     toastr.error(data.msg);
                 }
-                setTimeout(function () { window.location.href = "CheckApply?sysNo=" + "@bam.sysNum"; }, 1000);
             });
         });
     }
@@ -234,6 +433,7 @@
 }
 
 <div class="panel panel-success">
+    @if (!form.is_outside) { 
     <div class="panel-heading">
         <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
@@ -243,6 +443,7 @@
             <li class="active">处理维修单</li>
         </ol>
     </div>
+    }
     <div class="panel-body">
         @*申请环节*@
         <div class="panel panel-success" id="firstStepDiv">
@@ -334,7 +535,6 @@
                         <span>
                             @form.contact_phone
                         </span>
-
                     </div>
                     <div class="col-xs-12 col-md-4 col-sm-6">
                         <span class="b-label">
@@ -343,7 +543,6 @@
                         <span>
                             @form.contact_short_phone
                         </span>
-
                     </div>
                     <div class="col-xs-12">
                         <span class="b-label">维修内容:</span>
@@ -570,6 +769,8 @@
                                 <span>@form.charge_fee 元</span>
                             </div>
                         </div>
+                        @*<div>使用配件清单：</div>
+                        <div><table id="tb"></table></div>*@
                         <div style="margin-top:6px;">
                             <div class="b-label">修复图片:</div>
                             <div id="attList2"></div>
@@ -594,15 +795,29 @@
                                 </span>
                             </span>
                         </div>
+                        @*<div class="b-div">
+                            <span class="b-label">
+                                使用配件清单:
+                            </span>
+                            <div class="b-input">
+                                <button class="btn btn-success btn-sm" type="button" id="addBt"> <i class="fa fa-plus"></i> 新增配件</button>
+                                <button class="btn btn-primary btn-sm" type="button" id="editBt"> <i class="fa fa-edit"></i> 修改数量 </button>
+                                <button class="btn btn-danger btn-sm" type="button" id="removeBt"> <i class="fa fa-remove"></i> 删除配件 </button>
+                                <button class="btn btn-info btn-sm" type="button" id="isPublicBt"> <i class="fa fa-toggle-on"></i> 公费切换 </button>
+                            </div>
+                        </div>
+                        <div>
+                            <table id="tb"></table>
+                        </div>*@
                         <div class="b-div">
                             <span class="b-label">维修费用</span>
                             <span style="display:inline-block;width:70%;">
                                 <span class="input-group" style="display:inline-table;">
-                                    <input type="number" step="0.1" min="0" class="form-control" id="repairFee" />
+                                    <input type="number" step="0.1" min="0" class="form-control" id="repairFee" value="@totalCost" />
                                     <span class="input-group-addon">元</span>
                                 </span>
                             </span>
-                            <p class="small text-danger"><i class="fa fa-info-circle"></i> 费用保留一位小数点，免费维修请输入0</p>
+                            <p class="small text-danger"><i class="fa fa-info-circle"></i> 费用直接从所选的配件清单中计算，如果没有配件消耗，费用是0</p>
                         </div>
                         <div style="display:inline-block;">
                             <div id="picker"> <i class="fa fa-upload"></i> 上传修复图片 </div>
@@ -708,4 +923,28 @@
 
 @section modal{
     @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_InputDialog")
+    <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">新增配件</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="searchText" placeholder="请输入配件名称搜索">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="button" id="searchBt" data-loading-text="查询中..."><span class="fa fa-search"></span> 搜索</button>
+                            </span>
+                        </div>
+                        <div><table id="tb2"></table></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 取消</button>
+                        <button type="button" class="btn btn-success" id="saveBt"><span class="fa fa-check-circle"></span> 确认</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 }

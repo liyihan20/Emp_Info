@@ -9,6 +9,7 @@ using EmpInfo.Util;
 using EmpInfo.FlowSvr;
 using Newtonsoft.Json;
 using System.Configuration;
+using EmpInfo.QywxWebSrv;
 
 namespace EmpInfo.Services
 {
@@ -134,10 +135,10 @@ namespace EmpInfo.Services
 
             MyUtils.SetFieldValueToModel(fc, bill);
 
-            if (dealWay.Contains("挽留失败") && bill.leave_date == null) return new SimpleResultModel() { suc = false, msg = "挽留失败时离职时间必须填写" };
             if (string.IsNullOrEmpty(bill.work_evaluation)) return new SimpleResultModel() { suc = false, msg = "工作评价必须选择" };
             if (string.IsNullOrEmpty(bill.wanna_employ)) return new SimpleResultModel() { suc = false, msg = "是否再录用必须选择" };
             if (stepName.Contains("组长")) {
+                if (!dealWay.Contains("成功") && bill.leave_date == null) return new SimpleResultModel() { suc = false, msg = "离职时间必须填写" };
                 if (string.IsNullOrEmpty(bill.charger_name)) return new SimpleResultModel() { suc = false, msg = "请选择主管审核人" };
                 if(string.IsNullOrEmpty(bill.charger_num)) bill.charger_num = GetUserCardByNameAndCardNum(bill.charger_name);
                 bill.group_leader_choise = dealWay;
@@ -324,7 +325,80 @@ namespace EmpInfo.Services
 
         public override bool CanAccessApply(UserInfo userInfo)
         {
-            return HasGotPower("ModuelTest", userInfo.id);
+            return true;
         }
+
+        public string ToggleCheck1()
+        {
+            bill.check1 = !(bill.check1 ?? false);
+            db.SaveChanges();
+            return bill.check1.ToString();
+        }
+
+        //辞职流程未完结的申请人都能撤销
+        public override SimpleResultModel AbortApply(UserInfo userInfo, string sysNo, string reason = "")
+        {
+            bill = db.ei_mqApply.Where(m => m.sys_no == sysNo).FirstOrDefault();
+            if (bill == null) {
+                return new SimpleResultModel(false, "单号不存在");
+            }
+            if (!string.IsNullOrEmpty(bill.produce_minister_num)) {
+                return new SimpleResultModel(false, "主管审批后不能再撤销");
+            }
+
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+            FlowResultModel result = flow.AbortFlow(userInfo.cardNo, sysNo);
+
+            return new SimpleResultModel() { suc = result.suc, msg = result.msg };
+        }
+
+        //申请人选择需要人事面谈
+        public void NeedHRTalk()
+        { 
+            //判断最近是否有会谈过
+            var hasTalked = db.ei_mqHRTalkRecord.Where(r => r.sys_no == bill.sys_no).OrderByDescending(r => r.id).FirstOrDefault();
+            if (hasTalked != null) {
+                if (hasTalked.t_status.Equals("已预约")) {
+                    throw new Exception("已预约人事面谈，不能重复预约");
+                }
+                if (hasTalked.t_status.Equals("面谈完成")) {
+                    throw new Exception("已完成面谈，不能再次预约，请选择其它处理按钮");
+                }
+            }
+
+            //1. 插入面谈记录
+            var t = new ei_mqHRTalkRecord();
+            t.sys_no = bill.sys_no;
+            t.in_time = DateTime.Now;
+            t.t_status = "已预约";
+            db.ei_mqHRTalkRecord.Add(t);
+            db.SaveChanges();
+
+            //2. 推送给申请人
+            var msg = new TextMsg();
+            msg.touser = bill.applier_num;
+            msg.text = new TextContent();
+            msg.text.content = "人事面谈通知<br/>";
+            msg.text.content += "您已预约了人事面谈，请于3天以内（周一至周六）到指定地点进行人事面谈，具体时间和地点如下： <br/>";
+            msg.text.content += "时间：上午8:15-11：45 <br/>";
+            msg.text.content += "地点：信利学院102培训室 <br/>";
+            msg.text.content += "联系人：范美玉（手机短号：668560；长号：13421578560；座机：3380416） <br/>";
+            msg.text.content += "请提前1天电话沟通并准时到达，逾期将自动取消此次面谈。";
+            SendQYWXMsg(msg);
+
+            //3. 推送给人事部
+            msg = new TextMsg();
+            msg.touser = "07110367";// 范美玉;
+            msg.text = new TextContent();
+            msg.text.content = "人事面谈已预约通知<br/>";
+            msg.text.content += "刚有员工预约了人事面谈，具体信息如下： <br/>";
+            msg.text.content += "部门："+bill.dep_name+" <br/>";
+            msg.text.content += "姓名：" + bill.name + " <br/>";
+            msg.text.content += "厂牌：" + bill.card_number + " <br/>";
+            msg.text.content += "预计离职日期："+((DateTime)bill.leave_date).ToString("yyyy-MM-dd");
+            SendQYWXMsg(msg);
+
+        }
+
     }
 }

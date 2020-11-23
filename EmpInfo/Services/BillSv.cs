@@ -351,7 +351,7 @@ namespace EmpInfo.Services
             msg.textcard.description += "<div class=\"highlight\">办结时间：" + DateTime.Now.ToString("yyyy-MM-dd HH:mm") + "</div>";
             url = "http://emp.truly.com.cn/emp/QYWX/Login?returnUrl=http://emp.truly.com.cn/emp/Apply/CheckApply?sysNo=" + sysNo;
             msg.textcard.url = GetQYWXOAthLink(url);
-                        
+
             SendQYWXCardMsg(msg);
             
         }

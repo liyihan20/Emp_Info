@@ -57,7 +57,7 @@
                     }
                 </td>
                 <td>
-                    <span class="text-primary">[@r.stepName]</span>   @r.auditors @(r.stepName.IndexOf("提交")>=0?"提交申请成功":("审批" + @r.auditResult))
+                    <span class="text-primary">[@r.stepName]</span>   @r.auditors @(r.stepName.IndexOf("提交")>=0?"提交申请成功":(r.auditResult=="成功"?"已通过":(r.auditResult=="失败"?"已拒绝":"处理中")))
                     @if (!string.IsNullOrEmpty(r.opinions)) {
                         <div class="small">审批意见：@r.opinions</div>
                     }

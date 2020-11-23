@@ -103,7 +103,6 @@ namespace EmpInfo.Models
         public DbSet<vw_APExcel> vw_APExcel { get; set; }
         public DbSet<ei_jqApply> ei_jqApply { get; set; }
         public DbSet<vw_JQExcel> vw_JQExcel { get; set; }
-        public DbSet<ei_spApply> ei_spApply { get; set; }
         public DbSet<ei_flowAuthority> ei_flowAuthority { get; set; }
         public DbSet<ei_spApplyEntry> ei_spApplyEntry { get; set; }
         public DbSet<vw_SPReport> vw_SPReport { get; set; }
@@ -146,6 +145,11 @@ namespace EmpInfo.Models
         public DbSet<ei_hhApply> ei_hhApply { get; set; }
         public DbSet<ei_hhReturnDetail> ei_hhReturnDetail { get; set; }
         public DbSet<ei_hhApplyEntry> ei_hhApplyEntry { get; set; }
+        public DbSet<ei_dormRepairIems> ei_dormRepairIems { get; set; }
+        public DbSet<vw_JMExcel> vw_JMExcel { get; set; }
+        public DbSet<ei_mqHRTalkRecord> ei_mqHRTalkRecord { get; set; }
+        public DbSet<ei_spApply> ei_spApply { get; set; }
+        public DbSet<ei_PPApply> ei_PPApply { get; set; }
     
         public virtual ObjectResult<string> GetDormChargeMonth()
         {
@@ -632,6 +636,19 @@ namespace EmpInfo.Models
                 new ObjectParameter("yearMonth", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetLodDepSalarySum_Result>("GetLodDepSalarySum", yearMonthParameter);
+        }
+    
+        public virtual int DP_SearchInventory(string itemName, string opUser)
+        {
+            var itemNameParameter = itemName != null ?
+                new ObjectParameter("itemName", itemName) :
+                new ObjectParameter("itemName", typeof(string));
+    
+            var opUserParameter = opUser != null ?
+                new ObjectParameter("opUser", opUser) :
+                new ObjectParameter("opUser", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DP_SearchInventory", itemNameParameter, opUserParameter);
         }
     }
 }

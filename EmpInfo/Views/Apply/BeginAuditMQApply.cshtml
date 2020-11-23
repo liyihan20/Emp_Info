@@ -82,6 +82,19 @@
                     });
                 });                
             });
+
+            $("#hrTalkBt").on("click",function(){
+                openConfirmDialog("确认要申请人事面谈吗？", function () {
+                    $.post("../ApplyExtra/NeedHRTalk",{sysNo:"@bam.sysNum"},function(data){
+                        if(!data.suc){
+                            toastr.error(data.msg);
+                            return;
+                        }
+                        openMessageDialog("人事面谈预约成功，具体时间和地点稍后会通过企业微信推送到您手机，请注意查收。<br />面谈结束后请再回到此流程选择处理方式。","人事面谈预约结果");
+                    })
+                });
+            });
+
             var auditJson=@Html.Raw(auditJson);
             auditJson.leave_date=utils.parseTDate(auditJson.leave_date);
             utils.loadObjData($("#auditForm"),auditJson);
@@ -119,7 +132,7 @@
                     success: function (data) {
                         if (data.suc) {
                             toastr.success(data.msg);
-                            setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
+                            setTimeout(function () { window.location.href = "GetMyAuditingList?billType=JM"; }, 2000);
                         } else {
                             toastr.error(data.msg);
                         }
@@ -247,8 +260,13 @@
             }
             <div style="margin-top:12px;"></div>
             @if (bam.isPass == null) {
+                if (bam.stepName.Contains("申请人再确认")) {
+                    <div>
+                        <button type="button" id="hrTalkBt" class="btn btn-block btn-success" style="margin-bottom:6px;">申请人事面谈，协调换部门</button>
+                    </div>
+                }
                 <div class="btn-group btn-group-justified" role="group">
-                    @if (bam.stepName.Contains("申请人")) {
+                    @if (bam.stepName.Contains("申请人")) {                        
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-danger" onclick="audit('坚持辞职')">坚持辞职</button>
                         </div>

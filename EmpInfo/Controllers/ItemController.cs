@@ -336,7 +336,7 @@ namespace EmpInfo.Controllers
         {
             try {
                 var result = new SPSv(sysNum).GetExInfo();
-                if (result.Count() == 0) return Json(new SimpleResultModel() { suc = false, msg = "查询不到任何快递信息" });
+                if (result.Count() == 0) return Json(new SimpleResultModel() { suc = false, msg = "查询不到任何快递信息，请提供寄收地址联系物流处理" });
                 return Json(new SimpleResultModel() { suc = true, extra = JsonConvert.SerializeObject(result) });
             }
             catch (Exception ex) {

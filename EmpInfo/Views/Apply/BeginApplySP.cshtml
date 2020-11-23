@@ -44,6 +44,7 @@
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
     <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
     <script>
         var ex = {
             ex_company: "",
@@ -74,6 +75,16 @@
         });
         $(function () {
             displayExInfo();
+
+            $(".selectUser").on("focus", function () {
+                var self = this;
+                $.selectUsers({
+                    userHasSelected: $(self).val(),
+                    callback: function (result) {
+                        $(self).val(result);
+                    }
+                });
+            });
 
             $("#checkExBtn").on("click",function(){
                 var obj = utils.getFormObj($("#fm"));
@@ -121,10 +132,26 @@
 
 
             $("#content_type").on("change", function () {
-                if ($(this).val() == "产品") {
+                var ty=$(this).val();
+                if (ty == "产品" || ty=="原材料") {
                     $(".product_extra_info").show();
+                    if(ty=="产品"){
+                        $(".isReturnBackDiv").show();
+                    }else{
+                        $(".isReturnBackDiv").hide();
+                    }
+                    if(ty=="原材料"){
+                        $(".qualityAuditorNameDiv").show();
+                        $(".stockAddrDiv").show();
+                    }else{
+                        $(".qualityAuditorNameDiv").hide();
+                        $(".stockAddrDiv").hide();
+                    }
                 } else {
                     $(".product_extra_info").hide();
+                    $(".isReturnBackDiv").hide();
+                    $(".qualityAuditorNameDiv").hide();
+                    $(".stockAddrDiv").hide();
                 }
             });
 
@@ -180,9 +207,9 @@
                         return;
                     }
                 }
-                if (obj.content_type == "产品") {
+                if (obj.content_type == "产品" || obj.content_type == "原材料") {
                     if(items.length<1){
-                        toastr.error("至少必须录入一行产品");
+                        toastr.error("至少必须录入一行产品或原材料");
                         return;
                     }
                     if (obj.package_num == "") {
@@ -214,6 +241,16 @@
                     if (obj.cardboard_num != "" && !utils.testIsInt(obj.cardboard_num)) {
                         toastr.error("卡板数必须录入整数");
                         return;
+                    }
+                    if(obj.content_type == "原材料"){
+                        if(obj.quality_audior_name==""){
+                            toastr.error("品质审核人必须选择");
+                            return;
+                        }
+                        if(obj.stock_addr==""){
+                            toastr.error("仓库地址必须选择");
+                            return;
+                        }
                     }
                 }
                 if (!utils.testIsFloat(obj.total_weight, 1)) {
@@ -534,11 +571,12 @@
                                 <option value="">---- 下拉选择收寄内容 ----</option>
                                 <option value="产品">产品</option>
                                 <option value="文件">文件</option>
+                                <option value="原材料">原材料</option>
                             </select>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="col-md-4 col-sm-6 col-xs-12 isReturnBackDiv">
                     <div class="b-div">
                         <span class="b-label">
                             是否退补货:
@@ -548,6 +586,31 @@
                                 <option value="">---- 下拉选择是否退补货 ----</option>
                                 <option value="是">是</option>
                                 <option value="否">否</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>                
+                <div class="col-md-4 col-sm-6 col-xs-12 qualityAuditorNameDiv">
+                    <div class="b-div">
+                        <span class="b-label">
+                            品质审核人:
+                        </span>
+                        <div class="b-input">
+                            <input type="text" class="form-control selectUser" name="quality_audior_name" placeholder="请选择品质审核人" required />                            
+                        </div>
+                    </div>
+                </div>              
+                <div class="col-md-4 col-sm-6 col-xs-12 stockAddrDiv">
+                    <div class="b-div">
+                        <span class="b-label">
+                            仓库地址:
+                        </span>
+                        <div class="b-input">
+                            <select class="form-control" name="stock_addr" id="stock_addr" required>
+                                <option value="">---- 下拉选择仓库地址 ----</option>
+                                @foreach (var a in m.stockAddrList) {
+                                    <option value="@a">@a</option>
+                                }
                             </select>
                         </div>
                     </div>
@@ -694,7 +757,7 @@
             </div>
             <div class="b-div product_extra_info">
                 <span class="b-label">
-                    产品明细:
+                    物品明细:
                 </span>
                 <div class="b-input">
                     <button class="btn btn-primary" type="button" onclick="openDialog()"> + </button>
@@ -703,7 +766,7 @@
             <table class="table table-condensed table-hover product_extra_info" style="margin:10px 0 30px 0;">
                 <thead>
                     <tr>
-                        <th style="width:30%;">产品名称</th>
+                        <th style="width:30%;">物品名称</th>
                         <th style="width:30%;">规格型号</th>
                         <th style="width:25%;">数量</th>
                         <th style="width:15%;">操作</th>
@@ -770,7 +833,10 @@
         <h4 class="text-danger"><i class="fa fa-info-circle"></i> 操作说明 </h4>
         <div style="margin-left:18px;padding-top:6px;" class="text-danger">
             <p>
-                1. 流程步骤：流程开始--->员工提交申请--->部门负责人审批--->QA审批（如果不是退补货，则跳过此步骤）---> 行政部审批（如不是寄产品，则跳过此步骤）--->物流部审批（如总毛重小于10KG，则跳过此步骤）--->流程结束。
+                1. 流程步骤如下：<br/>
+                [1]. 收寄文件：流程开始--->员工提交申请--->部门负责人审批--->流程结束。<br/>
+                [2]. 收寄产品：流程开始--->员工提交申请--->部门负责人审批--->QA审批（如果不是退补货，则跳过此步骤）---> 行政部审批（如不是寄件，则跳过此步骤）---> 物流部审批（如总毛重小于10KG，则跳过此步骤）--->流程结束。<br/>
+                [3]. 收寄原材料：流程开始--->员工提交申请--->品质部审批--->部门负责人审批--->仓管部审批---> 行政部审批（如不是寄件，则跳过此步骤）---> 物流部审批（如总毛重小于10KG，则跳过此步骤）--->流程结束。
             </p>
             <p>
                 2. 10KG以内的省内件，默认使用顺丰标快；10KG以内的省外件或港澳台件，时效是次日达的，默认使用顺丰标快；

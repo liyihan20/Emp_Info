@@ -116,11 +116,18 @@ namespace EmpInfo.Controllers
         {
             DateTime lastYear = DateTime.Now.AddYears(-1);
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            List<FlowMyAppliesModel> list = flow.GetMyApplyList(userInfo.cardNo, lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), "", new ArrayOfString() { billType }, "", "", 10, 200).ToList();
-            ViewData["list"] = list;
-            ViewData["billType"] = billType;
+            ArrayOfString aos = new ArrayOfString() { billType };
 
             SetBillByType(billType);
+            var irb = bill as IRealBillType;
+            if (irb != null) {
+                aos = irb.GetRealBillTypes();
+            }
+
+            List<FlowMyAppliesModel> list = flow.GetMyApplyList(userInfo.cardNo, lastYear.ToShortDateString(), DateTime.Now.ToShortDateString(), "", aos, "", "", 10, 200).ToList();
+            ViewData["list"] = list;
+            ViewData["billType"] = billType;
+            
             ViewData["billTypeName"] = bill.BillTypeName;
             ViewData["navigatorLinks"] = bill.GetApplyNavigatorLinks();
 
@@ -133,6 +140,7 @@ namespace EmpInfo.Controllers
         public JsonResult AbortApply(string sysNo, string reason = "")
         {
             SetBillByType(sysNo);
+            
             var result = bill.AbortApply(userInfo, sysNo, reason);
 
             WriteEventLog(bill.BillTypeName, "撤销、中止流程：" + sysNo + ";result:" + result.msg);
@@ -178,9 +186,19 @@ namespace EmpInfo.Controllers
         public ActionResult GetMyAuditingList(string billType)
         {
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            List<FlowAuditListModel> list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { billType }, 600).ToList();
-            list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
             SetBillByType(billType);
+            ArrayOfString aos = new ArrayOfString() { billType };
+
+            SetBillByType(billType);
+            var irb = bill as IRealBillType;
+            if (irb != null) {
+                aos = irb.GetRealBillTypes();
+            }
+
+            List<FlowAuditListModel> list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, aos, 600).ToList();
+            list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
+            
+
             //list.Sort(bill.GetAuditListComparer()); //自定义排序的结果有问题，改为直接orderby
             list = bill.OrderAuditList(list);
             ViewData["list"] = list;
@@ -212,10 +230,17 @@ namespace EmpInfo.Controllers
             }
 
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            var list = flow.GetAuditList(userInfo.cardNo, sysNo, cardNo, "", "", fromDateDt.ToShortDateString(), toDateDt.ToShortDateString(), new ArrayOfInt() { 1, -1 }, new ArrayOfInt() { 10 }, new ArrayOfString() { billType }, 300).ToList();
-            list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
+            SetBillByType(billType);
+            ArrayOfString aos = new ArrayOfString() { billType };
 
             SetBillByType(billType);
+            var irb = bill as IRealBillType;
+            if (irb != null) {
+                aos = irb.GetRealBillTypes();
+            }
+
+            var list = flow.GetAuditList(userInfo.cardNo, sysNo, cardNo, "", "", fromDateDt.ToShortDateString(), toDateDt.ToShortDateString(), new ArrayOfInt() { 1, -1 }, new ArrayOfInt() { 10 }, aos, 300).ToList();
+            list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
 
             ViewData["list"] = list;
             ViewData["billType"] = billType;

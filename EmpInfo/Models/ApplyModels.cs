@@ -160,6 +160,13 @@ namespace EmpInfo.Models
     {
         public ei_dormRepair bill { get; set; }
         public List<FlowSvr.FlowRecordModels> records { get; set; }
+        public List<ei_dormRepairIems> items { get; set; }
+    }
+
+    public class PPCheckApplyModel
+    {
+        public ei_PPApply bill { get; set; }
+        public List<ei_dormRepairIems> items { get; set; }
     }
 
     public class ETBeforeApplyModel
@@ -220,6 +227,7 @@ namespace EmpInfo.Models
         public string receiver_phone { get; set; }
         public string scope { get; set; }
         public List<string> busDepList { get; set; }
+        public List<string> stockAddrList { get; set; }
     }
 
     public class SPExInfoModel
