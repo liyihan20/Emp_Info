@@ -18,6 +18,30 @@ namespace EmpInfo.Controllers
     public class ReportController : BaseController
     {
 
+        #region 公共方法
+
+        /// <summary>
+        /// 获取审核步骤名称和审核人姓名
+        /// </summary>
+        /// <param name="sysNo"></param>
+        /// <returns></returns>
+        public List<StepNameAndAuditor> GetAuditorList(string sysNo)
+        {
+            var auditorList = (from a in db.flow_apply
+                               join ad in db.flow_applyEntry on a.id equals ad.apply_id
+                               join u in db.ei_users on ad.final_auditor equals u.card_number
+                               where a.sys_no == sysNo && ad.final_auditor != null
+                               select new StepNameAndAuditor()
+                               {
+                                   stepName = ad.step_name,
+                                   auditorName = u.name,
+                                   auditorNo = u.card_number
+                               }).ToList();
+            return auditorList;
+        }
+
+        #endregion
+
         #region 请假流程报表
 
         [SessionTimeOutFilter]
@@ -232,10 +256,10 @@ namespace EmpInfo.Controllers
             WriteEventLog("待办Excel", "导出请假待办记录");
 
             ushort[] colWidth = new ushort[] { 20, 16, 60, 12, 18, 18,
-                                               10, 10, 12, 24, 16, 16, 16, 16, 16};
+                                               10, 10, 12, 16, 24, 16, 16, 16, 16, 16};
 
             string[] colName = new string[] { "申请人", "申请时间", "部门", "职位级别", "开始时间", "结束时间", 
-                                              "天数", "小时数", "类型", "事由", "流水号","面谈通知","预约时间","发送时间","发送人" };
+                                              "天数", "小时数", "类型", "去向","事由", "流水号","面谈通知","预约时间","发送时间","发送人" };
 
             //設置excel文件名和sheet名
             XlsDocument xls = new XlsDocument();
@@ -285,6 +309,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.al.work_days);
                 cells.Add(rowIndex, ++colIndex, d.al.work_hours);
                 cells.Add(rowIndex, ++colIndex, d.al.leave_type);
+                cells.Add(rowIndex, ++colIndex, d.al.go_where);
                 cells.Add(rowIndex, ++colIndex, d.al.leave_reason);
                 cells.Add(rowIndex, ++colIndex, d.al.sys_no);
                 cells.Add(rowIndex, ++colIndex, d.pushLog == null ? "未发送" : "已发送");
@@ -2410,7 +2435,8 @@ namespace EmpInfo.Controllers
                              v.name,
                              v.dep_name,
                              v.leave_date,
-                             v.audit_result
+                             v.audit_result,
+                             h.talk_result
                          };
             if (!string.IsNullOrEmpty(empName)) {
                 result = result.Where(r => r.name.Contains(empName));
@@ -2421,12 +2447,105 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel(true, "查询完成", JsonConvert.SerializeObject(result.OrderBy(r => r.id).ToList())));
         }
 
-        public JsonResult SetHRHasTalked(int id)
+        public void BeginExportMQHRTalkReport(string fromDate, string toDate, string empName, string status)
+        {
+            DateTime fd, td;
+            if (!DateTime.TryParse(fromDate, out fd)) {
+                return;
+            }
+            if (!DateTime.TryParse(toDate, out td)) {
+                return;
+            }
+            td = td.AddDays(1);
+
+            var result = from v in db.vw_MQExcel
+                         join h in db.ei_mqHRTalkRecord on v.sys_no equals h.sys_no
+                         where h.in_time >= fd && h.in_time <= td
+                         select new
+                         {                             
+                             h.in_time,
+                             h.t_status,
+                             h.sys_no,
+                             v.name,
+                             v.dep_name,
+                             v.leave_date,
+                             v.audit_result,
+                             h.talk_result,
+                             h.talk_time
+                         };
+            if (!string.IsNullOrEmpty(empName)) {
+                result = result.Where(r => r.name.Contains(empName));
+            }
+            if (!string.IsNullOrEmpty(status)) {
+                result = result.Where(r => r.t_status == status);
+            }
+
+            string[] colName = new string[] { "申请流水号", "人事部门", "离职人", "离职时间","处理结果", "预约时间", "面谈状态", "面谈结果","面谈处理时间" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "人事面谈列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("面谈详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result) {
+                colIndex = 1;
+
+                //"申请流水号", "人事部门", "离职人", "离职时间","处理结果", "预约时间", "面谈状态", "面谈结果","面谈处理时间"
+                cells.Add(++rowIndex, colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.dep_name);
+                cells.Add(rowIndex, ++colIndex, d.name);
+                cells.Add(rowIndex, ++colIndex, d.leave_date==null?"":((DateTime)d.leave_date).ToString("yyyy-MM-dd"));
+                cells.Add(rowIndex, ++colIndex, d.audit_result);
+                cells.Add(rowIndex, ++colIndex, d.in_time == null ? "" : ((DateTime)d.in_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.t_status);
+                cells.Add(rowIndex, ++colIndex, d.talk_result);
+                cells.Add(rowIndex, ++colIndex, d.talk_time == null ? "" : ((DateTime)d.talk_time).ToString("yyyy-MM-dd HH:mm"));
+            }
+
+            xls.Send();
+
+        }
+
+        public JsonResult SetHRHasTalked(int id,string talkResult="")
         {
             var h = db.ei_mqHRTalkRecord.Where(r => r.id == id).FirstOrDefault();
             if (h != null) {
                 h.t_status = "面谈完成";
                 h.talk_time = DateTime.Now;
+                h.talk_result = talkResult;
                 db.SaveChanges();
             }
             return Json(new SimpleResultModel(true));
@@ -3230,15 +3349,7 @@ namespace EmpInfo.Controllers
                 ViewBag.tip = "此放行条已放行，不能再打印";
                 return View("Error");
             }
-            var auditorList = (from a in db.flow_apply
-                               join ad in db.flow_applyEntry on a.id equals ad.apply_id
-                               join u in db.ei_users on ad.final_auditor equals u.card_number
-                               where a.sys_no == sysNo && ad.final_auditor != null
-                               select new StepNameAndAuditor()
-                               {
-                                   stepName = ad.step_name,
-                                   auditorName = u.name
-                               }).ToList();
+            var auditorList = GetAuditorList(sysNo);
             var result = new HHCheckApplyModel()
             {
                 head = hs.First().h,
@@ -3262,16 +3373,8 @@ namespace EmpInfo.Controllers
             if (hs.Count() < 1) {
                 ViewBag.tip = "单据不存在，不能打印";
                 return View("Error");
-            }            
-            var auditorList = (from a in db.flow_apply
-                               join ad in db.flow_applyEntry on a.id equals ad.apply_id
-                               join u in db.ei_users on ad.final_auditor equals u.card_number
-                               where a.sys_no == sysNo && ad.final_auditor != null
-                               select new StepNameAndAuditor()
-                               {
-                                   stepName = ad.step_name,
-                                   auditorName = u.name
-                               }).ToList();
+            }
+            var auditorList = GetAuditorList(sysNo);
 
             if (auditorList.Where(a => a.stepName.Contains("总经理")).Count() < 1) {
                 ViewBag.tip = "事业部总经理还未审批，不能打印";
@@ -3447,6 +3550,45 @@ namespace EmpInfo.Controllers
             }
 
             xls.Send();
+        }
+
+        #endregion
+
+        #region 项目单
+
+        public ActionResult PrintXA(string sysNo)
+        {
+            var bill = db.ei_xaApply.Where(x => x.sys_no == sysNo).FirstOrDefault();
+            if (bill == null) {
+                ViewBag.tip = "单据不存在";
+                return View("Error");
+            }
+            //if (!bill.can_print) {
+            //    ViewBag.tip = "不能打印";
+            //    return View("Error");
+            //}
+
+            //string bidder = db.ei_xaApplySupplier.Where(x => x.sys_no == sysNo && x.is_bidder == true).Select(x=>x.supplier_name).FirstOrDefault();
+            var auditorList=GetAuditorList(sysNo);
+            var result = (from r in db.flow_auditorRelation
+                          where r.bill_type == "XA"
+                          && (
+                          (r.relate_name == "部门总经理" && r.relate_text == bill.company + "_" + bill.dept_name)
+                          || (r.relate_name == "项目大类" && r.relate_text == bill.classification)
+                          || (r.relate_name == "节省与监督")
+                          )
+                          select r).ToList();
+
+            //将会签中的步骤设置一下
+            foreach (var l in auditorList.Where(a => a.stepName == "管理部会签")) {
+                l.stepName = result.Where(r => r.relate_value == l.auditorNo).Select(r => r.relate_name).FirstOrDefault() ?? "";
+            }
+
+            ViewData["bill"] = bill;
+            //ViewData["bidder"] = bidder;
+            ViewData["auditorList"] = auditorList;
+
+            return View();
         }
 
         #endregion

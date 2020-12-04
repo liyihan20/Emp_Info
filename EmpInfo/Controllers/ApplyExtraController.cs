@@ -759,5 +759,53 @@ namespace EmpInfo.Controllers
 
         #endregion
 
+        #region 项目单流程
+
+        public JsonResult AddXASpplier(string sysNo,string supplierName)
+        {
+            try {
+                var result = new XASv(sysNo).AddSupplier(supplierName);
+                return Json(new SimpleResultModel(true, "", JsonConvert.SerializeObject(result)));
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+        }
+
+        public JsonResult UpdateXASupplierName(int id, string supplierName)
+        {
+            try {
+                new XASv().UpdateSupplierName(id, supplierName);
+                return Json(new SimpleResultModel(true));
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+        }
+
+        public JsonResult UpdateXASupplierPrice(int id, decimal price)
+        {
+            try {
+                new XASv().UpdateSupplierPrice(id, price);
+                return Json(new SimpleResultModel(true));
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+        }
+
+        public JsonResult RemoveXASupplier(int id)
+        {
+            try {
+                new XASv().RemoveSupplier(id);
+                return Json(new SimpleResultModel(true));
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+        }
+
+        #endregion
+
     }
 }

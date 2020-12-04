@@ -25,7 +25,7 @@ namespace EmpInfo.Services
 
         public override string BillTypeName
         {
-            get { return "宿舍公共预约维修申请"; }
+            get { return "后勤公共预约维修申请"; }
         }
 
         public override string AuditViewName()
@@ -146,6 +146,7 @@ namespace EmpInfo.Services
                         (isSuc ? "批准" : "被拒绝"),
                         new List<string>() { bill.applier_num }
                         );
+                    
                 }
                 else {
                     FlowSvrSoapClient flow = new FlowSvrSoapClient();
@@ -175,5 +176,11 @@ namespace EmpInfo.Services
                 }
             }
         }
+
+        public override bool CanAccessApply(UserInfo userInfo)
+        {
+            return HasGotPower("PPApply", userInfo.id);
+        }
+
     }
 }

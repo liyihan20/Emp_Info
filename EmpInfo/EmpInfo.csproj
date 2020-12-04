@@ -460,6 +460,12 @@
     <Compile Include="Models\ei_vacationDays.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_xaApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_xaApplySupplier.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\EmergencyEnum.cs" />
     <Compile Include="Models\EpModels.cs" />
     <Compile Include="Models\flow_apply.cs">
@@ -751,6 +757,7 @@
     <Compile Include="Services\TISv.cs" />
     <Compile Include="Services\UCSv.cs" />
     <Compile Include="Services\WxSv.cs" />
+    <Compile Include="Services\XASv.cs" />
     <Compile Include="Util\BillUtils.cs" />
     <Compile Include="Util\MyEmail.cs" />
     <Compile Include="Util\MyUtils.cs" />
@@ -1020,6 +1027,7 @@
     <Content Include="Content\images\user_man.png" />
     <Content Include="Content\images\user_woman.png" />
     <Content Include="Content\images\warn.png" />
+    <Content Include="Content\images\xa.png" />
     <Content Include="Content\login.css" />
     <Content Include="Content\select2.min.css" />
     <Content Include="Content\skins\all.css" />
@@ -1640,6 +1648,10 @@
     <Content Include="Views\Report\MQHRTalkReport.cshtml" />
     <Content Include="Views\Apply\BeginApplyPP.cshtml" />
     <Content Include="Views\Apply\CheckPPApply.cshtml" />
+    <Content Include="Views\Apply\BeginApplyXA.cshtml" />
+    <Content Include="Views\Apply\CheckXAApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditXAApply.cshtml" />
+    <Content Include="Views\Report\PrintXA.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

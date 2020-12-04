@@ -25,7 +25,6 @@
         <EntityTypeShape EntityType="ICAuditModel.dn_shoppingCar" Width="1.5" PointX="2.875" PointY="0.5" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_dn_shoppingCar_dn_dishes" />
         <AssociationConnector Association="ICAuditModel.FK_dn_shoppingCar_dn_order" />
-        <EntityTypeShape EntityType="ICAuditModel.all_maxNum" Width="1.5" PointX="5.375" PointY="6.25" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.dn_discountInfo" Width="1.5" PointX="0.5" PointY="3.125" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.dn_discountInfoUsers" Width="1.5" PointX="2.875" PointY="3.125" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.dn_points" Width="1.5" PointX="2.875" PointY="3.875" IsExpanded="false" />
@@ -155,6 +154,9 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_spApply" Width="1.5" PointX="6" PointY="14.375" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_spApplyEntry_ei_spApply" />
         <EntityTypeShape EntityType="ICAuditModel.ei_PPApply" Width="1.5" PointX="8.25" PointY="17.875" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_xaApply" Width="1.5" PointX="0.5" PointY="18" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_xaApplySupplier" Width="1.5" PointX="2.375" PointY="18" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.all_maxNum" Width="1.5" PointX="5.375" PointY="6.125" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

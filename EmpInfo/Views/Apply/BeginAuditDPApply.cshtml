@@ -276,7 +276,7 @@
             },
             sysNum: "@form.sys_no",
             fileNumLimit: 3,
-            prefix: "2^" //申请人的前缀
+            prefix: "2^" 
         });
 
         $("#attList1").myDownloader({ sysNum: "@form.sys_no", prefix: "1^" });
@@ -769,8 +769,8 @@
                                 <span>@form.charge_fee 元</span>
                             </div>
                         </div>
-                        @*<div>使用配件清单：</div>
-                        <div><table id="tb"></table></div>*@
+                        <div>使用配件清单：</div>
+                        <div><table id="tb"></table></div>
                         <div style="margin-top:6px;">
                             <div class="b-label">修复图片:</div>
                             <div id="attList2"></div>
@@ -795,7 +795,7 @@
                                 </span>
                             </span>
                         </div>
-                        @*<div class="b-div">
+                        <div class="b-div">
                             <span class="b-label">
                                 使用配件清单:
                             </span>
@@ -808,12 +808,12 @@
                         </div>
                         <div>
                             <table id="tb"></table>
-                        </div>*@
+                        </div>
                         <div class="b-div">
                             <span class="b-label">维修费用</span>
                             <span style="display:inline-block;width:70%;">
                                 <span class="input-group" style="display:inline-table;">
-                                    <input type="number" step="0.1" min="0" class="form-control" id="repairFee" value="@totalCost" />
+                                    <input type="number" step="0.1" min="0" class="form-control" id="repairFee" value="@totalCost" readonly />
                                     <span class="input-group-addon">元</span>
                                 </span>
                             </span>

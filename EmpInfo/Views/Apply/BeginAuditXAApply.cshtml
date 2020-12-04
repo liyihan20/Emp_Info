@@ -1,0 +1,615 @@
+﻿@using EmpInfo.Models;
+@using Newtonsoft.Json;
+@{
+    BeginAuditModel bam = ViewData["bam"] as BeginAuditModel;
+    XACheckApplyModel m = bam.otherInfo as XACheckApplyModel;
+    var itemsJson = JsonConvert.SerializeObject(m.suppliers);
+}
+
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
+
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 100px;
+            vertical-align: top;
+            color: gray;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUploaderPro.js?v=2")"></script>
+    <script src="@Url.Content("~/Scripts/myDownloaderPro.js")"></script>
+
+    <script>
+        $(function () {
+
+            if($("#myUploader1").length>0){
+                console.log("1");
+                $("#myUploader1").myUploader({
+                    sysNum: "@bam.sysNum",
+                    fileNumLimit: 3,
+                    prefix: "施工清单_",
+                    accept: {
+                        title: '*',
+                        extensions: '*',
+                        mimeTypes: '*'
+                    }
+                });
+            }
+            if($("#myUploader2").length>0){
+                console.log("2");
+                $("#myUploader2").myUploader({
+                    sysNum: "@bam.sysNum",
+                    fileNumLimit: 3,
+                    prefix: "报价单_",
+                    accept: {
+                        title: '*',
+                        extensions: '*',
+                        mimeTypes: '*'
+                    }
+                });
+            }
+            if ($("#attList1").length>0) {
+                $("#attList1").myDownloader({ sysNum: "@bam.sysNum", prefix: "施工清单_" });
+            }
+            if ($("#attList2").length>0) {
+                $("#attList2").myDownloader({ sysNum: "@bam.sysNum", prefix: "报价单_" });
+            }
+
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.bill.sys_no" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+            });
+        })
+
+        function audit(isPass) {
+            if(isPass){
+                if("@bam.stepName".indexOf("上传施工清单")>0){
+                    if($("#myUploader1").getMyUploaderFilesNum()<1){
+                        toastr.error("请先上传施工清单附件");
+                        return;
+                    }
+                }
+            }
+
+            $("#isPass").val(isPass);
+            $("#returnBack").val(false);
+            openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此申请吗？", function () {
+                $.ajax({
+                    type: 'post',
+                    url: 'HandleApply',
+                    data: $("#auditForm").serialize(),
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.suc) {
+                            toastr.success(data.msg);
+                            setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
+                        } else {
+                            toastr.error(data.msg);
+                        }
+
+                    }
+                });
+
+            });
+        }
+
+        function ToPreStep(flag){
+            $("#returnBack").val(flag);
+            openConfirmDialog("确认要返回上一级处理吗", function () {
+                $.ajax({
+                    type: 'post',
+                    url: 'HandleApply',
+                    data: $("#auditForm").serialize(),
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.suc) {
+                            toastr.success(data.msg);
+                            setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
+                        } else {
+                            toastr.error(data.msg);
+                        }
+
+                    }
+                });
+
+            });
+        }
+
+    </script>
+
+    <script>
+        if($("#tb").length>0){
+            $("#tb").bootstrapTable({
+                data:@Html.Raw(itemsJson),
+                striped: true,
+                clickToSelect: true,
+                idField: "id",
+                uniqueId: "id",
+                columns: [
+                    {
+                        radio: true
+                    },
+                    {
+                        field: "supplier_name",
+                        title: "供应商名称"
+                    }
+                ]
+            });
+        }
+        if($("#tb2").length>0){
+            $("#tb2").bootstrapTable({
+                data:@Html.Raw(itemsJson),
+                striped: true,
+                clickToSelect: true,
+                idField: "id",
+                uniqueId: "id",
+                columns: [
+                    {
+                        radio: true
+                    },
+                    {
+                        field: "supplier_name",
+                        title: "供应商名称",
+                        width:"70%"
+                    }
+                , {
+                    field: "price",
+                    title: "价格",
+                    width:"30%"
+                }
+                ]
+            });
+        }
+        if($("#tb_check").length>0){
+            $("#tb_check").bootstrapTable({
+                data:@Html.Raw(itemsJson),
+                striped: true,
+                clickToSelect: true,
+                columns: [
+                    {
+                        field: "supplier_name",
+                        title: "供应商名称",
+                        width:"70%"
+                    }
+                    , {
+                        field: "price",
+                        title: "价格",
+                        width:"30%"
+                    }
+                ]
+            });
+        }
+        $(function(){
+            $("#addBt").on("click",function(){
+                openInputDialog("请输入供应商名称",
+                    function(content){
+                        $.post("../ApplyExtra/AddXASpplier",{sysNo:"@bam.sysNum",supplierName:content},function(data){
+                            if(data.suc){
+                                $("#tb").bootstrapTable('append', JSON.parse(data.extra));
+                            }else{
+                                toastr.error(data.msg);
+                            }
+                        });
+                    }, "新增供应商");
+            });
+
+            $("#editBt").on("click",function(){
+                var rows = $('#tb').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再修改");
+                    return;
+                }
+                var row=rows[0];
+
+                openInputDialog("请输入新的供应商名称",
+                    function(content){
+                        $.post("../ApplyExtra/UpdateXASupplierName",{id:row.id,supplierName:content},function(data){
+                            if(data.suc){
+                                $("#tb").bootstrapTable('updateByUniqueId',{
+                                    id:row.id,
+                                    row:{supplier_name:content}
+                                });
+                            }else{
+                                toastr.error(data.msg);
+                            }
+                        });
+                    }, "修改供应商", "取消", "确认",row.supplier_name);
+            });
+
+            $("#removeBt").on("click",function(){
+                var rows = $('#tb').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                var row=rows[0];
+
+                openConfirmDialog("确认要删除此供应商吗", function () {
+                    $.post("../ApplyExtra/RemoveXASupplier",{id:row.id},function(data){
+                        if(data.suc){
+                            $("#tb").bootstrapTable('removeByUniqueId',row.id);
+                        }else{
+                            toastr.error(data.msg);
+                        }
+                    });
+                });
+            });
+
+            $("#priceBt").on("click",function(){
+                var rows = $('#tb2').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再录入");
+                    return;
+                }
+                var row=rows[0];
+
+                openInputDialog("请输入价钱",
+                    function(content){
+                        if(!utils.testIsFloat(content,2)){
+                            toastr.error("价钱请输入数字，最多支持2位小数");
+                            return;
+                        }
+                        $.post("../ApplyExtra/UpdateXASupplierPrice",{id:row.id,price:content},function(data){
+                            if(data.suc){
+                                $("#tb2").bootstrapTable('updateByUniqueId',{
+                                    id:row.id,
+                                    row:{price:content}
+                                });
+                            }else{
+                                toastr.error(data.msg);
+                            }
+                        });
+                    }, row.supplier_name, "取消", "确认",row.price);
+
+            });
+
+        })
+    </script>
+}
+
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="ApplyIndex?billType=XA">项目单申请流程</a></li>
+            <li class="active">审核申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="b-div">
+            <span class="b-label">
+                流转记录:
+            </span>
+            <span class="b-input">
+                <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请流水号:
+            </span>
+            <span class="b-input">
+                @m.bill.sys_no
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请人:
+            </span>
+            <span class="b-input">
+                @m.bill.applier_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请时间:
+            </span>
+            <span class="b-input">
+                @(m.bill.apply_time.ToString("yyyy-MM-dd"))
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请部门:
+            </span>
+            <span class="b-input">
+                @m.bill.dept_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                项目编号:
+            </span>
+            <span class="b-input">
+                @m.bill.bill_no
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                项目名称:
+            </span>
+            <span class="b-input">
+                @m.bill.project_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                地点:
+            </span>
+            <span class="b-input">
+                @m.bill.addr
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                项目大类:
+            </span>
+            <span class="b-input">
+                @m.bill.classification
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                项目类别:
+            </span>
+            <span class="b-input">
+                @m.bill.project_type
+            </span>
+        </div>
+        @*<div class="b-div">
+                <span class="b-label">
+                    项目类别说明:
+                </span>
+                <span class="b-input">
+                    @m.bill.project_detail
+                </span>
+            </div>*@
+        <div class="b-div">
+            <span class="b-label">
+                申请原因:
+            </span>
+            <span class="b-input">
+                @m.bill.reason
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                具体要求:
+            </span>
+            <div class="b-input">
+                @foreach (var d in m.bill.demands.Split(new string[] { "\br" }, StringSplitOptions.RemoveEmptyEntries)) {
+                    <div><i class="fa fa-circle"></i> @d</div>
+                }
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                项目收益:
+            </span>
+            <span class="b-input">
+                @(m.bill.has_profit ? "有项目收益" : "无项目收益（维修维护类）")
+            </span>
+        </div>
+        @if (m.bill.has_profit) {
+            <div class="b-div">
+                <span class="b-label">
+                    人员节省:
+                </span>
+                <span class="b-input">
+                    @m.bill.save_people
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    产能收益:
+                </span>
+                <span class="b-input">
+                    @m.bill.productivity_profit
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    其它收益:
+                </span>
+                <span class="b-input">
+                    @m.bill.other_profit
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    收益数据确认人:
+                </span>
+                <span class="b-input">
+                    @m.bill.profit_confirm_people_name
+                </span>
+            </div>
+        }
+        <div class="b-div">
+            <span class="b-label">
+                设备科负责人:
+            </span>
+            <span class="b-input">
+                @m.bill.equitment_auditor_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                部门主管:
+            </span>
+            <span class="b-input">
+                @m.bill.dept_charger_name
+            </span>
+        </div>
+        @if (m.suppliers.Count() > 0) {
+            <div class="b-div">
+                <span class="b-label">
+                    供应商列表:
+                </span>
+            </div>
+            <div><table id="tb_check"></table></div>
+            if (m.suppliers.Where(s => s.is_bidder).Count() > 0) {
+                <div class="b-div">
+                    <span class="b-label">
+                        中标供应商:
+                    </span>
+                    <span class="b-input text-danger" style="font-weight:bold;text-decoration:double underline;">
+                        @m.suppliers.Where(s => s.is_bidder).Select(s => s.supplier_name).FirstOrDefault()
+                    </span>
+                </div>
+            }
+        }
+        <div style="margin-top:6px;">
+            <div class="b-label">施工清单:</div>
+            <div id="attList1"></div>
+        </div>
+        <div style="margin-top:6px;">
+            <div class="b-label">报价单:</div>
+            <div id="attList2"></div>
+        </div>
+
+    </div>
+</div>
+
+<div class="panel panel-default" style="margin:16px 0;">
+    <div class="panel-body">
+        <h4 class="text-danger"><i class="fa fa-info-circle"></i> 说明 </h4>
+        <div style="margin-left:18px;padding-top:6px;" class="text-danger">
+            <p>
+                1. 流程步骤：流程开始--->提交申请--->收益提供人审批(如没有可跳过)--->设备科负责人审批--->部门主管审批--->部门总经理审批--->采购部接单--->申请人上传施工清单--->设备科负责人审批--->采购部上传报价单--->管理部会签（部门总经理、项目大类负责人、节省与监督审批人）--->审核部确认中标供应商--->申请人验收项目--->流程结束。
+            </p>
+        </div>
+    </div>
+</div>
+
+@*审批信息*@
+<div class="auditContent">
+    <div class="panel panel-primary">
+        <div class="panel-heading" id="auditHead">
+            <i class='fa fa-pencil'></i> @bam.stepName
+        </div>
+        <div class="panel-body">
+            @if (bam.isPass == null) {
+                <form id="auditForm">
+                    <input type="hidden" name="sysNo" value="@bam.sysNum" />
+                    <input type="hidden" name="step" value="@bam.step" />
+                    <input type="hidden" name="stepName" value="@bam.stepName" />
+                    <input type="hidden" name="isPass" id="isPass" value="true" />
+                    <input type="hidden" name="returnBack" id="returnBack" value="false" />
+
+                    @if (bam.stepName.Contains("采购部接单")) {
+                        <div class="b-div">
+                            <span class="b-label">
+                                供应商列表:
+                            </span>
+                            <div class="b-input">
+                                <button class="btn btn-success btn-sm" type="button" id="addBt"> <i class="fa fa-plus"></i> 新增</button>
+                                <button class="btn btn-primary btn-sm" type="button" id="editBt"> <i class="fa fa-edit"></i> 修改 </button>
+                                <button class="btn btn-danger btn-sm" type="button" id="removeBt"> <i class="fa fa-remove"></i> 删除 </button>
+                            </div>
+                        </div>
+                        <div>
+                            <table id="tb"></table>
+                        </div>
+                        <div class="text-danger small" style="margin-bottom:12px;"><i class="fa fa-info-circle"></i> 先确认供应商列表，并邮件通知供应商报方案，后续上传报价单环节再到此流程录入价钱</div>
+
+                    }
+                    else if (bam.stepName.Contains("上传施工清单")) {
+                        <div style="display:inline-block;">
+                            <div id="picker"> <i class="fa fa-upload"></i> 上传施工清单 </div>
+                        </div>
+                        <div id="myUploader1">
+
+                        </div>
+                    }
+                    else if (bam.stepName.Contains("上传报价单")) {
+                        <div class="b-div">
+                            <span class="b-label">
+                                供应商列表:
+                            </span>
+                            <div class="b-input">
+                                <button class="btn btn-success btn-sm" type="button" id="priceBt"> <i class="fa fa-edit"></i> 录入价钱 </button>
+                            </div>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <table id="tb2"></table>
+                        </div>
+
+                        <div style="display:inline-block;">
+                            <div id="picker"> <i class="fa fa-upload"></i> 上传报价单 </div>
+                        </div>
+                        <div id="myUploader2">
+
+                        </div>
+                    }
+                    else if (bam.stepName.Contains("确认中标供应商")) {
+                        <div class="b-div">
+                            <span class="b-label">
+                                选择中标供应商:
+                            </span>
+                            <div class="b-input">
+                                <select class="form-control" name="bidder">
+                                    <option value="">-----请选择中标供应商-----</option>
+                                    @foreach (var s in m.suppliers) {
+                                        <option value="@s.id">@s.supplier_name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    }
+
+                    <textarea class="form-control" rows="2" name="opinion" placeholder="请在此处输入审核意见"></textarea>
+                </form>
+
+                <div style="margin-top:12px;"></div>
+                <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-block btn-warning" onclick="ToPreStep(true)" style="margin-top:6px;">退回上一步处理</button>
+            }
+            else {
+                <div style="margin-top:12px;"></div>
+                if (bam.isPass == true) {
+                    <button type="button" class="btn btn-block btn-success disabled">已同意此申请</button>
+                }
+                else {
+                    <button type="button" class="btn btn-block btn-danger disabled">已拒绝此申请</button>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_MessageDialog")
+    @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_InputDialog")
+}

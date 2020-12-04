@@ -37,5 +37,6 @@ namespace EmpInfo.Models
         public Nullable<bool> check1 { get; set; }
         public Nullable<bool> check2 { get; set; }
         public bool is_continue { get; set; }
+        public string go_where { get; set; }
     }
 }

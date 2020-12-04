@@ -23,5 +23,6 @@ namespace EmpInfo.Models
         public string repair_content { get; set; }
         public string comment { get; set; }
         public Nullable<System.DateTime> repair_day { get; set; }
+        public string area_name { get; set; }
     }
 }

@@ -234,6 +234,8 @@ namespace EmpInfo.Controllers
             ArrayOfString aos = new ArrayOfString() { billType };
 
             SetBillByType(billType);
+
+            //通过接口，有时需要在某一类中展示多个类的数据，例如在JM中展示JQ和MQ
             var irb = bill as IRealBillType;
             if (irb != null) {
                 aos = irb.GetRealBillTypes();

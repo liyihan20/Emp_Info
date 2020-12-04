@@ -70,6 +70,15 @@
             });
         });
 
+        $("#exportBt").on("click", function () {
+            window.location.href = "BeginExportMQHRTalkReport"
+            + "?fromDate=" + $("#fromDate").val()
+            + "&toDate=" + $("#toDate").val()
+            + "&empName=" + escape($("#empName").val())
+            + "&status=" + escape($("#status").val())
+            ;
+        });
+
     });
 
         $("#check_tb").bootstrapTable({
@@ -85,10 +94,11 @@
                     field: "id",
                     visible:false
                 },
+                //{
+                //    field: "sys_no",
+                //    title: "流水号"
+                //},
                 {
-                    field: "sys_no",
-                    title: "流水号"
-                }, {
                     field: "dep_name",
                     title: "人事部门",
                     width: "30%"
@@ -115,12 +125,15 @@
                 }, {
                     field: "t_status",
                     title: "面谈状态"
+                }, {
+                    field: "talk_result",
+                    title: "面谈结果"
                 },
                 {
                     field: "opButtons",
                     title: "操作按钮",
                     formatter: function (value, row, index) {
-                        return '<button class="btn btn-sm btn-primary" style="margin-right:6px;" onclick="UpdateTalkStatus(\'' + row.id + '\')"><i class="fa fa-check"></i> 已面谈</button>';
+                        return '<button class="btn btn-sm btn-primary" style="margin-right:6px;" onclick="UpdateTalkStatus(\'' + row.id + '\',\''+row.talk_result +'\')"><i class="fa fa-check"></i> 已面谈</button>';
                     }
                 }
             ],
@@ -136,10 +149,14 @@
             }
         });
         
-        function UpdateTalkStatus(id) {
-            $.post("SetHRHasTalked", { id: id }, function (data) {
-                $("#check_tb").bootstrapTable("updateCellById", { id: id, field: "t_status", value: "面谈完成" });
-            });
+        function UpdateTalkStatus(id, talkResult) {
+            openInputDialog("面谈结果",
+                    function (content) {                        
+                        $.post("SetHRHasTalked", { id: id, talkResult: content }, function (data) {
+                            $("#check_tb").bootstrapTable("updateCellById", { id: id, field: "t_status", value: "面谈完成" });
+                            $("#check_tb").bootstrapTable("updateCellById", { id: id, field: "talk_result", value: content });
+                        });
+                    }, "请在此填写面谈结果", "取消", "确认", talkResult);            
         }
 
     </script>
@@ -186,10 +203,20 @@
                     </select>
             </div>
         </div>
+        <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-block btn-primary" id="checkBt" data-loading-text="搜索中..." style="margin:8px 0;"><i class="fa fa-search"></i> 搜索</button>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-block btn-success" id="exportBt" data-loading-text="导出中..." style="margin:8px 0;"><i class="fa fa-file-excel-o"></i> 导出excel</button>
+                    </div>
+                </div>
         
-        <button class="btn btn-block btn-primary" id="checkBt" data-loading-text="搜索中..." style="margin:8px 0;"><i class="fa fa-search"></i> 搜索</button>
 
         <table id="check_tb"></table>
 
     </div>
 </div>
+@section Modal {
+    @Html.Partial("_InputDialog")
+}

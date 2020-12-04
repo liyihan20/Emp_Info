@@ -12,13 +12,12 @@ namespace EmpInfo.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class ei_mqHRTalkRecord
+    public partial class ei_xaApplySupplier
     {
         public int id { get; set; }
         public string sys_no { get; set; }
-        public System.DateTime in_time { get; set; }
-        public Nullable<System.DateTime> talk_time { get; set; }
-        public string t_status { get; set; }
-        public string talk_result { get; set; }
+        public string supplier_name { get; set; }
+        public Nullable<decimal> price { get; set; }
+        public bool is_bidder { get; set; }
     }
 }

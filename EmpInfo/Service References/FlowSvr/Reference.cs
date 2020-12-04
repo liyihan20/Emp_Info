@@ -882,6 +882,10 @@ namespace EmpInfo.FlowSvr {
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/StepRollBack", ReplyAction="*")]
         EmpInfo.FlowSvr.StepRollBackResponse StepRollBack(EmpInfo.FlowSvr.StepRollBackRequest request);
         
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 sysNo 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/ToPreStep", ReplyAction="*")]
+        EmpInfo.FlowSvr.ToPreStepResponse ToPreStep(EmpInfo.FlowSvr.ToPreStepRequest request);
+        
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 cardNumber 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/ReturnToBeforeStep", ReplyAction="*")]
         EmpInfo.FlowSvr.ReturnToBeforeStepResponse ReturnToBeforeStep(EmpInfo.FlowSvr.ReturnToBeforeStepRequest request);
@@ -2152,6 +2156,90 @@ namespace EmpInfo.FlowSvr {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class ToPreStepRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="ToPreStep", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.ToPreStepRequestBody Body;
+        
+        public ToPreStepRequest() {
+        }
+        
+        public ToPreStepRequest(EmpInfo.FlowSvr.ToPreStepRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class ToPreStepRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string sysNo;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public int step;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public string stepName;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string auditorNumber;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        public string opinions;
+        
+        public ToPreStepRequestBody() {
+        }
+        
+        public ToPreStepRequestBody(string sysNo, int step, string stepName, string auditorNumber, string opinions) {
+            this.sysNo = sysNo;
+            this.step = step;
+            this.stepName = stepName;
+            this.auditorNumber = auditorNumber;
+            this.opinions = opinions;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class ToPreStepResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="ToPreStepResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.ToPreStepResponseBody Body;
+        
+        public ToPreStepResponse() {
+        }
+        
+        public ToPreStepResponse(EmpInfo.FlowSvr.ToPreStepResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class ToPreStepResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public EmpInfo.FlowSvr.FlowResultModel ToPreStepResult;
+        
+        public ToPreStepResponseBody() {
+        }
+        
+        public ToPreStepResponseBody(EmpInfo.FlowSvr.FlowResultModel ToPreStepResult) {
+            this.ToPreStepResult = ToPreStepResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class ReturnToBeforeStepRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="ReturnToBeforeStep", Namespace="http://ic.truly.com.cn/", Order=0)]
@@ -3122,6 +3210,23 @@ namespace EmpInfo.FlowSvr {
             inValue.Body.step = step;
             EmpInfo.FlowSvr.StepRollBackResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).StepRollBack(inValue);
             return retVal.Body.StepRollBackResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.FlowSvr.ToPreStepResponse EmpInfo.FlowSvr.FlowSvrSoap.ToPreStep(EmpInfo.FlowSvr.ToPreStepRequest request) {
+            return base.Channel.ToPreStep(request);
+        }
+        
+        public EmpInfo.FlowSvr.FlowResultModel ToPreStep(string sysNo, int step, string stepName, string auditorNumber, string opinions) {
+            EmpInfo.FlowSvr.ToPreStepRequest inValue = new EmpInfo.FlowSvr.ToPreStepRequest();
+            inValue.Body = new EmpInfo.FlowSvr.ToPreStepRequestBody();
+            inValue.Body.sysNo = sysNo;
+            inValue.Body.step = step;
+            inValue.Body.stepName = stepName;
+            inValue.Body.auditorNumber = auditorNumber;
+            inValue.Body.opinions = opinions;
+            EmpInfo.FlowSvr.ToPreStepResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).ToPreStep(inValue);
+            return retVal.Body.ToPreStepResult;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]

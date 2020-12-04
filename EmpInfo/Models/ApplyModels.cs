@@ -27,6 +27,7 @@ namespace EmpInfo.Models
             this.totalLeaveDays = "共 " + al.work_days + " 天 " + al.work_hours + " 小时";
             this.isContinue = al.is_continue ? "是" : "否";
             this.hasAttachment = al.has_attachment ?? false;
+            this.goWhere = al.go_where;
         }
         public string auditStatus { get; set; }
         public string sysNo { get; set; }
@@ -44,6 +45,7 @@ namespace EmpInfo.Models
         public string informMan { get; set; }
         public bool hasAttachment { get; set; }
         public string account { get; set; }
+        public string goWhere { get; set; }
     }
 
     public class AttachmentModel
@@ -309,6 +311,20 @@ namespace EmpInfo.Models
     {
         public string stepName { get; set; }
         public string auditorName { get; set; }
+        public string auditorNo { get; set; }
+    }
+
+    public class XABeforeApplyModel
+    {
+        public string sys_no { get; set; }
+        public string applierName { get; set; }
+        public List<string> depNameList { get; set; }
+    }
+
+    public class XACheckApplyModel
+    {
+        public ei_xaApply bill;
+        public List<ei_xaApplySupplier> suppliers;
     }
 
 }

@@ -1,0 +1,328 @@
+﻿@using EmpInfo.Models;
+@{
+    XABeforeApplyModel m = ViewData["infoBeforeApply"] as XABeforeApplyModel;
+}
+@section CSS{
+
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 100px;
+            vertical-align: top;
+            color: gray;
+        }
+        .b-input{
+            display:inline-block;
+            width:65%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+
+@section Scripts {    
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
+
+    <script>
+        $(function () {
+            var arr = {};
+            arr["工程项目"] = [
+                { name: "车间装修类", detail: "车间装修类：如 墙体 / 地板 / 天花板 / 管道 等各类新增或修补 等" },
+                { name: "车间整改类", detail: "车间整改类：如 净房相关改造 / 图纸布局更改 / 土建基建相关 等" },
+                { name: "消防及环保工程类", detail: "消防及环保工程类：如 消防相关 / 废水废气相关 / 污染废弃物处理相关 等" },
+                { name: "涉及厂区其余公共区域类", detail: "涉及厂区其余公共区域类：如 公共区域的外观、设施、绿化的维护，增补 等" }
+            ];
+            arr["工作项目"] = [
+                { name: "设备搬运/二次配", detail: "设备搬运/二次配类：设备搬运 / 打包 / 拆装 / 运输 / 一次配水电气 / 二次配水电气 等" },
+                { name: "办公/宣传类", detail: "办公/宣传类：更换牌匾 / 增加标识 / 办公区域相关 等" },
+                { name: "监控/网络等弱电项目", detail: "监控/网络等弱电项目：监控维修及增加 / 网络维修及增加 / 各类线路维护及增加 等" },
+                { name: "维修/更换项目", detail: "维修/更换类：车间各类配套设施和辅助设施的维修 / 维护 / 更换" }
+            ];
+            arr["后勤项目"] = [
+                { name: "宿舍、食堂等区域相关", detail: "宿舍、食堂等区域相关：宿舍、食堂区域的增补、维修、整改 等" },
+                { name: "安保及安全配套相关", detail: "安保及安全配套相关：厂区出入大门硬软件维护维修、公共区域监控系统维护维修 等" }
+            ];
+            
+            $("#classification").on("change", function () {
+                $("#project_type").empty();
+                $("#project_type").append("<option value=''>----下拉选择项目类别----</option>");
+                var rs = arr[$(this).val()];
+                for (var i = 0; i < rs.length; i++) {
+                    $("#project_type").append("<option value='"+rs[i].name+"'>"+rs[i].name+"</option>");
+                }
+            });
+
+            $("#project_type").on("change", function () {
+                var detail = arr[$("#classification").val()].filter(function (v) { return v.name == $("#project_type").val() })[0].detail;                
+                $("#projectInfo").html(detail);
+                $("#project_detail").val(detail);
+            });
+
+            $("#btnAddDemand").on("click", function () {
+                var demandInput = '<div class="input-group" style="margin-top:6px;"> \
+                                       <input type="text" class="form-control" name="demands" placeholder="需要达到的效果，分项填写"/> \
+                                       <span class="input-group-addon deleteDemand" style="cursor:pointer;"><i class="fa fa-remove text-danger" title="删除"></i></span> \
+                                   </div>';
+                $(demandInput).insertBefore($(this));
+            });
+
+            $("#demandDiv").on("click", ".deleteDemand", function () {
+                $(this).parent(".input-group").remove();
+            });
+
+            $("#profitInfo").hide();
+            $("#has_profit").on("change", function () {
+                if ($(this).val() == "true") {
+                    $("#profitInfo").show();
+                } else {
+                    $("#profitInfo").hide();
+                }
+            });
+
+            $(".select-user").on("focus", function () {
+                var self = this;
+                var userNum = $(this).attr("data-user-num") || 1;
+                $.selectUsers({
+                    userLimit: userNum,
+                    userHasSelected: $(self).val(),
+                    callback: function (result) {
+                        $(self).val(result);
+                    }
+                });
+            });
+
+            //提交申请
+            $("#apply_bt").on("click", function () {
+                var result = utils.validateRequiredField($("#fm"));
+                if (!result.suc) {
+                    toastr.error(result.msg);
+                    return;
+                }
+                var head = utils.getFormObj($("#fm"));
+                var demandsInput = $("input[name='demands']");
+                var demands = "";
+                for (var i = 0; i < demandsInput.length; i++) {
+                    if ($.trim($(demandsInput[i]).val()) != "") {
+                        demands += $(demandsInput[i]).val() + "\br"; //给换行符，读取时再转
+                    }
+                }
+                head.demands = demands;
+                head.company = head.dept_name.split("_")[0];
+                head.dept_name = head.dept_name.split("_")[1];
+                openConfirmDialog("确定要提交申请吗？", function () {
+                    $("#apply_bt").button("loading");
+                    $.ajax({
+                        type: 'post',
+                        url: 'SaveApply',
+                        data: "sys_no="+head.sys_no+"&head="+utils.StringifyAndParseCharacter(head),
+                        cache: false,
+                        dataType: 'json',
+                        success: function (data) {
+                            $("#apply_bt").button("reset");
+                            if (data.suc) {
+                                toastr.success("提交成功:" + data.msg);
+                                setTimeout(function () { window.location.href = "CheckApply?sysNo=" + head.sys_no; }, 2000);
+                            } else {
+                                toastr.error("提交失败：" + data.msg);
+                                $("#apply_bt").button("reset");
+                            }
+
+                        }
+                    });
+                });
+
+            });
+
+        });
+
+
+    </script>
+}
+
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
+            <li><a href="ApplyIndex?billType=XA">项目单申请流程</a></li>
+            <li class="active">开始申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <form id="fm" style="margin-top:-12px;">
+            <div class="b-div">
+                <span class="b-label">
+                    申请流水号:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="sys_no" value="@m.sys_no" readonly />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    申请人:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="applier_name" value="@m.applierName" readonly />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    申请部门:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="dept_name" id="dept_name" required>
+                        <option value="">----下拉选择部门----</option>
+                        @foreach (var c in m.depNameList.Select(d=>d.Split('_','1','2')[0]).Distinct()) {
+                            <optgroup label="@c">
+                                @foreach (var d in m.depNameList.Where(d=>d.StartsWith(c))) {
+                                    <option value="@d">@d.Split('_')[1]</option>
+                                }
+                            </optgroup>
+                            
+                        }
+                    </select>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    项目名称:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="project_name" placeholder="填写项目名称" required/>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    地点:
+                </span>
+                <span class="b-input">
+                    <textarea type="text" class="form-control" rows="2" id="addr" name="addr" placeholder="例如：19栋1楼" required></textarea>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    项目大类:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="classification" id="classification" required>
+                        <option value="">----下拉选择项目大类----</option>
+                        <option value="工程项目">工程项目</option>
+                        <option value="工作项目">工作项目</option>
+                        <option value="后勤项目">后勤项目</option>
+                    </select>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    项目类别:
+                </span>
+                <div class="b-input">
+                    <select class="form-control" name="project_type" id="project_type" required>
+                        <option value="">----下拉选择项目类别----</option>
+                    </select>
+                    <div class="small text-danger"><i class="fa fa-info-circle"></i> 项目类别说明： <span id="projectInfo"></span></div>
+                    <input type="hidden" name="project_detail" id="project_detail" />
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    申请原因:
+                </span>
+                <span class="b-input">
+                    <textarea type="text" class="form-control" rows="4" id="reason" name="reason" placeholder="请说明所申请项目的缘由、必要性以及目前已造成的影响或损失" required></textarea>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    具体要求:
+                </span>
+                <div class="b-input" id="demandDiv">
+                    <input type="text" class="form-control" name="demands" placeholder="需要达到的效果，分项填写" required />
+                    <button type="button" class="btn btn-sm btn-success" id="btnAddDemand" style="margin-top:6px;"><i class="fa fa-plus"></i> 添加要求</button>                    
+                </div>
+            </div>            
+            <div class="b-div">
+                <span class="b-label">
+                    项目收益:
+                </span>
+                <div class="b-input">
+                    <select class="form-control" name="has_profit" id="has_profit" required>
+                        <option value="">----下拉选择是否有项目收益----</option>
+                        <option value="true">有项目收益</option>
+                        <option value="false">无项目收益（维修维护类）</option>
+                    </select>
+                </div>
+            </div>
+            <div id="profitInfo">
+                <div class="b-div">
+                    <span class="b-label">
+                        人员节省:
+                    </span>
+                    <div class="b-input">
+                        <textarea type="text" class="form-control" rows="3" name="save_people" placeholder="填写节省岗位目前状态/项目完成后岗位状态"></textarea>
+                    </div>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        产能收益:
+                    </span>
+                    <div class="b-input">
+                        <textarea type="text" class="form-control" rows="3" name="productivity_profit" placeholder="填写现产能明细/项目完成后产能/产能增加净值"></textarea>
+                    </div>
+                </div>     
+                <div class="b-div">
+                    <span class="b-label">
+                        其它收益:
+                    </span>
+                    <div class="b-input">
+                        <textarea type="text" class="form-control" rows="3" name="other_profit" placeholder="详细填写其它收益项目"></textarea>
+                    </div>
+                </div>    
+                 <div class="b-div">
+                    <span class="b-label">
+                        收益数据确认人:
+                    </span>
+                    <div class="b-input">
+                        <input type="text" class="form-control select-user" data-user-num="3" name="profit_confirm_people_name" placeholder="选择收益收据确认人"/>
+                    </div>
+                </div>
+            </div>  
+                 <div class="b-div">
+                    <span class="b-label">
+                        设备科负责人:
+                    </span>
+                    <div class="b-input">
+                        <input type="text" class="form-control select-user" name="equitment_auditor_name" placeholder="选择设备科负责人"/>
+                    </div>
+                </div>
+                 <div class="b-div">
+                    <span class="b-label">
+                        部门主管:
+                    </span>
+                    <div class="b-input">
+                        <input type="text" class="form-control select-user" name="dept_charger_name" placeholder="选择部门主管"/>
+                    </div>
+                </div>
+        </form>
+        <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:16px;"><i class="fa fa-check-circle-o"></i> 提交申请单</button>
+    </div>
+</div>
+
+<div class="panel panel-default" style="margin:16px 0;">
+    <div class="panel-body">
+        <h4 class="text-danger"><i class="fa fa-info-circle"></i> 说明 </h4>
+        <div style="margin-left:18px;padding-top:6px;" class="text-danger">            
+            <p>
+                1. 流程步骤：流程开始--->提交申请--->收益提供人审批(如没有可跳过)--->设备科负责人审批--->部门主管审批--->部门总经理审批--->采购部接单--->申请人上传施工清单--->设备科负责人审批--->采购部上传报价单--->管理部会签（部门总经理、项目大类负责人、节省与监督审批人）--->审核部确认中标供应商--->申请人验收项目--->流程结束。
+            </p>
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+}

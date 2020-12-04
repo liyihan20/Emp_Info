@@ -216,6 +216,10 @@
             toastr.error("请假时间不能都是0");
             return false;
         }
+        if ($.trim($("#goWhere").val()) == "") {
+            toastr.error("请假去向必须填写");
+            return false;
+        }
         if ($($("input[name='leave_type']:checked")[0]).val() == "病假") {
             if ($("#al_file_list tr").length < 1) {
                 toastr.error("当[请假类型]是病假时，必须上传医院诊断证明等附件");
@@ -518,10 +522,18 @@
                     </div>
                     <div class="b-div">
                         <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>请假去向</button>
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <input type="text" class="form-control" name="go_where" id="goWhere" placeholder="填写地点，如城市名、市镇名等" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
                             <button class="btn btn-block btn-default" disabled>请假事由</button>
                         </span>
                         <span style="display:inline-block;width:70%">
-                            <textarea type="text" class="form-control" rows="2" id="leaveReason" name="leave_reason"></textarea>
+                            <textarea type="text" class="form-control" rows="2" id="leaveReason" name="leave_reason" placeholder="填写请假原因"></textarea>
                         </span>
                     </div>
                     <div class="b-div">

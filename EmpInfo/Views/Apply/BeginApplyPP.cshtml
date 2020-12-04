@@ -248,7 +248,7 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/DormGroupIndex")">后勤事务</a></li>
-            <li><a href="ApplyIndex?billType=PP">宿舍公共区域维修</a></li>
+            <li><a href="ApplyIndex?billType=PP">后勤公共区域维修</a></li>
             <li class="active">开始申请</li>
         </ol>
     </div>
@@ -269,6 +269,19 @@
                         <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span> </span>
                         <input class="form-control" type="text" readonly id="repair_day" name="repair_day" required>
                     </span>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    宿舍区:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="area_name" required>
+                        <option value="">-----下拉选择宿舍区-----</option>
+                        @foreach (var a in new string[] { "一区", "二区", "三区", "五区", "六区", "红草一区" }) {
+                            <option value="@a">@a</option>
+                        }
+                    </select>
                 </span>
             </div>
             <div class="b-div">

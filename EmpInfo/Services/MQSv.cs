@@ -371,6 +371,7 @@ namespace EmpInfo.Services
             t.sys_no = bill.sys_no;
             t.in_time = DateTime.Now;
             t.t_status = "已预约";
+            t.talk_result = "";
             db.ei_mqHRTalkRecord.Add(t);
             db.SaveChanges();
 
@@ -387,6 +388,10 @@ namespace EmpInfo.Services
             SendQYWXMsg(msg);
 
             //3. 推送给人事部
+            string phone = db.ei_users.Where(u => u.card_number == bill.applier_num).FirstOrDefault().phone;
+            if (string.IsNullOrEmpty(phone)) {
+                phone = new HRDBSv().GetHREmpInfo(bill.applier_num).tp;
+            }
             msg = new TextMsg();
             msg.touser = "07110367";// 范美玉;
             msg.text = new TextContent();
@@ -395,6 +400,7 @@ namespace EmpInfo.Services
             msg.text.content += "部门："+bill.dep_name+" <br/>";
             msg.text.content += "姓名：" + bill.name + " <br/>";
             msg.text.content += "厂牌：" + bill.card_number + " <br/>";
+            msg.text.content += "手机：" + (phone ?? "") + " <br/>";
             msg.text.content += "预计离职日期："+((DateTime)bill.leave_date).ToString("yyyy-MM-dd");
             SendQYWXMsg(msg);
 

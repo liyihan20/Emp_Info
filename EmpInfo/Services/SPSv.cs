@@ -92,7 +92,8 @@ namespace EmpInfo.Services
                 {
                     sys_no = sysNo,
                     applier_phone = string.IsNullOrWhiteSpace(userInfoDetail.shortPhone) ? userInfoDetail.phone : userInfoDetail.shortPhone,
-                    busDepList = busDepList
+                    busDepList = busDepList,
+                    stockAddrList=stockAddrList
                 };
             }
             return new SPBeforeApplyModel()

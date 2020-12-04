@@ -157,8 +157,9 @@ namespace EmpInfo.Services
         //获取流水号
         public virtual string GetNextSysNum(string billType, int digitPerDay = 3)
         {
-            string result = billType + DateTime.Now.ToString("yyMMdd");
-            var maxNumRecords = db.all_maxNum.Where(a => a.bill_type == billType && a.date_str == result);
+            string dateStr = DateTime.Now.ToString("yyMMdd");
+            string result = billType + dateStr;
+            var maxNumRecords = db.all_maxNum.Where(a => a.bill_type == billType && a.date_str == dateStr);
             if (maxNumRecords.Count() > 0) {
                 var maxNumRecord = maxNumRecords.First();
                 result += string.Format("{0:D" + digitPerDay + "}", maxNumRecord.max_num);
@@ -167,7 +168,7 @@ namespace EmpInfo.Services
             else {
                 var maxNumRecord = new all_maxNum();
                 maxNumRecord.bill_type = billType;
-                maxNumRecord.date_str = result;
+                maxNumRecord.date_str = dateStr;
                 maxNumRecord.max_num = 2;
                 db.all_maxNum.Add(maxNumRecord);
 

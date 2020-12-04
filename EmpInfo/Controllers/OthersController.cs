@@ -485,7 +485,7 @@ namespace EmpInfo.Controllers
         public JsonResult GetManagementReport(string depName, string yearMonth)
         {
             yearMonth = yearMonth.Replace("-", "");
-            string sqlText = string.Format("exec [192.168.100.205].truly_data.dbo.tpro_jy_data_yybb @dept_name = {0},@month_no = {1}", depName, yearMonth);
+            string sqlText = string.Format("exec [192.168.100.205].truly_data.dbo.tpro_jy_data_yybb @dept_name = '{0}',@month_no = '{1}'", depName, yearMonth);
             try {
                 var result = new BIBaseSv().GetTableResult(sqlText);
 

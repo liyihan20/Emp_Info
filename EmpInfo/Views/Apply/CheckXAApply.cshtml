@@ -1,0 +1,303 @@
+﻿@using EmpInfo.Models;
+@using Newtonsoft.Json;
+@{
+    var m = ViewData["am"] as XACheckApplyModel;
+    var itemsJson = JsonConvert.SerializeObject(m.suppliers);
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 100px;
+            vertical-align: top;
+            color: gray;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 65%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myDownloaderPro.js")"></script>
+
+    <script>
+
+    if($("#tb_check").length>0){
+        $("#tb_check").bootstrapTable({
+            data:@Html.Raw(itemsJson),
+            striped: true,
+            clickToSelect: true,
+            columns: [
+                {
+                    field: "supplier_name",
+                    title: "供应商名称",
+                    width:"70%"
+                }
+                , {
+                    field: "price",
+                    title: "价格",
+                    width:"30%"
+                }
+            ]
+        });
+    }
+
+
+
+    $(function () {
+
+        if ($("#attList1").length>0) {
+            $("#attList1").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "施工清单_" });
+        }
+        if ($("#attList2").length>0) {
+            $("#attList2").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "报价单_" });
+        }
+
+        $("#flowRecordBt").on("click", function () {
+            var box = $("<div></div>");
+            $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.bill.sys_no" }, function () {
+                openMessageDialog($(box).html(), "查看流转记录");
+            });
+        });
+
+        $("#printBt").on("click",function(){
+            window.open("../Report/PrintXA?sysNo="+"@m.bill.sys_no");
+        })
+    })
+
+
+    </script>
+
+}
+
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="ApplyIndex?billType=XA">项目单申请流程</a></li>
+            <li class="active">查看申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="b-div">
+            <span class="b-label">
+                流转记录:
+            </span>
+            <span class="b-input">
+                <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+            </span>
+        </div>
+        @if (m.bill.can_print) { 
+        <div class="b-div">
+            <span class="b-label">
+                打印:
+            </span>
+            <span class="b-input">
+                <button type="button" class="btn btn-default btn-sm" id="printBt"><i class="fa fa-print"></i> 打印单据</button>
+            </span>
+        </div>
+        }
+        <div class="b-div">
+            <span class="b-label">
+                申请流水号:
+            </span>
+            <span class="b-input">
+                @m.bill.sys_no
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请人:
+            </span>
+            <span class="b-input">
+                @m.bill.applier_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请时间:
+            </span>
+            <span class="b-input">
+                @(m.bill.apply_time.ToString("yyyy-MM-dd"))
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请部门:
+            </span>
+            <span class="b-input">
+                @m.bill.dept_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                项目编号:
+            </span>
+            <span class="b-input">
+                @m.bill.bill_no
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                项目名称:
+            </span>
+            <span class="b-input">
+                @m.bill.project_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                地点:
+            </span>
+            <span class="b-input">
+                @m.bill.addr
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                项目大类:
+            </span>
+            <span class="b-input">
+                @m.bill.classification
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                项目类别:
+            </span>
+            <span class="b-input">
+                @m.bill.project_type
+            </span>
+        </div>
+        @*<div class="b-div">
+                <span class="b-label">
+                    项目类别说明:
+                </span>
+                <span class="b-input">
+                    @m.bill.project_detail
+                </span>
+            </div>*@
+        <div class="b-div">
+            <span class="b-label">
+                申请原因:
+            </span>
+            <span class="b-input">
+                @m.bill.reason
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                具体要求:
+            </span>
+            <div class="b-input">
+                @foreach (var d in m.bill.demands.Split(new string[]{"\br"}, StringSplitOptions.RemoveEmptyEntries)) {
+                    <div><i class="fa fa-circle"></i> @d</div>
+                }
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                项目收益:
+            </span>
+            <span class="b-input">
+                @(m.bill.has_profit ? "有项目收益" : "无项目收益（维修维护类）")
+            </span>
+        </div>
+        @if (m.bill.has_profit) {
+            <div class="b-div">
+                <span class="b-label">
+                    人员节省:
+                </span>
+                <span class="b-input">
+                    @m.bill.save_people
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    产能收益:
+                </span>
+                <span class="b-input">
+                    @m.bill.productivity_profit
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    其它收益:
+                </span>
+                <span class="b-input">
+                    @m.bill.other_profit
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    收益数据确认人:
+                </span>
+                <span class="b-input">
+                    @m.bill.profit_confirm_people_name
+                </span>
+            </div>
+        }
+        <div class="b-div">
+            <span class="b-label">
+                设备科负责人:
+            </span>
+            <span class="b-input">
+                @m.bill.equitment_auditor_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                部门主管:
+            </span>
+            <span class="b-input">
+                @m.bill.dept_charger_name
+            </span>
+        </div>
+        @if (m.suppliers.Count() > 0) {
+            <div class="b-div">
+                <span class="b-label">
+                    供应商列表:
+                </span>
+            </div>
+            <div><table id="tb_check"></table></div>
+            if (m.suppliers.Where(s => s.is_bidder).Count() > 0) {
+                <div class="b-div">
+                    <span class="b-label">
+                        中标供应商:
+                    </span>
+                    <span class="b-input text-danger" style="font-weight:bold;text-decoration:double underline;">
+                        @m.suppliers.Where(s => s.is_bidder).Select(s => s.supplier_name).FirstOrDefault()
+                    </span>
+                </div>
+            }
+        }
+        <div style="margin-top:6px;">
+            <div class="b-label">施工清单:</div>
+            <div id="attList1"></div>
+        </div>
+        <div style="margin-top:6px;">
+            <div class="b-label">报价单:</div>
+            <div id="attList2"></div>
+        </div>
+
+
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

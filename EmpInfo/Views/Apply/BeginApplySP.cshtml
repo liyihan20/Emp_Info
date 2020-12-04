@@ -251,6 +251,11 @@
                             toastr.error("仓库地址必须选择");
                             return;
                         }
+                    }else{
+                        if(obj.isReturnBack==""){
+                            toastr.error("是否退补货必须选择");
+                            return;
+                        }
                     }
                 }
                 if (!utils.testIsFloat(obj.total_weight, 1)) {
@@ -582,7 +587,7 @@
                             是否退补货:
                         </span>
                         <div class="b-input">
-                            <select class="form-control" name="isReturnBack" id="isReturnBack" required>
+                            <select class="form-control" name="isReturnBack" id="isReturnBack" 、>
                                 <option value="">---- 下拉选择是否退补货 ----</option>
                                 <option value="是">是</option>
                                 <option value="否">否</option>
@@ -596,7 +601,7 @@
                             品质审核人:
                         </span>
                         <div class="b-input">
-                            <input type="text" class="form-control selectUser" name="quality_audior_name" placeholder="请选择品质审核人" required />                            
+                            <input type="text" class="form-control selectUser" name="quality_audior_name" placeholder="请选择品质审核人" />                            
                         </div>
                     </div>
                 </div>              
@@ -606,7 +611,7 @@
                             仓库地址:
                         </span>
                         <div class="b-input">
-                            <select class="form-control" name="stock_addr" id="stock_addr" required>
+                            <select class="form-control" name="stock_addr" id="stock_addr">
                                 <option value="">---- 下拉选择仓库地址 ----</option>
                                 @foreach (var a in m.stockAddrList) {
                                     <option value="@a">@a</option>

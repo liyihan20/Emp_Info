@@ -1,0 +1,100 @@
+﻿@using EmpInfo.Models;
+@{
+    ei_xaApply h = ViewData["bill"] as ei_xaApply;
+    string bidder = ViewData["bidder"] as string;
+    List<StepNameAndAuditor> al = ViewData["auditorList"] as List<StepNameAndAuditor>;
+}
+
+@section CSS{
+    <style type="text/css" media="print">
+        .noPrint {
+            display: none;
+        }
+
+        .pageNext {
+            page-break-after: always;
+        }
+    </style>
+    <style type="text/css">
+        #reportTb tr td {
+            text-align: center;
+            border: 1px solid;
+            padding: 2px;
+        }
+
+        #itemTb tr td {
+            text-align: center;
+            border: 1px dashed;
+            padding: 2px;
+        }
+    </style>
+}
+
+
+<div class="text-center noPrint" style="margin-bottom:8px;">
+    <button type="button" class="btn btn-default btn-sm" onclick="javascript: window.print();"><i class="fa fa-print"></i> 开始打印</button>
+</div>
+    <div><img src="@Url.Content("~/Content/images/Truly.gif")" /></div>
+    <div style="text-align:right;padding-right:8px;font-size:10px;">        
+        <div>项目单号：@h.bill_no</div>
+    </div>
+    <table style="width:100%;" id="reportTb">
+        <tr>
+            <td colspan="4">
+                <div style="font-size:22px;font-weight:bold;padding:6px 2px;">项目申请单</div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:20%;">申请人:</td>
+            <td style="width:30%;">@h.applier_name</td>
+            <td style="width:20%;">申请部门:</td>
+            <td style="width:30%;">@h.dept_name</td>
+        </tr>
+        <tr>
+            <td>申请时间:</td>
+            <td>@(((DateTime)h.apply_time).ToString("yyyy-MM-dd HH:mm"))</td>
+            <td>打印时间:</td>
+            <td>@DateTime.Now.ToString("yyyy-MM-dd HH:mm")</td>
+        </tr>
+        <tr>
+            <td>项目类别:</td>
+            <td>@h.project_type</td>
+            <td>项目名称:</td>
+            <td>@h.project_name</td>
+        </tr>
+        <tr>
+            <td>地点:</td>
+            <td colspan="3">@h.addr</td>
+        </tr>
+        <tr>
+            <td>申请原因:</td>
+            <td colspan="3">@h.reason</td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>设备科负责人:</td>
+            <td style="font-weight:bold;">@al.Where(a => a.stepName.Contains("设备科负责人")).Select(a => a.auditorName).FirstOrDefault()</td>
+            <td>部门主管:</td>
+            <td style="font-weight:bold;">@al.Where(a => a.stepName.Contains("部门主管")).Select(a => a.auditorName).FirstOrDefault()</td>
+        </tr>
+        <tr>
+            <td>部门总经理:</td>
+            <td style="font-weight:bold;">@al.Where(a => a.stepName.Contains("部门总经理")).Select(a => a.auditorName).FirstOrDefault()</td>
+            <td>采购负责人:</td>
+            <td style="font-weight:bold;">@al.Where(a => a.stepName.Contains("采购")).Select(a => a.auditorName).FirstOrDefault()</td>
+        </tr>
+        <tr>
+            <td>项目负责人:</td>
+            <td style="font-weight:bold;">@al.Where(a => a.stepName.Contains("项目大类")).Select(a => a.auditorName).FirstOrDefault()</td>
+            <td>节省与监督:</td>
+            <td style="font-weight:bold;">@al.Where(a => a.stepName.Contains("节省与监督")).Select(a => a.auditorName).FirstOrDefault()</td>
+        </tr>
+        <tr>
+            <td>审核部负责人:</td>
+            <td style="font-weight:bold;">@al.Where(a => a.stepName.Contains("审核部")).Select(a => a.auditorName).FirstOrDefault()</td>
+            <td>验收人:</td>
+            <td style="font-weight:bold;">@al.Where(a => a.stepName.Contains("验收项目")).Select(a => a.auditorName).FirstOrDefault()</td>
+        </tr>
+    </table>
