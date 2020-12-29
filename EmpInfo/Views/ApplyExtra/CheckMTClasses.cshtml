@@ -1,0 +1,160 @@
+﻿@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+}
+@section Scripts{
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
+    <script>
+        $("#tb1").bootstrapTable({
+            url: "GetMTClasses",
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 50,
+            pageList: [20, 50, 100, 200],
+            search: true,
+            clickToSelect: true,
+            columns: [
+                {
+                    radio: true
+                }, {
+                    field: "class_name",
+                    title: "科室名称"
+                }, {
+                    field: "leader",
+                    title: "负责人"
+                }, {
+                    field: "member",
+                    title: "成员"
+                }, {
+                    field: "create_time",
+                    title: "创建日期",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(row.create_time);
+                    }
+                }
+            ]
+        });
+
+        $(function () {
+
+            $(".select-user").on("focus", function () {
+                var self = this;
+                var userNum = $(this).attr("data-user-num") || 1;
+                $.selectUsers({
+                    userLimit: userNum,
+                    userHasSelected: $(self).val(),
+                    callback: function (result) {
+                        $(self).val(result);
+                    }
+                });
+            });
+
+            $("#tb1AddBt").on("click", function () {
+                $("#tb1Modal .modal-title").html("新增科室");
+                utils.resetForm($("#tb1Form"));
+                $("#tb1Modal").modal("show");
+            });
+
+            $("#tb1ModifyBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再修改");
+                    return;
+                }
+                $("#tb1Modal .modal-title").html("修改科室");                
+                utils.loadObjData($("#tb1Form"), rows[0]);
+                $("#tb1Modal").modal("show");
+            });
+
+            $("#tb1RemoveBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                openConfirmDialog("确定要删除选中行吗？", function () {
+                    $.post("RemoveMTClass", { id: rows[0].id }, function (data) {
+                        if (data.suc) {
+                            toastr.success("删除成功");
+                            $('#tb1').bootstrapTable('refresh');
+                        } else {
+                            toastr.error("删除失败：" + data.msg);
+                        }
+                    });
+                });
+            });
+
+            $("#saveTb1FormBt").on("click", function () {
+                var obj = utils.getFormObj($("#tb1Form"));
+                if (obj.class_name == "" || obj.leader == "" || obj.member == "") {
+                    toastr.error("所有字段都必须填写才能保存");
+                    return;
+                }
+                console.log(obj);
+                $.post("SaveMTClass", { obj: JSON.stringify(obj) }, function (data) {
+                    if (data.suc) {
+                        $("#tb1Modal").modal("hide");
+                        toastr.success("保存成功");
+                        $('#tb1').bootstrapTable('refresh');
+                    } else {
+                        toastr.error("保存失败：" + data.msg);
+                    }
+                });
+            });
+        });
+
+    </script>
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="../Apply/ApplyIndex?billType=MT">设备保养流程</a></li>
+            <li class="active">设备科室维护</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div>
+            <button class="btn btn-success" id="tb1AddBt"><i class="fa fa-plus"></i> 新增</button>
+            <button class="btn btn-primary" id="tb1ModifyBt"><i class="fa fa-edit"></i> 修改</button>
+            <button class="btn btn-danger" id="tb1RemoveBt"><i class="fa fa-plus"></i> 删除</button>
+        </div>
+
+        <table id="tb1"></table>
+    </div>
+</div>
+
+@section Modal{
+    @Html.Partial("_ConfirmDialog")
+    <div class="modal fade" id="tb1Modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="tb1Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> 新增设备科室</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="tb1Form">
+                        <input type="hidden" name="id" data-value="0" />
+                        <div style="margin-top:6px;">科室名称：</div>
+                        <input type="text" class="form-control" name="class_name" placeholder="录入科室名称" />
+                        <div style="margin-top:6px;">负责人：</div>
+                        <input type="text" class="form-control select-user" name="leader" placeholder="选择负责人" />
+                        <div style="margin-top:6px;">成员：</div>
+                        <textarea class="form-control select-user" rows="6" name="member" data-user-num="20" placeholder="最多可以设置20人"></textarea>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-reply"></i> 取消</button>
+                    <button id="saveTb1FormBt" type="button" class="btn btn-success"><i class="fa fa-check"></i> 确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

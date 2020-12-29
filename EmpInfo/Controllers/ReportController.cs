@@ -35,7 +35,8 @@ namespace EmpInfo.Controllers
                                {
                                    stepName = ad.step_name,
                                    auditorName = u.name,
-                                   auditorNo = u.card_number
+                                   auditorNo = u.card_number,
+                                   auditTime = ad.audit_time
                                }).ToList();
             return auditorList;
         }
@@ -3563,19 +3564,19 @@ namespace EmpInfo.Controllers
                 ViewBag.tip = "单据不存在";
                 return View("Error");
             }
-            //if (!bill.can_print) {
-            //    ViewBag.tip = "不能打印";
-            //    return View("Error");
-            //}
+            if (!bill.can_print) {
+                ViewBag.tip = "不能打印";
+                return View("Error");
+            }
 
-            //string bidder = db.ei_xaApplySupplier.Where(x => x.sys_no == sysNo && x.is_bidder == true).Select(x=>x.supplier_name).FirstOrDefault();
+            var bidder = db.ei_xaApplySupplier.Where(x => x.sys_no == sysNo && x.is_bidder == true).FirstOrDefault();
             var auditorList=GetAuditorList(sysNo);
             var result = (from r in db.flow_auditorRelation
                           where r.bill_type == "XA"
                           && (
-                          (r.relate_name == "部门总经理" && r.relate_text == bill.company + "_" + bill.dept_name)
-                          || (r.relate_name == "项目大类" && r.relate_text == bill.classification)
-                          || (r.relate_name == "节省与监督")
+                          //(r.relate_name == "部门总经理" && r.relate_text == bill.company + "_" + bill.dept_name) ||
+                          (r.relate_name == "项目大类" && r.relate_text == bill.classification) ||
+                          (r.relate_name == "节省与监督")
                           )
                           select r).ToList();
 
@@ -3585,13 +3586,161 @@ namespace EmpInfo.Controllers
             }
 
             ViewData["bill"] = bill;
-            //ViewData["bidder"] = bidder;
+            ViewData["bidder"] = bidder;
             ViewData["auditorList"] = auditorList;
+            ViewData["username"] = userInfo.name;
 
             return View();
         }
 
+        public ActionResult XAReport()
+        {
+            return View();
+        }
+
+        public JsonResult SearchXAReport(string obj)
+        {
+            XASearchReportModel m = JsonConvert.DeserializeObject<XASearchReportModel>(obj);
+            m.toDate=m.toDate.AddDays(1);
+
+            var result = from x in db.ei_xaApply
+                         join a in db.flow_apply on x.sys_no equals a.sys_no
+                         where x.apply_time >= m.fromDate
+                         && x.apply_time < m.toDate
+                         select new
+                         {
+                             sysNo = x.sys_no,
+                             auditStatus = a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : "审批中")),
+                             applierName = x.applier_name,
+                             applyTime = x.apply_time,
+                             projectName = x.project_name,
+                             classification = x.classification,
+                             billNo = x.bill_no
+                         };
+
+            if (!string.IsNullOrEmpty(m.classification)) {
+                result = result.Where(r => r.classification == m.classification);
+            }
+            if (!string.IsNullOrEmpty(m.applierName)) {
+                result = result.Where(r => r.applierName.Contains(m.applierName));
+            }
+            if (!string.IsNullOrEmpty(m.sysNo)) {
+                result = result.Where(r => r.sysNo.Contains(m.sysNo));
+            }
+            if (!string.IsNullOrEmpty(m.projectName)) {
+                result = result.Where(r => r.projectName.Contains(m.projectName));
+            }
+
+            return Json(result.ToList());
+        }
+
+        public void ExportXAExcel(string obj)
+        {
+            XASearchReportModel m = JsonConvert.DeserializeObject<XASearchReportModel>(obj);
+            m.toDate = m.toDate.AddDays(1);
+
+            var result = from x in db.ei_xaApply
+                         join a in db.flow_apply on x.sys_no equals a.sys_no
+                         join st in db.ei_xaApplySupplier on x.sys_no equals st.sys_no into stemp
+                         from s in stemp.DefaultIfEmpty()
+                         where x.apply_time >= m.fromDate
+                         && x.apply_time < m.toDate                         
+                         select new
+                         {
+                             x,
+                             s,
+                             auditResult = a.success == true ? "已通过" : (a.success == false ? "已拒绝" : "审批中")
+                         };
+
+            if (!string.IsNullOrEmpty(m.classification)) {
+                result = result.Where(r => r.x.classification == m.classification);
+            }
+            if (!string.IsNullOrEmpty(m.applierName)) {
+                result = result.Where(r => r.x.applier_name.Contains(m.applierName));
+            }
+            if (!string.IsNullOrEmpty(m.sysNo)) {
+                result = result.Where(r => r.x.sys_no.Contains(m.sysNo));
+            }
+            if (!string.IsNullOrEmpty(m.projectName)) {
+                result = result.Where(r => r.x.project_name.Contains(m.projectName));
+            }
+
+            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "联系电话", "申请时间", "申请部门", "项目编号", "项目名称","地点", "项目大类",
+                                              "项目类别", "申请原因", "具体要求", "项目收益","人员节省","产能收益","其它收益", "中标供应商","中标价格" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "项目单申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("申请详情");
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            var data = result.ToList();
+            foreach (var d in data.Select(r => r.x).Distinct().ToList()) {
+                colIndex = 1;
+
+                //"处理结果","申请流水号", "申请人", "联系电话", "申请时间", "申请部门", "项目编号", "项目名称","地点", "项目大类",
+                //"项目类别", "申请原因", "具体要求", "项目收益","人员节省","产能收益","其它收益", "中标供应商","中标价格"
+                cells.Add(++rowIndex, colIndex, data.Where(a=>a.x==d).First().auditResult);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.applier_name);
+                cells.Add(rowIndex, ++colIndex, d.applier_phone);
+                cells.Add(rowIndex, ++colIndex, d.apply_time.ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.dept_name);
+                cells.Add(rowIndex, ++colIndex, d.bill_no);
+                cells.Add(rowIndex, ++colIndex, d.project_name);
+                cells.Add(rowIndex, ++colIndex, d.addr);
+                cells.Add(rowIndex, ++colIndex, d.classification);
+
+                cells.Add(rowIndex, ++colIndex, d.project_type);
+                cells.Add(rowIndex, ++colIndex, d.reason);
+                cells.Add(rowIndex, ++colIndex, d.demands.Replace("\br",";"));
+                cells.Add(rowIndex, ++colIndex, d.has_profit ? "有项目收益" : "无项目收益（维修维护类）");
+                cells.Add(rowIndex, ++colIndex, d.save_people);
+                cells.Add(rowIndex, ++colIndex, d.productivity_profit);
+                cells.Add(rowIndex, ++colIndex, d.other_profit);
+                if (data.Where(a => a.x == d && a.s != null).Count() > 0) {
+                    cells.Add(rowIndex, ++colIndex, data.Where(a => a.x == d && a.s.is_bidder).Select(a => a.s.supplier_name).FirstOrDefault());
+                    cells.Add(rowIndex, ++colIndex, data.Where(a => a.x == d && a.s.is_bidder).Select(a => a.s.price).FirstOrDefault());
+                }
+            }
+
+            xls.Send();
+
+        }
+
         #endregion
+
+        
 
     }
 }

@@ -1132,6 +1132,77 @@
           <Property Name="t_status" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="talk_result" Type="nvarchar" MaxLength="200" />
         </EntityType>
+        <EntityType Name="ei_mtApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="applier_number" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="apply_time" Type="datetime" Nullable="false" />
+          <Property Name="eqInfo_id" Type="int" Nullable="false" />
+          <Property Name="accept_member_no" Type="varchar" MaxLength="50" />
+          <Property Name="accept_member_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="accept_time" Type="datetime" />
+          <Property Name="maintence_begin_time" Type="smalldatetime" />
+          <Property Name="maintence_end_time" Type="smalldatetime" />
+          <Property Name="maintence_hours" Type="decimal" Precision="6" Scale="1" />
+          <Property Name="member_helping" Type="nvarchar" MaxLength="500" />
+          <Property Name="confirm_time" Type="datetime" />
+          <Property Name="comment" Type="nvarchar" MaxLength="500" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="maintence_time" Type="datetime" />
+        </EntityType>
+        <EntityType Name="ei_mtClass">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="class_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="leader_number" Type="varchar" MaxLength="50" />
+          <Property Name="leader" Type="nvarchar" MaxLength="50" />
+          <Property Name="member_number" Type="varchar" MaxLength="500" />
+          <Property Name="member" Type="nvarchar" MaxLength="1000" />
+          <Property Name="create_time" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ei_mtEqInfo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="property_number" Type="nvarchar" MaxLength="100" />
+          <Property Name="equitment_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="equitment_modual" Type="nvarchar" MaxLength="200" />
+          <Property Name="maker" Type="nvarchar" MaxLength="100" />
+          <Property Name="using_status" Type="nvarchar" MaxLength="20" />
+          <Property Name="check_dep" Type="nvarchar" MaxLength="100" />
+          <Property Name="check_list_no" Type="nvarchar" MaxLength="50" />
+          <Property Name="file_no" Type="nvarchar" MaxLength="50" />
+          <Property Name="produce_dep_name" Type="nvarchar" MaxLength="100" />
+          <Property Name="maintenance_cycle" Type="int" Nullable="false" />
+          <Property Name="important_level" Type="nvarchar" MaxLength="50" />
+          <Property Name="last_maintenance_date" Type="smalldatetime" />
+          <Property Name="next_maintenance_date" Type="smalldatetime" />
+          <Property Name="maintenance_status" Type="nvarchar" MaxLength="50" />
+          <Property Name="comment" Type="nvarchar" MaxLength="500" />
+          <Property Name="creater_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="creater_number" Type="varchar" MaxLength="50" />
+          <Property Name="class_id" Type="int" />
+          <Property Name="create_time" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ei_mtFile">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="file_no" Type="varchar" MaxLength="50" />
+          <Property Name="maintenance_content" Type="nvarchar" MaxLength="2000" />
+          <Property Name="maintenance_steps" Type="nvarchar" MaxLength="2000" />
+          <Property Name="create_user" Type="varchar" MaxLength="50" />
+          <Property Name="create_time" Type="datetime" Nullable="false" />
+          <Property Name="update_user" Type="varchar" MaxLength="50" />
+          <Property Name="update_time" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="ei_PPApply">
           <Key>
             <PropertyRef Name="id" />
@@ -1430,6 +1501,16 @@
           <Property Name="moduel" Type="varchar" MaxLength="500" />
           <Property Name="qty" Type="decimal" Precision="18" Scale="4" />
         </EntityType>
+        <EntityType Name="ei_urgeRecords">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="auditor_number" Type="varchar" MaxLength="50" />
+          <Property Name="urge_time" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="ei_users">
           <Key>
             <PropertyRef Name="id" />
@@ -1507,11 +1588,15 @@
           <Property Name="profit_confirm_people_num" Type="nvarchar" MaxLength="200" />
           <Property Name="equitment_auditor_name" Type="nvarchar" MaxLength="50" />
           <Property Name="equitment_auditor_num" Type="varchar" MaxLength="50" />
-          <Property Name="dept_charger_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="dept_charger_name" Type="nvarchar" MaxLength="100" />
           <Property Name="dept_charger_num" Type="nvarchar" MaxLength="50" />
           <Property Name="can_print" Type="bit" Nullable="false" />
           <Property Name="check_date" Type="datetime" />
           <Property Name="company" Type="nvarchar" MaxLength="20" />
+          <Property Name="applier_phone" Type="varchar" MaxLength="50" />
+          <Property Name="is_share_fee" Type="bit" Nullable="false" />
+          <Property Name="share_fee_detail" Type="nvarchar" MaxLength="500" />
+          <Property Name="share_fee_managers" Type="varchar" MaxLength="500" />
         </EntityType>
         <EntityType Name="ei_xaApplySupplier">
           <Key>
@@ -1585,6 +1670,34 @@
           <Property Name="name" Type="nvarchar" MaxLength="50" />
           <Property Name="cond1" Type="nvarchar" MaxLength="200" />
           <Property Name="cond2" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="flow_template">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="50" />
+          <Property Name="enable" Type="bit" Nullable="false" />
+          <Property Name="effective_date" Type="smalldatetime" />
+          <Property Name="expire_date" Type="smalldatetime" />
+          <Property Name="bill_type" Type="varchar" MaxLength="20" />
+          <Property Name="summary" Type="varchar" MaxLength="200" />
+          <Property Name="create_date" Type="datetime" />
+          <Property Name="creater" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="flow_templateEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="flow_id" Type="int" />
+          <Property Name="step" Type="int" />
+          <Property Name="step_name" Type="varchar" MaxLength="50" />
+          <Property Name="auditors" Type="varchar" MaxLength="500" />
+          <Property Name="can_be_null" Type="bit" Nullable="false" />
+          <Property Name="countersign" Type="bit" Nullable="false" />
+          <Property Name="pass_callback" Type="varchar" MaxLength="50" />
+          <Property Name="ng_callback" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="k3_database">
           <Key>
@@ -1847,6 +1960,21 @@
           <Property Name="short_dep_name" Type="varchar" MaxLength="200" />
           <Property Name="short_phone" Type="varchar" MaxLength="50" />
           <Property Name="bank_no" Type="varchar" MaxLength="19" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“ICAudit.dbo.vw_ep_dep”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vw_ep_dep">
+          <Key>
+            <PropertyRef Name="pr_id" />
+          </Key>
+          <Property Name="eq_dep_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="eq_charger_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="eq_charger_number" Type="varchar" MaxLength="50" />
+          <Property Name="pr_dep_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="bus_dep_name" Type="nvarchar" MaxLength="500" />
+          <Property Name="pr_charger_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="pr_charger_num" Type="varchar" MaxLength="50" />
+          <Property Name="pr_id" Type="int" Nullable="false" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_epReport”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -2767,6 +2895,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_flow_apply_flow_template">
+          <End Role="flow_template" Type="Self.flow_template" Multiplicity="0..1" />
+          <End Role="flow_apply" Type="Self.flow_apply" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="flow_template">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="flow_apply">
+              <PropertyRef Name="flow_template_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_flow_applyEntry_flow_apply">
           <End Role="flow_apply" Type="Self.flow_apply" Multiplicity="0..1" />
           <End Role="flow_applyEntry" Type="Self.flow_applyEntry" Multiplicity="*" />
@@ -2776,6 +2916,30 @@
             </Principal>
             <Dependent Role="flow_applyEntry">
               <PropertyRef Name="apply_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_flow_applyEntry_flow_templateEntry">
+          <End Role="flow_templateEntry" Type="Self.flow_templateEntry" Multiplicity="0..1" />
+          <End Role="flow_applyEntry" Type="Self.flow_applyEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="flow_templateEntry">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="flow_applyEntry">
+              <PropertyRef Name="flow_template_entry_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_flow_templateEntry_flow_template">
+          <End Role="flow_template" Type="Self.flow_template" Multiplicity="0..1" />
+          <End Role="flow_templateEntry" Type="Self.flow_templateEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="flow_template">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="flow_templateEntry">
+              <PropertyRef Name="flow_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -3004,6 +3168,10 @@
           <EntitySet Name="ei_leaveDayExceedPushLog" EntityType="Self.ei_leaveDayExceedPushLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_mqApply" EntityType="Self.ei_mqApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_mqHRTalkRecord" EntityType="Self.ei_mqHRTalkRecord" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_mtApply" EntityType="Self.ei_mtApply" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_mtClass" EntityType="Self.ei_mtClass" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_mtEqInfo" EntityType="Self.ei_mtEqInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_mtFile" EntityType="Self.ei_mtFile" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_PPApply" EntityType="Self.ei_PPApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_public_fund" EntityType="Self.ei_public_fund" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_pushMsg" EntityType="Self.ei_pushMsg" Schema="dbo" store:Type="Tables" />
@@ -3019,6 +3187,7 @@
           <EntitySet Name="ei_TIApplyEntry" EntityType="Self.ei_TIApplyEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_ucApply" EntityType="Self.ei_ucApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_ucApplyEntry" EntityType="Self.ei_ucApplyEntry" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_urgeRecords" EntityType="Self.ei_urgeRecords" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_users" EntityType="Self.ei_users" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_users_android" EntityType="Self.ei_users_android" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_vacationDays" EntityType="Self.ei_vacationDays" Schema="dbo" store:Type="Tables" />
@@ -3029,6 +3198,8 @@
           <EntitySet Name="flow_applyEntryQueue" EntityType="Self.flow_applyEntryQueue" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="flow_auditorRelation" EntityType="Self.flow_auditorRelation" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="flow_notifyUsers" EntityType="Self.flow_notifyUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="flow_template" EntityType="Self.flow_template" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="flow_templateEntry" EntityType="Self.flow_templateEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="k3_database" EntityType="Self.k3_database" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="kw_catalogs" EntityType="Self.kw_catalogs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="kw_itemKey" EntityType="Self.kw_itemKey" Schema="dbo" store:Type="Tables" />
@@ -3179,6 +3350,18 @@ FROM [dbo].[vw_ei_simple_users] AS [vw_ei_simple_users]</DefiningQuery>
 [vw_ei_users].[short_phone] AS [short_phone], 
 [vw_ei_users].[bank_no] AS [bank_no]
 FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_ep_dep" EntityType="Self.vw_ep_dep" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vw_ep_dep].[eq_dep_name] AS [eq_dep_name], 
+[vw_ep_dep].[eq_charger_name] AS [eq_charger_name], 
+[vw_ep_dep].[eq_charger_number] AS [eq_charger_number], 
+[vw_ep_dep].[pr_dep_name] AS [pr_dep_name], 
+[vw_ep_dep].[bus_dep_name] AS [bus_dep_name], 
+[vw_ep_dep].[pr_charger_name] AS [pr_charger_name], 
+[vw_ep_dep].[pr_charger_num] AS [pr_charger_num], 
+[vw_ep_dep].[pr_id] AS [pr_id]
+FROM [dbo].[vw_ep_dep] AS [vw_ep_dep]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="vw_epReport" EntityType="Self.vw_epReport" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
@@ -3807,9 +3990,21 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <End Role="ei_ucApply" EntitySet="ei_ucApply" />
             <End Role="ei_ucApplyEntry" EntitySet="ei_ucApplyEntry" />
           </AssociationSet>
+          <AssociationSet Name="FK_flow_apply_flow_template" Association="Self.FK_flow_apply_flow_template">
+            <End Role="flow_template" EntitySet="flow_template" />
+            <End Role="flow_apply" EntitySet="flow_apply" />
+          </AssociationSet>
           <AssociationSet Name="FK_flow_applyEntry_flow_apply" Association="Self.FK_flow_applyEntry_flow_apply">
             <End Role="flow_apply" EntitySet="flow_apply" />
             <End Role="flow_applyEntry" EntitySet="flow_applyEntry" />
+          </AssociationSet>
+          <AssociationSet Name="FK_flow_applyEntry_flow_templateEntry" Association="Self.FK_flow_applyEntry_flow_templateEntry">
+            <End Role="flow_templateEntry" EntitySet="flow_templateEntry" />
+            <End Role="flow_applyEntry" EntitySet="flow_applyEntry" />
+          </AssociationSet>
+          <AssociationSet Name="FK_flow_templateEntry_flow_template" Association="Self.FK_flow_templateEntry_flow_template">
+            <End Role="flow_template" EntitySet="flow_template" />
+            <End Role="flow_templateEntry" EntitySet="flow_templateEntry" />
           </AssociationSet>
           <AssociationSet Name="FK_Table_1_ei_hhApply" Association="Self.FK_Table_1_ei_hhApply">
             <End Role="ei_hhApply" EntitySet="ei_hhApply" />
@@ -4209,6 +4404,26 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySet Name="ei_xaApply" EntityType="ICAuditModel.ei_xaApply" />
           <EntitySet Name="ei_xaApplySupplier" EntityType="ICAuditModel.ei_xaApplySupplier" />
           <EntitySet Name="all_maxNum" EntityType="ICAuditModel.all_maxNum" />
+          <EntitySet Name="ei_mtClass" EntityType="ICAuditModel.ei_mtClass" />
+          <EntitySet Name="ei_mtEqInfo" EntityType="ICAuditModel.ei_mtEqInfo" />
+          <EntitySet Name="ei_mtFile" EntityType="ICAuditModel.ei_mtFile" />
+          <EntitySet Name="ei_urgeRecords" EntityType="ICAuditModel.ei_urgeRecords" />
+          <EntitySet Name="flow_template" EntityType="ICAuditModel.flow_template" />
+          <EntitySet Name="flow_templateEntry" EntityType="ICAuditModel.flow_templateEntry" />
+          <AssociationSet Name="FK_flow_apply_flow_template" Association="ICAuditModel.FK_flow_apply_flow_template">
+            <End Role="flow_template" EntitySet="flow_template" />
+            <End Role="flow_apply" EntitySet="flow_apply" />
+          </AssociationSet>
+          <AssociationSet Name="FK_flow_applyEntry_flow_templateEntry" Association="ICAuditModel.FK_flow_applyEntry_flow_templateEntry">
+            <End Role="flow_templateEntry" EntitySet="flow_templateEntry" />
+            <End Role="flow_applyEntry" EntitySet="flow_applyEntry" />
+          </AssociationSet>
+          <AssociationSet Name="FK_flow_templateEntry_flow_template" Association="ICAuditModel.FK_flow_templateEntry_flow_template">
+            <End Role="flow_template" EntitySet="flow_template" />
+            <End Role="flow_templateEntry" EntitySet="flow_templateEntry" />
+          </AssociationSet>
+          <EntitySet Name="vw_ep_dep" EntityType="ICAuditModel.vw_ep_dep" />
+          <EntitySet Name="ei_mtApply" EntityType="ICAuditModel.ei_mtApply" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -6866,6 +7081,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="form_sub_title" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="user_abort" Type="Boolean" />
           <NavigationProperty Name="flow_applyEntry" Relationship="ICAuditModel.FK_flow_applyEntry_flow_apply" FromRole="flow_apply" ToRole="flow_applyEntry" />
+          <NavigationProperty Name="flow_template" Relationship="ICAuditModel.FK_flow_apply_flow_template" FromRole="flow_apply" ToRole="flow_template" />
         </EntityType>
         <EntityType Name="flow_applyEntry">
           <Key>
@@ -6882,6 +7098,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="flow_template_entry_id" Type="Int32" />
           <Property Name="final_auditor" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="flow_apply" Relationship="ICAuditModel.FK_flow_applyEntry_flow_apply" FromRole="flow_applyEntry" ToRole="flow_apply" />
+          <NavigationProperty Name="flow_templateEntry" Relationship="ICAuditModel.FK_flow_applyEntry_flow_templateEntry" FromRole="flow_applyEntry" ToRole="flow_templateEntry" />
         </EntityType>
         <Association Name="FK_flow_applyEntry_flow_apply">
           <End Type="ICAuditModel.flow_apply" Role="flow_apply" Multiplicity="0..1" />
@@ -7225,11 +7442,15 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="profit_confirm_people_num" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
           <Property Name="equitment_auditor_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="equitment_auditor_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="dept_charger_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="dept_charger_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="dept_charger_num" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="can_print" Type="Boolean" Nullable="false" />
           <Property Name="check_date" Type="DateTime" Precision="3" />
           <Property Name="company" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="applier_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="is_share_fee" Type="Boolean" Nullable="false" />
+          <Property Name="share_fee_detail" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="share_fee_managers" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="ei_xaApplySupplier">
           <Key>
@@ -7249,6 +7470,168 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="bill_type" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="date_str" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="max_num" Type="Int32" />
+        </EntityType>
+        <EntityType Name="ei_mtClass">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="class_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="leader_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="leader" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="member_number" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="member" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="create_time" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="ei_mtEqInfo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="property_number" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="equitment_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="equitment_modual" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="maker" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="using_status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="check_dep" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="check_list_no" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="file_no" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="produce_dep_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="maintenance_cycle" Type="Int32" Nullable="false" />
+          <Property Name="important_level" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="last_maintenance_date" Type="DateTime" Precision="0" />
+          <Property Name="next_maintenance_date" Type="DateTime" Precision="0" />
+          <Property Name="maintenance_status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="creater_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="creater_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="class_id" Type="Int32" />
+          <Property Name="create_time" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="ei_mtFile">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="file_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="maintenance_content" Type="String" MaxLength="2000" FixedLength="false" Unicode="true" />
+          <Property Name="maintenance_steps" Type="String" MaxLength="2000" FixedLength="false" Unicode="true" />
+          <Property Name="create_user" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="create_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="update_user" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="update_time" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="ei_urgeRecords">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="auditor_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="urge_time" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="flow_template">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="enable" Type="Boolean" Nullable="false" />
+          <Property Name="effective_date" Type="DateTime" Precision="0" />
+          <Property Name="expire_date" Type="DateTime" Precision="0" />
+          <Property Name="bill_type" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="summary" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="create_date" Type="DateTime" Precision="3" />
+          <Property Name="creater" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="flow_apply" Relationship="ICAuditModel.FK_flow_apply_flow_template" FromRole="flow_template" ToRole="flow_apply" />
+          <NavigationProperty Name="flow_templateEntry" Relationship="ICAuditModel.FK_flow_templateEntry_flow_template" FromRole="flow_template" ToRole="flow_templateEntry" />
+        </EntityType>
+        <EntityType Name="flow_templateEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="flow_id" Type="Int32" />
+          <Property Name="step" Type="Int32" />
+          <Property Name="step_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="auditors" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="can_be_null" Type="Boolean" Nullable="false" />
+          <Property Name="countersign" Type="Boolean" Nullable="false" />
+          <Property Name="pass_callback" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ng_callback" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="flow_applyEntry" Relationship="ICAuditModel.FK_flow_applyEntry_flow_templateEntry" FromRole="flow_templateEntry" ToRole="flow_applyEntry" />
+          <NavigationProperty Name="flow_template" Relationship="ICAuditModel.FK_flow_templateEntry_flow_template" FromRole="flow_templateEntry" ToRole="flow_template" />
+        </EntityType>
+        <Association Name="FK_flow_apply_flow_template">
+          <End Type="ICAuditModel.flow_template" Role="flow_template" Multiplicity="0..1" />
+          <End Type="ICAuditModel.flow_apply" Role="flow_apply" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="flow_template">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="flow_apply">
+              <PropertyRef Name="flow_template_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_flow_applyEntry_flow_templateEntry">
+          <End Type="ICAuditModel.flow_templateEntry" Role="flow_templateEntry" Multiplicity="0..1" />
+          <End Type="ICAuditModel.flow_applyEntry" Role="flow_applyEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="flow_templateEntry">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="flow_applyEntry">
+              <PropertyRef Name="flow_template_entry_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_flow_templateEntry_flow_template">
+          <End Type="ICAuditModel.flow_template" Role="flow_template" Multiplicity="0..1" />
+          <End Type="ICAuditModel.flow_templateEntry" Role="flow_templateEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="flow_template">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="flow_templateEntry">
+              <PropertyRef Name="flow_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="vw_ep_dep">
+          <Key>
+            <PropertyRef Name="pr_id" />
+          </Key>
+          <Property Name="eq_dep_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="eq_charger_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="eq_charger_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="pr_dep_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="bus_dep_name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="pr_charger_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="pr_charger_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="pr_id" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ei_mtApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="applier_number" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="apply_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="eqInfo_id" Type="Int32" Nullable="false" />
+          <Property Name="accept_member_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="accept_member_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="accept_time" Type="DateTime" Precision="3" />
+          <Property Name="maintence_begin_time" Type="DateTime" Precision="0" />
+          <Property Name="maintence_end_time" Type="DateTime" Precision="0" />
+          <Property Name="maintence_hours" Type="Decimal" Precision="6" Scale="1" />
+          <Property Name="member_helping" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="confirm_time" Type="DateTime" Precision="3" />
+          <Property Name="comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="maintence_time" Type="DateTime" Precision="3" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -10061,6 +10444,10 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_xaApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_xaApply">
               <MappingFragment StoreEntitySet="ei_xaApply">
+                <ScalarProperty Name="share_fee_managers" ColumnName="share_fee_managers" />
+                <ScalarProperty Name="share_fee_detail" ColumnName="share_fee_detail" />
+                <ScalarProperty Name="is_share_fee" ColumnName="is_share_fee" />
+                <ScalarProperty Name="applier_phone" ColumnName="applier_phone" />
                 <ScalarProperty Name="company" ColumnName="company" />
                 <ScalarProperty Name="check_date" ColumnName="check_date" />
                 <ScalarProperty Name="can_print" ColumnName="can_print" />
@@ -10108,6 +10495,136 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="max_num" ColumnName="max_num" />
                 <ScalarProperty Name="date_str" ColumnName="date_str" />
                 <ScalarProperty Name="bill_type" ColumnName="bill_type" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_mtClass">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_mtClass">
+              <MappingFragment StoreEntitySet="ei_mtClass">
+                <ScalarProperty Name="create_time" ColumnName="create_time" />
+                <ScalarProperty Name="member" ColumnName="member" />
+                <ScalarProperty Name="member_number" ColumnName="member_number" />
+                <ScalarProperty Name="leader" ColumnName="leader" />
+                <ScalarProperty Name="leader_number" ColumnName="leader_number" />
+                <ScalarProperty Name="class_name" ColumnName="class_name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_mtEqInfo">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_mtEqInfo">
+              <MappingFragment StoreEntitySet="ei_mtEqInfo">
+                <ScalarProperty Name="create_time" ColumnName="create_time" />
+                <ScalarProperty Name="class_id" ColumnName="class_id" />
+                <ScalarProperty Name="creater_number" ColumnName="creater_number" />
+                <ScalarProperty Name="creater_name" ColumnName="creater_name" />
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="maintenance_status" ColumnName="maintenance_status" />
+                <ScalarProperty Name="next_maintenance_date" ColumnName="next_maintenance_date" />
+                <ScalarProperty Name="last_maintenance_date" ColumnName="last_maintenance_date" />
+                <ScalarProperty Name="important_level" ColumnName="important_level" />
+                <ScalarProperty Name="maintenance_cycle" ColumnName="maintenance_cycle" />
+                <ScalarProperty Name="produce_dep_name" ColumnName="produce_dep_name" />
+                <ScalarProperty Name="file_no" ColumnName="file_no" />
+                <ScalarProperty Name="check_list_no" ColumnName="check_list_no" />
+                <ScalarProperty Name="check_dep" ColumnName="check_dep" />
+                <ScalarProperty Name="using_status" ColumnName="using_status" />
+                <ScalarProperty Name="maker" ColumnName="maker" />
+                <ScalarProperty Name="equitment_modual" ColumnName="equitment_modual" />
+                <ScalarProperty Name="equitment_name" ColumnName="equitment_name" />
+                <ScalarProperty Name="property_number" ColumnName="property_number" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_mtFile">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_mtFile">
+              <MappingFragment StoreEntitySet="ei_mtFile">
+                <ScalarProperty Name="update_time" ColumnName="update_time" />
+                <ScalarProperty Name="update_user" ColumnName="update_user" />
+                <ScalarProperty Name="create_time" ColumnName="create_time" />
+                <ScalarProperty Name="create_user" ColumnName="create_user" />
+                <ScalarProperty Name="maintenance_steps" ColumnName="maintenance_steps" />
+                <ScalarProperty Name="maintenance_content" ColumnName="maintenance_content" />
+                <ScalarProperty Name="file_no" ColumnName="file_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_urgeRecords">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_urgeRecords">
+              <MappingFragment StoreEntitySet="ei_urgeRecords">
+                <ScalarProperty Name="urge_time" ColumnName="urge_time" />
+                <ScalarProperty Name="auditor_number" ColumnName="auditor_number" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="flow_template">
+            <EntityTypeMapping TypeName="ICAuditModel.flow_template">
+              <MappingFragment StoreEntitySet="flow_template">
+                <ScalarProperty Name="creater" ColumnName="creater" />
+                <ScalarProperty Name="create_date" ColumnName="create_date" />
+                <ScalarProperty Name="summary" ColumnName="summary" />
+                <ScalarProperty Name="bill_type" ColumnName="bill_type" />
+                <ScalarProperty Name="expire_date" ColumnName="expire_date" />
+                <ScalarProperty Name="effective_date" ColumnName="effective_date" />
+                <ScalarProperty Name="enable" ColumnName="enable" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="flow_templateEntry">
+            <EntityTypeMapping TypeName="ICAuditModel.flow_templateEntry">
+              <MappingFragment StoreEntitySet="flow_templateEntry">
+                <ScalarProperty Name="ng_callback" ColumnName="ng_callback" />
+                <ScalarProperty Name="pass_callback" ColumnName="pass_callback" />
+                <ScalarProperty Name="countersign" ColumnName="countersign" />
+                <ScalarProperty Name="can_be_null" ColumnName="can_be_null" />
+                <ScalarProperty Name="auditors" ColumnName="auditors" />
+                <ScalarProperty Name="step_name" ColumnName="step_name" />
+                <ScalarProperty Name="step" ColumnName="step" />
+                <ScalarProperty Name="flow_id" ColumnName="flow_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_ep_dep">
+            <EntityTypeMapping TypeName="ICAuditModel.vw_ep_dep">
+              <MappingFragment StoreEntitySet="vw_ep_dep">
+                <ScalarProperty Name="pr_id" ColumnName="pr_id" />
+                <ScalarProperty Name="pr_charger_num" ColumnName="pr_charger_num" />
+                <ScalarProperty Name="pr_charger_name" ColumnName="pr_charger_name" />
+                <ScalarProperty Name="bus_dep_name" ColumnName="bus_dep_name" />
+                <ScalarProperty Name="pr_dep_name" ColumnName="pr_dep_name" />
+                <ScalarProperty Name="eq_charger_number" ColumnName="eq_charger_number" />
+                <ScalarProperty Name="eq_charger_name" ColumnName="eq_charger_name" />
+                <ScalarProperty Name="eq_dep_name" ColumnName="eq_dep_name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_mtApply">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_mtApply">
+              <MappingFragment StoreEntitySet="ei_mtApply">
+                <ScalarProperty Name="maintence_time" ColumnName="maintence_time" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="confirm_time" ColumnName="confirm_time" />
+                <ScalarProperty Name="member_helping" ColumnName="member_helping" />
+                <ScalarProperty Name="maintence_hours" ColumnName="maintence_hours" />
+                <ScalarProperty Name="maintence_end_time" ColumnName="maintence_end_time" />
+                <ScalarProperty Name="maintence_begin_time" ColumnName="maintence_begin_time" />
+                <ScalarProperty Name="accept_time" ColumnName="accept_time" />
+                <ScalarProperty Name="accept_member_name" ColumnName="accept_member_name" />
+                <ScalarProperty Name="accept_member_no" ColumnName="accept_member_no" />
+                <ScalarProperty Name="eqInfo_id" ColumnName="eqInfo_id" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_number" ColumnName="applier_number" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

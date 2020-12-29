@@ -1,0 +1,172 @@
+﻿@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />    
+}
+@section Scripts{
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+        $("#tb1").bootstrapTable({
+            url: "CheckMyMTEqInfo",
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 50,
+            pageList: [20, 50, 100, 200],
+            search: true,
+            clickToSelect: true,
+            columns: [
+                {
+                    radio: true
+                }, {
+                    field: "property_number",
+                    title: "资产编号"
+                }, {
+                    field: "equitment_name",
+                    title: "设备名称"
+                }, {
+                    field: "equitment_modual",
+                    title: "规格型号"
+                }, {
+                    field: "produce_dep_name",
+                    title: "生产部门"
+                }, {
+                    field: "maintenance_status",
+                    title: "保养状态"
+                }, {
+                    field: "next_maintenance_date",
+                    title: "下次保养日期",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(row.next_maintenance_date);
+                    }
+                }
+            ]
+        });
+
+        $("#record_tb").bootstrapTable({
+            striped: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 50],
+            search: false,
+            clickToSelect: true,
+            columns: [
+                {
+                    field: "accept_member_name",
+                    title: "保养人"
+                }, {
+                    field: "maintence_begin_time",
+                    title: "保养开始时间",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(row.maintence_begin_time, true);
+                    }
+                }, {
+                    field: "maintence_end_time",
+                    title: "保养结束时间",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(row.maintence_end_time, true);
+                    }
+                }, {
+                    field: "sys_no",
+                    title: "流水号"
+                }
+            ],
+            onClickCell: function (field, value, row, $element) {
+                if (row.sys_no) {
+                    window.open("@Url.Content("~/Apply/CheckApply?sysNo=")" + row.sys_no);
+                }
+            },
+            rowStyle: function (row, index) {
+                return { css: { cursor: 'pointer' } };
+            }
+        });
+
+        $(function () {
+            $("#tb1AddBt").on("click", function () {
+                window.location.href = "UpdateMTEqInfo?id=0";
+            });
+
+            $("#tb1ModifyBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再查询");
+                    return;
+                }
+                window.location.href = "UpdateMTEqInfo?id="+rows[0].id;
+            });
+
+            $("#tb1RemoveBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                openConfirmDialog("确定要删除选中行吗？", function () {
+                    $.post("RemoveMTEqInfo", { id: rows[0].id }, function (data) {
+                        if (data.suc) {
+                            toastr.success("删除成功");
+                            $('#tb1').bootstrapTable('refresh');
+                        } else {
+                            toastr.error("删除失败：" + data.msg);
+                        }
+                    });
+                });
+            });
+
+            $("#tb1ApplyRecordBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再查询");
+                    return;
+                }
+                $.post("GetMTApplyRecord", { eqInfoId: rows[0].id }, function (data) {
+                    $("#recordModal").modal("show");
+                    $('#record_tb').bootstrapTable('load', data);
+                });
+            });
+
+        });
+
+    </script>
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="../Apply/ApplyIndex?billType=MT">设备保养流程</a></li>
+            <li class="active">设备信息维护</li>
+        </ol>
+    </div>
+    <div class="panel-body">        
+        <div>
+            <button class="btn btn-success" id="tb1AddBt"><i class="fa fa-plus"></i> 新增</button>
+            <button class="btn btn-primary" id="tb1ModifyBt"><i class="fa fa-edit"></i> 修改</button>
+            <button class="btn btn-danger" id="tb1RemoveBt"><i class="fa fa-plus"></i> 删除</button>
+            <button class="btn btn-info" id="tb1ApplyRecordBt"><i class="fa fa-files-o"></i> 保养记录</button>
+        </div>
+
+        <table id="tb1"></table>                    
+    </div>
+</div>
+@section Modal{
+    @Html.Partial("_ConfirmDialog")
+        <div class="modal fade" id="recordModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">保养记录</h4>
+                </div>
+                <div class="modal-body">                    
+                    <table id="record_tb"></table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

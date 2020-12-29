@@ -12,20 +12,24 @@ namespace EmpInfo.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class flow_applyEntry
+    public partial class flow_templateEntry
     {
+        public flow_templateEntry()
+        {
+            this.flow_applyEntry = new HashSet<flow_applyEntry>();
+        }
+    
         public int id { get; set; }
-        public Nullable<int> apply_id { get; set; }
-        public string auditors { get; set; }
-        public Nullable<bool> pass { get; set; }
-        public Nullable<System.DateTime> audit_time { get; set; }
-        public string opinion { get; set; }
+        public Nullable<int> flow_id { get; set; }
         public Nullable<int> step { get; set; }
         public string step_name { get; set; }
-        public Nullable<int> flow_template_entry_id { get; set; }
-        public string final_auditor { get; set; }
+        public string auditors { get; set; }
+        public bool can_be_null { get; set; }
+        public bool countersign { get; set; }
+        public string pass_callback { get; set; }
+        public string ng_callback { get; set; }
     
-        public virtual flow_apply flow_apply { get; set; }
-        public virtual flow_templateEntry flow_templateEntry { get; set; }
+        public virtual ICollection<flow_applyEntry> flow_applyEntry { get; set; }
+        public virtual flow_template flow_template { get; set; }
     }
 }

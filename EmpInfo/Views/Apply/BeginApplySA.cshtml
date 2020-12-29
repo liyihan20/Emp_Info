@@ -115,14 +115,16 @@
         <h4 style="margin-bottom:12px;" class="text-danger"><i class="fa fa-question-circle"></i> 请选择K3账套:</h4>
         <div class="panel panel-default">
             <div class="panel-body">
-                <div class="text-success"><i class="fa fa-flag"></i> 半导体 </div>
-                <div class="row">
-                    @foreach (var acc in accs.Where(a => a.number.Contains("semi"))) {
-                        <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
-                            <input type="radio" name="k3Account" value="@acc.name" /> <span class="accountName"> @acc.number | @acc.name </span>
-                        </div>
-                    }
-                </div>
+                @if (accs.Where(a => a.number.Contains("semi")).Count() > 0) {
+                    <div class="text-success"><i class="fa fa-flag"></i> 半导体 </div>
+                    <div class="row">
+                        @foreach (var acc in accs.Where(a => a.number.Contains("semi"))) {
+                            <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
+                                <input type="radio" name="k3Account" value="@acc.name" /> <span class="accountName"> @acc.number | @acc.name </span>
+                            </div>
+                        }
+                    </div>
+                }
                 @if (accs.Where(a => a.number.Contains("HT")).Count() > 0) {
                 <div class="text-success" style="margin-top:16px;"><i class="fa fa-flag"></i> 香港 </div>
                 <div class="row">
@@ -132,26 +134,26 @@
                         </div>
                     }
                 </div>
-                }
-                @if (accs.Where(a => a.number.Contains("truly")).Count() > 0) {
-                <div class="text-success" style="margin-top:16px;"><i class="fa fa-flag"></i> 集团 </div>
+                } 
+                @if (accs.Where(a => a.number.Contains("OPTO")).Count() > 0) {
+                <div class="text-success" style="margin-top:16px;"><i class="fa fa-flag"></i> 光电 </div>
                 <div class="row">
-                    @foreach (var acc in accs.Where(a => a.number.Contains("truly"))) {
+                    @foreach (var acc in accs.Where(a => a.number.Contains("OPTO"))) {
                         <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
                             <input type="radio" name="k3Account" value="@acc.name" /> <span class="accountName"> @acc.number | @acc.name </span>
                         </div>
                     }
                 </div>
-                }
-                @if (accs.Where(a => a.number.Contains("OPTO")).Count() > 0) {
-                    <div class="text-success" style="margin-top:16px;"><i class="fa fa-flag"></i> 光电 </div>
-                    <div class="row">
-                        @foreach (var acc in accs.Where(a => a.number.Contains("OPTO"))) {
-                            <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
-                                <input type="radio" name="k3Account" value="@acc.name" /> <span class="accountName"> @acc.number | @acc.name </span>
-                            </div>
-                        }
-                    </div>
+            }
+            @if (accs.Where(a => !a.number.Contains("semi") && !a.number.Contains("HT") && !a.number.Contains("OPTO")).Count() > 0) {
+                <div class="text-success" style="margin-top:16px;"><i class="fa fa-flag"></i> 集团 </div>
+                <div class="row">
+                    @foreach (var acc in accs.Where(a => !a.number.Contains("semi") && !a.number.Contains("HT") && !a.number.Contains("OPTO"))) {
+                        <div class="col-xs-12 col-sm-6 col-md-4" style="margin-top:6px;">
+                            <input type="radio" name="k3Account" value="@acc.name" /> <span class="accountName"> @acc.number | @acc.name </span>
+                        </div>
+                    }
+                </div>
                 }
             </div>
         </div>

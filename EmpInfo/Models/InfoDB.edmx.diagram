@@ -157,6 +157,17 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_xaApply" Width="1.5" PointX="0.5" PointY="18" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_xaApplySupplier" Width="1.5" PointX="2.375" PointY="18" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.all_maxNum" Width="1.5" PointX="5.375" PointY="6.125" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_mtClass" Width="1.5" PointX="10.375" PointY="18.625" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_mtEqInfo" Width="1.5" PointX="10.375" PointY="19.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_mtFile" Width="1.5" PointX="10.375" PointY="17.875" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_urgeRecords" Width="1.5" PointX="8.25" PointY="18.625" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.flow_template" Width="1.5" PointX="12.25" PointY="14.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.flow_templateEntry" Width="1.5" PointX="12.25" PointY="15.125" IsExpanded="false" />
+        <AssociationConnector Association="ICAuditModel.FK_flow_apply_flow_template" />
+        <AssociationConnector Association="ICAuditModel.FK_flow_applyEntry_flow_templateEntry" />
+        <AssociationConnector Association="ICAuditModel.FK_flow_templateEntry_flow_template" />
+        <EntityTypeShape EntityType="ICAuditModel.vw_ep_dep" Width="1.5" PointX="12.625" PointY="4.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_mtApply" Width="1.5" PointX="8.25" PointY="19.375" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

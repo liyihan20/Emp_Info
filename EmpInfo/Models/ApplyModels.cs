@@ -312,12 +312,14 @@ namespace EmpInfo.Models
         public string stepName { get; set; }
         public string auditorName { get; set; }
         public string auditorNo { get; set; }
+        public DateTime? auditTime { get; set; }
     }
 
     public class XABeforeApplyModel
     {
         public string sys_no { get; set; }
         public string applierName { get; set; }
+        public string applierPhone { get; set; }
         public List<string> depNameList { get; set; }
     }
 
@@ -326,5 +328,39 @@ namespace EmpInfo.Models
         public ei_xaApply bill;
         public List<ei_xaApplySupplier> suppliers;
     }
+
+    public class XAFeeShareModel
+    {
+        public string n { get; set; }
+        public int v { get; set; }
+    }
+
+    public class XASearchReportModel
+    {
+        public string sysNo { get; set; }
+        public string classification { get; set; }
+        public string applierName { get; set; }
+        public DateTime fromDate { get; set; }
+        public DateTime toDate { get; set; }
+        public string projectName { get; set; }
+    }
+
+    public class MTUpdateEqInfoModel
+    {
+        public object info { get; set; }
+        public List<SelectModel> classesList { get; set; }
+        public List<vw_ep_dep> depList { get; set; }
+        public List<string> fileNoList { get; set;}
+        public string myClassId { get; set; }
+    }
+
+    public class MTBillModel
+    {
+        public ei_mtApply apply { get; set; }
+        public ei_mtEqInfo eqInfo { get; set; }
+        public ei_mtFile file { get; set; }
+        public ei_mtClass cla { get; set; }
+    }
+
 
 }

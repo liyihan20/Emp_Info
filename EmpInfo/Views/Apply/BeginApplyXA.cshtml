@@ -3,6 +3,7 @@
     XABeforeApplyModel m = ViewData["infoBeforeApply"] as XABeforeApplyModel;
 }
 @section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
 
     <style type="text/css">
         .b-label {
@@ -22,8 +23,10 @@
     </style>
 }
 
-@section Scripts {    
+@section Scripts {
     <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUploaderPro.js?v=2")"></script>
 
     <script>
         $(function () {
@@ -37,7 +40,8 @@
             arr["工作项目"] = [
                 { name: "设备搬运/二次配", detail: "设备搬运/二次配类：设备搬运 / 打包 / 拆装 / 运输 / 一次配水电气 / 二次配水电气 等" },
                 { name: "办公/宣传类", detail: "办公/宣传类：更换牌匾 / 增加标识 / 办公区域相关 等" },
-                { name: "监控/网络等弱电项目", detail: "监控/网络等弱电项目：监控维修及增加 / 网络维修及增加 / 各类线路维护及增加 等" },
+                { name: "监控项目", detail: "监控项目：监控维修及增加 等" },
+                { name: "网络等弱电项目", detail: "网络等弱电项目：网络维修及增加 / 各类线路维护及增加 等" },
                 { name: "维修/更换项目", detail: "维修/更换类：车间各类配套设施和辅助设施的维修 / 维护 / 更换" }
             ];
             arr["后勤项目"] = [
@@ -59,6 +63,17 @@
                 $("#projectInfo").html(detail);
                 $("#project_detail").val(detail);
             });
+                        
+            $("#myUploader").myUploader({
+                sysNum: "@m.sys_no",
+                fileNumLimit: 3,
+                prefix: "现场照片_",
+                accept: {
+                    title: '*',
+                    extensions: '*',
+                    mimeTypes: '*'
+                }
+            });
 
             $("#btnAddDemand").on("click", function () {
                 var demandInput = '<div class="input-group" style="margin-top:6px;"> \
@@ -78,6 +93,34 @@
                     $("#profitInfo").show();
                 } else {
                     $("#profitInfo").hide();
+                }
+            });
+
+            $("#btnAddShare").on("click", function () {
+                $('<div class="row" style="margin-top:8px;"> \
+                    <div class="col-xs-12 col-sm-6"> \
+                        <select class="form-control" name="share_dept"></select> \
+                    </div> \
+                    <div class="col-xs-12 col-sm-6"> \
+                        <div class="input-group">  \
+                            <input type="text" class="form-control" name="share_percent" placeholder="分摊比例%"/>  \
+                            <span class="input-group-addon deleteShare" style="cursor:pointer;"><i class="fa fa-remove text-danger" title="删除"></i></span>  \
+                        </div> \
+                    </div> \
+                </div>').insertBefore($(this));
+                fillShareDeptSelect();
+            });
+
+            $("#shareDiv").on("click", ".deleteShare", function () {                
+                $(this).parents(".row").remove();
+            });
+
+            $("#shareInfo").hide();
+            $("#is_share_fee").on("change", function () {
+                if ($(this).val() == "true") {
+                    $("#shareInfo").show();
+                } else {
+                    $("#shareInfo").hide();
                 }
             });
 
@@ -103,6 +146,7 @@
                 var head = utils.getFormObj($("#fm"));
                 var demandsInput = $("input[name='demands']");
                 var demands = "";
+
                 for (var i = 0; i < demandsInput.length; i++) {
                     if ($.trim($(demandsInput[i]).val()) != "") {
                         demands += $(demandsInput[i]).val() + "\br"; //给换行符，读取时再转
@@ -111,6 +155,28 @@
                 head.demands = demands;
                 head.company = head.dept_name.split("_")[0];
                 head.dept_name = head.dept_name.split("_")[1];
+
+                //分摊数据
+                if (head.is_share_fee == "true") {
+                    var shareDeptSelect = $("select[name='share_dept']");
+                    var sharePercentInput = $("input[name='share_percent']");
+                    var shareInfoObj = [];
+                    var totalPercent = 0;
+                    for (var i = 0; i < shareDeptSelect.length; i++) {
+                        if (!utils.testIsFloat($(sharePercentInput[i]).val())) {
+                            toastr.error("分摊比例必须填写数字格式");
+                            return;
+                        }
+                        shareInfoObj.push({ n: $(shareDeptSelect[i]).val(), v: $(sharePercentInput[i]).val() });
+                        totalPercent += parseFloat($(sharePercentInput[i]).val());
+                    }
+                    if (Math.abs(totalPercent - 100) > 0.000001) {
+                        toastr.error("分摊比例之和必须等于100");
+                        return;
+                    }
+                    head.share_fee_detail = JSON.stringify(shareInfoObj);
+                }
+
                 openConfirmDialog("确定要提交申请吗？", function () {
                     $("#apply_bt").button("loading");
                     $.ajax({
@@ -134,9 +200,17 @@
                 });
 
             });
-
+            fillShareDeptSelect();
         });
 
+        function fillShareDeptSelect() {            
+            var selects = $("select[name='share_dept']");
+            for (var i = 0; i < selects.length; i++) {
+                if ($.trim($(selects[i]).html()) == "") {
+                    $(selects[i]).html($("#dept_name").html());
+                }
+            }
+        }
 
     </script>
 }
@@ -168,6 +242,14 @@
                 </span>
                 <span class="b-input">
                     <input type="text" class="form-control" name="applier_name" value="@m.applierName" readonly />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    联系电话:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="applier_phone" placeholder="填写手机短号+长号" required />
                 </span>
             </div>
             <div class="b-div">
@@ -245,7 +327,46 @@
                     <input type="text" class="form-control" name="demands" placeholder="需要达到的效果，分项填写" required />
                     <button type="button" class="btn btn-sm btn-success" id="btnAddDemand" style="margin-top:6px;"><i class="fa fa-plus"></i> 添加要求</button>                    
                 </div>
-            </div>            
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    是否多部门分摊:
+                </span>
+                <div class="b-input">
+                    <select class="form-control" name="is_share_fee" id="is_share_fee" required>
+                        <option value="">----下拉选择是否是否多部门分摊----</option>
+                        <option value="false">否</option>
+                        <option value="true">是</option>
+                    </select>
+                </div>
+            </div>
+            <div id="shareInfo">                
+                <div class="b-div">
+                    <span class="b-label">
+                        分摊明细:
+                    </span>
+                    <div class="b-input" id="shareDiv">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6">
+                                <select class="form-control" name="share_dept"></select>
+                            </div>
+                            <div class="col-xs-12 col-sm-6">
+                                <input type="text" class="form-control" name="share_percent" placeholder="分摊比例%"/> 
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:8px;">
+                            <div class="col-xs-12 col-sm-6">
+                                <select class="form-control" name="share_dept"></select>
+                            </div>
+                            <div class="col-xs-12 col-sm-6">
+                                <input type="text" class="form-control" name="share_percent" placeholder="分摊比例%"/> 
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary" id="btnAddShare" style="margin-top:6px;"><i class="fa fa-plus"></i> 添加分摊明细</button>
+                        <div class="text-danger small" style="margin-top:6px;"><i class="fa fa-info-circle"></i> 比例只录数字，不用录%；所有部门的分摊比例之和必须等于100%</div>                  
+                    </div>
+                </div>        
+            </div> 
             <div class="b-div">
                 <span class="b-label">
                     项目收益:
@@ -274,7 +395,7 @@
                     <div class="b-input">
                         <textarea type="text" class="form-control" rows="3" name="productivity_profit" placeholder="填写现产能明细/项目完成后产能/产能增加净值"></textarea>
                     </div>
-                </div>     
+                </div>
                 <div class="b-div">
                     <span class="b-label">
                         其它收益:
@@ -288,7 +409,7 @@
                         收益数据确认人:
                     </span>
                     <div class="b-input">
-                        <input type="text" class="form-control select-user" data-user-num="3" name="profit_confirm_people_name" placeholder="选择收益收据确认人"/>
+                        <input type="text" class="form-control select-user" data-user-num="3" name="profit_confirm_people_name" placeholder="选择收益收据确认人" />
                     </div>
                 </div>
             </div>  
@@ -297,16 +418,22 @@
                         设备科负责人:
                     </span>
                     <div class="b-input">
-                        <input type="text" class="form-control select-user" name="equitment_auditor_name" placeholder="选择设备科负责人"/>
+                        <input type="text" class="form-control select-user" name="equitment_auditor_name" placeholder="选择设备科负责人" />
                     </div>
                 </div>
                  <div class="b-div">
                     <span class="b-label">
-                        部门主管:
+                        生产部主管:
                     </span>
                     <div class="b-input">
-                        <input type="text" class="form-control select-user" name="dept_charger_name" placeholder="选择部门主管"/>
+                        <input type="text" class="form-control select-user" name="dept_charger_name" data-user-num="3" placeholder="选择生产部主管" required />
                     </div>
+                </div>
+                <div class="b-div">
+                    <div id="picker"> <i class="fa fa-upload"></i> 上传现场照片 </div>
+                </div>
+                <div id="myUploader">
+
                 </div>
         </form>
         <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:16px;"><i class="fa fa-check-circle-o"></i> 提交申请单</button>
@@ -318,7 +445,14 @@
         <h4 class="text-danger"><i class="fa fa-info-circle"></i> 说明 </h4>
         <div style="margin-left:18px;padding-top:6px;" class="text-danger">            
             <p>
-                1. 流程步骤：流程开始--->提交申请--->收益提供人审批(如没有可跳过)--->设备科负责人审批--->部门主管审批--->部门总经理审批--->采购部接单--->申请人上传施工清单--->设备科负责人审批--->采购部上传报价单--->管理部会签（部门总经理、项目大类负责人、节省与监督审批人）--->审核部确认中标供应商--->申请人验收项目--->流程结束。
+                1. 流程步骤：流程开始--->提交申请--->收益提供人审批(如没有可跳过)--->设备科负责人审批--->生产部主管审批--->部门总经理审批--->
+                采购部接单--->申请人上传施工清单--->设备科负责人处理--->项目类别负责人(监控类/网络类)--->采购部上传报价单--->
+                管理部会签（项目大类负责人、节省与监督审批人）--->部门总经理确认--->审核部最终确认--->申请人验收项目--->设备负责人验收--->
+                生产主管验收--->部门总经理验收--->项目大类负责人验收--->流程结束。
+                <br/>
+                2. 如果部门有设置CEO，那么部门总经理审批后，采购部接单前，系统会推送通知给CEO。
+                <br/>
+                3. 申请人上传施工清单，设备科负责人处理后，采购部上传报价单前，系统会推送通知给项目大类负责人。
             </p>
         </div>
     </div>

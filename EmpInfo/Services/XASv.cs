@@ -36,31 +36,69 @@ namespace EmpInfo.Services
             return "BeginAuditXAApply";
         }
 
+        public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
+        {
+            var menus = base.GetApplyMenuItems(userInfo);
+
+            if (db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).Count() > 0) {
+                menus.Add(new ApplyMenuItemModel()
+                {
+                    text = "查询报表",
+                    iconFont = "fa-file-text-o",
+                    url = "../Report/XAReport"
+                });
+            }
+
+            return menus;
+        }
+
         public override object GetInfoBeforeApply(UserInfo userInfo, UserInfoDetail userInfoDetail)
         {
             XABeforeApplyModel m = new XABeforeApplyModel();
             m.sys_no = GetNextSysNum(BillType);
             m.applierName = userInfo.name;
+            //m.applierPhone = userInfoDetail.phone ?? "";
             m.depNameList = db.flow_auditorRelation.Where(f => f.bill_type == BillType && f.relate_name == "部门总经理").Select(f => f.relate_text).OrderBy(f => f).Distinct().ToList();
 
             return m;
         }
 
         public override void SaveApply(System.Web.Mvc.FormCollection fc, UserInfo userInfo)
-        {            
+        {
             bill = JsonConvert.DeserializeObject<ei_xaApply>(fc.Get("head"));
             if (bill.has_profit && !string.IsNullOrEmpty(bill.profit_confirm_people_name)) {
                 bill.profit_confirm_people_num = GetUserCardByNameAndCardNum(bill.profit_confirm_people_name);
             }
+            else {
+                bill.profit_confirm_people_num = "";
+            }
             bill.dept_charger_num = GetUserCardByNameAndCardNum(bill.dept_charger_name);
-            bill.equitment_auditor_num = GetUserCardByNameAndCardNum(bill.equitment_auditor_name);
+            if (!string.IsNullOrEmpty(bill.equitment_auditor_name)) {
+                bill.equitment_auditor_num = GetUserCardByNameAndCardNum(bill.equitment_auditor_name);
+            }
+            else {
+                bill.equitment_auditor_num = "";
+            }
+
+            //增加部门分摊功能 2020-12-16
+            if (bill.is_share_fee) {
+                if (!string.IsNullOrEmpty(bill.share_fee_detail)) {
+                    List<XAFeeShareModel> shares = JsonConvert.DeserializeObject<List<XAFeeShareModel>>(bill.share_fee_detail);
+                    var depList = shares.Where(s => s.n != bill.dept_name).Select(s => s.n).Distinct().ToList();
+                    bill.share_fee_managers = string.Join(";", db.flow_auditorRelation.Where(f => f.bill_type == BillType && f.relate_name == "部门总经理" && depList.Contains(f.relate_text)).Select(f => f.relate_value).ToList());
+                }
+                else {
+                    bill.is_share_fee = false;
+                }
+            }
+            
             bill.applier_num = userInfo.cardNo;
             bill.applier_name = userInfo.name;
             bill.apply_time = DateTime.Now;
-            bill.bill_no = GetNextSysNum(bill.dept_name+"-");
+            bill.bill_no = GetNextSysNum(bill.dept_name + "-");
 
             FlowSvrSoapClient client = new FlowSvrSoapClient();
-            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.classification+"_"+bill.project_type, bill.project_name);
+            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.classification + "_" + bill.project_type, bill.project_name);
             if (result.suc) {
                 try {
                     db.ei_xaApply.Add(bill);
@@ -103,23 +141,31 @@ namespace EmpInfo.Services
             string bidder = fc.Get("bidder");
 
             if (isPass && !returnBack) {
+                if (stepName.Contains("采购部接单")) {
+                    if (db.ei_xaApplySupplier.Where(x => x.sys_no == bill.sys_no).Count() < 1) {
+                        throw new Exception("请先录入供应商");
+                    }
+                }
                 if (stepName.Contains("上传报价单")) {
-                    if (db.ei_xaApplySupplier.Where(x => x.sys_no == bill.sys_no && x.price == null).Count() > 0) {
-                        throw new Exception("存在未录入价钱的供应商，请全部录入后再审批通过");
+                    if (db.ei_xaApplySupplier.Where(x => x.sys_no == bill.sys_no && x.price != null).Count() < 1) {
+                        throw new Exception("请至少录入一个供应商的价格再审批");
                     }
                 }
                 if (stepName.Contains("确认中标供应商")) {
-                    int bidderId;
-                    if (!int.TryParse(bidder, out bidderId)) {
-                        throw new Exception("请先选择中标的供应商");
-                    }
+                    int bidderId=0;
+                    int.TryParse(bidder, out bidderId);
                     var bidderSupplier = db.ei_xaApplySupplier.Where(s => s.sys_no == bill.sys_no && s.id == bidderId).FirstOrDefault();
                     if (bidderSupplier == null) {
-                        throw new Exception("选择的供应商不存在");
+                        bidderSupplier = db.ei_xaApplySupplier.Where(s => s.sys_no == bill.sys_no && s.price != null).OrderBy(s => s.price).FirstOrDefault();
+                        if (bidderSupplier == null) {
+                            throw new Exception("所有供应商都未录入价格，审批失败");
+                        }
                     }
                     bidderSupplier.is_bidder = true;
-                    bill.can_print = true;
-                    db.SaveChanges();
+                    bill.can_print = true;  
+                }
+                if (stepName.Contains("申请人验收")) {
+                    bill.check_date = DateTime.Now;
                 }
             }
 
@@ -132,7 +178,8 @@ namespace EmpInfo.Services
                 string formJson = JsonConvert.SerializeObject(bill);
                 result = flow.BeginAudit(bill.sys_no, step, userInfo.cardNo, isPass, opinion, formJson);
             }
-            if (result.suc) {                
+            if (result.suc) {
+                db.SaveChanges();
                 //发送通知到下一级审核人
                 SendNotification(result);
             }
@@ -155,7 +202,6 @@ namespace EmpInfo.Services
                         GetUserEmailByCardNum(bill.applier_num),
                         ccEmails
                         );
-
                     SendQywxMessageForCompleted(
                         BillTypeName,
                         bill.sys_no,
@@ -182,8 +228,8 @@ namespace EmpInfo.Services
 
                     string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     SendQywxMessageToNextAuditor(
-                        BillTypeName,
-                        bill.sys_no + isReturn,
+                        BillTypeName + isReturn,
+                        bill.sys_no,
                         result.step,
                         result.stepName,
                         bill.applier_name,
@@ -191,6 +237,38 @@ namespace EmpInfo.Services
                         string.Format("项目类别：{0}；项目名称：{1}", bill.project_type, bill.project_name),
                         nextAuditors.ToList()
                         );
+                    
+                    if (string.IsNullOrEmpty(isReturn)) {
+                        //总经理审批后，推送给采购接单时，需要抄送给部门CEO
+                        if (result.stepName.Contains("采购部接单")) {
+                            var notifyCeo = db.flow_notifyUsers.Where(f => f.bill_type == BillType && f.cond1 == bill.company && f.cond2 == bill.dept_name).Select(f => f.card_number).ToList();
+                            if (notifyCeo.Count() > 0) {
+                                SendQywxMessageToCC(
+                                    BillTypeName,
+                                    bill.sys_no,
+                                    bill.applier_name,
+                                    ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                                    string.Format("项目类别：{0}；项目名称：{1}", bill.project_type, bill.project_name),
+                                    notifyCeo
+                                    );
+                            }
+                        }
+                        //设备部确认后，采购报价前，还要抄送给项目大类负责人
+                        if (result.stepName.Contains("采购部上传报价单")) {
+                            var notifyUser = db.flow_auditorRelation.Where(f => f.bill_type == BillType && f.relate_name == "项目大类" && f.relate_text == bill.classification).Select(f => f.relate_value).ToList();
+                            if (notifyUser.Count() > 0) {
+                                SendQywxMessageToCC(
+                                    BillTypeName + "（已上传施工清单）",
+                                    bill.sys_no,
+                                    bill.applier_name,
+                                    ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                                    string.Format("项目类别：{0}；项目名称：{1}", bill.project_type, bill.project_name),
+                                    notifyUser
+                                    );
+                            }
+                        }
+                    }
+
                 }
             }
         }

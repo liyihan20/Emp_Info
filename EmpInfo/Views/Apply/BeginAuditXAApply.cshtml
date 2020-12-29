@@ -3,6 +3,19 @@
 @{
     BeginAuditModel bam = ViewData["bam"] as BeginAuditModel;
     XACheckApplyModel m = bam.otherInfo as XACheckApplyModel;
+    List<XAFeeShareModel> shareList = new List<XAFeeShareModel>();
+    if (!string.IsNullOrEmpty(m.bill.share_fee_detail)) {
+        shareList = JsonConvert.DeserializeObject<List<XAFeeShareModel>>(m.bill.share_fee_detail);
+    }
+
+    bool canSeePrice = false;//能否查看价格和报价单
+    if (bam.stepName.Contains("采购") || bam.stepName.Contains("会签") || bam.stepName.Contains("审核部")) {
+        canSeePrice = true;
+    }
+    if (!canSeePrice) {
+        m.suppliers.ForEach(s => s.price = null);
+    }
+
     var itemsJson = JsonConvert.SerializeObject(m.suppliers);
 }
 
@@ -15,16 +28,16 @@
             display: inline-block;
             width: 100px;
             vertical-align: top;
-            color: gray;
+            /*color: gray;*/
         }
 
         .b-input {
             display: inline-block;
-            width: 70%;
+            width: 65%;
         }
 
         .b-div {
-            margin: 10px 0;
+            margin: 16px 0;
         }
     </style>
 }
@@ -43,7 +56,7 @@
                 console.log("1");
                 $("#myUploader1").myUploader({
                     sysNum: "@bam.sysNum",
-                    fileNumLimit: 3,
+                    fileNumLimit: 10,
                     prefix: "施工清单_",
                     accept: {
                         title: '*',
@@ -56,7 +69,7 @@
                 console.log("2");
                 $("#myUploader2").myUploader({
                     sysNum: "@bam.sysNum",
-                    fileNumLimit: 3,
+                    fileNumLimit: 10,
                     prefix: "报价单_",
                     accept: {
                         title: '*',
@@ -70,6 +83,9 @@
             }
             if ($("#attList2").length>0) {
                 $("#attList2").myDownloader({ sysNum: "@bam.sysNum", prefix: "报价单_" });
+            }
+            if ($("#attList3").length>0) {
+                $("#attList3").myDownloader({ sysNum: "@bam.sysNum", prefix: "现场照片_" });
             }
 
             $("#flowRecordBt").on("click", function () {
@@ -326,6 +342,14 @@
         </div>
         <div class="b-div">
             <span class="b-label">
+                联系电话:
+            </span>
+            <span class="b-input">
+                @m.bill.applier_phone
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
                 申请时间:
             </span>
             <span class="b-input">
@@ -392,9 +416,11 @@
             <span class="b-label">
                 申请原因:
             </span>
-            <span class="b-input">
-                @m.bill.reason
-            </span>
+            <div class="b-input">
+                @foreach (var d in m.bill.reason.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)) {
+                    <div>@d</div>
+                }    
+            </div>
         </div>
         <div class="b-div">
             <span class="b-label">
@@ -406,6 +432,26 @@
                 }
             </div>
         </div>
+        <div class="b-div">
+            <span class="b-label">
+                是否多部门分摊:
+            </span>
+            <div class="b-input">
+                @(m.bill.is_share_fee ? "是" : "否")
+            </div>
+        </div>
+        @if (m.bill.is_share_fee) {
+            <div class="b-div">
+                <span class="b-label">
+                    分摊明细:
+                </span>
+                <div class="b-input">
+                    @foreach (var share in shareList) {
+                        <div><i class="fa fa-square"></i> @share.n.Split(new char[] { '_' })[1] : @string.Concat(share.v, "%") </div>
+                    }
+                </div>
+            </div>
+        }
         <div class="b-div">
             <span class="b-label">
                 项目收益:
@@ -458,7 +504,7 @@
         </div>
         <div class="b-div">
             <span class="b-label">
-                部门主管:
+                生产部主管:
             </span>
             <span class="b-input">
                 @m.bill.dept_charger_name
@@ -478,30 +524,25 @@
                     </span>
                     <span class="b-input text-danger" style="font-weight:bold;text-decoration:double underline;">
                         @m.suppliers.Where(s => s.is_bidder).Select(s => s.supplier_name).FirstOrDefault()
+                        （价格：<span>@m.suppliers.Where(s => s.is_bidder).Select(s => s.price).FirstOrDefault()</span>）
                     </span>
                 </div>
             }
         }
         <div style="margin-top:6px;">
+            <div class="b-label">现场照片:</div>
+            <div id="attList3"></div>
+        </div>
+        <div style="margin-top:6px;">
             <div class="b-label">施工清单:</div>
             <div id="attList1"></div>
         </div>
-        <div style="margin-top:6px;">
-            <div class="b-label">报价单:</div>
-            <div id="attList2"></div>
-        </div>
-
-    </div>
-</div>
-
-<div class="panel panel-default" style="margin:16px 0;">
-    <div class="panel-body">
-        <h4 class="text-danger"><i class="fa fa-info-circle"></i> 说明 </h4>
-        <div style="margin-left:18px;padding-top:6px;" class="text-danger">
-            <p>
-                1. 流程步骤：流程开始--->提交申请--->收益提供人审批(如没有可跳过)--->设备科负责人审批--->部门主管审批--->部门总经理审批--->采购部接单--->申请人上传施工清单--->设备科负责人审批--->采购部上传报价单--->管理部会签（部门总经理、项目大类负责人、节省与监督审批人）--->审核部确认中标供应商--->申请人验收项目--->流程结束。
-            </p>
-        </div>
+        @if (canSeePrice) {
+            <div style="margin-top:6px;">
+                <div class="b-label">报价单:</div>
+                <div id="attList2"></div>
+            </div>
+        }
     </div>
 </div>
 
@@ -509,7 +550,7 @@
 <div class="auditContent">
     <div class="panel panel-primary">
         <div class="panel-heading" id="auditHead">
-            <i class='fa fa-pencil'></i> @bam.stepName
+            <i class='fa fa-pencil'></i>@bam.sysNum -- @bam.stepName
         </div>
         <div class="panel-body">
             @if (bam.isPass == null) {
@@ -535,7 +576,6 @@
                             <table id="tb"></table>
                         </div>
                         <div class="text-danger small" style="margin-bottom:12px;"><i class="fa fa-info-circle"></i> 先确认供应商列表，并邮件通知供应商报方案，后续上传报价单环节再到此流程录入价钱</div>
-
                     }
                     else if (bam.stepName.Contains("上传施工清单")) {
                         <div style="display:inline-block;">
@@ -554,10 +594,10 @@
                                 <button class="btn btn-success btn-sm" type="button" id="priceBt"> <i class="fa fa-edit"></i> 录入价钱 </button>
                             </div>
                         </div>
-                        <div style="margin-bottom:12px;">
+                        <div style="margin-bottom:4px;">
                             <table id="tb2"></table>
                         </div>
-
+                        <div style="margin-bottom:12px;" class="text-danger small"><i class="fa fa-info-circle"></i> 没有报价的供应商可以不录入价格，但至少必须录入1个供应商的价格</div>
                         <div style="display:inline-block;">
                             <div id="picker"> <i class="fa fa-upload"></i> 上传报价单 </div>
                         </div>
@@ -604,6 +644,24 @@
                     <button type="button" class="btn btn-block btn-danger disabled">已拒绝此申请</button>
                 }
             }
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default" style="margin:16px 0;">
+    <div class="panel-body">
+        <h4 class="text-danger"><i class="fa fa-info-circle"></i> 说明 </h4>
+        <div style="margin-left:18px;padding-top:6px;" class="text-danger">
+            <p>
+                1. 流程步骤：流程开始--->提交申请--->收益提供人审批(如没有可跳过)--->设备科负责人审批--->生产部主管审批--->部门总经理审批--->
+                采购部接单--->申请人上传施工清单--->设备科负责人处理--->项目类别负责人(监控类/网络类)--->采购部上传报价单--->
+                管理部会签（项目大类负责人、节省与监督审批人）--->部门总经理确认--->审核部最终确认--->申请人验收项目--->设备负责人验收--->
+                生产主管验收--->部门总经理验收--->项目大类负责人验收--->流程结束。
+                <br />
+                2. 如果部门有设置CEO，那么部门总经理审批后，采购部接单前，系统会推送通知给CEO。
+                <br />
+                3. 申请人上传施工清单，设备科负责人处理后，采购部上传报价单前，系统会推送通知给项目大类负责人。
+            </p>
         </div>
     </div>
 </div>

@@ -209,6 +209,24 @@
         if (isNegtive) result = "-" + result;
 
         return result;
+    },
+    //比较两个日期，返回日期差，第一个日期大，第二个日期小，第三个参数可以是d（天），h（小时），m（分钟），s（秒）,第四个参数是结果保留小数位
+    diffDays: function (date1, date2, which,digitNum) {
+        var d1 = Date.parse(date1.replace(/-/ig, '/'));
+        var d2 = Date.parse(date2.replace(/-/ig, '/'));
+        var span = d1 - d2;
+        digitNum = digitNum | 0;
+        switch (which) {
+            case "d":
+                return (span / 1000 / 60 / 60 / 24.0).toFixed(digitNum);
+            case "h":
+                return (span / 1000 / 60 / 60.0).toFixed(digitNum);
+            case "m":
+                return (span / 1000 / 60.0).toFixed(digitNum);
+            case "s":
+                return (span / 1000.0).toFixed(digitNum);
+        }
+        return span;
     }
 
 }

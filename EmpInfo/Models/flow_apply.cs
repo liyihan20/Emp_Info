@@ -31,5 +31,6 @@ namespace EmpInfo.Models
         public Nullable<bool> user_abort { get; set; }
     
         public virtual ICollection<flow_applyEntry> flow_applyEntry { get; set; }
+        public virtual flow_template flow_template { get; set; }
     }
 }

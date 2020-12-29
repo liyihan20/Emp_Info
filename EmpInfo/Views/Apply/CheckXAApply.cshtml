@@ -3,6 +3,10 @@
 @{
     var m = ViewData["am"] as XACheckApplyModel;
     var itemsJson = JsonConvert.SerializeObject(m.suppliers);
+    List<XAFeeShareModel> shareList = new List<XAFeeShareModel>();
+    if (!string.IsNullOrEmpty(m.bill.share_fee_detail)) {
+        shareList = JsonConvert.DeserializeObject<List<XAFeeShareModel>>(m.bill.share_fee_detail);
+    }
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
@@ -12,7 +16,7 @@
             display: inline-block;
             width: 100px;
             vertical-align: top;
-            color: gray;
+            /*color: gray;*/
         }
 
         .b-input {
@@ -21,7 +25,8 @@
         }
 
         .b-div {
-            margin: 10px 0;
+            margin: 16px 0;
+            /*border-bottom:1px solid;*/
         }
     </style>
 }
@@ -42,13 +47,13 @@
                 {
                     field: "supplier_name",
                     title: "供应商名称",
-                    width:"70%"
+                    //width:"70%"
                 }
-                , {
-                    field: "price",
-                    title: "价格",
-                    width:"30%"
-                }
+                //, {
+                //    field: "price",
+                //    title: "价格",
+                //    width:"30%"
+                //}
             ]
         });
     }
@@ -60,13 +65,15 @@
         if ($("#attList1").length>0) {
             $("#attList1").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "施工清单_" });
         }
-        if ($("#attList2").length>0) {
+        @*if ($("#attList2").length>0) {
             $("#attList2").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "报价单_" });
-        }
-
-        $("#flowRecordBt").on("click", function () {
-            var box = $("<div></div>");
-            $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.bill.sys_no" }, function () {
+        }*@
+            if ($("#attList3").length>0) {
+                $("#attList3").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "现场照片_" });
+            }
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.bill.sys_no" }, function () {
                 openMessageDialog($(box).html(), "查看流转记录");
             });
         });
@@ -101,15 +108,15 @@
                 <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
             </span>
         </div>
-        @if (m.bill.can_print) { 
-        <div class="b-div">
-            <span class="b-label">
-                打印:
-            </span>
-            <span class="b-input">
-                <button type="button" class="btn btn-default btn-sm" id="printBt"><i class="fa fa-print"></i> 打印单据</button>
-            </span>
-        </div>
+        @if (m.bill.can_print) {
+            <div class="b-div">
+                <span class="b-label">
+                    打印:
+                </span>
+                <span class="b-input">
+                    <button type="button" class="btn btn-default btn-sm" id="printBt"><i class="fa fa-print"></i> 打印单据</button>
+                </span>
+            </div>
         }
         <div class="b-div">
             <span class="b-label">
@@ -125,6 +132,14 @@
             </span>
             <span class="b-input">
                 @m.bill.applier_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                联系电话:
+            </span>
+            <span class="b-input">
+                @m.bill.applier_phone
             </span>
         </div>
         <div class="b-div">
@@ -195,20 +210,42 @@
             <span class="b-label">
                 申请原因:
             </span>
-            <span class="b-input">
-                @m.bill.reason
-            </span>
+            <div class="b-input">
+                @foreach (var d in m.bill.reason.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)) {
+                    <div>@d</div>
+                }               
+            </div>
         </div>
         <div class="b-div">
             <span class="b-label">
                 具体要求:
             </span>
             <div class="b-input">
-                @foreach (var d in m.bill.demands.Split(new string[]{"\br"}, StringSplitOptions.RemoveEmptyEntries)) {
+                @foreach (var d in m.bill.demands.Split(new string[] { "\br" }, StringSplitOptions.RemoveEmptyEntries)) {
                     <div><i class="fa fa-circle"></i> @d</div>
                 }
             </div>
         </div>
+        <div class="b-div">
+            <span class="b-label">
+                是否多部门分摊:
+            </span>
+            <div class="b-input">
+                @(m.bill.is_share_fee ? "是" : "否")
+            </div>
+        </div>
+        @if (m.bill.is_share_fee) {
+            <div class="b-div">
+                <span class="b-label">
+                    分摊明细:
+                </span>
+                <div class="b-input">
+                    @foreach (var share in shareList) {
+                        <div><i class="fa fa-square"></i> @share.n.Split(new char[]{'_'})[1] : @string.Concat(share.v,"%") </div>
+                    }
+                </div>
+            </div>
+        }
         <div class="b-div">
             <span class="b-label">
                 项目收益:
@@ -261,7 +298,7 @@
         </div>
         <div class="b-div">
             <span class="b-label">
-                部门主管:
+                生产部主管:
             </span>
             <span class="b-input">
                 @m.bill.dept_charger_name
@@ -281,18 +318,23 @@
                     </span>
                     <span class="b-input text-danger" style="font-weight:bold;text-decoration:double underline;">
                         @m.suppliers.Where(s => s.is_bidder).Select(s => s.supplier_name).FirstOrDefault()
+                        （价格：<span>@m.suppliers.Where(s => s.is_bidder).Select(s => s.price).FirstOrDefault()</span>）
                     </span>
                 </div>
             }
         }
         <div style="margin-top:6px;">
+            <div class="b-label">现场照片:</div>
+            <div id="attList3"></div>
+        </div>
+        <div style="margin-top:6px;">
             <div class="b-label">施工清单:</div>
             <div id="attList1"></div>
         </div>
-        <div style="margin-top:6px;">
-            <div class="b-label">报价单:</div>
-            <div id="attList2"></div>
-        </div>
+        @*<div style="margin-top:6px;">
+                <div class="b-label">报价单:</div>
+                <div id="attList2"></div>
+            </div>*@
 
 
     </div>

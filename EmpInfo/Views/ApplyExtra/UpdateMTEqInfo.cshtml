@@ -1,0 +1,349 @@
+﻿@using EmpInfo.Models;
+@using Newtonsoft.Json;
+@{
+    MTUpdateEqInfoModel m = ViewData["m"] as MTUpdateEqInfoModel;
+    string infoJson = "{}";
+    if (m.info != null) {
+        infoJson = JsonConvert.SerializeObject(m.info);
+    }
+    string depJson = JsonConvert.SerializeObject(m.depList);
+    
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <style type="text/css">
+        .b-label {
+            /*display: inline-block;
+            width: 80px;*/
+            vertical-align: central;
+            color: gray;
+            font-style:italic;
+        }
+        .b-input{
+            /*display:inline-block;
+            width:65%;*/
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+    </style>
+}
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+<script>
+    $(function () {
+        $(".datePicker").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            startView: 2,
+            minView: 2,
+            initialDate: "@DateTime.Now.ToString("yyyy-MM-dd")",
+            startDate: "@DateTime.Now.ToString("yyyy-MM-dd")"
+        });
+
+        $("select[name='produce_dep_name']").on("change",function(){
+            var prDepName = $(this).val();
+            var deps = @Html.Raw(depJson);
+            var dep = deps.filter(function(d){return d.pr_dep_name == prDepName});
+            if(dep.length > 0){
+                dep = dep[0];
+                $("#bus_dep_name").val(dep.bus_dep_name);
+                $("#pr_charger_name").val(dep.pr_charger_name);
+                $("#eq_dep_name").val(dep.eq_dep_name);
+                $("#eq_charger_name").val(dep.eq_charger_name);
+            }
+        });
+
+        $("select[name='file_no']").on("change",function(){
+            var fileNo = $(this).val();
+            $.post("GetMTFileDetail",{ fileNo:fileNo },function(data){
+                if(data){
+                    $("#maintenance_content").val(data.maintenance_content);
+                    $("#maintenance_steps").val(data.maintenance_steps);
+                }
+            });
+        });
+
+        $("#apply_bt").on("click", function () {
+            var result = utils.validateRequiredField($("#fm"));
+            if (!result.suc) {
+                toastr.error(result.msg);
+                return;
+            }
+            var obj = utils.getFormObj($("#fm"));
+            console.log(obj);
+                
+            openConfirmDialog("确定要保存吗？", function () {
+                $("#apply_bt").button("loading");
+                $.post("SaveMTEqInfo",{obj:JSON.stringify(obj)},function(data){
+                    if(data.suc){
+                        toastr.success("保存成功");
+                        setTimeout(function(){window.location.href="CheckMTEqInfo"},1000);
+                    }else{
+                        toastr.error("保存失败："+data.msg);
+                        $("#apply_bt").button("reset");
+                    }
+                });
+            });
+
+        });
+
+        initForm();
+    });
+
+    function initForm() {
+        var infoObj = @Html.Raw(infoJson);
+        if(infoObj.id!=undefined){
+            infoObj.next_maintenance_date=utils.parseTDate(infoObj.next_maintenance_date);
+            utils.loadObjData($("#fm"),infoObj);
+            $("select[name='file_no']").trigger("change");
+            $("select[name='produce_dep_name']").trigger("change");
+        }else{
+            //设置一些值
+            $("select[name='class_id']").val("@m.myClassId");
+        }
+
+    }
+
+
+
+</script>
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="../Apply/ApplyIndex?billType=MT">设备保养流程</a></li>
+            <li><a href="CheckMTEqInfo">设备信息维护</a></li>
+            <li class="active">@(m.info==null?"新增设备信息":"修改设备信息")</li>
+        </ol>
+    </div>
+    <div class="panel-body">        
+         <form id="fm">
+             <input type="hidden" name="id" value="0" />
+             <div class="row">
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             使用状态:
+                         </div>
+                         <div class="b-input">
+                             <select class="form-control" name="using_status" required>
+                                 <option value="正常">正常</option>
+                                 <option value="停用">停用</option>
+                             </select>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             设备保养科室:
+                         </div>
+                         <div class="b-input">
+                             <select class="form-control" name="class_id" required>
+                                 <option value="">----下拉选择科室----</option>
+                                 @foreach (var c in m.classesList) {
+                                     <option value="@c.intValue">@c.text</option>
+                                 }
+                             </select>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             资产编号:
+                         </div>
+                         <div class="b-input">
+                             <input type="text" class="form-control" name="property_number" placeholder="必填，设备唯一标识" required />
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             设备名称:
+                         </div>
+                         <div class="b-input">
+                             <input type="text" class="form-control" name="equitment_name" placeholder="必填" required />
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             规格型号:
+                         </div>
+                         <div class="b-input">
+                             <input type="text" class="form-control" name="equitment_modual" placeholder="必填" required />
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             制造商/供应商:
+                         </div>
+                         <div class="b-input">
+                             <input type="text" class="form-control" name="maker" placeholder="必填" required />
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             盘点部门:
+                         </div>
+                         <div class="b-input">
+                             <input type="text" class="form-control" name="check_dep" placeholder="必填" required />
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             盘点表编号:
+                         </div>
+                         <div class="b-input">
+                             <input type="text" class="form-control" name="check_list_no" placeholder="必填" required />
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             生产部门:
+                         </div>
+                         <div class="b-input">
+                             <select class="form-control" name="produce_dep_name" required>
+                                 <option value="">----下拉选择生产部门----</option>
+                                 @foreach (var d in m.depList) {
+                                     <option value="@d.pr_dep_name">@d.pr_dep_name</option>
+                                 }
+                             </select>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             生产主管:
+                         </div>
+                         <div class="b-input">
+                             <input type="text" class="form-control" id="pr_charger_name" placeholder="生产部门选择后带出" readonly />
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             事业部:
+                         </div>
+                         <div class="b-input">
+                             <input type="text" class="form-control" id="bus_dep_name" placeholder="生产部门选择后带出" readonly />
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             设备支部:
+                         </div>
+                         <div class="b-input">
+                             <input type="text" class="form-control" id="eq_dep_name" placeholder="生产部门选择后带出" readonly />
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             设备经理:
+                         </div>
+                         <div class="b-input">
+                             <input type="text" class="form-control" id="eq_charger_name" placeholder="生产部门选择后带出" readonly />
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             优先处理级别:
+                         </div>
+                         <div class="b-input">
+                             <select class="form-control" name="important_level" required>
+                                 <option value="">----下拉选择优先处理级别----</option>
+                                 <option value="重要保养">重要保养</option>
+                                 <option value="一般保养">一般保养</option>
+                             </select>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             保养周期（单位：月）:
+                         </div>
+                         <div class="b-input">
+                             <input type="text" class="form-control" name="maintenance_cycle" placeholder="必填，只能是整数" required />
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-6 col-md-4">
+                     <div class="b-div">
+                         <div class="b-label">
+                             下次保养日期:
+                         </div>
+                         <div class="b-input">
+                            <span class="input-group date datePicker">
+                                <input class="form-control" type="text" name="next_maintenance_date" autocomplete="off" placeholder="必填，选择日期" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                            </span>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+             <div class="b-div">
+                <div class="b-label">
+                    保养文件编号:
+                </div>
+                <div class="b-input">                             
+                    <select class="form-control" name="file_no" required>
+                        <option value="">----下拉选择文件编号----</option>
+                        @foreach (var f in m.fileNoList) {
+                            <option value="@f">@f</option>
+                        }
+                    </select>
+                </div>
+            </div>
+             <div class="b-div">
+                <div class="b-label">
+                    保养内容描述:
+                </div>
+                <div class="b-input">
+                    <textarea class="form-control" rows="4" id="maintenance_content" readonly placeholder="保养文件编号选择后带出"></textarea>
+                </div>
+            </div>
+             <div class="b-div">
+                <div class="b-label">
+                    保养步骤:
+                </div>
+                <div class="b-input">
+                    <textarea class="form-control" rows="4" id="maintenance_steps" readonly placeholder="保养文件编号选择后带出"></textarea>
+                </div>
+            </div>
+         </form>
+         <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在保存..." style="margin-top:16px;"><i class="fa fa-check-circle-o"></i> 保存设备信息</button>
+
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+}

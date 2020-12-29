@@ -406,6 +406,18 @@
     <Compile Include="Models\ei_mqHRTalkRecord.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_mtApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_mtClass.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_mtEqInfo.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_mtFile.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_PPApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -451,6 +463,9 @@
     <Compile Include="Models\ei_ucApplyEntry.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_urgeRecords.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_users.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -481,6 +496,12 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\flow_notifyUsers.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\flow_template.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\flow_templateEntry.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GenTrulyDeliveryBill_Result.cs">
@@ -653,6 +674,9 @@
     <Compile Include="Models\vw_epReport.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\vw_ep_dep.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\vw_ETExcel.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -748,7 +772,9 @@
     <Compile Include="Services\JMSv.cs" />
     <Compile Include="Services\MQSv.cs" />
     <Compile Include="Services\KSSv.cs" />
+    <Compile Include="Services\MTSv.cs" />
     <Compile Include="Services\PPSv.cs" />
+    <Compile Include="Services\ShareSv.cs" />
     <Compile Include="Services\SJSv.cs" />
     <Compile Include="Services\JQSv.cs" />
     <Compile Include="Services\SASv.cs" />
@@ -981,6 +1007,7 @@
     <Content Include="Content\images\leave.png" />
     <Content Include="Content\images\managemen_report.png" />
     <Content Include="Content\images\mq.png" />
+    <Content Include="Content\images\mt.png" />
     <Content Include="Content\images\office.png" />
     <Content Include="Content\images\paint.png" />
     <Content Include="Content\images\paper.png" />
@@ -1652,6 +1679,13 @@
     <Content Include="Views\Apply\CheckXAApply.cshtml" />
     <Content Include="Views\Apply\BeginAuditXAApply.cshtml" />
     <Content Include="Views\Report\PrintXA.cshtml" />
+    <Content Include="Views\Report\XAReport.cshtml" />
+    <Content Include="Views\ApplyExtra\CheckMTFiles.cshtml" />
+    <Content Include="Views\ApplyExtra\CheckMTClasses.cshtml" />
+    <Content Include="Views\ApplyExtra\CheckMTEqInfo.cshtml" />
+    <Content Include="Views\ApplyExtra\UpdateMTEqInfo.cshtml" />
+    <Content Include="Views\Apply\CheckMTApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditMTApply.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

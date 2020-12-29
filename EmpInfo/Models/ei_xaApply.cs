@@ -41,5 +41,9 @@ namespace EmpInfo.Models
         public bool can_print { get; set; }
         public Nullable<System.DateTime> check_date { get; set; }
         public string company { get; set; }
+        public string applier_phone { get; set; }
+        public bool is_share_fee { get; set; }
+        public string share_fee_detail { get; set; }
+        public string share_fee_managers { get; set; }
     }
 }

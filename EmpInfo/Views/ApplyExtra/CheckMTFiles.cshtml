@@ -1,0 +1,153 @@
+﻿
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />    
+}
+@section Scripts{
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+        $("#tb1").bootstrapTable({
+            url: "GetMTFiles",
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 50,
+            pageList: [20, 50, 100, 200],
+            search: true,
+            clickToSelect: true,
+            columns: [
+                {
+                    radio: true
+                }, {
+                    field: "file_no",
+                    title: "文件编号"
+                }, {
+                    field: "content",
+                    title: "内容描述"
+                }, {
+                    field: "steps",
+                    title: "操作说明"
+                }, {
+                    field: "create_user",
+                    title: "创建人"
+                }, {
+                    field: "update_user",
+                    title: "最近修改人"
+                }
+            ]
+        });
+
+        $(function () {
+            $("#tb1AddBt").on("click", function () {
+                $("#tb1Modal .modal-title").html("新增保养文件");
+                utils.resetForm($("#tb1Form"));                
+                $("#tb1Modal").modal("show");
+            });
+
+            $("#tb1ModifyBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再查询");
+                    return;
+                }
+                $("#tb1Modal .modal-title").html("修改保养文件");
+                $.post("GetMTFile", { id: rows[0].id }, function (data) {
+                    if (data.suc) {
+                        utils.loadObjData($("#tb1Form"), JSON.parse(data.extra));
+                        $("#tb1Modal").modal("show");
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                });
+            });
+
+            $("#tb1RemoveBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                openConfirmDialog("确定要删除选中行吗？", function () {
+                    $.post("RemoveMTFile", { id: rows[0].id }, function (data) {
+                        if (data.suc) {
+                            toastr.success("删除成功");
+                            $('#tb1').bootstrapTable('refresh');
+                        } else {
+                            toastr.error("删除失败：" + data.msg);
+                        }
+                    });
+                });
+            });
+
+            $("#saveTb1FormBt").on("click", function () {
+                var obj = utils.getFormObj($("#tb1Form"));
+                if (obj.fileNo == "" || obj.content == "" || obj.steps == "") {
+                    toastr.error("所有字段都必须填写才能保存");
+                    return;
+                }
+                console.log(obj);
+                $.post("SaveMTFile", { obj: JSON.stringify(obj) }, function (data) {
+                    if (data.suc) {
+                        $("#tb1Modal").modal("hide");
+                        toastr.success("保存成功");
+                        $('#tb1').bootstrapTable('refresh');
+                    } else {
+                        toastr.error("保存失败：" + data.msg);
+                    }
+                });
+            });
+        });
+
+    </script>
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="../Apply/ApplyIndex?billType=MT">设备保养流程</a></li>
+            <li class="active">设备保养文件维护</li>
+        </ol>
+    </div>
+    <div class="panel-body">        
+        <div>
+            <button class="btn btn-success" id="tb1AddBt"><i class="fa fa-plus"></i> 新增</button>
+            <button class="btn btn-primary" id="tb1ModifyBt"><i class="fa fa-edit"></i> 修改</button>
+            <button class="btn btn-danger" id="tb1RemoveBt"><i class="fa fa-plus"></i> 删除</button>
+        </div>
+
+        <table id="tb1"></table>                    
+    </div>
+</div>
+
+@section Modal{
+    @Html.Partial("_ConfirmDialog")
+    <div class="modal fade" id="tb1Modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="tb1Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> 新增保养文件</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="tb1Form">
+                        <input type="hidden" name="id" data-value="0" />
+                        <div style="margin-top:6px;">文件编号：</div>
+                        <input type="text" class="form-control" name="file_no" />
+                        <div style="margin-top:6px;">内容描述：</div>
+                        <textarea class="form-control" rows="6" name="maintenance_content"></textarea>
+                        <div style="margin-top:6px;">操作说明：</div>
+                        <textarea class="form-control" rows="6" name="maintenance_steps"></textarea>                        
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-reply"></i> 取消</button>
+                    <button id="saveTb1FormBt" type="button" class="btn btn-success"><i class="fa fa-check"></i> 确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

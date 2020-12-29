@@ -152,6 +152,14 @@ namespace EmpInfo.Models
         public DbSet<ei_xaApply> ei_xaApply { get; set; }
         public DbSet<ei_xaApplySupplier> ei_xaApplySupplier { get; set; }
         public DbSet<all_maxNum> all_maxNum { get; set; }
+        public DbSet<ei_mtClass> ei_mtClass { get; set; }
+        public DbSet<ei_mtEqInfo> ei_mtEqInfo { get; set; }
+        public DbSet<ei_mtFile> ei_mtFile { get; set; }
+        public DbSet<ei_urgeRecords> ei_urgeRecords { get; set; }
+        public DbSet<flow_template> flow_template { get; set; }
+        public DbSet<flow_templateEntry> flow_templateEntry { get; set; }
+        public DbSet<vw_ep_dep> vw_ep_dep { get; set; }
+        public DbSet<ei_mtApply> ei_mtApply { get; set; }
     
         public virtual ObjectResult<string> GetDormChargeMonth()
         {

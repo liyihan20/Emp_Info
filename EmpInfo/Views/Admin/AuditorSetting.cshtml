@@ -162,8 +162,9 @@
                 });
             });
 
-            $("#tb2AddBt").on("click", function () {                
-                utils.resetForm($("#tb2Form")); //可以reset掉hidden的值，默认的不行
+            $("#tb2AddBt").on("click", function () {
+                //utils.resetForm($("#tb2Form")); //可以reset掉hidden的值，默认的不行
+                $("#tb2Form input[name='id']").val("0");
                 $("#tb2Modal").modal("show");
             });
 

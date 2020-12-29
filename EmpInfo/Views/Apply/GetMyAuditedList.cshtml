@@ -3,6 +3,7 @@
     List<EmpInfo.FlowSvr.FlowAuditListModel> list = (List<EmpInfo.FlowSvr.FlowAuditListModel>)ViewData["list"];
 }
 @section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <style type="text/css">
         #auditDiv .subTitle {
@@ -13,6 +14,9 @@
     </style>
 }
 @section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
     @*加入以下js，使IE8支持datetimepicker组件*@
     <script>
         if (!Array.prototype.indexOf) {
@@ -38,6 +42,23 @@
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
     <script>
+        $("#tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 30,
+            pageList: [10, 30, 50, 100],
+            search: true,
+            rowStyle: function () {
+                return {
+                    css: { "cursor": "pointer" }
+                };
+            },
+            onClickRow: function (row, ele, field) {
+                var sysNo = $.trim(row[0]);
+                window.location.href = "CheckApply?sysNo=" + sysNo;
+            }
+        });
     $(function () {
         $(".form_date").datetimepicker({
             language: 'zh-CN',
@@ -130,22 +151,26 @@
                 <button class="btn btn-default pull-right" id="exportExcelBt"><i class="fa fa-file-excel-o"></i> 导出到excel</button>
                 <div class="clearfix"></div>
             }
-            <table class="table table-hover">
+            <table id="tb">
                 <thead>
                     <tr>
-                        <th data-width="20%">申请单号 /<span class="subTitle">申请日期</span></th>
-                        <th data-width="40%">申请人 /<span class="subTitle">申请内容</span></th>
-                        <th data-width="20%">审批结果 / <span class="subTitle">审批节点</span></th>
-                        <th data-width="20%">操作</th>
+                        <th data-width="10%">申请单号</th>
+                        <th data-width="10%">申请日期</th>
+                        <th data-width="10%">申请人</th>
+                        <th data-width="45%">申请内容</th>
+                        <th data-width="10%">审批结果</th>
+                        <th data-width="15%">审批节点</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var l in list) {
                         <tr>
-                            <td>@l.sysNo <br /> <span class="subTitle">@(((DateTime)l.applyTime).ToString("MM-dd HH:mm"))</span> </td>
-                            <td>@l.applier <span class="text-danger"> @l.title</span> <br /> <span class="subTitle">@l.subTitle</span></td>
-                            <td><b class="@(l.auditResult == "OK" ? "text-success" : "text-danger")"> @l.auditResult (@l.finalResult) </b><br /> <span class="subTitle">@l.stepName</span></td>
-                            <td style="vertical-align:central;"><a href="CheckApply?sysNo=@l.sysNo">查看详细</a></td>
+                            <td>@l.sysNo</td>
+                            <td>@(((DateTime)l.applyTime).ToString("MM-dd HH:mm"))</td>
+                            <td>@l.applier</td>
+                            <td>@l.title / @l.subTitle</td>
+                            <td>@l.auditResult (@l.finalResult)</td>
+                            <td>@l.stepName</td>
                         </tr>
                     }
                 </tbody>

@@ -1,0 +1,350 @@
+﻿@using EmpInfo.Models
+@{
+    MTBillModel m = ViewData["am"] as MTBillModel;
+}
+
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 100px;
+            vertical-align: central;
+            color: gray;
+            font-style: italic;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 65%;
+        }
+
+        .b-div {
+            margin: 6px 0;
+        }
+    </style>
+}
+@section Scripts{
+    <script>
+        $(function () {
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.apply.sys_no" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+            });
+        });
+    </script>
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="../Apply/ApplyIndex?billType=MT">设备保养流程</a></li>
+            <li class="active">查看设备保养申请单</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">本次保养情况</h4>
+        <div class="b-div">
+            <span class="b-label">
+                流转记录:
+            </span>
+            <span class="b-input">
+                <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+            </span>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="b-div">
+                    <div class="b-label">
+                        审核状态:
+                    </div>
+                    <div class="b-input">
+                        @ViewData["auditStatus"]
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请流水号:
+                    </span>
+                    <span class="b-input">
+                        @m.apply.sys_no
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请人:
+                    </span>
+                    <span class="b-input">
+                        @m.apply.applier_name
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="b-div">
+                    <span class="b-label">
+                        申请日期:
+                    </span>
+                    <span class="b-input">
+                        @(((DateTime)m.apply.apply_time).ToString("yyyy-MM-dd HH:mm"))
+                    </span>
+                </div>
+            </div>
+            @if (m.apply.accept_time != null) {
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            接单人:
+                        </span>
+                        <span class="b-input">
+                            @m.apply.accept_member_name
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="b-div">
+                        <span class="b-label">
+                            接单日期:
+                        </span>
+                        <span class="b-input">
+                            @(((DateTime)m.apply.accept_time).ToString("yyyy-MM-dd HH:mm"))
+                        </span>
+                    </div>
+                </div>
+                if (m.apply.maintence_begin_time != null) {
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                保养开始时间:
+                            </span>
+                            <span class="b-input">
+                                @(((DateTime)m.apply.maintence_begin_time).ToString("yyyy-MM-dd HH:mm"))
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                保养结束时间:
+                            </span>
+                            <span class="b-input">
+                                @(((DateTime)m.apply.maintence_end_time).ToString("yyyy-MM-dd HH:mm"))
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                保养花费时间:
+                            </span>
+                            <span class="b-input">
+                                @m.apply.maintence_hours 小时
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                保养协助人:
+                            </span>
+                            <span class="b-input">
+                                @m.apply.member_helping
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                备注:
+                            </span>
+                            <span class="b-input">
+                                @m.apply.comment
+                            </span>
+                        </div>
+                    </div>
+                    if (m.apply.confirm_time != null) {
+                        <div class="col-xs-12">
+                            <div class="b-div">
+                                <span class="b-label">
+                                    确认时间:
+                                </span>
+                                <span class="b-input">
+                                    @(((DateTime)m.apply.confirm_time).ToString("yyyy-MM-dd HH:mm"))
+                                </span>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+        <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">设备状况</h4>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="b-div">
+                    <div class="b-label">
+                        使用状态:
+                    </div>
+                    <div class="b-input">
+                        @m.eqInfo.using_status
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="b-div">
+                    <div class="b-label">
+                        设备保养科室:
+                    </div>
+                    <div class="b-input">
+                        @m.cla.class_name
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="b-div">
+                    <div class="b-label">
+                        资产编号:
+                    </div>
+                    <div class="b-input">
+                        @m.eqInfo.property_number
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="b-div">
+                    <div class="b-label">
+                        设备名称:
+                    </div>
+                    <div class="b-input">
+                        @m.eqInfo.equitment_name
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="b-div">
+                    <div class="b-label">
+                        规格型号:
+                    </div>
+                    <div class="b-input">
+                        @m.eqInfo.equitment_modual
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="b-div">
+                    <div class="b-label">
+                        制造商/供应商:
+                    </div>
+                    <div class="b-input">
+                        @m.eqInfo.maker
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="b-div">
+                    <div class="b-label">
+                        盘点部门:
+                    </div>
+                    <div class="b-input">
+                        @m.eqInfo.check_dep
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="b-div">
+                    <div class="b-label">
+                        盘点表编号:
+                    </div>
+                    <div class="b-input">
+                        @m.eqInfo.check_list_no
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="b-div">
+                    <div class="b-label">
+                        生产部门:
+                    </div>
+                    <div class="b-input">
+                        @m.eqInfo.produce_dep_name
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="b-div">
+                    <div class="b-label">
+                        优先处理级别:
+                    </div>
+                    <div class="b-input">
+                        @m.eqInfo.important_level
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="b-div">
+                    <div class="b-label">
+                        保养周期:
+                    </div>
+                    <div class="b-input">
+                        @m.eqInfo.maintenance_cycle 月
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="b-div">
+                    <div class="b-label">
+                        上次保养日期:
+                    </div>
+                    <div class="b-input">
+                        @(m.eqInfo.last_maintenance_date == null ? "无" : ((DateTime)m.eqInfo.last_maintenance_date).ToString("yyyy-MM-dd"))
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="b-div">
+                    <div class="b-label">
+                        下次保养日期:
+                    </div>
+                    <div class="b-input">
+                        @(m.eqInfo.next_maintenance_date == null ? "" : ((DateTime)m.eqInfo.next_maintenance_date).ToString("yyyy-MM-dd"))
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">保养文件</h4>
+        <div class="b-div">
+            <div class="b-label">
+                保养文件编号:
+            </div>
+            <div class="b-input">
+                @m.file.file_no
+            </div>
+        </div>
+        <div class="b-div">
+            <div class="b-label" style="vertical-align:top;">
+                保养内容描述:
+            </div>
+            <div class="b-input">
+                @Html.Raw(m.file.maintenance_content.Replace("\n", "<br/>"));
+            </div>
+        </div>
+        <div class="b-div">
+            <div class="b-label" style="vertical-align:top;">
+                保养步骤:
+            </div>
+            <div class="b-input">
+                @Html.Raw(m.file.maintenance_steps.Replace("\n", "<br/>"));
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

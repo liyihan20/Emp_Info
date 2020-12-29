@@ -39,6 +39,84 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel() { suc = true, msg = string.Format("【发送记录】发送人：{0}；发送时间：{1}；", log.send_user, ((DateTime)log.send_date).ToString("yyyy-MM-dd HH:mm")) });
         }
 
+        //申请人催办
+        public JsonResult UrgeAuditor(string sysNo)
+        {
+            //只能在白天催办
+            var currentHour = DateTime.Now.Hour;
+            if (currentHour < 8 || currentHour > 20) {
+                return Json(new SimpleResultModel(false, "只能在白天8时到20时催办"));
+            }
+
+            var today = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd"));
+            var a = (from ap in db.flow_apply
+                     from ad in ap.flow_applyEntry
+                     where ap.sys_no == sysNo
+                     select new
+                     {
+                         ap,
+                         ad
+                     }).ToList();
+            if (a.Count() < 1) {
+                return Json(new SimpleResultModel(false, "流水号不存在"));
+            }
+
+            var apply = a.First().ap;
+            if (apply.success != null) {
+                return Json(new SimpleResultModel(false, "此流程已完结"));
+            }
+            if (apply.start_date > today) {
+                return Json(new SimpleResultModel(false, "当前处理人超过1天未处理的才可以催办"));
+            }
+            var lastAuditedEntry = a.Where(x => x.ad.pass == true).OrderByDescending(x => x.ad.step).FirstOrDefault();
+            if (lastAuditedEntry != null && lastAuditedEntry.ad.audit_time > today) {
+                return Json(new SimpleResultModel(false, "当前处理人超过1天未处理的才可以催办"));
+            }
+            List<string> currentAuditors = new List<string>();
+            int step=0;
+            string stepName = "";
+            foreach (var entry in a.Where(x => x.ad.pass == null).Select(x => x.ad).ToList()) {
+                currentAuditors.AddRange(entry.auditors.Split(new char[] { ';' }).ToList());
+                step = (int)entry.step;
+                stepName = entry.step_name;
+            }
+            if (step == 0) {
+                return Json(new SimpleResultModel(false, "当前处理人不存在"));
+            }
+            string currentAuditorsStr = string.Join(";", currentAuditors);
+            var urgeRecord = db.ei_urgeRecords.Where(u => u.sys_no == sysNo && u.auditor_number == currentAuditorsStr).OrderByDescending(u => u.id).FirstOrDefault();
+            if (urgeRecord != null && urgeRecord.urge_time > today) {
+                return Json(new SimpleResultModel(false, "当前处理人今天已经催办过，至少需要明天才能继续催办"));
+            }
+            try {
+                //验证结束，开始发送催办企业微信推送
+                string flowName = apply.flow_template.name;
+                new ShareSv().SendQywxMsgToAuditors(
+                            flowName + "（催办）",
+                            sysNo,
+                            step,
+                            stepName,
+                            userInfo.name,
+                            (DateTime)apply.start_date,
+                            string.Format("{0}；{1}", apply.form_title, apply.form_sub_title),
+                            currentAuditors
+                            );
+
+                db.ei_urgeRecords.Add(new ei_urgeRecords()
+                {
+                    applier_name = userInfo.name,
+                    auditor_number = userInfo.cardNo,
+                    sys_no = sysNo,
+                    urge_time = DateTime.Now
+                });
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(false, "操作失败:" + ex.Message));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
         #endregion
 
         #region 请假
@@ -803,6 +881,158 @@ namespace EmpInfo.Controllers
             catch (Exception ex) {
                 return Json(new SimpleResultModel(ex));
             }
+        }
+
+        #endregion
+
+        #region 设备保养流程
+
+        //保养文件
+        public ActionResult CheckMTFiles()
+        {
+            return View();
+        }
+
+        public JsonResult GetMTFiles()
+        {
+            return Json(new MTSv().CheckFiles(),JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetMTFile(int id)
+        {
+            ei_mtFile file;
+            if (id == 0) {
+                file = new ei_mtFile();
+            }
+            else {
+                try {
+                    file = new MTSv().GetFile(id);
+                }
+                catch (Exception ex) {
+                    return Json(new SimpleResultModel(ex));
+                }
+            }
+            return Json(new SimpleResultModel(true,"",JsonConvert.SerializeObject(file)));
+        }
+
+        public JsonResult SaveMTFile(FormCollection fc)
+        {
+            ei_mtFile file = JsonConvert.DeserializeObject<ei_mtFile>(fc.Get("obj"));
+            try {
+                new MTSv().SaveFile(file.id, file.file_no, file.maintenance_content, file.maintenance_steps, userInfo.name);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+        public JsonResult RemoveMTFile(int id)
+        {
+            try {
+                new MTSv().RemoveFile(id);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+
+        //设备科室
+        public ActionResult CheckMTClasses()
+        {
+            return View();
+        }
+
+        public JsonResult GetMTClasses()
+        {
+            return Json(new MTSv().GetClasses(),JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult SaveMTClass(string obj)
+        {
+            ei_mtClass cla = JsonConvert.DeserializeObject<ei_mtClass>(obj);
+            try {
+                new MTSv().SaveClass(cla);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+        public JsonResult RemoveMTClass(int id)
+        {
+            try {
+                new MTSv().RemoveClass(id);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+
+        //设备资料
+        public ActionResult CheckMTEqInfo()
+        {
+            return View();
+        }
+
+        public JsonResult CheckMyMTEqInfo()
+        {
+            return Json(new MTSv().GetEqInfoList(userInfo.cardNo),JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetMTFileDetail(string fileNo)
+        {
+            return Json(new MTSv().GetFileDetail(fileNo));
+        }
+
+        public ActionResult UpdateMTEqInfo(int id)
+        {
+            var mt = new MTSv();
+            MTUpdateEqInfoModel m = new MTUpdateEqInfoModel();
+            if (id > 0) {
+                m.info = mt.GetEqInfoDetail(id);
+            }
+            m.classesList = mt.GetClassesForSelect();
+            m.depList = mt.GetEpDepList();
+            m.fileNoList = mt.GetFileNoList();
+            m.myClassId = mt.GetMyClassId(userInfo.cardNo);
+
+            ViewData["m"] = m;
+
+            return View();
+        }
+
+        public JsonResult SaveMTEqInfo(string obj)
+        {
+            ei_mtEqInfo info = JsonConvert.DeserializeObject<ei_mtEqInfo>(obj);
+            try {
+                new MTSv().SaveEqInfo(info,userInfo);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+        public JsonResult RemoveMTEqInfo(int id)
+        {
+            try {
+                new MTSv().RemoveEqInfo(id);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+        public JsonResult GetMTApplyRecord(int eqInfoId)
+        {
+            return Json(new MTSv().GetApplyRecord(eqInfoId));
         }
 
         #endregion

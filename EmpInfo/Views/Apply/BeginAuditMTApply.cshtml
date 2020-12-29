@@ -1,0 +1,206 @@
+﻿@using EmpInfo.Models;
+@{
+    BeginAuditModel bam = (BeginAuditModel)ViewData["bam"];
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 85px;
+            color: gray;
+            vertical-align: top;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 70%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+
+}
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
+    <script>
+        $(function () {
+            $(".datePicker").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd hh:ii",
+                autoclose: true,
+                startView: 2,
+                maxView: 2,
+                minuteStep: 5
+            });
+            $("#applyContent").load("CheckApply", { sysNo: "@bam.sysNum" }, function () {
+                $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> @bam.billTypeName");
+                $("#waiting").remove();
+                $(".auditContent").css("visibility", "visible");
+            });
+            $(".user-select").on("focus", function () {
+                var self = this;
+                //只能动态加载才能执行，原因暂不明确
+                $.getScript("@Url.Content("~/Scripts/myUserSelecter.js")", function () {
+                    $.selectUsers({
+                        userLimit: 10,
+                        userHasSelected: $(self).val(),
+                        callback: function (result) {
+                            $(self).val(result);
+                        }
+                    });
+                });                
+            });
+            $("input[name='maintence_begin_time'],input[name='maintence_end_time']").on("change", function () {
+                setMaintenceHour();
+            });
+
+        });
+
+        function setMaintenceHour() {
+            var fd = $("input[name='maintence_begin_time']").val();
+            var td = $("input[name='maintence_end_time']").val();
+            if (fd != "" && td != "") {
+                $("input[name='maintence_hours']").val(utils.diffDays(td, fd, "h", 1));
+            }
+        }
+
+        function audit(dealWay) {
+            openConfirmDialog("此保养申请确认要" + dealWay + "吗？", function () {
+                $.ajax({
+                    type: 'post',
+                    url: 'HandleApply',
+                    data: $("#auditForm").serialize(),
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.suc) {
+                            toastr.success(data.msg);
+                            setTimeout(function () { window.location.href = "GetMyAuditingList?billType=" + "@bam.billType"; }, 2000);
+                        } else {
+                            toastr.error(data.msg);
+                        }
+
+                    }
+                });
+            });
+        }
+</script>
+    @if (bam.isPass != null) {
+        <script>
+            $(function () {
+                $("#opinion").prop("readonly", "readonly").prop("placeholder", "");
+                $("#opinion").val("@bam.opinion");
+            });
+        </script>
+
+    }
+
+}
+@*通过load获取申请单内容*@
+<div class="text-center text-danger" id="waiting"><i class="fa fa-3x fa-spinner fa-pulse"></i></div>
+<div id="applyContent"></div>
+
+@*物流填写信息*@
+@if (bam.isPass == null) {
+    <div class="auditContent" style="visibility:hidden;">
+        <form id="auditForm">
+            <input type="hidden" name="sysNo" value="@bam.sysNum" />
+            <input type="hidden" name="step" value="@bam.step" />
+            <input type="hidden" name="stepName" value="@bam.stepName" />
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="auditHead">
+                    <i class='fa fa-pencil'></i> @bam.stepName
+                </div>
+                <div class="panel-body">
+                    @if (bam.stepName.Contains("接单")) {
+                        <button type="button" class="btn btn-block btn-success" onclick="audit('接单')"><i class="fa fa-check"></i> 接单</button>
+                    }
+                    else if (bam.stepName.Contains("处理")) {
+                        <div class="b-div">
+                            <span class="b-label">
+                                保养开始时间:
+                            </span>
+                            <span class="b-input">
+                                <span class="input-group date datePicker">
+                                    <input class="form-control" type="text" name="maintence_begin_time" autocomplete="off" required />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                保养结束时间:
+                            </span>
+                            <span class="b-input">
+                                <span class="input-group date datePicker">
+                                    <input class="form-control" type="text" name="maintence_end_time" autocomplete="off" required />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                保养时间（小时）:
+                            </span>
+                            <span class="b-input">
+                                <span class="input-group date datePicker">
+                                    <input class="form-control" type="text" name="maintence_hours" placeholder="自动计算" readonly />
+                                    <span class="input-group-addon">小时</span>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                协助人员:
+                            </span>
+                            <span class="b-input">
+                                <textarea class="form-control user-select" rows="2" name="member_helping"></textarea>
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                备注:
+                            </span>
+                            <span class="b-input">
+                                <textarea class="form-control" rows="3" name="comment"></textarea>
+                            </span>
+                        </div>
+
+                        <button type="button" class="btn btn-block btn-success" onclick="audit('保养完成')"><i class="fa fa-check"></i> 保养养成</button>
+                    }
+                    else if (bam.stepName.Contains("确认")) {
+                        <button type="button" class="btn btn-block btn-success" onclick="audit('保养确认')"><i class="fa fa-check"></i> 保养确认</button>
+                    }
+                    
+                </div>
+            </div>
+        </form>
+    </div>
+}
+else {
+    @*审批信息*@
+    <div class="auditContent" style="visibility:hidden;">
+        <div class="panel panel-primary">
+            <div class="panel-heading" id="auditHead">
+                <i class='fa fa-pencil'></i> 开始审批
+            </div>
+            <div class="panel-body">                    
+                <div style="margin-top:12px;"></div>
+                @if ((bool)bam.isPass) {
+                    <button type="button" class="btn btn-block btn-success disabled">已处理此申请</button>
+                }
+                else {
+                    <button type="button" class="btn btn-block btn-danger disabled">已拒绝此申请</button>
+                }
+            </div>
+        </div>
+    </div>
+}
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+}
