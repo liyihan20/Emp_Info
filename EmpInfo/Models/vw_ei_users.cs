@@ -30,5 +30,6 @@ namespace EmpInfo.Models
         public string short_phone { get; set; }
         public byte[] short_portrait { get; set; }
         public string bank_no { get; set; }
+        public string native_place { get; set; }
     }
 }

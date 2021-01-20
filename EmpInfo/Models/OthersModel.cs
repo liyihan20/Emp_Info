@@ -13,4 +13,13 @@ namespace EmpInfo.Models
         public string depName { get; set; }
     }
 
+    public class XAAuditorsModel
+    {
+        public int id { get; set; }
+        public string company { get; set; }
+        public string deptName { get; set; }
+        public string position { get; set; }
+        public string userName { get; set; }
+        public string userNumber { get; set; }
+    }
 }

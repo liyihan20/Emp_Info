@@ -196,7 +196,7 @@
         }
         if (parseFloat(hours) >= 12) {
             toastr.error("[小时]必须少于12小时,如果请假2天，写2天0小时即可，不需要写2天16小时");
-            return false
+            return false;
         }
         if ($($("input[name='leave_type']:checked")[0]).val() == "年假") {
             if (hours % 4 != 0) {
@@ -227,6 +227,12 @@
             }
             if (days < 10) {
                 toastr.error("行政部要求：病假天数少于10天时，请走纸质申请流程或按事假请假");
+                return false;
+            }
+        }
+        if ($($("input[name='leave_type']:checked")[0]).val() == "产检假") {
+            if ($("#al_file_list tr").length < 1) {
+                toastr.error("当[请假类型]是产检假时，必须上传医院诊断证明等附件");
                 return false;
             }
         }
@@ -469,7 +475,7 @@
                         <div style="display:inline-block;width:70%">
                             <span style="display:block;margin:0;" class="row">
                                 @{
-                                    string[] types = new string[] { "事假", "病假", "年假", "探亲", "婚假", "产假", "工伤", "丧假", "产假延期","疫情隔离" };
+                                    string[] types = new string[] { "事假", "病假", "年假", "探亲", "婚假", "产假", "工伤", "丧假", "产检假", "产假延期", "疫情隔离" };
                                     foreach (var ty in types) {
                                         if (ty.Length > 2) {
                                             <span class="col-xs-6" style="padding:0 4px;">

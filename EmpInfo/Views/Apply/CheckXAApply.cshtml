@@ -74,7 +74,7 @@
             $("#flowRecordBt").on("click", function () {
                 var box = $("<div></div>");
                 $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.bill.sys_no" }, function () {
-                openMessageDialog($(box).html(), "查看流转记录");
+                    openMessageDialog($(box).html(), "查看流转记录（"+"@m.bill.sys_no"+"）");
             });
         });
 

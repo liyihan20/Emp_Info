@@ -34,7 +34,7 @@
             arr["工程项目"] = [
                 { name: "车间装修类", detail: "车间装修类：如 墙体 / 地板 / 天花板 / 管道 等各类新增或修补 等" },
                 { name: "车间整改类", detail: "车间整改类：如 净房相关改造 / 图纸布局更改 / 土建基建相关 等" },
-                { name: "消防及环保工程类", detail: "消防及环保工程类：如 消防相关 / 废水废气相关 / 污染废弃物处理相关 等" },
+                //{ name: "消防及环保工程类", detail: "消防及环保工程类：如 消防相关 / 废水废气相关 / 污染废弃物处理相关 等" },
                 { name: "涉及厂区其余公共区域类", detail: "涉及厂区其余公共区域类：如 公共区域的外观、设施、绿化的维护，增补 等" }
             ];
             arr["工作项目"] = [
@@ -48,14 +48,25 @@
                 { name: "宿舍、食堂等区域相关", detail: "宿舍、食堂等区域相关：宿舍、食堂区域的增补、维修、整改 等" },
                 { name: "安保及安全配套相关", detail: "安保及安全配套相关：厂区出入大门硬软件维护维修、公共区域监控系统维护维修 等" }
             ];
+            arr["消防项目"] = [{ name: "消防类", detail: "消防类：如 消防相关 等" }, ];
+            arr["环保项目"] = [{ name: "环保工程类", detail: "环保工程类：如 废水废气相关 / 污染废弃物处理相关 等" }, ];
             
+            for (var k in arr) {
+                $("#classification").append("<option value='" + k + "'>" + k + "</option>");
+            }
+
             $("#classification").on("change", function () {
                 $("#project_type").empty();
                 $("#project_type").append("<option value=''>----下拉选择项目类别----</option>");
                 var rs = arr[$(this).val()];
-                for (var i = 0; i < rs.length; i++) {
-                    $("#project_type").append("<option value='"+rs[i].name+"'>"+rs[i].name+"</option>");
-                }
+                if (rs.length == 1) {
+                    $("#project_type").append("<option value='" + rs[0].name + "' selected>" + rs[0].name + "</option>");
+                    $("#project_type").trigger("change");
+                } else {
+                    for (var i = 0; i < rs.length; i++) {
+                        $("#project_type").append("<option value='" + rs[i].name + "'>" + rs[i].name + "</option>");
+                    }
+                }                
             });
 
             $("#project_type").on("change", function () {
@@ -63,7 +74,7 @@
                 $("#projectInfo").html(detail);
                 $("#project_detail").val(detail);
             });
-                        
+            
             $("#myUploader").myUploader({
                 sysNum: "@m.sys_no",
                 fileNumLimit: 3,
@@ -249,7 +260,7 @@
                     联系电话:
                 </span>
                 <span class="b-input">
-                    <input type="text" class="form-control" name="applier_phone" placeholder="填写手机短号+长号" required />
+                    <input type="text" class="form-control" name="applier_phone" placeholder="填写手机短号与长号" required />
                 </span>
             </div>
             <div class="b-div">
@@ -259,13 +270,12 @@
                 <span class="b-input">
                     <select class="form-control" name="dept_name" id="dept_name" required>
                         <option value="">----下拉选择部门----</option>
-                        @foreach (var c in m.depNameList.Select(d=>d.Split('_','1','2')[0]).Distinct()) {
-                            <optgroup label="@c">
-                                @foreach (var d in m.depNameList.Where(d=>d.StartsWith(c))) {
+                        @foreach (var c in m.depNameList.Select(d=>d.Split('_')[0]).Distinct()) {
+                            <optgroup label="@c.Replace("1","").Replace("2","")">
+                                @foreach (var d in m.depNameList.Where(d=>d.StartsWith(c+"_"))) {
                                     <option value="@d">@d.Split('_')[1]</option>
                                 }
                             </optgroup>
-                            
                         }
                     </select>
                 </span>
@@ -293,9 +303,6 @@
                 <span class="b-input">
                     <select class="form-control" name="classification" id="classification" required>
                         <option value="">----下拉选择项目大类----</option>
-                        <option value="工程项目">工程项目</option>
-                        <option value="工作项目">工作项目</option>
-                        <option value="后勤项目">后勤项目</option>
                     </select>
                 </span>
             </div>
@@ -448,11 +455,13 @@
                 1. 流程步骤：流程开始--->提交申请--->收益提供人审批(如没有可跳过)--->设备科负责人审批--->生产部主管审批--->部门总经理审批--->
                 采购部接单--->申请人上传施工清单--->设备科负责人处理--->项目类别负责人(监控类/网络类)--->采购部上传报价单--->
                 管理部会签（项目大类负责人、节省与监督审批人）--->部门总经理确认--->审核部最终确认--->申请人验收项目--->设备负责人验收--->
-                生产主管验收--->部门总经理验收--->项目大类负责人验收--->流程结束。
+                生产主管验收--->部门总经理验收--->信息管理部验收（网络类）--->项目大类负责人验收--->流程结束。
                 <br/>
                 2. 如果部门有设置CEO，那么部门总经理审批后，采购部接单前，系统会推送通知给CEO。
                 <br/>
                 3. 申请人上传施工清单，设备科负责人处理后，采购部上传报价单前，系统会推送通知给项目大类负责人。
+                <br/>
+                4. 审核部最终确认后，申请人验收项目前，系统会推送通知给采购部接单员。
             </p>
         </div>
     </div>

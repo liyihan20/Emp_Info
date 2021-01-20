@@ -1,12 +1,10 @@
-﻿using System;
+﻿using EmpInfo.FlowSvr;
+using EmpInfo.Models;
+using EmpInfo.Util;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using EmpInfo.Models;
-using EmpInfo.FlowSvr;
-using EmpInfo.Interfaces;
-using Newtonsoft.Json;
-using EmpInfo.Util;
 
 namespace EmpInfo.Services
 {
@@ -248,7 +246,11 @@ namespace EmpInfo.Services
 
         public void RemoveFile(int id)
         {
-            db.ei_mtFile.Remove(db.ei_mtFile.Where(f => f.id == id).FirstOrDefault());
+            var file = db.ei_mtFile.Where(f => f.id == id).FirstOrDefault();
+            if (db.ei_mtEqInfo.Where(m => m.file_no == file.file_no).Count() > 0) {
+                throw new Exception("存在关联此保养文件的设备，不能删除");
+            }
+            db.ei_mtFile.Remove(file);
             db.SaveChanges();
         }        
 

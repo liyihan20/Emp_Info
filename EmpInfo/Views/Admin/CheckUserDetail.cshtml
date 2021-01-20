@@ -54,11 +54,11 @@
     </div>
     @{
         string[] texts = new string[] { "姓名", "厂牌", "性别", "部门", "长部门", "身份证", "条形码",
-            "银行卡号", "邮箱地址", "手机长号", "手机短号", "注册日期", "最后登陆日期" 
+            "银行卡号", "邮箱地址", "手机长号", "手机短号", "籍贯","注册日期", "最后登陆日期" 
         };
         string[] values = new string[]{
             user.name,user.card_number,user.sex,user.short_dep_name,user.dep_name,user.id_number,user.salary_no,
-            user.bank_no,user.email,user.phone,user.short_phone,
+            user.bank_no,user.email,user.phone,user.short_phone,user.native_place,
             ((DateTime)user.create_date).ToString("yyyy-MM-dd HH:mm"),user.last_login_date==null?"":(((DateTime)user.last_login_date).ToString("yyyy-MM-dd HH:mm"))
         };
     }

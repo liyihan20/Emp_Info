@@ -1,4 +1,9 @@
-﻿@section CSS{
+﻿@using EmpInfo.Models;
+@{
+    List<XAAuditorsModel> buyers = ViewData["buyers"] as List<XAAuditorsModel>;
+}
+
+@section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
 }
 @section Scripts{
@@ -6,13 +11,14 @@
     <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
     <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
+
     <script>
         $("#tb1").bootstrapTable({
-            url: "GetMTClasses",
+            url: "GetXAAuditors",
             striped: true,
             mobileResponsive: true,
             pagination: true,
-            pageSize: 50,
+            pageSize: 20,
             pageList: [20, 50, 100, 200],
             search: true,
             clickToSelect: true,
@@ -20,46 +26,30 @@
                 {
                     radio: true
                 }, {
-                    width:"15%",
-                    field: "class_name",
-                    title: "科室名称"
+                    field: "position",
+                    title: "职位"
                 }, {
-                    width:"15%",
-                    field: "leader",
-                    title: "负责人"
+                    field: "company",
+                    title: "公司"
                 }, {
-                    width:"55%",
-                    field: "member",
-                    title: "成员"
+                    field: "deptName",
+                    title: "部门"
                 }, {
-                    width:"10%",
-                    field: "create_time",
-                    title: "创建日期",
-                    formatter: function (value, row, index, field) {
-                        return utils.parseTDate(row.create_time);
-                    }
+                    field: "userName",
+                    title: "姓名"
+                }, {
+                    field: "userNumber",
+                    title: "厂牌"
                 }
             ]
         });
 
         $(function () {
-
-            $(".select-user").on("focus", function () {
-                var self = this;
-                var userNum = $(this).attr("data-user-num") || 1;
-                $.selectUsers({
-                    userLimit: userNum,
-                    userHasSelected: $(self).val(),
-                    callback: function (result) {
-                        $(self).val(result);
-                    }
-                });
-            });
-
             $("#tb1AddBt").on("click", function () {
-                $("#tb1Modal .modal-title").html("新增科室");
+                $("#tb1Modal .modal-title").html("增加处理人");
                 utils.resetForm($("#tb1Form"));
                 $("#tb1Modal").modal("show");
+                $("select[name='position']").removeAttr("disabled");
             });
 
             $("#tb1ModifyBt").on("click", function () {
@@ -68,8 +58,10 @@
                     toastr.error("请先选择一行后再修改");
                     return;
                 }
-                $("#tb1Modal .modal-title").html("修改科室");                
+                $("#tb1Modal .modal-title").html("修改处理人");
                 utils.loadObjData($("#tb1Form"), rows[0]);
+                $("#tb1Form input[name='userName']").val(rows[0].userName + "(" + rows[0].userNumber + ")");
+                $("select[name='position']").attr("disabled", "disabled");
                 $("#tb1Modal").modal("show");
             });
 
@@ -80,7 +72,7 @@
                     return;
                 }
                 openConfirmDialog("确定要删除选中行吗？", function () {
-                    $.post("RemoveMTClass", { id: rows[0].id }, function (data) {
+                    $.post("RemoveXAAuditor", { position: rows[0].position, id: rows[0].id }, function (data) {
                         if (data.suc) {
                             toastr.success("删除成功");
                             $('#tb1').bootstrapTable('refresh');
@@ -92,13 +84,14 @@
             });
 
             $("#saveTb1FormBt").on("click", function () {
+                $("select[name='position']").removeAttr("disabled");
                 var obj = utils.getFormObj($("#tb1Form"));
-                if (obj.class_name == "" || obj.leader == "" || obj.member == "") {
-                    toastr.error("所有字段都必须填写才能保存");
+                if (obj.company == "" || obj.deptName == "" || obj.userName == "") {
+                    toastr.error("缺少值");
+                    $("select[name='position']").attr("disabled", "disabled");
                     return;
                 }
-                console.log(obj);
-                $.post("SaveMTClass", { obj: JSON.stringify(obj) }, function (data) {
+                $.post("SaveXAAuditor", { obj: JSON.stringify(obj) }, function (data) {
                     if (data.suc) {
                         $("#tb1Modal").modal("hide");
                         toastr.success("保存成功");
@@ -108,24 +101,33 @@
                     }
                 });
             });
-        });
 
+            $(".user-select").on("focus", function () {
+                var self = this;
+                $.selectUsers({
+                    userLimit: 1,
+                    userHasSelected: $(self).val(),
+                    callback: function (result) {
+                        $(self).val(result);
+                    }
+                });
+            });
+
+        });
     </script>
 }
-
 <div class="panel panel-success">
     <div class="panel-heading">
         <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
-            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-            <li><a href="../Apply/ApplyIndex?billType=MT">设备保养流程</a></li>
-            <li class="active">设备科室维护</li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=XA")">项目申请单</a></li>
+            <li class="active">总经理与CEO</li>
         </ol>
     </div>
     <div class="panel-body">
         <div>
-            <button class="btn btn-success" id="tb1AddBt"><i class="fa fa-plus"></i> 新增</button>
+            <button class="btn btn-success" id="tb1AddBt"><i class="fa fa-plus"></i> 增加</button>
             <button class="btn btn-primary" id="tb1ModifyBt"><i class="fa fa-edit"></i> 修改</button>
             <button class="btn btn-danger" id="tb1RemoveBt"><i class="fa fa-plus"></i> 删除</button>
         </div>
@@ -135,23 +137,32 @@
 </div>
 
 @section Modal{
-    @Html.Partial("_ConfirmDialog")
     <div class="modal fade" id="tb1Modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="tb1Modal" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title"><i class="fa fa-plus"></i> 新增设备科室</h4>
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> 增加人员</h4>
                 </div>
                 <div class="modal-body">
                     <form id="tb1Form">
                         <input type="hidden" name="id" data-value="0" />
-                        <div style="margin-top:6px;">科室名称：</div>
-                        <input type="text" class="form-control" name="class_name" placeholder="录入科室名称" />
-                        <div style="margin-top:6px;">负责人：</div>
-                        <input type="text" class="form-control select-user" name="leader" placeholder="选择负责人" />
-                        <div style="margin-top:6px;">成员：</div>
-                        <textarea class="form-control select-user" rows="6" name="member" data-user-num="20" placeholder="最多可以设置20人"></textarea>
+                        <div>职位：</div>
+                        <select class="form-control" name="position">
+                            <option value="总经理">总经理</option>
+                            <option value="CEO">CEO</option>
+                        </select>
+                        <div style="margin-top:4px;">公司：</div>
+                        <select class="form-control" name="company">
+                            <option value="">------下拉选择公司------</option>
+                            @foreach (var b in buyers) {
+                                <option value="@b.company">@b.company @b.userName</option>
+                            }
+                        </select>
+                        <div style="margin-top:4px;">部门：</div>
+                        <input type="text" class="form-control" name="deptName" />
+                        <div style="margin-top:4px;">职员：</div>
+                        <input type="text" class="form-control user-select" name="userName" />
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -161,4 +172,6 @@
             </div>
         </div>
     </div>
+
+    @Html.Partial("_ConfirmDialog")
 }

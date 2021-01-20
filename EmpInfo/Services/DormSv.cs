@@ -117,7 +117,7 @@ namespace EmpInfo.Services
                       where d.number == dr.dorm_num
                       && a.name == dr.area_name
                       && l.out_date == null
-                      && (e.card_number == null || e.card_number == "")
+                      && (e.card_number == null || e.card_number == "" || e.account_number == null || e.account_number == "")
                       select new { dormId = d.id, empId = l.emp_id, empName = e.name, inDate = l.in_date }).ToList();
 
             if (v1.Count() == 0) {

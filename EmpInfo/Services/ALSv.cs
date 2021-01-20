@@ -135,6 +135,9 @@ namespace EmpInfo.Services
             else if (al.to_date <= al.from_date) {
                 throw new Exception("请检查请假期间");
             }
+            else if ((((DateTime)al.to_date) - ((DateTime)al.from_date)).TotalDays > 300) {
+                throw new Exception("请假开始时间和结束时间的日期跨度不能超过300天");
+            }
 
             if (al.leave_type.Equals("年假") && ((DateTime)al.to_date).Year != ((DateTime)al.from_date).Year) {
                 throw new Exception("不能跨年度休年假，请分开请假");

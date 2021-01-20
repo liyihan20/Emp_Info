@@ -141,12 +141,18 @@ namespace EmpInfo.Services
                 if (!dealWay.Contains("成功") && bill.leave_date == null) return new SimpleResultModel() { suc = false, msg = "离职时间必须填写" };
                 if (string.IsNullOrEmpty(bill.charger_name)) return new SimpleResultModel() { suc = false, msg = "请选择主管审核人" };
                 if(string.IsNullOrEmpty(bill.charger_num)) bill.charger_num = GetUserCardByNameAndCardNum(bill.charger_name);
+                if (!new HRDBSv().EmpIsNotQuit(bill.charger_num)) {
+                    return new SimpleResultModel(false, "主管审批人现已离职，请重新选择");
+                }
                 bill.group_leader_choise = dealWay;
                 bill.group_leader_talked = hasTalked;
             }
             if (stepName.Contains("主管")) {
                 if (string.IsNullOrEmpty(bill.produce_minister_name)) return new SimpleResultModel() { suc = false, msg = "请选择生产部长审核人" };
                 if (string.IsNullOrEmpty(bill.produce_minister_num)) bill.produce_minister_num = GetUserCardByNameAndCardNum(bill.produce_minister_name);
+                if (!new HRDBSv().EmpIsNotQuit(bill.produce_minister_num)) {
+                    return new SimpleResultModel(false, "生产部长审批人现已离职，请重新选择");
+                }
                 //加入到主管修改离职日期的表
                 if (db.ei_flowAuthority.Where(f => f.bill_type == "JQ" && f.relate_type == "修改离职日期" && f.relate_value == userInfo.cardNo).Count() < 1) {
                     db.ei_flowAuthority.Add(new ei_flowAuthority()
@@ -377,13 +383,32 @@ namespace EmpInfo.Services
 
             //2. 推送给申请人
             var msg = new TextMsg();
+            string addr = "", contacts = "", timeSpan = "", contact_man = "";
+            if (bill.dep_name.Contains("惠州")) {
+                addr = "研发楼一楼人事部办公室";
+                contacts = "何秀棠（手机：13543121618，座机：6568888）";
+                timeSpan = "下午13:30-17:30";
+                contact_man = "06101101";
+            }
+            else if (bill.dep_name.Contains("仁寿")) {
+                addr = "研发楼一楼人事部办公室";
+                contacts = "袁大军（手机:18808201780，座机:028－36223087）";
+                timeSpan = "下午13:30-17:30";
+                contact_man = "101028026";
+            }
+            else {
+                addr = "信利学院102培训室";
+                contacts = "范美玉（手机短号：668560；长号：13421578560；座机：3380416）";
+                timeSpan = "上午8:15-11：45";
+                contact_man = "07110367";
+            }
             msg.touser = bill.applier_num;
             msg.text = new TextContent();
             msg.text.content = "人事面谈通知<br/>";
-            msg.text.content += "您已预约了人事面谈，请于3天以内（周一至周六）到指定地点进行人事面谈，具体时间和地点如下： <br/>";
-            msg.text.content += "时间：上午8:15-11：45 <br/>";
-            msg.text.content += "地点：信利学院102培训室 <br/>";
-            msg.text.content += "联系人：范美玉（手机短号：668560；长号：13421578560；座机：3380416） <br/>";
+            msg.text.content += "您已预约了人事面谈，请于3天以内（周一至周五）到指定地点进行人事面谈，具体时间和地点如下： <br/>";
+            msg.text.content += string.Format("时间：{0} <br/>",timeSpan);
+            msg.text.content += string.Format("地点：{0} <br/>",addr);
+            msg.text.content += string.Format("联系人：{0} <br/>",contacts);
             msg.text.content += "请提前1天电话沟通并准时到达，逾期将自动取消此次面谈。";
             SendQYWXMsg(msg);
 
@@ -393,7 +418,7 @@ namespace EmpInfo.Services
                 phone = new HRDBSv().GetHREmpInfo(bill.applier_num).tp;
             }
             msg = new TextMsg();
-            msg.touser = "07110367";// 范美玉;
+            msg.touser = contact_man;
             msg.text = new TextContent();
             msg.text.content = "人事面谈已预约通知<br/>";
             msg.text.content += "刚有员工预约了人事面谈，具体信息如下： <br/>";

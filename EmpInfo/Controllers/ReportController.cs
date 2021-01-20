@@ -3615,8 +3615,15 @@ namespace EmpInfo.Controllers
                              applyTime = x.apply_time,
                              projectName = x.project_name,
                              classification = x.classification,
-                             billNo = x.bill_no
+                             billNo = x.bill_no,
+                             company = x.company
                          };
+
+            var buyerRelation = db.flow_auditorRelation.Where(f => f.bill_type == "XA" && f.relate_name == "采购部审批" && f.relate_value == userInfo.cardNo).ToList();
+            if (buyerRelation.Count() > 0) {
+                var companyList = buyerRelation.Select(b => b.relate_text).ToList();
+                result = result.Where(r => companyList.Contains(r.company));
+            }
 
             if (!string.IsNullOrEmpty(m.classification)) {
                 result = result.Where(r => r.classification == m.classification);

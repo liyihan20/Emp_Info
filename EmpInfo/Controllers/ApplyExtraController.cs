@@ -883,6 +883,139 @@ namespace EmpInfo.Controllers
             }
         }
 
+        public ActionResult XAAuditorSetting()
+        {
+            //采购员
+            var buyerList = (from a in db.flow_auditorRelation
+                               join u in db.ei_users on a.relate_value equals u.card_number
+                               where a.bill_type == "XA" && a.relate_name == "采购部审批"
+                               orderby a.relate_text
+                               select new XAAuditorsModel()
+                               {
+                                   company = a.relate_text,
+                                   userName = u.name
+                               }).ToList();
+            ViewData["buyers"] = buyerList;
+            return View();
+        }
+
+        public JsonResult GetXAAuditors()
+        {
+            //总经理审批
+            var auditorList = (from a in db.flow_auditorRelation
+                               join u in db.ei_users on a.relate_value equals u.card_number
+                               where a.bill_type == "XA" && a.relate_name == "部门总经理"
+                               orderby a.relate_text
+                               select new XAAuditorsModel()
+                               {
+                                   id = a.id,
+                                   position = "总经理",
+                                   company = a.relate_text,
+                                   userName = u.name,
+                                   userNumber = a.relate_value
+                               }).ToList();
+            auditorList.ForEach(a =>
+            {
+                a.deptName = a.company.Split(new char[] { '_' })[1];
+                a.company = a.company.Split(new char[] { '_' })[0];
+            });
+            
+            //CEO抄送
+            var ceoList = db.flow_notifyUsers
+                .Where(f => f.bill_type == "XA" && f.cond2 != "")
+                .OrderBy(f => f.cond1)
+                .ThenBy(f => f.cond2)
+                .Select(f => new XAAuditorsModel()
+                {
+                    id = f.id,
+                    position = "CEO",
+                    company = f.cond1,
+                    deptName = f.cond2,
+                    userName = f.name,
+                    userNumber = f.card_number
+                }).ToList();
+
+            return Json(auditorList.Union(ceoList),JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult SaveXAAuditor(string obj)
+        {
+            try {
+                XAAuditorsModel m = JsonConvert.DeserializeObject<XAAuditorsModel>(obj);
+
+                if (m.position.Equals("总经理")) {
+                    string relateText = m.company + "_" + m.deptName;
+                    string relateValue = GetUserCardByNameAndCardNum(m.userName);
+                    if (db.flow_auditorRelation.Where(f => f.bill_type == "XA" && f.relate_name == "部门总经理" && f.relate_text == relateText && f.relate_value == relateValue && f.id != m.id).Count() > 0) {
+                        return Json(new SimpleResultModel(false, "信息已存在，不能重复增加"));
+                    }
+                    if (m.id == 0) {
+                        var rel = new flow_auditorRelation();
+                        rel.bill_type = "XA";
+                        rel.relate_name = "部门总经理";
+                        rel.relate_text = relateText;
+                        rel.relate_value = relateValue;
+
+                        db.flow_auditorRelation.Add(rel);
+                    }
+                    else {
+                        var rel = db.flow_auditorRelation.Single(f => f.id == m.id);
+                        rel.relate_text = relateText;
+                        rel.relate_value = relateValue;
+                    }
+                }
+                else if (m.position.Equals("CEO")) {
+                    string userNumber = GetUserCardByNameAndCardNum(m.userName);
+                    string userName = GetUserNameByNameAndCardNum(m.userName);
+                    if (db.flow_notifyUsers.Where(f => f.bill_type == "XA" && f.cond1 == m.company && f.cond2 == m.deptName && f.card_number == m.userNumber && f.id != m.id).Count() > 0) {
+                        return Json(new SimpleResultModel(false, "信息已存在，不能重复增加"));
+                    }
+                    if (m.id == 0) {
+                        var nty = new flow_notifyUsers();
+                        nty.bill_type = "XA";
+                        nty.card_number = userNumber;
+                        nty.name = userName;
+                        nty.cond1 = m.company;
+                        nty.cond2 = m.deptName;
+
+                        db.flow_notifyUsers.Add(nty);
+                    }
+                    else {
+                        var nty = db.flow_notifyUsers.Single(f => f.id == m.id);
+                        nty.card_number = userNumber;
+                        nty.name = userName;
+                        nty.cond1 = m.company;
+                        nty.cond2 = m.deptName;
+                    }
+                }
+
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+
+            return Json(new SimpleResultModel(true));
+        }
+
+        public JsonResult RemoveXAAuditor(string position, int id)
+        {
+            try {
+                if (position.Equals("总经理")) {
+                    db.flow_auditorRelation.Remove(db.flow_auditorRelation.Single(f => f.bill_type == "XA" && f.id == id));
+                }
+                else if (position.Equals("CEO")) {
+                    db.flow_notifyUsers.Remove(db.flow_notifyUsers.Single(f => f.bill_type == "XA" && f.id == id));
+                }
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+
+            return Json(new SimpleResultModel(true));
+        }
+
         #endregion
 
         #region 设备保养流程

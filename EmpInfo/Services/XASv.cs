@@ -39,13 +39,23 @@ namespace EmpInfo.Services
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
             var menus = base.GetApplyMenuItems(userInfo);
+            var auth = db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_value == userInfo.cardNo).ToList();
 
-            if (db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).Count() > 0) {
+            if (auth.Where(a => a.relate_type == "查询报表").Count() > 0) {
                 menus.Add(new ApplyMenuItemModel()
                 {
                     text = "查询报表",
                     iconFont = "fa-file-text-o",
                     url = "../Report/XAReport"
+                });
+            }
+
+            if (auth.Where(a => a.relate_type == "修改审核人").Count() > 0) {
+                menus.Add(new ApplyMenuItemModel()
+                {
+                    text = "总经理与CEO",
+                    iconFont = "fa-user",
+                    url = "../ApplyExtra/XAAuditorSetting"
                 });
             }
 
@@ -151,8 +161,8 @@ namespace EmpInfo.Services
                         throw new Exception("请至少录入一个供应商的价格再审批");
                     }
                 }
-                if (stepName.Contains("确认中标供应商")) {
-                    int bidderId=0;
+                if (stepName.Contains("审核部最终确认")) {
+                    int bidderId = 0;
                     int.TryParse(bidder, out bidderId);
                     var bidderSupplier = db.ei_xaApplySupplier.Where(s => s.sys_no == bill.sys_no && s.id == bidderId).FirstOrDefault();
                     if (bidderSupplier == null) {
@@ -263,6 +273,36 @@ namespace EmpInfo.Services
                                     bill.applier_name,
                                     ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
                                     string.Format("项目类别：{0}；项目名称：{1}", bill.project_type, bill.project_name),
+                                    notifyUser
+                                    );
+                            }
+                        }
+
+                        //会签之前，消防项目和环保项目需要抄送给黄志锋
+                        if (result.stepName.Contains("管理部会签")) {
+                            var notifyUser = db.flow_notifyUsers.Where(f => f.bill_type == BillType && f.cond1 == bill.classification).Select(f => f.card_number).ToList();
+                            if (notifyUser.Count() > 0) {
+                                SendQywxMessageToCC(
+                                    BillTypeName,
+                                    bill.sys_no,
+                                    bill.applier_name,
+                                    ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                                    string.Format("项目类别：{0}；项目名称：{1}", bill.project_type, bill.project_name),
+                                    notifyUser
+                                    );
+                            }
+                        }
+
+                        //审核部最终确认后，申请人验收前，需要抄送给采购员
+                        if (result.stepName.Contains("申请人验收")) {
+                            var notifyUser = db.flow_auditorRelation.Where(f => f.bill_type == BillType && f.relate_name == "采购部审批" && f.relate_text == bill.company).Select(f => f.relate_value).ToList();
+                            if (notifyUser.Count() > 0) {
+                                SendQywxMessageToCC(
+                                    BillTypeName + "（审核部已确认）",
+                                    bill.sys_no,
+                                    bill.applier_name,
+                                    ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                                    string.Format("现可通知中标供应商：项目类别：{0}；项目名称：{1}", bill.project_type, bill.project_name),
                                     notifyUser
                                     );
                             }

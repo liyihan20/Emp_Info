@@ -32,15 +32,18 @@ namespace EmpInfo.Services
 
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
-            var salaryType = new HRDBSv().GetHREmpInfo(userInfo.cardNo).salary_type;
+            var hrInfo = new HRDBSv().GetHREmpInfo(userInfo.cardNo);
+            var salaryType = hrInfo == null ? null : hrInfo.salary_type;
             var list = new List<ApplyMenuItemModel>();
-            list.Add(new ApplyMenuItemModel()
-            {
-                url = "BeginApply?billType=" + ("月薪".Equals(salaryType) ? "JQ&quitType=1" : "MQ"),
-                text = "辞职申请",
-                iconFont = "fa-pencil",
-                colorClass = "text-danger"
-            });
+            if (salaryType != null) {
+                list.Add(new ApplyMenuItemModel()
+                {
+                    url = "BeginApply?billType=" + ("月薪".Equals(salaryType) ? "JQ&quitType=1" : "MQ"),
+                    text = "辞职申请",
+                    iconFont = "fa-pencil",
+                    colorClass = "text-danger"
+                });
+            }
             list.Add(new ApplyMenuItemModel()
             {
                 url = "BeginApply?billType=JQ&quitType=2",

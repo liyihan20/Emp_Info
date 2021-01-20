@@ -1686,6 +1686,7 @@
     <Content Include="Views\ApplyExtra\UpdateMTEqInfo.cshtml" />
     <Content Include="Views\Apply\CheckMTApply.cshtml" />
     <Content Include="Views\Apply\BeginAuditMTApply.cshtml" />
+    <Content Include="Views\ApplyExtra\XAAuditorSetting.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

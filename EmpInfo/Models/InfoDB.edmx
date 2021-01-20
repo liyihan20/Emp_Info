@@ -1658,7 +1658,7 @@
           <Property Name="bill_type" Type="varchar" MaxLength="50" />
           <Property Name="relate_name" Type="varchar" MaxLength="50" />
           <Property Name="relate_value" Type="varchar" MaxLength="500" />
-          <Property Name="relate_text" Type="varchar" MaxLength="50" />
+          <Property Name="relate_text" Type="varchar" MaxLength="500" />
         </EntityType>
         <EntityType Name="flow_notifyUsers">
           <Key>
@@ -1960,6 +1960,7 @@
           <Property Name="short_dep_name" Type="varchar" MaxLength="200" />
           <Property Name="short_phone" Type="varchar" MaxLength="50" />
           <Property Name="bank_no" Type="varchar" MaxLength="19" />
+          <Property Name="native_place" Type="varchar" MaxLength="150" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“ICAudit.dbo.vw_ep_dep”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -3348,7 +3349,8 @@ FROM [dbo].[vw_ei_simple_users] AS [vw_ei_simple_users]</DefiningQuery>
 [vw_ei_users].[dep_name] AS [dep_name], 
 [vw_ei_users].[short_dep_name] AS [short_dep_name], 
 [vw_ei_users].[short_phone] AS [short_phone], 
-[vw_ei_users].[bank_no] AS [bank_no]
+[vw_ei_users].[bank_no] AS [bank_no], 
+[vw_ei_users].[native_place] AS [native_place]
 FROM [dbo].[vw_ei_users] AS [vw_ei_users]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="vw_ep_dep" EntityType="Self.vw_ep_dep" store:Type="Views" store:Schema="dbo">
@@ -4515,6 +4517,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="short_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="short_portrait" Type="Binary" MaxLength="Max" FixedLength="false" />
           <Property Name="bank_no" Type="String" MaxLength="19" FixedLength="false" Unicode="false" />
+          <Property Name="native_place" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="ei_authority">
           <Key>
@@ -5271,7 +5274,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="bill_type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="relate_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="relate_value" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="relate_text" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="relate_text" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="ei_ucApply">
           <Key>
@@ -7724,6 +7727,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="vw_ei_users">
             <EntityTypeMapping TypeName="ICAuditModel.vw_ei_users">
               <MappingFragment StoreEntitySet="vw_ei_users">
+                <ScalarProperty Name="native_place" ColumnName="native_place" />
                 <ScalarProperty Name="bank_no" ColumnName="bank_no" />
                 <ScalarProperty Name="short_portrait" ColumnName="short_portrait" />
                 <ScalarProperty Name="short_phone" ColumnName="short_phone" />
