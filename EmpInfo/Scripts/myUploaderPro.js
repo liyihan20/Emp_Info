@@ -81,6 +81,7 @@
 
         uploader.on('uploadError', function (file) {
             toastr.error(file.name + ":上传失败");
+            uploader.removeFile(file.id, true);
         });
 
         uploader.on("error", function (type) {

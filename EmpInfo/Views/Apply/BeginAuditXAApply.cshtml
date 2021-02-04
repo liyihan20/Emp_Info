@@ -510,6 +510,16 @@
                 @m.bill.dept_charger_name
             </span>
         </div>
+        @if (m.bill.is_po != null) {
+            <div class="b-div">
+                <span class="b-label">
+                    是否为PO单:
+                </span>
+                <span class="b-input">
+                    @(m.bill.is_po==true?"是":"否")
+                </span>
+            </div>
+        }
         @if (m.suppliers.Count() > 0) {
             <div class="b-div">
                 <span class="b-label">
@@ -588,6 +598,18 @@
                     else if (bam.stepName.Contains("上传报价单")) {
                         <div class="b-div">
                             <span class="b-label">
+                                是否为PO单:
+                            </span>
+                            <span class="b-input">
+                                <select class="form-control" name="is_po" required>
+                                    <option value="">----下拉选择----</option>
+                                    <option value="true">是</option>
+                                    <option value="false">否</option>
+                                </select>
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
                                 供应商列表:
                             </span>
                             <div class="b-input">
@@ -605,7 +627,7 @@
 
                         </div>
                     }
-                    else if (bam.stepName.Contains("确认中标供应商")) {
+                    else if (bam.stepName.Contains("审核部最终确认")) {
                         <div class="b-div">
                             <span class="b-label">
                                 选择中标供应商:
@@ -613,7 +635,7 @@
                             <div class="b-input">
                                 <select class="form-control" name="bidder">
                                     <option value="">-----请选择中标供应商-----</option>
-                                    @foreach (var s in m.suppliers) {
+                                    @foreach (var s in m.suppliers.Where(s=>s.price!=null && s.price>0)) {
                                         <option value="@s.id">@s.supplier_name</option>
                                     }
                                 </select>
@@ -654,8 +676,8 @@
         <div style="margin-left:18px;padding-top:6px;" class="text-danger">
             <p>
                 1. 流程步骤：流程开始--->提交申请--->收益提供人审批(如没有可跳过)--->设备科负责人审批--->生产部主管审批--->部门总经理审批--->
-                采购部接单--->申请人上传施工清单--->设备科负责人处理--->项目类别负责人(监控类/网络类)--->采购部上传报价单--->
-                管理部会签（项目大类负责人、节省与监督审批人）--->部门总经理确认--->审核部最终确认--->申请人验收项目--->设备负责人验收--->
+                项目初审--->采购部接单--->申请人上传施工清单--->设备科负责人处理--->项目类别负责人(监控类/网络类)--->节省与监督--->采购部上传报价单--->
+                管理部会签（项目大类负责人、分摊部门总经理）--->部门总经理确认--->审核部最终确认--->申请人验收项目--->设备负责人验收--->
                 生产主管验收--->部门总经理验收--->信息管理部验收（网络类）--->项目大类负责人验收--->流程结束。
                 <br />
                 2. 如果部门有设置CEO，那么部门总经理审批后，采购部接单前，系统会推送通知给CEO。

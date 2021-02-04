@@ -42,5 +42,6 @@ namespace EmpInfo.Models
         public Nullable<bool> check2 { get; set; }
         public string agent_man_name { get; set; }
         public string inform_man_name { get; set; }
+        public string go_where { get; set; }
     }
 }

@@ -131,9 +131,7 @@ namespace EmpInfo.Services
             else {
                 if (addrFlag != 1) throw new Exception("收寄范围是" + bill.scope + "时，寄件和收件地址只能包含一个广东");
             }
-            
-            
-
+                        
             if (string.IsNullOrEmpty(bill.ex_company)) {
                 throw new Exception("请先选择快递公司。如果快递公司不存在，请与物流部周秀花联系");
             }

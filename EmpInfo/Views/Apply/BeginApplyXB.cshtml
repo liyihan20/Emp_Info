@@ -1,8 +1,23 @@
 ﻿@using EmpInfo.Models;
 @{
-    XABeforeApplyModel m = ViewData["infoBeforeApply"] as XABeforeApplyModel;
+    XBBeforeApplyModel m = ViewData["infoBeforeApply"] as XBBeforeApplyModel;
+    var propertyFields = new List<fieldModel>
+    {
+        new fieldModel("property_name", "设备名称","填写设备名称"),
+        new fieldModel("property_number", "设备编号","填写设备编号"),
+        new fieldModel("property_modual", "设备型号","填写设备型号"),
+        new fieldModel("property_worth", "设备原价值","如：RMB500,000元"),
+        new fieldModel("date", "property_enable_date", "启用日期","选择启用日期"),
+        new fieldModel("property_idle_time", "闲置时间","如：20天"),
+        new fieldModel("property_qty_unit", "数量与单位","如：1台"),
+        new fieldModel("property_card_no", "设备卡片号","填写设备卡片号，没有填'无'"),
+        new fieldModel("property_supplier", "产地/供应商","填写产地和供应商"),
+        new fieldModel("textarea", "property_other_comment", "设备其它信息","如有其它信息在此备注",false)        
+    };
+    
 }
 @section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
 
     <style type="text/css">
@@ -24,61 +39,26 @@
 }
 
 @section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
     <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
     <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
     <script src="@Url.Content("~/Scripts/myUploaderPro.js?v=2")"></script>
 
     <script>
-        $(function () {
-            var arr = {};
-            arr["工程项目"] = [
-                { name: "车间装修类", detail: "车间装修类：如 墙体 / 地板 / 天花板 / 管道 等各类新增或修补 等" },
-                { name: "车间整改类", detail: "车间整改类：如 净房相关改造 / 图纸布局更改 / 土建基建相关 等" },
-                //{ name: "消防及环保工程类", detail: "消防及环保工程类：如 消防相关 / 废水废气相关 / 污染废弃物处理相关 等" },
-                { name: "涉及厂区其余公共区域类", detail: "涉及厂区其余公共区域类：如 公共区域的外观、设施、绿化的维护，增补 等" }
-            ];
-            arr["工作项目"] = [
-                { name: "设备搬运/二次配", detail: "设备搬运/二次配类：设备搬运 / 打包 / 拆装 / 运输 / 一次配水电气 / 二次配水电气 等" },
-                { name: "办公/宣传类", detail: "办公/宣传类：更换牌匾 / 增加标识 / 办公区域相关 等" },
-                { name: "监控项目", detail: "监控项目：监控维修及增加 等" },
-                { name: "网络等弱电项目", detail: "网络等弱电项目：网络维修及增加 / 各类线路维护及增加 等" },
-                { name: "维修/更换项目", detail: "维修/更换类：车间各类配套设施和辅助设施的维修 / 维护 / 更换" }
-            ];
-            arr["后勤项目"] = [
-                { name: "宿舍、食堂等区域相关", detail: "宿舍、食堂等区域相关：宿舍、食堂区域的增补、维修、整改 等" },
-                { name: "安保及安全配套相关", detail: "安保及安全配套相关：厂区出入大门硬软件维护维修、公共区域监控系统维护维修 等" }
-            ];
-            arr["消防项目"] = [{ name: "消防类", detail: "消防类：如 消防相关 等" }, ];
-            arr["环保项目"] = [{ name: "环保工程类", detail: "环保工程类：如 废水废气相关 / 污染废弃物处理相关 等" }, ];
-            
-            for (var k in arr) {
-                $("#classification").append("<option value='" + k + "'>" + k + "</option>");
-            }
-
-            $("#classification").on("change", function () {
-                $("#project_type").empty();
-                $("#project_type").append("<option value=''>----下拉选择项目类别----</option>");
-                var rs = arr[$(this).val()];
-                if (rs.length == 1) {
-                    $("#project_type").append("<option value='" + rs[0].name + "' selected>" + rs[0].name + "</option>");
-                    $("#project_type").trigger("change");
-                } else {
-                    for (var i = 0; i < rs.length; i++) {
-                        $("#project_type").append("<option value='" + rs[i].name + "'>" + rs[i].name + "</option>");
-                    }
-                }                
+        $(function () {            
+            $(".datePicker").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd",
+                autoclose: true,
+                startView: 2,
+                minView: 2
             });
 
-            $("#project_type").on("change", function () {
-                var detail = arr[$("#classification").val()].filter(function (v) { return v.name == $("#project_type").val() })[0].detail;                
-                $("#projectInfo").html(detail);
-                $("#project_detail").val(detail);
-            });
-            
             $("#myUploader").myUploader({
                 sysNum: "@m.sys_no",
-                fileNumLimit: 3,
-                prefix: "现场照片_",
+                fileNumLimit: 5,
+                prefix: "设备照片_",
                 accept: {
                     title: '*',
                     extensions: '*',
@@ -105,35 +85,7 @@
                 } else {
                     $("#profitInfo").hide();
                 }
-            });
-
-            $("#btnAddShare").on("click", function () {
-                $('<div class="row" style="margin-top:8px;"> \
-                    <div class="col-xs-12 col-sm-6"> \
-                        <select class="form-control" name="share_dept"></select> \
-                    </div> \
-                    <div class="col-xs-12 col-sm-6"> \
-                        <div class="input-group">  \
-                            <input type="text" class="form-control" name="share_percent" placeholder="分摊比例%"/>  \
-                            <span class="input-group-addon deleteShare" style="cursor:pointer;"><i class="fa fa-remove text-danger" title="删除"></i></span>  \
-                        </div> \
-                    </div> \
-                </div>').insertBefore($(this));
-                fillShareDeptSelect();
-            });
-
-            $("#shareDiv").on("click", ".deleteShare", function () {                
-                $(this).parents(".row").remove();
-            });
-
-            $("#shareInfo").hide();
-            $("#is_share_fee").on("change", function () {
-                if ($(this).val() == "true") {
-                    $("#shareInfo").show();
-                } else {
-                    $("#shareInfo").hide();
-                }
-            });
+            });                        
 
             $(".select-user").on("focus", function () {
                 var self = this;
@@ -154,6 +106,10 @@
                     toastr.error(result.msg);
                     return;
                 }
+                if ($("#myUploader").getMyUploaderFilesNum() < 1) {
+                    toastr.error("请先上传设备照片");
+                    return;
+                }
                 var head = utils.getFormObj($("#fm"));
                 var demandsInput = $("input[name='demands']");
                 var demands = "";
@@ -165,28 +121,7 @@
                 }
                 head.demands = demands;
                 head.company = head.dept_name.split("_")[0];
-                head.dept_name = head.dept_name.split("_")[1];
-
-                //分摊数据
-                if (head.is_share_fee == "true") {
-                    var shareDeptSelect = $("select[name='share_dept']");
-                    var sharePercentInput = $("input[name='share_percent']");
-                    var shareInfoObj = [];
-                    var totalPercent = 0;
-                    for (var i = 0; i < shareDeptSelect.length; i++) {
-                        if (!utils.testIsFloat($(sharePercentInput[i]).val())) {
-                            toastr.error("分摊比例必须填写数字格式");
-                            return;
-                        }
-                        shareInfoObj.push({ n: $(shareDeptSelect[i]).val(), v: $(sharePercentInput[i]).val() });
-                        totalPercent += parseFloat($(sharePercentInput[i]).val());
-                    }
-                    if (Math.abs(totalPercent - 100) > 0.000001) {
-                        toastr.error("分摊比例之和必须等于100");
-                        return;
-                    }
-                    head.share_fee_detail = JSON.stringify(shareInfoObj);
-                }
+                head.dept_name = head.dept_name.split("_")[1];                               
 
                 openConfirmDialog("确定要提交申请吗？", function () {
                     $("#apply_bt").button("loading");
@@ -211,18 +146,8 @@
                 });
 
             });
-            fillShareDeptSelect();
         });
-
-        function fillShareDeptSelect() {
-            var selects = $("select[name='share_dept']");
-            for (var i = 0; i < selects.length; i++) {
-                if ($.trim($(selects[i]).html()) == "") {
-                    $(selects[i]).html($("#dept_name").html());
-                }
-            }
-        }
-
+        
     </script>
 }
 
@@ -233,7 +158,7 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
-            <li><a href="ApplyIndex?billType=XA">项目单申请流程</a></li>
+            <li><a href="ApplyIndex?billType=XB">设备类申请单</a></li>
             <li class="active">开始申请</li>
         </ol>
     </div>
@@ -282,48 +207,68 @@
             </div>
             <div class="b-div">
                 <span class="b-label">
-                    项目名称:
-                </span>
-                <span class="b-input">
-                    <input type="text" class="form-control" name="project_name" placeholder="填写项目名称" required/>
-                </span>
-            </div>
-            <div class="b-div">
-                <span class="b-label">
                     地点:
                 </span>
                 <span class="b-input">
-                    <textarea type="text" class="form-control" rows="2" id="addr" name="addr" placeholder="例如：19栋1楼" required></textarea>
+                    <textarea type="text" class="form-control" rows="2" id="addr" name="addr" placeholder="例如：19栋1楼清洗线X线" required></textarea>
                 </span>
             </div>
             <div class="b-div">
                 <span class="b-label">
-                    项目大类:
+                    处理类别:
                 </span>
                 <span class="b-input">
-                    <select class="form-control" name="classification" id="classification" required>
-                        <option value="">----下拉选择项目大类----</option>
+                    <select class="form-control" name="deal_type" id="deal_type" required>
+                        <option value="">----下拉选择处理类别----</option>
+                        <option value="设备报废">设备报废</option>
+                        <option value="设备利旧">设备利旧</option>
+                        <option value="设备外卖">设备外卖</option>
                     </select>
                 </span>
             </div>
-            <div class="b-div">
-                <span class="b-label">
-                    项目类别:
-                </span>
-                <div class="b-input">
-                    <select class="form-control" name="project_type" id="project_type" required>
-                        <option value="">----下拉选择项目类别----</option>
-                    </select>
-                    <div class="small text-danger"><i class="fa fa-info-circle"></i> 项目类别说明： <span id="projectInfo"></span></div>
-                    <input type="hidden" name="project_detail" id="project_detail" />
-                </div>
-            </div>
+            
+            @foreach (var f in propertyFields) {
+                if ("input".Equals(f.fieldType)) {
+                    <div class="b-div">
+                        <span class="b-label">
+                            @f.fieldText:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="@f.fieldName" placeholder="@f.tip" @(f.required ? "required" : "")/>
+                        </span>
+                    </div>
+                }
+                else if ("textarea".Equals(f.fieldType)) {
+                    <div class="b-div">
+                        <span class="b-label">
+                            @f.fieldText:
+                        </span>
+                        <span class="b-input">
+                            <textarea type="text" class="form-control" rows="3" name="@f.fieldName" placeholder="@f.tip" @(f.required ? "required" : "")></textarea>
+                        </span>
+                    </div>
+                }
+                else if ("date".Equals(f.fieldType)) {
+                    <div class="b-div">
+                        <div class="b-label">
+                            @f.fieldText:
+                        </div>
+                        <div class="b-input">
+                            <span class="input-group date datePicker">
+                                <input class="form-control" type="text" name="@f.fieldName" autocomplete="off" placeholder="@f.tip" @(f.required ? "required" : "") />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                            </span>
+                        </div>
+                    </div>
+                }
+            }
+
             <div class="b-div">
                 <span class="b-label">
                     申请原因:
                 </span>
                 <span class="b-input">
-                    <textarea type="text" class="form-control" rows="4" id="reason" name="reason" placeholder="请说明所申请项目的缘由、必要性以及目前已造成的影响或损失" required></textarea>
+                    <textarea type="text" class="form-control" rows="4" id="reason" name="reason" placeholder="请说明所申请项目的缘由、必要性；如订单增加、客户需求、设备损坏等" required></textarea>
                 </span>
             </div>
             <div class="b-div">
@@ -335,45 +280,6 @@
                     <button type="button" class="btn btn-sm btn-success" id="btnAddDemand" style="margin-top:6px;"><i class="fa fa-plus"></i> 添加要求</button>                    
                 </div>
             </div>
-            <div class="b-div">
-                <span class="b-label">
-                    是否多部门分摊:
-                </span>
-                <div class="b-input">
-                    <select class="form-control" name="is_share_fee" id="is_share_fee" required>
-                        <option value="">----下拉选择是否是否多部门分摊----</option>
-                        <option value="false">否</option>
-                        <option value="true">是</option>
-                    </select>
-                </div>
-            </div>
-            <div id="shareInfo">                
-                <div class="b-div">
-                    <span class="b-label">
-                        分摊明细:
-                    </span>
-                    <div class="b-input" id="shareDiv">
-                        <div class="row">
-                            <div class="col-xs-12 col-sm-6">
-                                <select class="form-control" name="share_dept"></select>
-                            </div>
-                            <div class="col-xs-12 col-sm-6">
-                                <input type="text" class="form-control" name="share_percent" placeholder="分摊比例%"/> 
-                            </div>
-                        </div>
-                        <div class="row" style="margin-top:8px;">
-                            <div class="col-xs-12 col-sm-6">
-                                <select class="form-control" name="share_dept"></select>
-                            </div>
-                            <div class="col-xs-12 col-sm-6">
-                                <input type="text" class="form-control" name="share_percent" placeholder="分摊比例%"/> 
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-primary" id="btnAddShare" style="margin-top:6px;"><i class="fa fa-plus"></i> 添加分摊明细</button>
-                        <div class="text-danger small" style="margin-top:6px;"><i class="fa fa-info-circle"></i> 比例只录数字，不用录%；所有部门的分摊比例之和必须等于100%</div>                  
-                    </div>
-                </div>        
-            </div> 
             <div class="b-div">
                 <span class="b-label">
                     项目收益:
@@ -401,6 +307,14 @@
                     </span>
                     <div class="b-input">
                         <textarea type="text" class="form-control" rows="3" name="productivity_profit" placeholder="填写现产能明细/项目完成后产能/产能增加净值"></textarea>
+                    </div>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        战略性投资:
+                    </span>
+                    <div class="b-input">
+                        <textarea type="text" class="form-control" rows="3" name="strategy_profit" placeholder="具体说明情况"></textarea>
                     </div>
                 </div>
                 <div class="b-div">
@@ -437,7 +351,7 @@
                     </div>
                 </div>
                 <div class="b-div">
-                    <div id="picker"> <i class="fa fa-upload"></i> 上传现场照片 </div>
+                    <div id="picker"> <i class="fa fa-upload"></i> 上传设备照片 </div>
                 </div>
                 <div id="myUploader">
 
@@ -452,16 +366,12 @@
         <h4 class="text-danger"><i class="fa fa-info-circle"></i> 说明 </h4>
         <div style="margin-left:18px;padding-top:6px;" class="text-danger">            
             <p>
-                1. 流程步骤：流程开始--->提交申请--->收益提供人审批(如没有可跳过)--->设备科负责人审批--->生产部主管审批--->部门总经理审批--->
-                项目初审--->采购部接单--->申请人上传施工清单--->设备科负责人处理--->项目类别负责人(监控类/网络类)--->节省与监督--->采购部上传报价单--->
-                管理部会签（项目大类负责人、分摊部门总经理）--->部门总经理确认--->审核部最终确认--->申请人验收项目--->设备负责人验收--->
-                生产主管验收--->部门总经理验收--->信息管理部验收（网络类）--->项目大类负责人验收--->流程结束。
+                流程步骤：
                 <br/>
-                2. 如果部门有设置CEO，那么部门总经理审批后，采购部接单前，系统会推送通知给CEO。
+                利旧/报废流程：提交申请--->收益提供人审批(如没有可跳过)--->设备负责人审批--->部门主管审批--->部门总经理审批--->设备管理部审批--->结束 
                 <br/>
-                3. 申请人上传施工清单，设备科负责人处理后，采购部上传报价单前，系统会推送通知给项目大类负责人。
-                <br/>
-                4. 审核部最终确认后，申请人验收项目前，系统会推送通知给采购部接单员。
+                外卖流程：提交申请--->收益提供人审批--->设备负责人审批--->部门主管审批--->部门总经理审批--->设备管理部审批--->采购部接单并填写供应商--->
+                生产部确认设备清单--->采购部报价--->部门总经理审批--->设备管理部审批--->审核部确认--->结束
             </p>
         </div>
     </div>

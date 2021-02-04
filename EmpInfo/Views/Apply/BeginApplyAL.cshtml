@@ -216,8 +216,14 @@
             toastr.error("请假时间不能都是0");
             return false;
         }
+        //2020-11-26增加
         if ($.trim($("#goWhere").val()) == "") {
-            toastr.error("请假去向必须填写");
+            toastr.error("行政部规定：请假去向必须填写");
+            return false;
+        }
+        //2021-01-27增加
+        if ($.trim($("#leaveReason").val()) == "") {
+            toastr.error("行政部规定：请假事由必须填写");
             return false;
         }
         if ($($("input[name='leave_type']:checked")[0]).val() == "病假") {

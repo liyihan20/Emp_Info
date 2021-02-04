@@ -1,12 +1,9 @@
 ﻿@using EmpInfo.Models;
 @using Newtonsoft.Json;
 @{
-    var m = ViewData["am"] as XACheckApplyModel;
+    var m = ViewData["am"] as XBCheckApplyModel;
     var itemsJson = JsonConvert.SerializeObject(m.suppliers);
-    List<XAFeeShareModel> shareList = new List<XAFeeShareModel>();
-    if (!string.IsNullOrEmpty(m.bill.share_fee_detail)) {
-        shareList = JsonConvert.DeserializeObject<List<XAFeeShareModel>>(m.bill.share_fee_detail);
-    }
+    
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
@@ -32,55 +29,55 @@
 }
 
 @section Scripts {
-    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
-    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
     <script src="@Url.Content("~/Scripts/myDownloaderPro.js")"></script>
 
     <script>
 
-    if($("#tb_check").length>0){
-        $("#tb_check").bootstrapTable({
-            data:@Html.Raw(itemsJson),
-            striped: true,
-            clickToSelect: true,
-            columns: [
-                {
-                    field: "supplier_name",
-                    title: "供应商名称",
-                    //width:"70%"
-                }
-                //, {
-                //    field: "price",
-                //    title: "价格",
-                //    width:"30%"
-                //}
-            ]
-        });
-    }
+        if($("#tb_check").length>0){
+            $.getScript("@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")",function(){
+                $("#tb_check").bootstrapTable({
+                    data:@Html.Raw(itemsJson),
+                    striped: true,
+                    clickToSelect: true,
+                    columns: [
+                        {
+                            field: "supplier_name",
+                            title: "供应商名称",
+                            //width:"70%"
+                        }
+                        //, {
+                        //    field: "price",
+                        //    title: "价格",
+                        //    width:"30%"
+                        //}
+                    ]
+                });
+            });
+            }
 
 
 
     $(function () {
 
         if ($("#attList1").length>0) {
-            $("#attList1").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "施工清单_" });
+            $("#attList1").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "设备清单_" });
         }
-        @*if ($("#attList2").length>0) {
-            $("#attList2").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "报价单_" });
-        }*@
-            if ($("#attList3").length>0) {
-                $("#attList3").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "现场照片_" });
-            }
-            $("#flowRecordBt").on("click", function () {
-                var box = $("<div></div>");
-                $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.bill.sys_no" }, function () {
-                    openMessageDialog($(box).html(), "查看流转记录（"+"@m.bill.sys_no"+"）");
+        if ($("#attList2").length>0) {
+            $("#attList2").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "复核照片_" });
+        }
+        if ($("#attList3").length>0) {
+            $("#attList3").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "设备照片_" });
+        }
+        $("#flowRecordBt").on("click", function () {
+            var box = $("<div></div>");
+            $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.bill.sys_no" }, function () {
+                openMessageDialog($(box).html(), "查看流转记录（"+"@m.bill.sys_no"+"）");
             });
         });
 
-        $("#printBt").on("click",function(){
+        @*$("#printBt").on("click",function(){
             window.open("../Report/PrintXA?sysNo="+"@m.bill.sys_no");
-        })
+        })*@
     })
 
 
@@ -95,7 +92,7 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-            <li><a href="ApplyIndex?billType=XA">项目单申请流程</a></li>
+            <li><a href="ApplyIndex?billType=XB">设备类申请单</a></li>
             <li class="active">查看申请</li>
         </ol>
     </div>
@@ -109,14 +106,14 @@
             </span>
         </div>
         @if (m.bill.can_print) {
-            <div class="b-div">
+            @*<div class="b-div">
                 <span class="b-label">
                     打印:
                 </span>
                 <span class="b-input">
                     <button type="button" class="btn btn-default btn-sm" id="printBt"><i class="fa fa-print"></i> 打印单据</button>
                 </span>
-            </div>
+            </div>*@
         }
         <div class="b-div">
             <span class="b-label">
@@ -168,14 +165,6 @@
         </div>
         <div class="b-div">
             <span class="b-label">
-                项目名称:
-            </span>
-            <span class="b-input">
-                @m.bill.project_name
-            </span>
-        </div>
-        <div class="b-div">
-            <span class="b-label">
                 地点:
             </span>
             <span class="b-input">
@@ -184,28 +173,92 @@
         </div>
         <div class="b-div">
             <span class="b-label">
-                项目大类:
+                处理类别:
             </span>
             <span class="b-input">
-                @m.bill.classification
+                @m.bill.deal_type
             </span>
         </div>
         <div class="b-div">
             <span class="b-label">
-                项目类别:
+                设备名称:
             </span>
             <span class="b-input">
-                @m.bill.project_type
+                @m.bill.property_name
             </span>
         </div>
-        @*<div class="b-div">
-                <span class="b-label">
-                    项目类别说明:
-                </span>
-                <span class="b-input">
-                    @m.bill.project_detail
-                </span>
-            </div>*@
+        <div class="b-div">
+            <span class="b-label">
+                设备编号:
+            </span>
+            <span class="b-input">
+                @m.bill.property_number
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                设备型号:
+            </span>
+            <span class="b-input">
+                @m.bill.property_modual
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                设备原价值:
+            </span>
+            <span class="b-input">
+                @m.bill.property_worth
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                启用日期:
+            </span>
+            <span class="b-input">
+                @(((DateTime)m.bill.property_enable_date).ToString("yyyy-MM-dd"))
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                闲置时间:
+            </span>
+            <span class="b-input">
+                @m.bill.property_idle_time
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                数量与单位:
+            </span>
+            <span class="b-input">
+                @m.bill.property_qty_unit
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                设备卡片号:
+            </span>
+            <span class="b-input">
+                @m.bill.property_card_no
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                产地/供应商:
+            </span>
+            <span class="b-input">
+                @m.bill.property_supplier
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                设备其它信息:
+            </span>
+            <span class="b-input">
+                @m.bill.property_other_comment
+            </span>
+        </div>
         <div class="b-div">
             <span class="b-label">
                 申请原因:
@@ -228,30 +281,10 @@
         </div>
         <div class="b-div">
             <span class="b-label">
-                是否多部门分摊:
-            </span>
-            <div class="b-input">
-                @(m.bill.is_share_fee ? "是" : "否")
-            </div>
-        </div>
-        @if (m.bill.is_share_fee) {
-            <div class="b-div">
-                <span class="b-label">
-                    分摊明细:
-                </span>
-                <div class="b-input">
-                    @foreach (var share in shareList) {
-                        <div><i class="fa fa-square"></i> @share.n.Split(new char[]{'_'})[1] : @string.Concat(share.v,"%") </div>
-                    }
-                </div>
-            </div>
-        }
-        <div class="b-div">
-            <span class="b-label">
                 项目收益:
             </span>
             <span class="b-input">
-                @(m.bill.has_profit ? "有项目收益" : "无项目收益（维修维护类）")
+                @(m.bill.has_profit ? "有收益" : "无收益")
             </span>
         </div>
         @if (m.bill.has_profit) {
@@ -269,6 +302,14 @@
                 </span>
                 <span class="b-input">
                     @m.bill.productivity_profit
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    战略性投资:
+                </span>
+                <span class="b-input">
+                    @m.bill.strategy_profit
                 </span>
             </div>
             <div class="b-div">
@@ -304,16 +345,6 @@
                 @m.bill.dept_charger_name
             </span>
         </div>
-        @if (m.bill.is_po != null) {
-            <div class="b-div">
-                <span class="b-label">
-                    是否为PO单:
-                </span>
-                <span class="b-input">
-                    @(m.bill.is_po==true?"是":"否")
-                </span>
-            </div>
-        }
         @if (m.suppliers.Count() > 0) {
             <div class="b-div">
                 <span class="b-label">
@@ -333,19 +364,51 @@
                 </div>
             }
         }
+        @if (m.bill.has_match_equitment != null) {
+            <div class="b-div">
+                <span class="b-label">
+                    是否有闲置匹配设备:
+                </span>
+                <span class="b-input">
+                    @(m.bill.has_match_equitment==true?"有":"无")
+                </span>
+            </div>
+            if (m.bill.has_match_equitment == true) {
+                <div class="b-div">
+                    <span class="b-label">
+                        闲置匹配设备信息:
+                    </span>
+                    <span class="b-input">
+                        @string.Format("型号：{0}；生命周期（按产量：{1}；按时间：{2}）",m.bill.match_equitment_modual,m.bill.match_equitment_output,m.bill.match_equitment_period)
+                    </span>
+                </div>
+            }
+            else {
+                <div class="b-div">
+                    <span class="b-label">
+                        原因:
+                    </span>
+                    <span class="b-input">
+                        @m.bill.match_equitment_none_reason
+                    </span>
+                </div>
+            }
+        }
         <div style="margin-top:6px;">
-            <div class="b-label">现场照片:</div>
+            <div class="b-label">设备照片:</div>
             <div id="attList3"></div>
         </div>
-        <div style="margin-top:6px;">
-            <div class="b-label">施工清单:</div>
-            <div id="attList1"></div>
-        </div>
-        @*<div style="margin-top:6px;">
-                <div class="b-label">报价单:</div>
+        @if ("设备外卖".Equals(m.bill.deal_type)) { 
+            <div style="margin-top:6px;">
+                <div class="b-label">设备清单:</div>
+                <div id="attList1"></div>
+            </div>
+        }else if ("设备报废".Equals(m.bill.deal_type)) {
+            <div style="margin-top:6px;">
+                <div class="b-label">复核照片:</div>
                 <div id="attList2"></div>
-            </div>*@
-
+            </div>
+        }
 
     </div>
 </div>

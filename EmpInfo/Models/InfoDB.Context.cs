@@ -160,6 +160,7 @@ namespace EmpInfo.Models
         public DbSet<flow_templateEntry> flow_templateEntry { get; set; }
         public DbSet<vw_ep_dep> vw_ep_dep { get; set; }
         public DbSet<ei_mtApply> ei_mtApply { get; set; }
+        public DbSet<ei_xbApply> ei_xbApply { get; set; }
     
         public virtual ObjectResult<string> GetDormChargeMonth()
         {

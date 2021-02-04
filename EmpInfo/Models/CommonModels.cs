@@ -5,6 +5,31 @@ using System.Web;
 
 namespace EmpInfo.Models
 {
+    public class fieldModel
+    {
+        public fieldModel() { }
+        public fieldModel(string _filedName,string _fieldText, string _tip)
+        {
+            this.fieldType = "input";
+            this.fieldName = _filedName;
+            this.fieldText = _fieldText;
+            this.tip = _tip;
+            this.required = true;
+        }
+        public fieldModel(string _fieldType, string _filedName, string _fieldText, string _tip, bool _required = true)
+        {
+            this.fieldType = _fieldType;
+            this.fieldText = _fieldText;
+            this.fieldName = _filedName;
+            this.tip = _tip;
+            this.required = _required;
+        }
+        public string fieldType { get; set; }
+        public string fieldText { get; set; }
+        public string fieldName { get; set; }
+        public string tip { get; set; }
+        public bool required { get; set; }
+    }
     public class SelectModel
     {
         public string text { get; set; }

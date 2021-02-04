@@ -1597,6 +1597,7 @@
           <Property Name="is_share_fee" Type="bit" Nullable="false" />
           <Property Name="share_fee_detail" Type="nvarchar" MaxLength="500" />
           <Property Name="share_fee_managers" Type="varchar" MaxLength="500" />
+          <Property Name="is_po" Type="bit" />
         </EntityType>
         <EntityType Name="ei_xaApplySupplier">
           <Key>
@@ -1607,6 +1608,51 @@
           <Property Name="supplier_name" Type="nvarchar" MaxLength="200" />
           <Property Name="price" Type="decimal" Precision="12" Scale="2" />
           <Property Name="is_bidder" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ei_xbApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="applier_phone" Type="varchar" MaxLength="50" />
+          <Property Name="apply_time" Type="datetime" Nullable="false" />
+          <Property Name="company" Type="nvarchar" MaxLength="20" />
+          <Property Name="dept_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="addr" Type="nvarchar" MaxLength="100" />
+          <Property Name="bill_no" Type="nvarchar" MaxLength="50" />
+          <Property Name="deal_type" Type="nvarchar" MaxLength="50" />
+          <Property Name="property_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="property_worth" Type="nvarchar" MaxLength="100" />
+          <Property Name="property_enable_date" Type="smalldatetime" />
+          <Property Name="property_idle_time" Type="nvarchar" MaxLength="200" />
+          <Property Name="property_modual" Type="nvarchar" MaxLength="200" />
+          <Property Name="property_number" Type="nvarchar" MaxLength="100" />
+          <Property Name="property_card_no" Type="nvarchar" MaxLength="100" />
+          <Property Name="property_supplier" Type="nvarchar" MaxLength="100" />
+          <Property Name="property_qty_unit" Type="nvarchar" MaxLength="100" />
+          <Property Name="property_other_comment" Type="nvarchar" MaxLength="500" />
+          <Property Name="reason" Type="nvarchar" MaxLength="500" />
+          <Property Name="demands" Type="nvarchar" MaxLength="1000" />
+          <Property Name="has_profit" Type="bit" Nullable="false" />
+          <Property Name="save_people" Type="nvarchar" MaxLength="500" />
+          <Property Name="strategy_profit" Type="nvarchar" MaxLength="500" />
+          <Property Name="productivity_profit" Type="nvarchar" MaxLength="500" />
+          <Property Name="other_profit" Type="nvarchar" MaxLength="500" />
+          <Property Name="profit_confirm_people_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="profit_confirm_people_num" Type="nvarchar" MaxLength="200" />
+          <Property Name="equitment_auditor_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="equitment_auditor_num" Type="varchar" MaxLength="50" />
+          <Property Name="dept_charger_name" Type="nvarchar" MaxLength="100" />
+          <Property Name="dept_charger_num" Type="nvarchar" MaxLength="50" />
+          <Property Name="can_print" Type="bit" Nullable="false" />
+          <Property Name="has_match_equitment" Type="bit" />
+          <Property Name="match_equitment_modual" Type="nvarchar" MaxLength="200" />
+          <Property Name="match_equitment_output" Type="nvarchar" MaxLength="200" />
+          <Property Name="match_equitment_period" Type="nvarchar" MaxLength="100" />
+          <Property Name="match_equitment_none_reason" Type="nvarchar" MaxLength="200" />
         </EntityType>
         <EntityType Name="flow_apply">
           <Key>
@@ -1846,6 +1892,7 @@
           <Property Name="has_attachment" Type="bit" />
           <Property Name="apply_time" Type="datetime" />
           <Property Name="dep_id" Type="int" />
+          <Property Name="go_where" Type="nvarchar" MaxLength="100" />
           <Property Name="status" Type="varchar" MaxLength="6" Nullable="false" />
           <Property Name="salary_no" Type="varchar" MaxLength="20" />
           <Property Name="current_auditors" Type="varchar" MaxLength="500" Nullable="false" />
@@ -3194,6 +3241,7 @@
           <EntitySet Name="ei_vacationDays" EntityType="Self.ei_vacationDays" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_xaApply" EntityType="Self.ei_xaApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_xaApplySupplier" EntityType="Self.ei_xaApplySupplier" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_xbApply" EntityType="Self.ei_xbApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="flow_apply" EntityType="Self.flow_apply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="flow_applyEntry" EntityType="Self.flow_applyEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="flow_applyEntryQueue" EntityType="Self.flow_applyEntryQueue" Schema="dbo" store:Type="Tables" />
@@ -3259,6 +3307,7 @@ FROM [dbo].[vw_APExcel] AS [vw_APExcel]</DefiningQuery>
 [vw_askLeaveReport].[has_attachment] AS [has_attachment], 
 [vw_askLeaveReport].[apply_time] AS [apply_time], 
 [vw_askLeaveReport].[dep_id] AS [dep_id], 
+[vw_askLeaveReport].[go_where] AS [go_where], 
 [vw_askLeaveReport].[status] AS [status], 
 [vw_askLeaveReport].[salary_no] AS [salary_no], 
 [vw_askLeaveReport].[current_auditors] AS [current_auditors], 
@@ -4426,6 +4475,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           </AssociationSet>
           <EntitySet Name="vw_ep_dep" EntityType="ICAuditModel.vw_ep_dep" />
           <EntitySet Name="ei_mtApply" EntityType="ICAuditModel.ei_mtApply" />
+          <EntitySet Name="ei_xbApply" EntityType="ICAuditModel.ei_xbApply" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -5378,6 +5428,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="check2" Type="Boolean" />
           <Property Name="agent_man_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="inform_man_name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="go_where" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
         </EntityType>
         <ComplexType Name="GetOutStockBillsForAudit1To2_Result">
           <Property Type="Int32" Name="interId" Nullable="false" />
@@ -7454,6 +7505,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="is_share_fee" Type="Boolean" Nullable="false" />
           <Property Name="share_fee_detail" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="share_fee_managers" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="is_po" Type="Boolean" />
         </EntityType>
         <EntityType Name="ei_xaApplySupplier">
           <Key>
@@ -7635,6 +7687,51 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="maintence_time" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="ei_xbApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="applier_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="apply_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="company" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="dept_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="addr" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="bill_no" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="deal_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="property_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="property_worth" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="property_enable_date" Type="DateTime" Precision="0" />
+          <Property Name="property_idle_time" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="property_modual" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="property_number" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="property_card_no" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="property_supplier" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="property_qty_unit" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="property_other_comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="reason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="demands" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="has_profit" Type="Boolean" Nullable="false" />
+          <Property Name="save_people" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="strategy_profit" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="productivity_profit" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="other_profit" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="profit_confirm_people_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="profit_confirm_people_num" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="equitment_auditor_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="equitment_auditor_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="dept_charger_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="dept_charger_num" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="can_print" Type="Boolean" Nullable="false" />
+          <Property Name="has_match_equitment" Type="Boolean" />
+          <Property Name="match_equitment_modual" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="match_equitment_output" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="match_equitment_period" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="match_equitment_none_reason" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -8431,6 +8528,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="vw_askLeaveReport">
             <EntityTypeMapping TypeName="ICAuditModel.vw_askLeaveReport">
               <MappingFragment StoreEntitySet="vw_askLeaveReport">
+                <ScalarProperty Name="go_where" ColumnName="go_where" />
                 <ScalarProperty Name="inform_man_name" ColumnName="inform_man_name" />
                 <ScalarProperty Name="agent_man_name" ColumnName="agent_man_name" />
                 <ScalarProperty Name="check2" ColumnName="check2" />
@@ -10448,6 +10546,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_xaApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_xaApply">
               <MappingFragment StoreEntitySet="ei_xaApply">
+                <ScalarProperty Name="is_po" ColumnName="is_po" />
                 <ScalarProperty Name="share_fee_managers" ColumnName="share_fee_managers" />
                 <ScalarProperty Name="share_fee_detail" ColumnName="share_fee_detail" />
                 <ScalarProperty Name="is_share_fee" ColumnName="is_share_fee" />
@@ -10629,6 +10728,52 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="apply_time" ColumnName="apply_time" />
                 <ScalarProperty Name="applier_name" ColumnName="applier_name" />
                 <ScalarProperty Name="applier_number" ColumnName="applier_number" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_xbApply">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_xbApply">
+              <MappingFragment StoreEntitySet="ei_xbApply">
+                <ScalarProperty Name="match_equitment_none_reason" ColumnName="match_equitment_none_reason" />
+                <ScalarProperty Name="match_equitment_period" ColumnName="match_equitment_period" />
+                <ScalarProperty Name="match_equitment_output" ColumnName="match_equitment_output" />
+                <ScalarProperty Name="match_equitment_modual" ColumnName="match_equitment_modual" />
+                <ScalarProperty Name="has_match_equitment" ColumnName="has_match_equitment" />
+                <ScalarProperty Name="can_print" ColumnName="can_print" />
+                <ScalarProperty Name="dept_charger_num" ColumnName="dept_charger_num" />
+                <ScalarProperty Name="dept_charger_name" ColumnName="dept_charger_name" />
+                <ScalarProperty Name="equitment_auditor_num" ColumnName="equitment_auditor_num" />
+                <ScalarProperty Name="equitment_auditor_name" ColumnName="equitment_auditor_name" />
+                <ScalarProperty Name="profit_confirm_people_num" ColumnName="profit_confirm_people_num" />
+                <ScalarProperty Name="profit_confirm_people_name" ColumnName="profit_confirm_people_name" />
+                <ScalarProperty Name="other_profit" ColumnName="other_profit" />
+                <ScalarProperty Name="productivity_profit" ColumnName="productivity_profit" />
+                <ScalarProperty Name="strategy_profit" ColumnName="strategy_profit" />
+                <ScalarProperty Name="save_people" ColumnName="save_people" />
+                <ScalarProperty Name="has_profit" ColumnName="has_profit" />
+                <ScalarProperty Name="demands" ColumnName="demands" />
+                <ScalarProperty Name="reason" ColumnName="reason" />
+                <ScalarProperty Name="property_other_comment" ColumnName="property_other_comment" />
+                <ScalarProperty Name="property_qty_unit" ColumnName="property_qty_unit" />
+                <ScalarProperty Name="property_supplier" ColumnName="property_supplier" />
+                <ScalarProperty Name="property_card_no" ColumnName="property_card_no" />
+                <ScalarProperty Name="property_number" ColumnName="property_number" />
+                <ScalarProperty Name="property_modual" ColumnName="property_modual" />
+                <ScalarProperty Name="property_idle_time" ColumnName="property_idle_time" />
+                <ScalarProperty Name="property_enable_date" ColumnName="property_enable_date" />
+                <ScalarProperty Name="property_worth" ColumnName="property_worth" />
+                <ScalarProperty Name="property_name" ColumnName="property_name" />
+                <ScalarProperty Name="deal_type" ColumnName="deal_type" />
+                <ScalarProperty Name="bill_no" ColumnName="bill_no" />
+                <ScalarProperty Name="addr" ColumnName="addr" />
+                <ScalarProperty Name="dept_name" ColumnName="dept_name" />
+                <ScalarProperty Name="company" ColumnName="company" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_phone" ColumnName="applier_phone" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

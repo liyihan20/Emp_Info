@@ -113,12 +113,11 @@
 
         $("#alReportBt").on("click", function () {
             $(this).button("loading");
-            $("#alCheckBt").addClass("disabled");
             exportDatas("BeginExportALExcel");
             
             window.setTimeout(function () {
                 $("#alReportBt").button("reset");
-                $("#alCheckBt").removeClass("disabled");
+                
             }, 15 * 1000);
 
         });
@@ -230,8 +229,7 @@
             toastr.error("请先选择结束日期");
             return;
         }
-
-        $("#alCheckBt").button("loading");
+        
         $("#alReportBt").addClass("disabled");
         window.location.href = "@Url.Content("~/Report/")" + method
             + "?depId=" + depId

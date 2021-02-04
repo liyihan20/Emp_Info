@@ -12,26 +12,36 @@ namespace EmpInfo.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class ei_xaApply
+    public partial class ei_xbApply
     {
         public int id { get; set; }
         public string sys_no { get; set; }
         public string applier_num { get; set; }
         public string applier_name { get; set; }
+        public string applier_phone { get; set; }
         public System.DateTime apply_time { get; set; }
-        public string project_name { get; set; }
+        public string company { get; set; }
         public string dept_name { get; set; }
         public string addr { get; set; }
         public string bill_no { get; set; }
-        public string classification { get; set; }
-        public string project_type { get; set; }
-        public string project_detail { get; set; }
+        public string deal_type { get; set; }
+        public string property_name { get; set; }
+        public string property_worth { get; set; }
+        public Nullable<System.DateTime> property_enable_date { get; set; }
+        public string property_idle_time { get; set; }
+        public string property_modual { get; set; }
+        public string property_number { get; set; }
+        public string property_card_no { get; set; }
+        public string property_supplier { get; set; }
+        public string property_qty_unit { get; set; }
+        public string property_other_comment { get; set; }
         public string reason { get; set; }
         public string demands { get; set; }
+        public bool has_profit { get; set; }
         public string save_people { get; set; }
+        public string strategy_profit { get; set; }
         public string productivity_profit { get; set; }
         public string other_profit { get; set; }
-        public bool has_profit { get; set; }
         public string profit_confirm_people_name { get; set; }
         public string profit_confirm_people_num { get; set; }
         public string equitment_auditor_name { get; set; }
@@ -39,12 +49,10 @@ namespace EmpInfo.Models
         public string dept_charger_name { get; set; }
         public string dept_charger_num { get; set; }
         public bool can_print { get; set; }
-        public Nullable<System.DateTime> check_date { get; set; }
-        public string company { get; set; }
-        public string applier_phone { get; set; }
-        public bool is_share_fee { get; set; }
-        public string share_fee_detail { get; set; }
-        public string share_fee_managers { get; set; }
-        public Nullable<bool> is_po { get; set; }
+        public Nullable<bool> has_match_equitment { get; set; }
+        public string match_equitment_modual { get; set; }
+        public string match_equitment_output { get; set; }
+        public string match_equitment_period { get; set; }
+        public string match_equitment_none_reason { get; set; }
     }
 }

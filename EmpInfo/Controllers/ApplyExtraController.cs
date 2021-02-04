@@ -842,8 +842,16 @@ namespace EmpInfo.Controllers
         public JsonResult AddXASpplier(string sysNo,string supplierName)
         {
             try {
-                var result = new XASv(sysNo).AddSupplier(supplierName);
-                return Json(new SimpleResultModel(true, "", JsonConvert.SerializeObject(result)));
+                if (db.ei_xaApplySupplier.Where(s => s.sys_no == sysNo && s.supplier_name == supplierName).Count() > 0) {
+                    throw new Exception("此供应商已存在，不能再新增");
+                }
+                var supplier = db.ei_xaApplySupplier.Add(new ei_xaApplySupplier()
+                {
+                    sys_no = sysNo,
+                    supplier_name = supplierName
+                });
+                db.SaveChanges();
+                return Json(new SimpleResultModel(true, "", JsonConvert.SerializeObject(supplier)));
             }
             catch (Exception ex) {
                 return Json(new SimpleResultModel(ex));
@@ -853,7 +861,11 @@ namespace EmpInfo.Controllers
         public JsonResult UpdateXASupplierName(int id, string supplierName)
         {
             try {
-                new XASv().UpdateSupplierName(id, supplierName);
+                var supplier = db.ei_xaApplySupplier.SingleOrDefault(s => s.id == id);
+                if (supplier != null) {
+                    supplier.supplier_name = supplierName;
+                    db.SaveChanges();
+                }
                 return Json(new SimpleResultModel(true));
             }
             catch (Exception ex) {
@@ -864,7 +876,16 @@ namespace EmpInfo.Controllers
         public JsonResult UpdateXASupplierPrice(int id, decimal price)
         {
             try {
-                new XASv().UpdateSupplierPrice(id, price);
+                var supplier = db.ei_xaApplySupplier.SingleOrDefault(s => s.id == id);
+                if (supplier != null) {
+                    if (price == 0) {
+                        supplier.price = null;
+                    }
+                    else {
+                        supplier.price = price;
+                    }
+                    db.SaveChanges();
+                }
                 return Json(new SimpleResultModel(true));
             }
             catch (Exception ex) {
@@ -875,7 +896,11 @@ namespace EmpInfo.Controllers
         public JsonResult RemoveXASupplier(int id)
         {
             try {
-                new XASv().RemoveSupplier(id);
+                var supplier = db.ei_xaApplySupplier.SingleOrDefault(s => s.id == id);
+                if (supplier != null) {
+                    db.ei_xaApplySupplier.Remove(supplier);
+                    db.SaveChanges();
+                }
                 return Json(new SimpleResultModel(true));
             }
             catch (Exception ex) {
@@ -960,6 +985,7 @@ namespace EmpInfo.Controllers
                     }
                     else {
                         var rel = db.flow_auditorRelation.Single(f => f.id == m.id);
+
                         rel.relate_text = relateText;
                         rel.relate_value = relateValue;
                     }

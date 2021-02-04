@@ -168,6 +168,7 @@
         <AssociationConnector Association="ICAuditModel.FK_flow_templateEntry_flow_template" />
         <EntityTypeShape EntityType="ICAuditModel.vw_ep_dep" Width="1.5" PointX="12.625" PointY="4.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_mtApply" Width="1.5" PointX="8.25" PointY="19.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_xbApply" Width="1.5" PointX="0.5" PointY="18.75" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

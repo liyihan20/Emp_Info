@@ -157,16 +157,25 @@ namespace EmpInfo.Services
                     }
                 }
                 if (stepName.Contains("上传报价单")) {
+                    bool isPO;
+                    if (!bool.TryParse(fc.Get("is_po"), out isPO)) {
+                        throw new Exception("必须选择是否为PO单");
+                    }
+                    bill.is_po = isPO;
                     if (db.ei_xaApplySupplier.Where(x => x.sys_no == bill.sys_no && x.price != null).Count() < 1) {
                         throw new Exception("请至少录入一个供应商的价格再审批");
                     }
                 }
                 if (stepName.Contains("审核部最终确认")) {
+                    //如果之前已经有选的，先清空
+                    var bidderBefore = db.ei_xaApplySupplier.Where(s => s.sys_no == bill.sys_no && s.is_bidder == true).FirstOrDefault();
+                    if(bidderBefore!=null)  bidderBefore.is_bidder = false;
+                    
                     int bidderId = 0;
                     int.TryParse(bidder, out bidderId);
                     var bidderSupplier = db.ei_xaApplySupplier.Where(s => s.sys_no == bill.sys_no && s.id == bidderId).FirstOrDefault();
                     if (bidderSupplier == null) {
-                        bidderSupplier = db.ei_xaApplySupplier.Where(s => s.sys_no == bill.sys_no && s.price != null).OrderBy(s => s.price).FirstOrDefault();
+                        bidderSupplier = db.ei_xaApplySupplier.Where(s => s.sys_no == bill.sys_no && s.price != null && s.price > 0).OrderBy(s => s.price).FirstOrDefault();
                         if (bidderSupplier == null) {
                             throw new Exception("所有供应商都未录入价格，审批失败");
                         }
@@ -310,48 +319,6 @@ namespace EmpInfo.Services
                     }
 
                 }
-            }
-        }
-
-        public ei_xaApplySupplier AddSupplier(string supplierName)
-        {
-            if (db.ei_xaApplySupplier.Where(s => s.sys_no == bill.sys_no && s.supplier_name == supplierName).Count() > 0) {
-                throw new Exception("此供应商已存在，不能再新增"); 
-            }
-            var supplier = db.ei_xaApplySupplier.Add(new ei_xaApplySupplier()
-            {
-                sys_no = bill.sys_no,
-                supplier_name = supplierName
-            });
-            db.SaveChanges();
-
-            return supplier;
-        }
-
-        public void UpdateSupplierName(int id, string supplierName)
-        {
-            var supplier = db.ei_xaApplySupplier.SingleOrDefault(s => s.id == id);
-            if (supplier != null) {
-                supplier.supplier_name = supplierName;
-                db.SaveChanges();
-            }
-        }
-
-        public void UpdateSupplierPrice(int id, decimal price)
-        {
-            var supplier = db.ei_xaApplySupplier.SingleOrDefault(s => s.id == id);
-            if (supplier != null) {
-                supplier.price = price;
-                db.SaveChanges();
-            }
-        }
-
-        public void RemoveSupplier(int id)
-        {
-            var supplier = db.ei_xaApplySupplier.SingleOrDefault(s => s.id == id);
-            if (supplier != null) {
-                db.ei_xaApplySupplier.Remove(supplier);
-                db.SaveChanges();
             }
         }
 

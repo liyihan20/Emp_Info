@@ -362,5 +362,26 @@ namespace EmpInfo.Models
         public ei_mtClass cla { get; set; }
     }
 
+    public class XBCheckApplyModel
+    {
+        public ei_xbApply bill;
+        public List<ei_xaApplySupplier> suppliers;
+    }
 
+    public class XBBeforeApplyModel
+    {
+        public string sys_no { get; set; }
+        public string applierName { get; set; }
+        public List<string> depNameList { get; set; }
+    }
+
+    public class XBSearchReportModel
+    {
+        public string sysNo { get; set; }
+        public string dealType { get; set; }
+        public string applierName { get; set; }
+        public DateTime fromDate { get; set; }
+        public DateTime toDate { get; set; }
+        public string equitmentName { get; set; }
+    }
 }
