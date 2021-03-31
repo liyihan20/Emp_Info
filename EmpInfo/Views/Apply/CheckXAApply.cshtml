@@ -314,6 +314,16 @@
                 </span>
             </div>
         }
+        @if (m.bill.confirm_date != null) {
+            <div class="b-div">
+                <span class="b-label">
+                    审核部确认日期:
+                </span>
+                <span class="b-input">
+                    @(((DateTime)m.bill.confirm_date).ToString("yyyy-MM-dd HH:mm"))
+                </span>
+            </div>
+        }
         @if (m.suppliers.Count() > 0) {
             <div class="b-div">
                 <span class="b-label">

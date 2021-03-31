@@ -56,7 +56,8 @@
             },
             onClickRow: function (row, ele, field) {
                 var sysNo = $.trim(row[0]);
-                window.location.href = "CheckApply?sysNo=" + sysNo;
+                var step = $.trim(row[1]);
+                window.location.href = "BeginAuditApply?sysNo=" + sysNo +"&step="+step;
             }
         });
     $(function () {
@@ -155,6 +156,7 @@
                 <thead>
                     <tr>
                         <th data-width="10%">申请单号</th>
+                        <th data-width="0%" data-visible="false">step</th>
                         <th data-width="10%">申请日期</th>
                         <th data-width="10%">申请人</th>
                         <th data-width="45%">申请内容</th>
@@ -166,6 +168,7 @@
                     @foreach (var l in list) {
                         <tr>
                             <td>@l.sysNo</td>
+                            <td>@l.step</td>
                             <td>@(((DateTime)l.applyTime).ToString("MM-dd HH:mm"))</td>
                             <td>@l.applier</td>
                             <td>@l.title / @l.subTitle</td>

@@ -343,6 +343,21 @@ namespace EmpInfo.Models
         public DateTime fromDate { get; set; }
         public DateTime toDate { get; set; }
         public string projectName { get; set; }
+        public string deptName { get; set; }
+        public string currentNode { get; set; }
+    }
+
+    public class XASummaryDetailModel
+    {
+        public string 流水号 { get; set; }
+        public string 部门名称 { get; set; }
+        public string 确认日期 { get; set; }
+        public string 申请人 { get; set; }
+        public string 项目名称 { get; set; }
+        public string 是否PO { get; set; }
+        public string 中标供应商 { get; set; }
+        public string 价格 { get; set; }
+        public string 是否分摊单 { get; set; }
     }
 
     public class MTUpdateEqInfoModel

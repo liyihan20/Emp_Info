@@ -1,0 +1,126 @@
+﻿
+@section CSS{
+    <style type="text/css">
+        .depName{
+            cursor:pointer;
+        }
+    </style>
+}
+
+<script>
+    $(function () {
+        $("#searchReportBt").on("click", function () {
+            $.post("SearchXASummary", { year: $("#yearSt").val(), month: $("#monthSt").val(),isPO: $("#isPO").val() }, function (data) {
+                if (data.length < 1) {
+                    toastr.error("此时间段查不到已审核的项目单费用");
+                    return;
+                }
+                $(".btn_yearmonth").html($("#yearSt").val() + "-" + $("#monthSt").val());
+                $("#tb").empty();
+
+                var html = "";
+                var sum = 0;
+                var isSmallScreen = $(document).width() < 600; //是否小屏幕，如果是小的，则表格一行只显示两格，否则一行显示四格
+                for (var i = 0; i < data.length; i++) {
+                    if (i % 2 == 0 || isSmallScreen) {
+                        html += "<tr>";
+                    }
+
+                    html += "<td style='width:30%;'><span class='depName'>" + data[i].name + "</span></td><td style='width:20%;'><b class='text-primary'>" + parseDecimal(data[i].value) + "</b></td>";
+
+                    if (i % 2 == 1 || isSmallScreen) {
+                        html += "</tr>";
+                    }
+
+                    sum += data[i].value;
+                }
+                if (data.length % 2 == 1 && !isSmallScreen) {
+                    html += "</tr>";
+                }
+
+                html += "<tr><td><b class='text-danger'>费用汇总：</b></td><td><b class='text-danger'>" + parseDecimal(sum.toFixed(2)) + "</b></td></tr>";
+
+                $("#tb").append(html);
+
+            });
+        });
+
+        $("#tb").on("click", ".depName", function () {
+            window.open("CheckXASummaryDetail?year=" + $("#yearSt").val() + "&month=" + $("#monthSt").val() + "&isPO=" + $("#isPO").val() + "&depName=" + $(this).html());
+        })
+
+    })
+
+    function parseDecimal(value) {
+        if (isNaN(value)) return value;
+        if (value == 0 || value == "" || value == null) return "--";
+        var partInt = parseInt(value); //取出整数部分
+        var partDecimal = value.toString().split(".")[1]; //取出小数部分
+        var isInt = (value - partInt < 0.0000001); //原数字是否整数
+        //对整数部分加千分位逗号
+        var partIntStr = partInt.toString();
+        var result = "";
+        while (partIntStr.length > 3) {
+            result = "," + partIntStr.slice(-3) + result;
+            partIntStr = partIntStr.slice(0, partIntStr.length - 3);
+        }
+        if (partIntStr.length > 0) result = partIntStr + result;
+        //加上小数部分
+        if (!isInt) {
+            result = result + "." + partDecimal;
+        }
+        return result;
+    }
+
+</script>
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=XA")">项目单申请流程</a></li>
+            <li class="active">费用统计</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-sm-4 col-md-3" style="margin-bottom:12px;">
+                年度：
+                <select class="form-control" id="yearSt" style="width:120px;display:inline-block;">
+                    @for (var i = DateTime.Now.Year; i >= 2021; i--) {
+                        <option value="@i">@i</option>
+                    }
+                </select>
+            </div>
+            <div class="col-xs-12 col-sm-4 col-md-3" style="margin-bottom:12px;">                
+                月份：
+                <select class="form-control" id="monthSt" style="width:120px;display:inline-block;">
+                    @for (var i = 1; i <= 12; i++) {
+                        <option value="@i.ToString("00")">@i.ToString("00")</option>
+                    }
+                    <option value="整年">整年</option>
+                </select>
+            </div>
+            <div class="col-xs-12 col-sm-4 col-md-3" style="margin-bottom:12px;">
+                是否PO：
+                <select class="form-control" id="isPO" style="width:120px;display:inline-block;">   
+                    <option value="null">所有</option>                 
+                    <option value="true">是</option>
+                    <option value="false">否</option>
+                </select>
+            </div>
+            <div class="col-xs-12 col-sm-3 col-md-2" style="margin-bottom:12px;">
+                <button class="btn btn-primary btn-block" id="searchReportBt" data-loading-text="查询与计算中..."><i class="fa fa-search"></i> 开始统计</button>
+            </div>
+        </div>
+        <div class="small text-danger"><i class="fa fa-info-circle"></i> 2021年之后开始有统计数据</div>
+
+        <button class="btn btn-block btn-danger disabled" style="text-align:left;margin-bottom:2px;margin-top:16px;border-radius:0;font-style:italic;"><i class="fa fa-cny"></i> <span class="btn_yearmonth"></span> 费用统计结果</button>
+        <table class="table table-bordered" id="tb">
+
+        </table>
+
+    </div>
+</div>

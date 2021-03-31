@@ -167,7 +167,7 @@ namespace EmpInfo.Services
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
             FlowResultModel result;
             if (returnBack) {
-                result = flow.ToPreStep(bill.sys_no, step,stepName, userInfo.cardNo, opinion);
+                result = flow.ToPreStep(bill.sys_no, step, userInfo.cardNo,-1, opinion);
             }
             else {
                 string formJson = JsonConvert.SerializeObject(bill);
@@ -184,56 +184,56 @@ namespace EmpInfo.Services
 
         public override void SendNotification(FlowResultModel model)
         {
-            //if (model.suc) {
-            //    if (model.msg.Contains("完成") || model.msg.Contains("成功中止")) {
-            //        bool isSuc = model.msg.Contains("NG") ? false : true;
-            //        string ccEmails = "";
+            if (model.suc) {
+                if (model.msg.Contains("完成") || model.msg.Contains("成功中止")) {
+                    bool isSuc = model.msg.Contains("NG") ? false : true;
+                    string ccEmails = "";
 
-            //        SendEmailForCompleted(
-            //            bill.sys_no,
-            //            BillTypeName + "已" + (isSuc ? "批准" : "被撤销"),
-            //            bill.applier_name,
-            //            string.Format("你申请的单号为【{0}】的{1}已{2}，请知悉。", bill.sys_no, BillTypeName, (isSuc ? "批准" : "被撤销")),
-            //            GetUserEmailByCardNum(bill.applier_num),
-            //            ccEmails
-            //            );
-            //        SendQywxMessageForCompleted(
-            //            BillTypeName,
-            //            bill.sys_no,
-            //            (isSuc ? "批准" : "被撤销"),
-            //            new List<string>() { bill.applier_num }
-            //            );
-            //    }
-            //    else {
-            //        string isReturn = "";
-            //        if (model.msg.Contains("退回")) {
-            //            isReturn = "【下一处理人退回】";
-            //        }
-            //        FlowSvrSoapClient flow = new FlowSvrSoapClient();
-            //        var result = flow.GetCurrentStep(bill.sys_no);
+                    SendEmailForCompleted(
+                        bill.sys_no,
+                        BillTypeName + "已" + (isSuc ? "批准" : "被撤销"),
+                        bill.applier_name,
+                        string.Format("你申请的单号为【{0}】的{1}已{2}，请知悉。", bill.sys_no, BillTypeName, (isSuc ? "批准" : "被撤销")),
+                        GetUserEmailByCardNum(bill.applier_num),
+                        ccEmails
+                        );
+                    SendQywxMessageForCompleted(
+                        BillTypeName,
+                        bill.sys_no,
+                        (isSuc ? "批准" : "被撤销"),
+                        new List<string>() { bill.applier_num }
+                        );
+                }
+                else {
+                    string isReturn = "";
+                    if (model.msg.Contains("退回")) {
+                        isReturn = "【后续节点处理人退回】";
+                    }
+                    FlowSvrSoapClient flow = new FlowSvrSoapClient();
+                    var result = flow.GetCurrentStep(bill.sys_no);
 
-            //        SendEmailToNextAuditor(
-            //            bill.sys_no + isReturn,
-            //            result.step,
-            //            string.Format("你有一张待审批的{0}", BillTypeName),
-            //            GetUserNameByCardNum(model.nextAuditors),
-            //            string.Format("你有一张待处理的单号为【{0}】的{1},处理类别：{1}；设备名称：{2}，请尽快登陆系统处理。", bill.sys_no, BillTypeName, bill.deal_type, bill.property_name),
-            //            GetUserEmailByCardNum(model.nextAuditors)
-            //            );
+                    SendEmailToNextAuditor(
+                        bill.sys_no + isReturn,
+                        result.step,
+                        string.Format("你有一张待审批的{0}", BillTypeName),
+                        GetUserNameByCardNum(model.nextAuditors),
+                        string.Format("你有一张待处理的单号为【{0}】的{1},处理类别：{1}；设备名称：{2}，请尽快登陆系统处理。", bill.sys_no, BillTypeName, bill.deal_type, bill.property_name),
+                        GetUserEmailByCardNum(model.nextAuditors)
+                        );
 
-            //        string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-            //        SendQywxMessageToNextAuditor(
-            //            BillTypeName + isReturn,
-            //            bill.sys_no,
-            //            result.step,
-            //            result.stepName,
-            //            bill.applier_name,
-            //            ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
-            //            string.Format("处理类别：{0}；设备名称：{1}", bill.deal_type, bill.property_name),
-            //            nextAuditors.ToList()
-            //            );
-            //    }
-            //}
+                    string[] nextAuditors = model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    SendQywxMessageToNextAuditor(
+                        BillTypeName + isReturn,
+                        bill.sys_no,
+                        result.step,
+                        result.stepName,
+                        bill.applier_name,
+                        ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                        string.Format("处理类别：{0}；设备名称：{1}", bill.deal_type, bill.property_name),
+                        nextAuditors.ToList()
+                        );
+                }
+            }
         }
     }
 }

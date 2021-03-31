@@ -1,6 +1,7 @@
 ﻿@using EmpInfo.Models;
 @{
     ei_jqApply m = ViewData["am"] as ei_jqApply;
+    UserInfo userInfo = ViewData["currentUser"] as UserInfo;
 }
 @section CSS{    
     <style type="text/css">
@@ -423,7 +424,8 @@
                     <span style="display:inline-block;width:70%">
                         @(m.leave_date==null?"":((DateTime)m.leave_date).ToString("yyyy-MM-dd"))
                     </span>
-                </div>                
+                </div>
+                @if (!userInfo.cardNo.Equals(m.card_number)) { 
                 <div class="b-div">
                     <span class="b-label" style="vertical-align:top;width:150px;">
                         工作评价:
@@ -456,6 +458,7 @@
                         @m.employ_comment
                     </span>
                 </div>
+                }
             </div>
         }
             

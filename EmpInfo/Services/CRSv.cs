@@ -78,6 +78,11 @@ namespace EmpInfo.Services
                 throw new Exception("原因是补办厂牌的，必须上传附件！");
             }
 
+            //2021-03-13 罗继旺要求的限制，因为有人选错，跑到陈胜能那里
+            if (bill.dep_no.StartsWith("202")) {
+                throw new Exception("请确认部门后再提交，人力资源部不需处理楼刷卡流程");
+            }
+
             //处理一下审核队列,将姓名（厂牌）格式更换为厂牌
             if (!string.IsNullOrEmpty(bill.auditor_queues)) {
                 var queueList = JsonConvert.DeserializeObject<List<flow_applyEntryQueue>>(bill.auditor_queues);

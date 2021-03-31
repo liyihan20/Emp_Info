@@ -25,7 +25,7 @@ namespace EmpInfo.Services
 
         public override string BillTypeName
         {
-            get { return "后勤公共预约维修申请"; }
+            get { return "后勤公共区域维修申请"; }
         }
 
         public override string AuditViewName()

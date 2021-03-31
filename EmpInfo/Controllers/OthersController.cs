@@ -195,6 +195,13 @@ namespace EmpInfo.Controllers
 
             //加入工程支出的
             decimal deSum = db.ei_DEApplyEntry.Where(d => d.clear_date >= fromDate && d.clear_date < toDate).Sum(d => d.total_with_tax) ?? 0;
+            //再加上项目单的 2021-03-09
+            deSum += (from a in db.ei_xaApply
+                      join e in db.ei_xaApplySupplier on a.sys_no equals e.sys_no
+                      where a.confirm_date != null && e.is_bidder == true && a.dept_name == "后勤部"
+                      && a.confirm_date >= fromDate && a.confirm_date < toDate
+                      select e.price).Sum() ?? 0m;
+                            
             result.Add(new DormReportModel() { charge_type = "工程支出", type_sum = deSum });
 
             //从工资系统查询的后勤工资、宿舍房租和水电等
@@ -230,6 +237,14 @@ namespace EmpInfo.Controllers
                     summary as [摘要],convert(varchar(10),clear_date,23) as [结算日期]
                     from ei_DEApplyEntry ";
                 sqltext += string.Format("where clear_date >= '{0:yyyy-MM-dd}' and clear_date < '{1:yyyy-MM-dd}'", fromDate, toDate);
+                sqltext += @"union all
+                        select 
+	                        '项目单' as [类别],t1.project_type as [项目],t1.project_name as [名称],isnull(t2.price,0) as [金额],
+                            t1.addr as [摘要],convert(varchar(10),t1.confirm_date,23) as [结算日期]
+                        from ei_xaApply t1
+                        inner join ei_xaApplySupplier t2 on t1.sys_no = t2.sys_no and t2.is_bidder = 1
+                        where t1.confirm_date is not null and t1.dept_name='后勤部'";
+                sqltext += string.Format(" and t1.confirm_date >= '{0:yyyy-MM-dd}' and t1.confirm_date < '{1:yyyy-MM-dd}'", fromDate, toDate);
             }
             else if (new string[] { "辅料类", "设备类" }.Contains(chargeType)) {
                 sqltext = @"select

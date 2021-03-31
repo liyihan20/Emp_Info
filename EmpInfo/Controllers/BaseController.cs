@@ -280,10 +280,13 @@ namespace EmpInfo.Controllers
             string names = "";
             foreach (var num in cardNumbers.Split(new char[] { ';','；' })) {
                 if (!string.IsNullOrEmpty(num)) {
-                    var emp = db.vw_getAllhrEmp.Where(v => v.emp_no == num).ToList();
-                    if (emp.Count() > 0) {
+                    string name = db.ei_users.Where(u => u.card_number == num).Select(u => u.name).FirstOrDefault();
+                    if (name == null) {
+                        name = db.vw_getAllhrEmp.Where(v => v.emp_no == num).Select(v=>v.emp_name).FirstOrDefault();
+                    }                    
+                    if (name!=null) {
                         if (!string.IsNullOrEmpty(names)) names += ";";
-                        names += emp.First().emp_name;
+                        names += name;
                     }
                     else {
                         if (!string.IsNullOrEmpty(names)) names += ";";
@@ -301,10 +304,13 @@ namespace EmpInfo.Controllers
             string names = "";
             foreach (var num in cardNumbers.Split(new char[] { ';', '；' })) {
                 if (!string.IsNullOrEmpty(num)) {
-                    var emp = db.vw_getAllhrEmp.Where(v => v.emp_no == num).ToList();
-                    if (emp.Count() > 0) {
+                    string name = db.ei_users.Where(u => u.card_number == num).Select(u => u.name).FirstOrDefault();
+                    if (name == null) {
+                        name = db.vw_getAllhrEmp.Where(v => v.emp_no == num).Select(v => v.emp_name).FirstOrDefault();
+                    }
+                    if (name != null) {
                         if (!string.IsNullOrEmpty(names)) names += ";";
-                        names += emp.First().emp_name + "(" + num + ")";
+                        names += name + "(" + num + ")";
                     }
                 }
             }

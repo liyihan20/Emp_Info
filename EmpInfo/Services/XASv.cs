@@ -50,6 +50,15 @@ namespace EmpInfo.Services
                 });
             }
 
+            if (auth.Where(a => a.relate_type == "费用统计").Count() > 0) {
+                menus.Add(new ApplyMenuItemModel()
+                {
+                    text = "费用统计",
+                    iconFont = "fa-cny",
+                    url = "../Report/XASummary"
+                });
+            }
+
             if (auth.Where(a => a.relate_type == "修改审核人").Count() > 0) {
                 menus.Add(new ApplyMenuItemModel()
                 {
@@ -108,7 +117,7 @@ namespace EmpInfo.Services
             bill.bill_no = GetNextSysNum(bill.dept_name + "-");
 
             FlowSvrSoapClient client = new FlowSvrSoapClient();
-            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.classification + "_" + bill.project_type, bill.project_name);
+            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.classification + "_" + bill.project_type, bill.dept_name + "_" + bill.project_name);
             if (result.suc) {
                 try {
                     db.ei_xaApply.Add(bill);
@@ -165,6 +174,10 @@ namespace EmpInfo.Services
                     if (db.ei_xaApplySupplier.Where(x => x.sys_no == bill.sys_no && x.price != null).Count() < 1) {
                         throw new Exception("请至少录入一个供应商的价格再审批");
                     }
+
+                    //如果之前已经有选的，先清空
+                    var bidderBefore = db.ei_xaApplySupplier.Where(s => s.sys_no == bill.sys_no && s.is_bidder == true).FirstOrDefault();
+                    if (bidderBefore != null) bidderBefore.is_bidder = false;
                 }
                 if (stepName.Contains("审核部最终确认")) {
                     //如果之前已经有选的，先清空
@@ -181,7 +194,8 @@ namespace EmpInfo.Services
                         }
                     }
                     bidderSupplier.is_bidder = true;
-                    bill.can_print = true;  
+                    bill.can_print = true;
+                    bill.confirm_date = DateTime.Now;
                 }
                 if (stepName.Contains("申请人验收")) {
                     bill.check_date = DateTime.Now;
@@ -191,7 +205,8 @@ namespace EmpInfo.Services
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
             FlowResultModel result;
             if (returnBack) {
-                result = flow.ToPreStep(bill.sys_no, step,stepName, userInfo.cardNo, opinion);
+                int toStep = Int32.Parse(fc.Get("toStep"));
+                result = flow.ToPreStep(bill.sys_no, step, userInfo.cardNo, toStep, opinion);
             }
             else {
                 string formJson = JsonConvert.SerializeObject(bill);
@@ -229,6 +244,7 @@ namespace EmpInfo.Services
                         );
                 }
                 else {
+                    
                     string isReturn = "";
                     if (model.msg.Contains("退回")) {
                         isReturn = "【下一处理人退回】";

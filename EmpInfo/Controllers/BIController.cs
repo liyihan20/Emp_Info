@@ -63,6 +63,10 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel());
         }
 
+        /// <summary>
+        /// 从sql中获取数据创建动态表格
+        /// </summary>
+        /// <returns></returns>
         public ActionResult BasicTable()
         {
             string title = TempData["title"] as string;
@@ -87,7 +91,35 @@ namespace EmpInfo.Controllers
             return View();
 
         }
-        
+
+        /// <summary>
+        /// 从json数据创建动态表格
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult JsonTable()
+        {
+            string title = TempData["title"] as string;
+            string json = TempData["json"] as string;
+
+            if (string.IsNullOrEmpty(title)) {
+                ViewBag.tip = "数据已过期，请重新查询";
+                return View("Error");
+            }
+
+            if ("[]".Equals(json)) {
+                ViewBag.tip = "没有需要显示的数据";
+                return View("Error");
+            }
+
+            if (!json.Contains("[")) {
+                ViewBag.tip = "必须是数组的数据";
+                return View("Error");
+            }
+
+            ViewData["title"] = title;
+            ViewData["json"] = json;
+            return View();
+        }
 
     }
 }

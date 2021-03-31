@@ -56,37 +56,46 @@
             columns: [
                 {
                     field: "emp_name",
-                    title: "姓名"
+                    title: "姓名",
+                    width: "6%"
                 }, {
                     field: "card_number",
-                    title: "厂牌"
+                    title: "厂牌",
+                    width: "10%"
                 }, {
                     field: "id_number",
-                    title: "身份证"
+                    title: "身份证",
+                    width: "12%"
                 }, {
                     field: "dep_name",
-                    title: "部门"
+                    title: "部门",
+                    width: "14%"
                 }, {
                     field: "phone",
-                    title: "电话"
+                    title: "电话",
+                    width: "10%"
                 }, {
                     field: "family_address",
-                    title: "家庭住址"
+                    title: "家庭住址",
+                    width: "16%"
                 }, {
                     field: "family_card_info",
-                    title: "家属办证信息"
+                    title: "家属办证信息",
+                    width: "10%"
                 }, {
                     field: "in_date",
                     title: "入住日期",
                     formatter: function (value, row, index, field) {
                         return utils.parseTDate(value);
-                    }
+                    },
+                    width: "10%"
                 }, {
                     field: "out_date",
                     title: "退宿日期",
                     formatter: function (value, row, index, field) {
                         return utils.parseTDate(value);
-                    }
+                    },
+                    width: "10%"
                 }
             ]
         });

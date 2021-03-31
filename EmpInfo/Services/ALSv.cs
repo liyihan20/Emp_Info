@@ -66,7 +66,8 @@ namespace EmpInfo.Services
                 ba.vacationDaysLeft = db.GetVacationDaysLeftProc(userInfo.cardNo).First();                
             }
             catch(Exception ex) {
-                throw new Exception("计算本年度剩余年休假时出现错误，请联系部门负责做考勤的文员确认，错误信息：" + ex.Message);
+                ba.vacationDaysLeft = 0;
+                //throw new Exception("计算本年度剩余年休假时出现错误，请联系部门负责做考勤的文员确认，错误信息：" + ex.Message);
             }
             var appliedBills = db.ei_askLeave.Where(a => a.applier_num == userInfo.cardNo).ToList();
             if (appliedBills.Count() > 0) {

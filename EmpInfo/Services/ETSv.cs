@@ -53,23 +53,24 @@ namespace EmpInfo.Services
         {
             //申请时间：周一至周五出货：出货当天16:45前提交申请流程;
             //周六至周日出货: 周六上午11：45前完成申请流程
+            //周一至周日统一设置为8：00 ~ 16:45可申请 2021-02-08
             var hour = DateTime.Now.Hour;
             var minute = DateTime.Now.Minute;
-            if (DateTime.Now.ToString("yyyy-MM-dd") != "2019-09-29") {
-                if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday) {
-                    throw new Exception("不能在周日进行申请");
-                }
-            }
-            else if (DateTime.Now.DayOfWeek == DayOfWeek.Saturday) {
-                if (hour < 8 || hour >= 12 || (hour == 11 && minute > 45)) {
-                    throw new Exception("周六申请时间必须在08:00 ~ 11:45之间，当前时间不能申请");
-                }
-            }
-            else {
+            //if (DateTime.Now.ToString("yyyy-MM-dd") != "2019-09-29") {
+            //    if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday) {
+            //        throw new Exception("不能在周日进行申请");
+            //    }
+            //}
+            //else if (DateTime.Now.DayOfWeek == DayOfWeek.Saturday) {
+            //    if (hour < 8 || hour >= 12 || (hour == 11 && minute > 45)) {
+            //        throw new Exception("周六申请时间必须在08:00 ~ 11:45之间，当前时间不能申请");
+            //    }
+            //}
+            //else {
                 if (hour < 8 || hour >= 17 || (hour == 16 && minute > 45)) {
                     throw new Exception("周一至周五申请时间必须在08:00 ~ 16:45之间，当前时间不能申请");
                 }
-            }
+            //}
 
             ETBeforeApplyModel m = new ETBeforeApplyModel();
             m.sysNum = GetNextSysNum(BillType, 2);

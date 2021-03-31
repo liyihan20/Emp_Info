@@ -1696,6 +1696,8 @@
     <Content Include="Views\Apply\CheckXBApply.cshtml" />
     <Content Include="Views\Apply\BeginAuditXBApply.cshtml" />
     <Content Include="Views\Report\XBReport.cshtml" />
+    <Content Include="Views\Report\XASummary.cshtml" />
+    <Content Include="Views\BI\JsonTable.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

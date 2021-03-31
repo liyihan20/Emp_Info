@@ -1,6 +1,7 @@
 ﻿@using EmpInfo.Models;
 @{
     ei_mqApply m = ViewData["am"] as ei_mqApply;
+    UserInfo userInfo = ViewData["currentUser"] as UserInfo;
 }
 @section CSS{    
     <style type="text/css">
@@ -264,39 +265,41 @@
                     <span style="display:inline-block;width:70%">
                         @(m.leave_date==null?"":((DateTime)m.leave_date).ToString("yyyy-MM-dd"))
                     </span>
-                </div>                
-                <div class="b-div">
-                    <span class="b-label" style="vertical-align:top;width:150px;">
-                        工作评价:
-                    </span>
-                    <span style="display:inline-block;width:70%">
-                        @m.work_evaluation
-                    </span>
                 </div>
-                <div class="b-div">
-                    <span class="b-label" style="vertical-align:top;width:150px;">
-                        工作评价描述:
-                    </span>
-                    <span style="display:inline-block;width:70%">
-                        @m.work_comment
-                    </span>
-                </div>
-                <div class="b-div">
-                    <span class="b-label" style="vertical-align:top;width:150px;">
-                        本部是否再录用:
-                    </span>
-                    <span style="display:inline-block;width:70%">
-                        @m.wanna_employ
-                    </span>
-                </div>
-                <div class="b-div">
-                    <span class="b-label" style="vertical-align:top;width:150px;">
-                        是否再录用原因:
-                    </span>
-                    <span style="display:inline-block;width:70%">
-                        @m.employ_comment
-                    </span>
-                </div>
+                @if (!userInfo.cardNo.Equals(m.card_number)) {
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;width:150px;">
+                            工作评价:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            @m.work_evaluation
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;width:150px;">
+                            工作评价描述:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            @m.work_comment
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;width:150px;">
+                            本部是否再录用:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            @m.wanna_employ
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;width:150px;">
+                            是否再录用原因:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            @m.employ_comment
+                        </span>
+                    </div>
+                }
                 @if (!string.IsNullOrEmpty(m.group_leader_choise)) {
                     <div class="b-div">
                         <span class="b-label" style="vertical-align:top;width:150px;">

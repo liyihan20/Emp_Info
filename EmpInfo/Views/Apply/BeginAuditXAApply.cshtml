@@ -17,6 +17,15 @@
     }
 
     var itemsJson = JsonConvert.SerializeObject(m.suppliers);
+
+    //可以跳转到之前的节点
+    var canJumpToStep = new List<SelectModel>(){
+        new SelectModel(){ text = "上一步",intValue = -1 },
+        new SelectModel(){ text = "采购部接单",intValue = 1000 },
+        new SelectModel(){ text = "申请人上传施工清单",intValue = 1200 },
+        new SelectModel(){ text = "采购部上传报价单",intValue = 1600 }
+    }.Where(s => s.intValue < bam.step).OrderBy(s => s.intValue).ToList();
+    
 }
 
 @section CSS{
@@ -129,9 +138,10 @@
             });
         }
 
-        function ToPreStep(flag){
-            $("#returnBack").val(flag);
-            openConfirmDialog("确认要返回上一级处理吗", function () {
+        function ToPreStep(a){
+            $("#returnBack").val(true);
+            $("#toStep").val($(a).attr("data-step"));
+            openConfirmDialog("确认要返回【" + $(a).html() + "】处理吗？", function () {
                 $.ajax({
                     type: 'post',
                     url: 'HandleApply',
@@ -145,7 +155,6 @@
                         } else {
                             toastr.error(data.msg);
                         }
-
                     }
                 });
 
@@ -300,6 +309,10 @@
 
             });
 
+            $("#printBt").on("click",function(){
+                window.open("../Report/PrintXA?sysNo="+"@m.bill.sys_no");
+            })
+
         })
     </script>
 }
@@ -324,6 +337,16 @@
                 <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
             </span>
         </div>
+        @if (m.bill.can_print) {
+            <div class="b-div">
+                <span class="b-label">
+                    打印:
+                </span>
+                <span class="b-input">
+                    <button type="button" class="btn btn-default btn-sm" id="printBt"><i class="fa fa-print"></i> 打印单据</button>
+                </span>
+            </div>
+        }
         <div class="b-div">
             <span class="b-label">
                 申请流水号:
@@ -570,6 +593,7 @@
                     <input type="hidden" name="stepName" value="@bam.stepName" />
                     <input type="hidden" name="isPass" id="isPass" value="true" />
                     <input type="hidden" name="returnBack" id="returnBack" value="false" />
+                    <input type="hidden" name="toStep" id="toStep" value="-1" />
 
                     @if (bam.stepName.Contains("采购部接单")) {
                         <div class="b-div">
@@ -655,7 +679,18 @@
                         <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
                     </div>
                 </div>
-                <button type="button" class="btn btn-block btn-warning" onclick="ToPreStep(true)" style="margin-top:6px;">退回上一步处理</button>
+                <div class="dropdown">
+                    <button class="btn btn-block btn-warning dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        退回
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1" style="width:100%;">
+                        @foreach (var j in canJumpToStep) {
+                            <li><a href="#" onclick="ToPreStep(this)" data-step="@j.intValue">@j.text</a></li>
+                        }
+                    </ul>
+                </div>
+                @*<button type="button" class="btn btn-block btn-warning" onclick="ToPreStep(true)" style="margin-top:6px;">退回上一步处理</button>*@
             }
             else {
                 <div style="margin-top:12px;"></div>

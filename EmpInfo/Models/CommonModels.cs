@@ -37,6 +37,12 @@ namespace EmpInfo.Models
         public string stringValue { get; set; }
     }
 
+    public class stringDecimalModel
+    {
+        public string name { get; set; }
+        public decimal? value { get; set; }
+    }
+
     public class DormReportModel
     {
         public string charge_type { get; set; }

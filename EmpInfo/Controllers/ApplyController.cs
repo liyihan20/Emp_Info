@@ -160,6 +160,7 @@ namespace EmpInfo.Controllers
                 var m = bill.GetBill();
                 ViewData["am"] = m;
                 ViewData["auditStatus"] = bill.GetAuditStatus(sysNo);
+                ViewData["currentUser"] = userInfo;
 
                 WriteEventLog(bill.BillTypeName, "查看申请单：" + sysNo);
 
