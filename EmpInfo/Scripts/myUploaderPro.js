@@ -59,7 +59,7 @@
         uploader.on('fileQueued', function (file) {
             console.log(file);
             file.name = prefix + file.name; //先加上前缀
-            file.name = file.name.replace(/&/g, "_").replace(/ /g, "").replace(/#/g, "_"); //将文件名中的&转化为_，空格去掉,将#转化为_
+            file.name = file.name.replace(/&/g, "_").replace(/ /g, "").replace(/#/g, "_").replace(/\+/g, "_"); //将文件名中的&转化为_，空格去掉,将#转化为_
         });
 
         uploader.on('uploadProgress', function (file, percentage) {

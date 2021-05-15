@@ -1,0 +1,72 @@
+﻿@using EmpInfo.Models
+@{
+    List<EmpInfo.FlowSvr.FlowAuditListModel> list = (List<EmpInfo.FlowSvr.FlowAuditListModel>)ViewData["list"];
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+}
+@section Scripts{
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+
+        $("#tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 50,
+            pageList: [10, 50, 100, 200],
+            search: true,
+            rowStyle:function(){
+                return {
+                    css: {"cursor":"pointer"}
+                };
+            },
+            onClickRow: function (row, ele, field) {
+                var sysNo = $.trim(row[0]);
+                var step = $.trim(row[1]);
+                window.location.href = "BeginAuditApply?sysNo=" + row.sys_no.split(" ")[0] + "&step=" + row.step;
+            }
+        });
+
+    </script>
+}
+<div class="panel panel-success" id="applyDiv">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/Index/WorkGroupIndex")">智慧办公</a></li>
+            <li class="active">我的待办事项</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <table data-toggle="table" id="tb">
+            <thead>
+                <tr>
+                    <th data-width="12%">流程名</th>
+                    <th data-width="12%" data-field="sys_no">申请流水号</th>
+                    <th data-visible="false" data-field="step">step</th>
+                    <th data-width="10%">申请人</th>
+                    <th data-width="15%">申请时间</th>
+                    <th data-width="35%">申请信息</th>
+                    <th data-width="16%">审核节点</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = list.Count() - 1; i >= 0;i-- ) {
+                    <tr>
+                        <td>@list[i].processName</td>
+                        <td>@list[i].sysNo @if (list[i].isUserAobrt) {<span class="text-danger">(申请撤销)</span>}</td>
+                        <td>@list[i].step</td>
+                        <td>@list[i].applier</td>
+                        <td>@(((DateTime)list[i].applyTime).ToString("yyyy-MM-dd HH:mm"))</td>
+                        <td>@list[i].subTitle
+                        <td>@list[i].stepName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -66,7 +66,7 @@
     <div class="panel-body" id="workGroup">
         <div class="row" style="margin: 0;">
             <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
-                <input type="text" class="form-control" id="filterText" placeholder="在此处输入文本可以搜索功能项" />
+                <input type="text" class="form-control" id="filterText" placeholder="在此处输入文本可以搜索功能项" />                
             </div>
             <div class="col-xs-12 text-danger p-title"><i class="fa fa-th fa-fw"></i> 日常办公 & 考勤相关</div>
             <div class="col-xs-4 col-sm-3 col-md-2">
@@ -118,10 +118,17 @@
                 </a>
             </div>
             
-            <div class="col-xs-4 col-sm-3 col-md-2">
+            @*<div class="col-xs-4 col-sm-3 col-md-2">
                 <a href="@Url.Content("~/Apply/ApplyIndex?billType=XB")">
                     <img src="@Url.Content("~/Content/images/xb.png")" alt="设备申请单" class="center-block" />
                     <p class="text-center">设备类申请</p>
+                </a>
+            </div>*@
+
+            <div class="col-xs-4 col-sm-3 col-md-2">
+                <a href="@Url.Content("~/Apply/ApplyIndex?billType=XC")">
+                    <img src="@Url.Content("~/Content/images/xc.png")" alt="委外加工申请" class="center-block" />
+                    <p class="text-center">委外加工申请</p>
                 </a>
             </div>
 

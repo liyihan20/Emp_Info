@@ -366,7 +366,27 @@ namespace EmpInfo.Controllers
             }
             return Json(new SimpleResultModel(true, "", empName));
         }
-                
+
+        public JsonResult GetK3ItemInfo(string company, string itemInfo)
+        {
+            var result = new K3Sv(company).GetK3ProductByInfo(itemInfo);
+            return Json(result);
+        }
+
+        public JsonResult GetK3BomInfo(string company,int productId)
+        {
+            return Json(new K3Sv(company).GetK3BomInfo(productId));
+        }
+
+        public JsonResult GetK3BusPO(string account, string po)
+        {
+            return Json(new K3Sv(account).GetK3BusPO(po));
+        }
+
+        public JsonResult GetK3BusStockBill(string account, string billNo)
+        {
+            return Json(new K3Sv(account).GetK3BusStockBill(billNo));
+        }
 
         public string test()
         {

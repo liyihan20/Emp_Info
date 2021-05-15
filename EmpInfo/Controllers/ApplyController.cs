@@ -211,6 +211,19 @@ namespace EmpInfo.Controllers
             return View(bill.MyAuditingViewName());
         }
 
+        [SessionTimeOutFilter]
+        public ActionResult GetMyAllAuditingList()
+        {
+            FlowSvrSoapClient flow = new FlowSvrSoapClient();
+
+            List<FlowAuditListModel> list = flow.GetAuditList(userInfo.cardNo, "", "", "", "", "", "", new ArrayOfInt() { 0 }, new ArrayOfInt() { 0 }, new ArrayOfString() { "*" }, 1000).ToList();
+            list.ForEach(l => l.applier = GetUserNameByCardNum(l.applier));
+            
+            ViewData["list"] = list;
+
+            return View();
+        }
+
         //我的已办
         [SessionTimeOutFilter]
         public ActionResult GetMyAuditedList(string billType)

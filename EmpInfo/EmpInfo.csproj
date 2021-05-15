@@ -484,6 +484,18 @@
     <Compile Include="Models\ei_xbApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_xcApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_xcDepTarget.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_xcMatOutDetail.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_xcProductInDetail.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\EmergencyEnum.cs" />
     <Compile Include="Models\EpModels.cs" />
     <Compile Include="Models\flow_apply.cs">
@@ -773,6 +785,7 @@
     <Compile Include="Services\IESv.cs" />
     <Compile Include="Services\ITSv.cs" />
     <Compile Include="Services\JMSv.cs" />
+    <Compile Include="Services\K3Sv.cs" />
     <Compile Include="Services\MQSv.cs" />
     <Compile Include="Services\KSSv.cs" />
     <Compile Include="Services\MTSv.cs" />
@@ -788,6 +801,7 @@
     <Compile Include="Services\WxSv.cs" />
     <Compile Include="Services\XBSv.cs" />
     <Compile Include="Services\XASv.cs" />
+    <Compile Include="Services\XCSv.cs" />
     <Compile Include="Util\BillUtils.cs" />
     <Compile Include="Util\MyEmail.cs" />
     <Compile Include="Util\MyUtils.cs" />
@@ -1060,6 +1074,7 @@
     <Content Include="Content\images\warn.png" />
     <Content Include="Content\images\xa.png" />
     <Content Include="Content\images\xb.png" />
+    <Content Include="Content\images\xc.png" />
     <Content Include="Content\login.css" />
     <Content Include="Content\select2.min.css" />
     <Content Include="Content\skins\all.css" />
@@ -1394,7 +1409,9 @@
     <Content Include="Scripts\ICqywxJs.js" />
     <Content Include="Scripts\jweixin-1.2.0.js" />
     <Content Include="Scripts\myDownloaderPro.js" />
+    <Content Include="Scripts\myItemsSelecter.js" />
     <Content Include="Scripts\myUploaderSim.js" />
+    <Content Include="Scripts\myK3ItemSelecter.js" />
     <Content Include="Scripts\myUserSelecter.js" />
     <Content Include="Scripts\myUploaderPro.js" />
     <Content Include="Scripts\myUploader.js" />
@@ -1698,6 +1715,13 @@
     <Content Include="Views\Report\XBReport.cshtml" />
     <Content Include="Views\Report\XASummary.cshtml" />
     <Content Include="Views\BI\JsonTable.cshtml" />
+    <Content Include="Views\ApplyExtra\XCAuditorSetting.cshtml" />
+    <Content Include="Views\Apply\BeginApplyXC.cshtml" />
+    <Content Include="Views\Apply\CheckXCApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditXCApply.cshtml" />
+    <Content Include="Views\Report\PrintXC.cshtml" />
+    <Content Include="Views\Apply\GetMyAllAuditingList.cshtml" />
+    <Content Include="Views\Report\XCReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

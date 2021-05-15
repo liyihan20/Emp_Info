@@ -202,6 +202,10 @@ namespace EmpInfo.Services
                 }
             }
 
+            if (!isPass) {
+                bill.confirm_date = null;
+            }
+
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
             FlowResultModel result;
             if (returnBack) {

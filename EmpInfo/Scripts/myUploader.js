@@ -38,11 +38,11 @@
                 </div>';
         target.append(html);
         var filePanelEle = target.find("#al_file_panel");
-        var fileListEle = target.find("#al_file_list");               
+        var fileListEle = target.find("#al_file_list");
 
         uploader.on('fileQueued', function (file) {
             console.log(file);
-            file.name = file.name.replace(/&/g, "_");
+            file.name = file.name.replace(/&/g, "_").replace(/ /g, "").replace(/#/g, "_").replace(/\+/g, "_");
             var fileName = file.name;
             if (fileName.length > 20) {
                 var ext = fileName.substr(fileName.lastIndexOf("."));

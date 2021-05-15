@@ -183,6 +183,7 @@
           <s:element minOccurs="1" maxOccurs="1" name="applyTime" nillable="true" type="s:dateTime" />
           <s:element minOccurs="0" maxOccurs="1" name="sysNo" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="billType" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="processName" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="title" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="subTitle" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="applier" type="s:string" />
@@ -506,6 +507,20 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="TestGetMyDealingCount">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="cardNumber" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestGetMyDealingCountResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="TestGetMyDealingCountResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
     </s:schema>
   </wsdl:types>
   <wsdl:message name="StartWorkFlowSoapIn">
@@ -670,6 +685,12 @@
   <wsdl:message name="TestGetAuditQueueSoapOut">
     <wsdl:part name="parameters" element="tns:TestGetAuditQueueResponse" />
   </wsdl:message>
+  <wsdl:message name="TestGetMyDealingCountSoapIn">
+    <wsdl:part name="parameters" element="tns:TestGetMyDealingCount" />
+  </wsdl:message>
+  <wsdl:message name="TestGetMyDealingCountSoapOut">
+    <wsdl:part name="parameters" element="tns:TestGetMyDealingCountResponse" />
+  </wsdl:message>
   <wsdl:portType name="FlowSvrSoap">
     <wsdl:operation name="StartWorkFlow">
       <wsdl:input message="tns:StartWorkFlowSoapIn" />
@@ -778,6 +799,10 @@
     <wsdl:operation name="TestGetAuditQueue">
       <wsdl:input message="tns:TestGetAuditQueueSoapIn" />
       <wsdl:output message="tns:TestGetAuditQueueSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TestGetMyDealingCount">
+      <wsdl:input message="tns:TestGetMyDealingCountSoapIn" />
+      <wsdl:output message="tns:TestGetMyDealingCountSoapOut" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="FlowSvrSoap" type="tns:FlowSvrSoap">
@@ -1025,6 +1050,15 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="TestGetMyDealingCount">
+      <soap:operation soapAction="http://ic.truly.com.cn/TestGetMyDealingCount" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="FlowSvrSoap12" type="tns:FlowSvrSoap">
     <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
@@ -1264,6 +1298,15 @@
     </wsdl:operation>
     <wsdl:operation name="TestGetAuditQueue">
       <soap12:operation soapAction="http://ic.truly.com.cn/TestGetAuditQueue" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestGetMyDealingCount">
+      <soap12:operation soapAction="http://ic.truly.com.cn/TestGetMyDealingCount" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

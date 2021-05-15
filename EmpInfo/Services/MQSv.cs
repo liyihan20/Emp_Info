@@ -398,7 +398,7 @@ namespace EmpInfo.Services
             }
             else {
                 addr = "信利学院102培训室";
-                contacts = "范美玉（手机短号：668560；长号：13421578560；座机：3380416）";
+                contacts = "范美玉（手机：18922693672；座机：3380416）";
                 timeSpan = "上午8:15-11：45";
                 contact_man = "07110367";
             }

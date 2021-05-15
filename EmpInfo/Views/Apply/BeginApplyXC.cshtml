@@ -1,0 +1,725 @@
+﻿@using EmpInfo.Models
+@using Newtonsoft.Json;
+@{
+    XCBeforeApplyModel m = ViewData["infoBeforeApply"] as XCBeforeApplyModel;
+    var depJson = JsonConvert.SerializeObject(m.depList);
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 100px;
+            vertical-align: top;
+            color: gray;
+        }
+        .b-input{
+            display:inline-block;
+            width:65%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
+    <script src="@Url.Content("~/Scripts/myK3ItemSelecter.js")"></script>
+    <script src="@Url.Content("~/Scripts/myItemsSelecter.js")"></script>
+
+    <script>
+        var depList = @Html.Raw(depJson);
+        $(function () {
+            $(".form_date").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd",
+                autoclose: true,
+                todayBtn: true,
+                startView: 2,
+                minView: 2
+            });
+
+            $(".select-user").on("focus", function () {
+                var self = this;
+                var userNum = $(this).attr("data-user-num") || 1;
+                $.selectUsers({
+                    userLimit: userNum,
+                    userHasSelected: $(self).val(),
+                    callback: function (result) {
+                        $(self).val(result);
+                    }
+                });
+            });
+
+            $("#searchPOBt").on("click",function(){
+                var self = this;
+                var account = $("#k3_account").val();
+                var po = $("#bus_po_no").val();
+                if(account==""){
+                    toastr.error("请先选择K3帐套");
+                    return;
+                }
+                if(po == ""){
+                    toastr.error("请先填写PO单号");
+                    return;
+                }
+                $(self).button("loading");
+                $.post("../Item/GetK3BusPO",{account:account,po:po},function(data){
+                    $(self).button("reset");
+                    if(data.length<1){
+                        toastr.error("查询不到这张PO信息，请检查帐套或单号是否正确");
+                        return;
+                    }else if(data.length == 1){
+                        toastr.success("读取成功");
+                        setPOInfo(data[0]);
+                    }else{
+                        toastr.info("查询到有多个分录，请选择一行");
+                        //多分录的要给选择
+                        $.selectItemList({
+                            items:data,
+                            titles:[{
+                                field: "entry_id",
+                                title: "行号",
+                                width: "15%"
+                            },
+                            {
+                                field: "item_name",
+                                title: "产品名称",
+                                width: "25%"
+                            }, {
+                                field: "item_modual",
+                                title: "产品型号",
+                                width: "35%"
+                            }, {
+                                field: "unit_name",
+                                title: "单位",
+                                width: "10%"
+                            }, {
+                                field: "qty",
+                                title: "数量",
+                                width: "15%"
+                            }],
+                            callback:function(s){
+                                setPOInfo(s);
+                            }
+                        });
+                    }
+                });
+
+            });
+
+            //$("#product_model").on("focus",function(){
+            //    if($("#company").val()==""){
+            //        toastr.error("请先选择公司后再操作");
+            //        return;
+            //    }
+            //    var self = this;
+            //    $.selectK3Items({
+            //        company:$("#company").val(),
+            //        itemModel:$(self).val(),
+            //        callback:function(result){
+            //            console.log(result);
+            //            $(self).val(result.item_model);
+            //            $("#product_no").html(result.item_no);
+            //            $("#product_name").html(result.item_name);
+            //            $("#unit_name").html(result.unit_name);
+            //            $("input[name='product_id']").val(result.item_id);
+            //            $("input[name='product_name']").val(result.item_name);
+            //            $("input[name='product_no']").val(result.item_no);
+            //            $("input[name='unit_name']").val(result.unit_name);
+
+            //        }
+            //    })
+            //});
+
+            $("#itemModal #item_model").on("focus",function(){
+                if($("#company").val()==""){
+                    toastr.error("请先选择公司后再操作");
+                    return;
+                }
+                var self = this;
+                $.selectK3Items({
+                    company:$("#company").val(),
+                    itemModel:$(self).val(),
+                    callback:function(result){
+                        console.log(result);
+                        $(self).val(result.item_model);
+                        $("#itemModal #item_no").val(result.item_no);
+                        $("#itemModal #item_name").val(result.item_name);
+                        $("#itemModal #item_id").val(result.item_id);
+                        $("#itemModal #unit_name").val(result.unit_name);
+                    }
+                })
+            });
+
+            $("#company").on("change", function () {
+                var company = $(this).val();
+                var depNames = depList.filter(function(d){return d.company == company}).map(function(d){return d.dep_name});
+                var opts='<option value="">----下拉选择部门----</option>';
+                
+                for(var i=0;i<depNames.length;i++){
+                    opts+='<option value="'+depNames[i]+'">'+depNames[i]+'</option>';
+                }
+
+                $("#dep_name").empty();
+                $("#dep_name").append(opts);               
+
+            });
+
+            $("#dep_name").on("change", function () {
+                var company = $("#company").val();
+                var dep = $(this).val();
+                var monthTarget = depList.filter(function(d){return d.company == company && d.dep_name == dep}).map(function(d){return d.month_target});
+                if(monthTarget.length<1){
+                    toastr.error("目标额度未维护");
+                    return;
+                }
+                $("input[name='current_month_target']").val(monthTarget[0]);
+            });
+
+            //提交申请
+            $("#apply_bt").on("click", function () {
+                var result = utils.validateRequiredField($("#fm"));
+                if (!result.suc) {
+                    toastr.error(result.msg);
+                    return;
+                }
+                var head = utils.getFormObj($("#fm"));
+                var entrys = $("#tb").bootstrapTable('getData');
+
+                for(var i = 0;i<entrys.length;i++){
+                    if(entrys[i].out_qty == "" || !utils.testIsFloat(entrys[i].out_qty,6)){
+                        toastr.error("发出数量必须填写，行号："+(i+1));
+                        return;
+                    }
+                }
+
+                openConfirmDialog("确定要提交申请吗？", function () {
+                    $("#apply_bt").button("loading");
+                    $.ajax({
+                        type: 'post',
+                        url: 'SaveApply',
+                        data: "sys_no=" + head.sys_no + "&head=" + utils.StringifyAndParseCharacter(head) + "&entrys=" + utils.StringifyAndParseCharacter(entrys),
+                        cache: false,
+                        dataType: 'json',
+                        success: function (data) {
+                            $("#apply_bt").button("reset");
+                            if (data.suc) {
+                                toastr.success("提交成功:" + data.msg);
+                                setTimeout(function () { window.location.href = "CheckApply?sysNo=" + head.sys_no; }, 2000);
+                            } else {
+                                toastr.error("提交失败：" + data.msg);
+                                $("#apply_bt").button("reset");
+                            }
+
+                        }
+                    });
+                });
+
+            });
+        });
+
+        function setPOInfo(p){
+            $("#product_model").val(p.item_modual);
+            $("#product_no").html(p.item_no);
+            $("#product_name").html(p.item_name);
+            $("#unit_name").html(p.unit_name);
+            $("#qty").val(p.qty);
+            $("input[name='product_id']").val(p.item_id);
+            $("input[name='product_name']").val(p.item_name);
+            $("input[name='product_no']").val(p.item_no);
+            $("input[name='unit_name']").val(p.unit_name);
+            $("input[name='bus_po_entry']").val(p.entry_id);
+        }
+
+    </script>
+
+    <script>
+        var updateIndex = -1;
+        var addIndex = 0;
+        $("#tb").bootstrapTable({
+            striped: true,
+            pagination: false,
+            clickToSelect: true,
+            mobileResponsive: true,
+            idField: "idx", //用于修改
+            uniqueId: "idx", //用于删除
+            columns: [
+                {
+                    radio: true
+                }, {
+                    field: "idx",
+                    visible: false
+                },
+                {
+                    field: "item_name",
+                    title: "原料名称",
+                    width: "15%"
+                }, {
+                    field: "item_model",
+                    title: "原料型号",
+                    width: "30%"
+                }, {
+                    field: "unit_name",
+                    title: "单位",
+                    width: "6%"
+                }, {
+                    field: "per_qty",
+                    title: "单位用量",
+                    width: "12%"
+                }, {
+                    field: "out_qty",
+                    title: "发出数量",
+                    width: "12%"
+                }, {
+                    field: "yield_rate",
+                    title: "良率",
+                    width: "10%"
+                }, {
+                    field: "item_comment",
+                    title: "备注",
+                    width: "15%"
+                }
+            ],
+            onDblClickRow: function (row, $element, field) {
+                $("#editBt").trigger("click");
+            }
+        });
+
+        $(function () {
+            $("#addBt").on("click", function () {
+                $("#itemModal .modal-title").html("新增原料发出明细");
+                $("#itemModal").modal("show");
+                utils.resetForm($("#itemFm"));
+                updateIndex = -1;
+            });
+
+            $("#editBt").on("click", function () {
+                var rows = $('#tb').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再修改");
+                    return;
+                }
+                var row = rows[0];
+                updateIndex = row.idx;
+                utils.loadObjData($("#itemFm"), row);
+                $("#itemModal .modal-title").html("修改原料发出明细");
+                $("#itemModal").modal("show");
+            });
+
+            $("#saveBt").on("click", function () {
+                var validateResult = utils.validateRequiredField($("#itemFm"));
+                if (!validateResult.suc) {
+                    toastr.error(validateResult.msg);
+                    return;
+                }
+                var obj = utils.getFormObj($("#itemFm"));
+                if(!obj.item_name){
+                    toastr.error("请先选择原料型号");
+                    return;
+                }
+                if (!utils.testIsFloat(obj.per_qty,6)) {
+                    toastr.error("单位数量必须是小数，并且小数位不超过6位");
+                    return;
+                }
+                if (!utils.testIsFloat(obj.out_qty,6)) {
+                    toastr.error("发出数量必须是小数，并且小数位不超过6位");
+                    return;
+                }
+                if (updateIndex < 0) {
+                    //新增
+                    obj.idx = addIndex++;
+                    $("#tb").bootstrapTable('append', obj);
+                } else {
+                    //修改
+                    obj.idx = updateIndex;
+                    $("#tb").bootstrapTable('updateByUniqueId', { id: updateIndex, row: obj });
+                }
+                $("#itemModal").modal("hide");
+            });
+
+            $("#removeBt").on("click", function () {
+                var rows = $('#tb').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                openConfirmDialog("确定要删除选中的行吗？", function () {
+                    console.log(rows[0].idx);
+                    $("#tb").bootstrapTable('removeByUniqueId', rows[0].idx);
+                });
+            });
+
+            $("#itemModal #saveBt").on("click",function(){
+                var entrys = $("#tb").bootstrapTable('getData');
+                console.log(entrys);
+            });
+
+            $("#getBomBt").on("click",function(){
+                var rows = $("#tb").bootstrapTable('getData');
+                if(rows.filter(function(r){return r.sour == "bom"}).length>0){
+                    toastr.error("bom数据已导入，不能重复操作");
+                    return;
+                }
+
+                var company = $("#company").val();
+                var productId=$("input[name='product_id']").val();
+                if(company == ""){
+                    toastr.error("请先选择公司");
+                    return;
+                }
+                if(productId=="" || isNaN(productId)){
+                    toastr.error("请先选择委外产品型号");
+                    return;
+                }
+                $.post("../Item/GetK3BomInfo",{company:company,productId:productId},function(data){
+                    if(data.length<1){
+                        toastr.error("此产品型号没有关联BOM");
+                        return;
+                    }
+                    for(var i = 0;i<data.length;i++){
+                        data[i].idx = addIndex++;
+                    }
+                    $("#tb").bootstrapTable("append",data);
+                });
+            });
+
+        });
+
+    </script>
+}
+
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
+            <li><a href="ApplyIndex?billType=XC">委外加工流程</a></li>
+            <li class="active">开始申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <form id="fm" style="margin-top:-12px;">
+            <div class="b-div">
+                <span class="b-label">
+                    申请流水号:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="sys_no" value="@m.sys_no" readonly />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    申请人:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="applier_name" value="@m.applierName" readonly />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    联系电话:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="applier_phone" placeholder="填写手机短号与长号" required />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    公司:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="company" id="company" required>
+                        <option value="">----下拉选择公司----</option>
+                        @foreach (var c in m.depList.Select(l=>l.company).Distinct()) {
+                            <option value="@c">@c</option>
+                        }
+                    </select>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    申请部门:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="dep_name" id="dep_name" required>
+                        <option value="">----下拉选择部门----</option>
+                        
+                    </select>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    本月委外目标额度(元):
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="current_month_target" placeholder="选择部门后带出" readonly required />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    地点:
+                </span>
+                <span class="b-input">
+                    <textarea type="text" class="form-control" rows="2" id="addr" name="addr" placeholder="例如：19栋1楼" required></textarea>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    K3帐套:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="k3_account" id="k3_account" required>
+                        <option value="">----下拉选择帐套----</option>
+                        @foreach (var k in m.k3Accounts) {
+                            <option value="@k">@k</option>
+                        }
+                    </select>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    采购单号:
+                </span>
+                <div class="b-input">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="bus_po_no" name="bus_po_no" placeholder="输入采购订单号后点读取按钮">
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" id="searchPOBt" data-loading-text="查询中...">读取</button>
+                        </span>
+                    </div>
+                    <input type="hidden" name="bus_po_entry" />
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    委外产品型号:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control" name="product_model" id="product_model" placeholder="从订单中读取" readonly required/>
+                    <div class="small text-danger"><i class="fa fa-info-circle"></i> 代码： <span id="product_no"></span> 名称： <span id="product_name"></span></div>
+                    <input type="hidden" name="product_id" />
+                    <input type="hidden" name="product_name" />
+                    <input type="hidden" name="product_no" />
+                    <input type="hidden" name="unit_name" />
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    加工数量:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control" name="qty" id="qty" placeholder="从订单中读取" readonly required />
+                    <div class="small text-danger"><i class="fa fa-info-circle"></i> 单位： <span id="unit_name"></span></div>
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    本月订单需求产能:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control" name="order_require_capacity" required />                   
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    本月生产最高产能:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control" name="dep_highest_capacity" required />
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    本月需委外产能:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control" name="need_outsourcing_capacity" required />
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    本次委外加工周期:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control" name="outsourcing_cycle" required /> 
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    预计加工完成时间:
+                </span>
+                <div class="b-input">
+                    <div class="input-group date form_date" style="margin:6px 0;">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" name="estimate_finish_time" autocomplete="off" />
+                    </div>               
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    备注:
+                </span>
+                <span class="b-input">
+                    <textarea type="text" class="form-control" rows="4" name="comment" placeholder="此处可填写备注"></textarea>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    计划部负责人:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control select-user" name="planner_auditor" placeholder="选择计划部负责人" required />
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    部门主管:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control select-user" name="dep_charger" placeholder="选择部门主管" required />
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    采购员:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control select-user" name="buyer_auditor" placeholder="选择采购员" required />
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    物料组:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control select-user" name="mat_group" placeholder="选择物料组人员" required />
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    原料发出明细:
+                </span>
+                <div class="b-input">
+                    <button class="btn btn-success btn-sm" type="button" id="addBt" style="margin-bottom:4px;"> <i class="fa fa-plus"></i> 新增</button>
+                    <button class="btn btn-primary btn-sm" type="button" id="editBt" style="margin-bottom:4px;"> <i class="fa fa-edit"></i> 修改 </button>
+                    <button class="btn btn-danger btn-sm" type="button" id="removeBt" style="margin-bottom:4px;"> <i class="fa fa-th"></i> 删除</button>
+                    <button class="btn btn-warning btn-sm" type="button" id="getBomBt" style="margin-bottom:4px;"> <i class="fa fa-search"></i> 读取BOM</button>
+                </div>
+            </div>
+            <table data-toggle="table" id="tb"></table>
+        </form>
+
+        <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:16px;"><i class="fa fa-check-circle-o"></i> 提交申请单</button>
+    </div>
+</div>
+
+<div class="panel panel-default" style="margin:16px 0;">
+    <div class="panel-body">
+        <h4 class="text-danger"><i class="fa fa-info-circle"></i> 说明 </h4>
+        <div style="margin-left:18px;padding-top:6px;" class="text-danger">
+            <p>
+                1. 流程步骤：流程开始--->提交申请--->计划部负责人审批-->部门主管审批--->部门总经理审批--->采购询价--->营运部审批--->
+                总裁办审批（若部门累计金额超过月度目标）--->采购部下单--->物料组审批--->物流发出原料盘点--->仓库接收产成品--->营运部抽检--->申请人确认领回--->结束
+                <br/>
+                2. 委外时间设定为每周一至周五下午五点前，超出则顺延至第二个工作日处理。
+                <br/>
+                3. 不再允许一单多次的委外申请，每张委外单只对单次出库生效。
+                <br/>
+                4. SMT、CCM等部门，与供应商沟通配套料由其自己购买，本厂不再搭配外发。
+                <br/>
+                5. 各个门的委外目标由营运部指定，并每月进行管控。超出目标部门，需总裁办审批。
+            </p>
+        </div>
+    </div>
+</div>
+@section Modal {
+    <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">新增原料发出明细</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="itemFm">
+                        <input type="hidden" name="sour" id="sour" data-value="insert" />
+                        <div class="b-div">
+                            <span class="b-label">
+                                原料型号:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" id="item_model" name="item_model" required />
+                                <input type="hidden" name="item_no" id="item_no" />
+                                <input type="hidden" name="item_id" id="item_id" />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                原料名称:
+                            </span>
+                            <div class="b-input">
+                                <input type="text" class="form-control" id="item_name" name="item_name" required readonly placeholder="选择型号后带出" />
+                            </div>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                单位:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" id="unit_name" name="unit_name" required readonly placeholder="选择型号后带出" />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                单位用量:
+                            </span>
+                            <span class="b-input">
+                                <input type="number" class="form-control" id="per_qty" name="per_qty" required />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                发出数量:
+                            </span>
+                            <div class="b-input">
+                                <input type="number" class="form-control" id="out_qty" name="out_qty" required />
+                            </div>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                良率:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" id="yield_rate" name="yield_rate" />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                备注:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" id="item_comment" name="item_comment" />
+                            </span>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 取消</button>
+                    <button type="button" class="btn btn-success" id="saveBt"><span class="fa fa-check-circle"></span> 确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.Partial("_ConfirmDialog")
+}

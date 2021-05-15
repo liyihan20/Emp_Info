@@ -132,7 +132,8 @@ namespace EmpInfo.Services
             }
             else if (stepName.Contains("处理")) {
                 MyUtils.SetFieldValueToModel(fc, bill);
-                bill.maintence_time = DateTime.Now;                
+                bill.maintence_time = DateTime.Now;
+                bill.maintence_hours = (decimal)Math.Round((((DateTime)bill.maintence_end_time) - ((DateTime)bill.maintence_begin_time)).Minutes / 60.0, 1);
             }
             else if (stepName.Contains("确认")) {
                 bill.confirm_time = DateTime.Now;

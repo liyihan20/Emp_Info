@@ -59,107 +59,123 @@
     <script src="@Url.Content("~/Scripts/myDownloaderPro.js")"></script>
 
     <script>
-        $(function () {
+    $(function () {
 
-            if($("#myUploader1").length>0){
-                console.log("1");
-                $("#myUploader1").myUploader({
-                    sysNum: "@bam.sysNum",
-                    fileNumLimit: 10,
-                    prefix: "施工清单_",
-                    accept: {
-                        title: '*',
-                        extensions: '*',
-                        mimeTypes: '*'
-                    }
-                });
-            }
-            if($("#myUploader2").length>0){
-                console.log("2");
-                $("#myUploader2").myUploader({
-                    sysNum: "@bam.sysNum",
-                    fileNumLimit: 10,
-                    prefix: "报价单_",
-                    accept: {
-                        title: '*',
-                        extensions: '*',
-                        mimeTypes: '*'
-                    }
-                });
-            }
-            if ($("#attList1").length>0) {
-                $("#attList1").myDownloader({ sysNum: "@bam.sysNum", prefix: "施工清单_" });
-            }
-            if ($("#attList2").length>0) {
-                $("#attList2").myDownloader({ sysNum: "@bam.sysNum", prefix: "报价单_" });
-            }
-            if ($("#attList3").length>0) {
-                $("#attList3").myDownloader({ sysNum: "@bam.sysNum", prefix: "现场照片_" });
-            }
-
-            $("#flowRecordBt").on("click", function () {
-                var box = $("<div></div>");
-                $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.bill.sys_no" }, function () {
-                    openMessageDialog($(box).html(), "查看流转记录");
-                });
+        if($("#myUploader1").length>0){
+            console.log("1");
+            $("#myUploader1").myUploader({
+                sysNum: "@bam.sysNum",
+                fileNumLimit: 10,
+                prefix: "施工清单_",
+                accept: {
+                    title: '*',
+                    extensions: '*',
+                    mimeTypes: '*'
+                }
             });
-        })
+        }
+        if($("#myUploader2").length>0){
+            console.log("2");
+            $("#myUploader2").myUploader({
+                sysNum: "@bam.sysNum",
+                fileNumLimit: 10,
+                prefix: "报价单_",
+                accept: {
+                    title: '*',
+                    extensions: '*',
+                    mimeTypes: '*'
+                }
+            });
+        }
+        if($("#myUploader4").length>0){
+            console.log("4");
+            $("#myUploader4").myUploader({
+                sysNum: "@bam.sysNum",
+                fileNumLimit: 10,
+                prefix: "补充附件_",
+                accept: {
+                    title: '*',
+                    extensions: '*',
+                    mimeTypes: '*'
+                }
+            });
+        }
+        if ($("#attList1").length>0) {
+            $("#attList1").myDownloader({ sysNum: "@bam.sysNum", prefix: "施工清单_" });
+        }
+        if ($("#attList2").length>0) {
+            $("#attList2").myDownloader({ sysNum: "@bam.sysNum", prefix: "报价单_" });
+        }
+        if ($("#attList3").length>0) {
+            $("#attList3").myDownloader({ sysNum: "@bam.sysNum", prefix: "现场照片_" });
+        }
+        if ($("#attList4").length>0) {
+            $("#attList4").myDownloader({ sysNum: "@bam.sysNum", prefix: "补充附件_" });
+        }
 
-        function audit(isPass) {
-            if(isPass){
-                if("@bam.stepName".indexOf("上传施工清单")>0){
-                    if($("#myUploader1").getMyUploaderFilesNum()<1){
-                        toastr.error("请先上传施工清单附件");
-                        return;
-                    }
+        $("#flowRecordBt").on("click", function () {
+            var box = $("<div></div>");
+            $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.bill.sys_no" }, function () {
+                openMessageDialog($(box).html(), "查看流转记录");
+            });
+        });
+    })
+
+    function audit(isPass) {
+        if(isPass){
+            if("@bam.stepName".indexOf("上传施工清单")>0){
+                if($("#myUploader1").getMyUploaderFilesNum()<1){
+                    toastr.error("请先上传施工清单附件");
+                    return;
                 }
             }
-
-            $("#isPass").val(isPass);
-            $("#returnBack").val(false);
-            openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此申请吗？", function () {
-                $.ajax({
-                    type: 'post',
-                    url: 'HandleApply',
-                    data: $("#auditForm").serialize(),
-                    cache: false,
-                    dataType: 'json',
-                    success: function (data) {
-                        if (data.suc) {
-                            toastr.success(data.msg);
-                            setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
-                        } else {
-                            toastr.error(data.msg);
-                        }
-
-                    }
-                });
-
-            });
         }
 
-        function ToPreStep(a){
-            $("#returnBack").val(true);
-            $("#toStep").val($(a).attr("data-step"));
-            openConfirmDialog("确认要返回【" + $(a).html() + "】处理吗？", function () {
-                $.ajax({
-                    type: 'post',
-                    url: 'HandleApply',
-                    data: $("#auditForm").serialize(),
-                    cache: false,
-                    dataType: 'json',
-                    success: function (data) {
-                        if (data.suc) {
-                            toastr.success(data.msg);
-                            setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
-                        } else {
-                            toastr.error(data.msg);
-                        }
+        $("#isPass").val(isPass);
+        $("#returnBack").val(false);
+        openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此申请吗？", function () {
+            $.ajax({
+                type: 'post',
+                url: 'HandleApply',
+                data: $("#auditForm").serialize(),
+                cache: false,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
+                    } else {
+                        toastr.error(data.msg);
                     }
-                });
 
+                }
             });
-        }
+
+        });
+    }
+
+    function ToPreStep(a){
+        $("#returnBack").val(true);
+        $("#toStep").val($(a).attr("data-step"));
+        openConfirmDialog("确认要返回【" + $(a).html() + "】处理吗？", function () {
+            $.ajax({
+                type: 'post',
+                url: 'HandleApply',
+                data: $("#auditForm").serialize(),
+                cache: false,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.suc) {
+                        toastr.success(data.msg);
+                        setTimeout(function () { window.location.href = "@string.Concat("GetMyAuditingList?billType=",bam.billType)"; }, 2000);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                }
+            });
+
+        });
+    }
 
     </script>
 
@@ -576,6 +592,10 @@
                 <div id="attList2"></div>
             </div>
         }
+        <div style="margin-top:6px;">
+            <div class="b-label">补充附件:</div>
+            <div id="attList4"></div>
+        </div>
     </div>
 </div>
 
@@ -665,6 +685,12 @@
                                 </select>
                             </div>
                         </div>
+                        <div style="display:inline-block;">
+                            <div id="picker"> <i class="fa fa-upload"></i> 上传补充附件 </div>
+                        </div>
+                        <div id="myUploader4">
+
+                        </div>
                     }
 
                     <textarea class="form-control" rows="2" name="opinion" placeholder="请在此处输入审核意见"></textarea>
@@ -679,7 +705,7 @@
                         <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
                     </div>
                 </div>
-                <div class="dropdown">
+                <div class="dropdown" style="margin-top:4px;">
                     <button class="btn btn-block btn-warning dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                         退回
                         <span class="caret"></span>

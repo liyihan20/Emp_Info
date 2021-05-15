@@ -350,7 +350,7 @@ namespace EmpInfo.Models
     public class XASummaryDetailModel
     {
         public string 流水号 { get; set; }
-        public string 部门名称 { get; set; }
+        public string 申请部门 { get; set; }
         public string 确认日期 { get; set; }
         public string 申请人 { get; set; }
         public string 项目名称 { get; set; }
@@ -399,4 +399,32 @@ namespace EmpInfo.Models
         public DateTime toDate { get; set; }
         public string equitmentName { get; set; }
     }
+
+    public class XCBeforeApplyModel
+    {
+        public string sys_no { get; set; }
+        public string applierName { get; set; }
+        public List<string> k3Accounts { get; set; }
+        public List<ei_xcDepTarget> depList { get; set; }
+    }
+
+    public class XCCheckApplyModel
+    {
+        public ei_xcApply bill { get; set; }
+        public List<ei_xcMatOutDetail> mats { get; set; }
+        public List<ei_xcProductInDetail> pros { get; set; }
+        public List<StepNameAndAuditor> auditorList { get; set; }
+        public List<POInfoModel> k3StockInfo { get; set; }
+    }
+
+    public class XCSearchReportModel
+    {
+        public string sysNo { get; set; }
+        public string applierName { get; set; }
+        public DateTime fromDate { get; set; }
+        public DateTime toDate { get; set; }
+        public string depName { get; set; }
+        public string productModel { get; set; }
+    }
+
 }

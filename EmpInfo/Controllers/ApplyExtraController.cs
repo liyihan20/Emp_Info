@@ -1196,5 +1196,162 @@ namespace EmpInfo.Controllers
 
         #endregion
 
+        #region 委外加工
+
+        public ActionResult XCAuditorSetting()
+        {
+            return View();
+        }
+
+        public JsonResult GetXCAuditors(string fromDate, string toDate, string depName)
+        {
+            var result = db.ei_xcDepTarget
+                .Where(x => x.year_month.CompareTo(fromDate) >= 0 && x.year_month.CompareTo(toDate) <= 0 && x.dep_name.Contains(depName))
+                .OrderByDescending(x => x.year_month).ThenBy(x => x.dep_name)
+                .Select(x => new { 
+                    x.id,
+                    x.company,
+                    x.year_month,
+                    x.dep_name,
+                    x.manager,
+                    x.create_user,
+                    x.month_target
+                }).ToList();
+
+            return Json(result);
+        }
+
+        public JsonResult SaveXCAuditor(string obj)
+        {
+            var m = JsonConvert.DeserializeObject<ei_xcDepTarget>(obj);
+
+            if (db.ei_xcDepTarget.Where(x => x.year_month == m.year_month && x.dep_name == m.dep_name && x.id != m.id).Count() > 0) {
+                return Json(new SimpleResultModel(false, "当前月份的部门信息已存在，不能重复增加"));
+            }
+
+            m.manager_no = GetUserCardByNameAndCardNum(m.manager);
+            m.update_date = DateTime.Now;
+            m.update_user = userInfo.name;
+
+            if (m.id == 0) {
+                m.create_user = userInfo.name;
+                m.create_date = DateTime.Now;
+                db.ei_xcDepTarget.Add(m);
+            }
+            else {
+                var xc = db.ei_xcDepTarget.Where(x => x.id == m.id).FirstOrDefault();
+                if (xc == null) {
+                    return Json(new SimpleResultModel(false, "记录不存在，不能修改"));
+                }
+                m.create_date = xc.create_date;
+
+                MyUtils.CopyPropertyValue(m, xc);
+            }
+
+            db.SaveChanges();
+
+            return Json(new SimpleResultModel(true));
+        }
+
+        public JsonResult RemoveXCAuditor(int id)
+        {
+            var xc = db.ei_xcDepTarget.Where(x => x.id == id).FirstOrDefault();
+            if (xc == null) {
+                return Json(new SimpleResultModel(false, "记录不存在，不能删除"));
+            }
+
+            var fd = DateTime.Parse(xc.year_month + "-01");
+            var td = fd.AddMonths(1);
+            if (db.ei_xcApply.Where(x => x.apply_time >= fd && x.apply_time < td && x.dep_name == xc.dep_name).Count() > 0) {
+                return Json(new SimpleResultModel(false, "不能删除，因为当月此部门已有申请记录"));
+            }
+
+            db.ei_xcDepTarget.Remove(xc);
+            db.SaveChanges();
+
+            return Json(new SimpleResultModel(true));
+        }
+
+        public JsonResult CopyXCPreMonthAuditor()
+        {
+            var nowMonth = DateTime.Now.ToString("yyyy-MM");
+            var lastMonth = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-01")).AddMonths(-1).ToString("yyyy-MM");
+            var records = db.ei_xcDepTarget.Where(x => x.year_month.CompareTo(lastMonth) >= 0).ToList();
+
+            if (records.Where(r => r.year_month == nowMonth).Count() > 0) {
+                return Json(new SimpleResultModel(false, "当前月份" + nowMonth + "已有数据，不能复制"));
+            }
+            if (records.Where(r => r.year_month == lastMonth).Count() == 0) {
+                return Json(new SimpleResultModel(false, "上月" + lastMonth + "没有数据，不能复制"));
+            }
+
+            foreach (var r in records.Where(r => r.year_month == lastMonth)) {
+                db.ei_xcDepTarget.Add(new ei_xcDepTarget()
+                {
+                    company = r.company,
+                    create_date = DateTime.Now,
+                    create_user = userInfo.name,
+                    dep_name = r.dep_name,
+                    manager = r.manager,
+                    manager_no = r.manager_no,
+                    month_target = r.month_target,
+                    update_date = DateTime.Now,
+                    update_user = userInfo.name,
+                    year_month = nowMonth
+                });
+            }
+            db.SaveChanges();
+
+            return Json(new SimpleResultModel(true, "复制成功"));
+
+        }
+
+        public JsonResult SaveXCProInRecord(string obj)
+        {
+            ei_xcProductInDetail returnPro;
+            var pro = JsonConvert.DeserializeObject<ei_xcProductInDetail>(obj);
+
+            var hasInQty = db.ei_xcProductInDetail.Where(x => x.sys_no == pro.sys_no && x.id != pro.id).Sum(x => x.in_qty) ?? 0;
+            var xcQty = db.ei_xcApply.Where(x => x.sys_no == pro.sys_no).Select(x => x.qty).FirstOrDefault();
+
+            if (hasInQty + pro.in_qty > xcQty) {
+                return Json(new SimpleResultModel(false, string.Format("接收数量之和【{0}】不能大于委外加工的产品数量【{1}】", hasInQty + pro.in_qty, xcQty)));
+            }
+
+            if (pro.id == 0) {
+                returnPro = db.ei_xcProductInDetail.Add(pro);
+            }
+            else {
+                var exPro = db.ei_xcProductInDetail.Where(x => x.id == pro.id).FirstOrDefault();
+                if (exPro == null) {
+                    return Json(new SimpleResultModel(false, "修改的记录已不存在"));
+                }
+                MyUtils.CopyPropertyValue(pro, exPro);
+                returnPro = exPro;
+            }
+
+            try {
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+            return Json(new SimpleResultModel(true, "保存成功", JsonConvert.SerializeObject(returnPro)));
+        }
+
+        public JsonResult RemoveXCProInRecord(int id)
+        {
+            try {
+                db.ei_xcProductInDetail.Remove(db.ei_xcProductInDetail.Where(x => x.id == id).FirstOrDefault());
+                db.SaveChanges();
+                return Json(new SimpleResultModel(true, "删除成功"));
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+        }               
+
+        #endregion
+
     }
 }

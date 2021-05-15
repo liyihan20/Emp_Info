@@ -1,0 +1,454 @@
+﻿@using EmpInfo.Models;
+@using Newtonsoft.Json;
+
+@{
+    XCCheckApplyModel m = ViewData["am"] as XCCheckApplyModel;
+    var h = m.bill;
+    var matJson = JsonConvert.SerializeObject(m.mats);
+    var proJson = JsonConvert.SerializeObject(m.pros);
+    var stockJson = JsonConvert.SerializeObject(m.k3StockInfo);
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 100px;
+            vertical-align: top;
+            color: gray;
+        }
+
+        .b-input {
+            padding-left: 6px;
+            display: inline-block;
+            width: 65%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myDownloaderPro.js")"></script>
+
+    <script>
+    $("#tb").bootstrapTable({
+        striped: true,
+        pagination: false,
+        clickToSelect: true,
+        mobileResponsive: true,
+        data: @Html.Raw(matJson),
+        columns: [
+            {
+                field: "item_name",
+                title: "原料名称",
+                width: "15%"
+            }, {
+                field: "item_model",
+                title: "原料型号",
+                width: "30%"
+            }, {
+                field: "unit_name",
+                title: "单位",
+                width: "6%"
+            }, {
+                field: "per_qty",
+                title: "单位用量",
+                width: "12%"
+            }, {
+                field: "out_qty",
+                title: "发出数量",
+                width: "12%"
+            }, {
+                field: "yield_rate",
+                title: "良率",
+                width: "10%"
+            }, {
+                field: "item_comment",
+                title: "备注",
+                width: "15%"
+            }
+        ]
+    });
+
+    $("#tb2_check").bootstrapTable({
+        data:@Html.Raw(proJson),
+            striped: true,
+            mobileResponsive: true,
+            columns: [
+                {
+                    field: "in_qty",
+                    title: "实收数量",
+                    width: "25%"
+                }, {
+                    field: "in_time",
+                    title: "接收时间",
+                    width: "25%",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(row.in_time);
+                    }
+                }, {
+                    field: "in_user",
+                    title: "接收人",
+                    width: "20%"
+                }, {
+                    field: "in_comment",
+                    title: "备注",
+                    width: "30%"
+                }
+            ]
+        });
+
+        $("#tb3_check").bootstrapTable({
+            data:@Html.Raw(stockJson),
+            striped: true,
+            mobileResponsive: true,
+            columns: [
+                {
+                    field: "item_name",
+                    title: "物料名称",
+                    width: "30%"
+                }, {
+                    field: "item_modual",
+                    title: "规格型号",
+                    width: "40%"
+                }, {
+                    field: "qty",
+                    title: "数量",
+                    width: "20%"
+                }, {
+                    field: "unit_name",
+                    title: "单位",
+                    width: "10%"
+                }
+            ]
+        });
+
+        $(function(){
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@h.sys_no" }, function () {
+                openMessageDialog($(box).html(), "查看流转记录（"+"@h.sys_no"+"）");
+            });
+        });
+
+        $("#attList1").myDownloader({ sysNum: "@h.sys_no" });
+
+        $("#bt_print").on("click", function () {
+            window.open("../Report/PrintXC?sysNo=@h.sys_no");
+        })
+    });
+    </script>
+}
+
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
+            <li><a href="ApplyIndex?billType=XC">委外加工流程</a></li>
+            <li class="active">查看申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="b-div">
+            <span class="b-label">
+                流转记录:
+            </span>
+            <span class="b-input">
+                <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+            </span>
+        </div>
+        @if (h.total_price != null) {
+            <div class="b-div">
+                <span class="b-label">
+                    放行条:
+                </span>
+                <span class="b-input">
+                    <button type="button" class="btn btn-default btn-sm" id="bt_print"><i class="fa fa-print"></i> 打印</button>
+                </span>
+            </div>
+        }
+        <div class="b-div">
+            <span class="b-label">
+                审核状态:
+            </span>
+            <span class="b-input">
+                @ViewData["auditStatus"]
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请流水号:
+            </span>
+            <span class="b-input">
+                @h.sys_no
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请人:
+            </span>
+            <span class="b-input">
+                @h.applier_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                联系电话:
+            </span>
+            <span class="b-input">
+                @h.applier_phone
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                公司:
+            </span>
+            <span class="b-input">
+                @h.company
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请部门:
+            </span>
+            <span class="b-input">
+                @h.dep_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                本月委外目标额度(元):
+            </span>
+            <span class="b-input">
+                @h.current_month_target
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                地点:
+            </span>
+            <span class="b-input">
+                @h.addr
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                k3帐套:
+            </span>
+            <div class="b-input">
+                @h.k3_account
+            </div>
+        </div>        
+        <div class="b-div">
+            <span class="b-label">
+                采购单号:
+            </span>
+            <div class="b-input">
+                @h.bus_po_no
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                委外产品型号:
+            </span>
+            <div class="b-input">
+                @h.product_model
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                加工数量:
+            </span>
+            <div class="b-input">
+                @h.qty @h.unit_name
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                本月订单需求产能:
+            </span>
+            <div class="b-input">
+                @h.order_require_capacity
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                本月生产最高产能:
+            </span>
+            <div class="b-input">
+                @h.dep_highest_capacity
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                本月需委外产能:
+            </span>
+            <div class="b-input">
+                @h.need_outsourcing_capacity
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                本次委外加工周期:
+            </span>
+            <div class="b-input">
+                @h.outsourcing_cycle
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                预计加工完成时间:
+            </span>
+            <div class="b-input">
+                @h.estimate_finish_time.ToString("yyyy-MM-dd")
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                备注:
+            </span>
+            <span class="b-input">
+                @h.comment
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                计划部负责人:
+            </span>
+            <div class="b-input">
+                @h.planner_auditor
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                部门主管:
+            </span>
+            <div class="b-input">
+                @h.dep_charger
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                采购员:
+            </span>
+            <div class="b-input">
+                @h.buyer_auditor
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                原料发出明细:
+            </span>
+            <div class="b-input">
+            </div>
+        </div>
+        <table data-toggle="table" id="tb"></table>
+        @if (h.bus_stock_no != null) {
+            <div class="b-div">
+                <span class="b-label">
+                    委外加工出库单号:
+                </span>
+                <div class="b-input">
+                    @h.bus_stock_no
+                </div>
+            </div>
+            <table data-toggle="table" id="tb3_check"></table>
+        }
+        @if (h.unit_price != null) { 
+        <div class="b-div">
+            <span class="b-label">
+                供应商:
+            </span>
+            <div class="b-input">
+                @h.supplier_name
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                单价(元):
+            </span>
+            <div class="b-input">
+                @(((decimal)h.unit_price).ToString("0.####"))
+            </div>
+        </div>
+        }
+        @if (h.total_price != null) {
+            <div class="b-div">
+                <span class="b-label">
+                    总价(元):
+                </span>
+                <div class="b-input">
+                    @(((decimal)h.total_price).ToString("0.####"))
+                </div>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(h.check_out_comment)) {
+            <div>
+                <span class="b-label">
+                    审核部抽检（发出）:
+                </span>
+                <div class="b-input">
+                    @h.check_out_comment
+                </div>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(h.stock_out_comment)) {
+            <div>
+                <span class="b-label">
+                    物流抽检（发出）:
+                </span>
+                <div class="b-input">
+                    @h.stock_out_comment
+                </div>
+            </div>
+        }
+        @if (m.pros.Count() > 0) {
+            <div class="b-div">
+                <span class="b-label">
+                    产品接收明细:
+                </span>
+                <div class="b-input">
+                    （产品型号：@h.product_model）
+                </div>
+            </div>
+            <table data-toggle="table" id="tb2_check"></table>
+        }
+        @if (!string.IsNullOrEmpty(h.check_in_comment)) {
+            <div>
+                <span class="b-label">
+                    审核部抽检（接收）:
+                </span>
+                <div class="b-input">
+                    @h.check_in_comment
+                </div>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(h.stock_in_comment)) {
+            <div>
+                <span class="b-label">
+                    仓库备注：
+                </span>
+                <div class="b-input">
+                    @h.stock_in_comment
+                </div>
+            </div>
+        }
+        <div style="margin-top:6px;">
+            <div class="b-label">附件列表:</div>
+            <div id="attList1"></div>
+        </div>
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

@@ -101,9 +101,14 @@ namespace EmpInfo.Services
             if (string.IsNullOrEmpty(bill.responsibility)) throw new Exception("责任备注不能为空");
             if (string.IsNullOrEmpty(bill.transfer_style)) throw new Exception("运输方式不能为空");
 
-            var userDep = db.vw_ei_users.Where(u => u.card_number == userInfo.cardNo).FirstOrDefault().dep_name;
-            if (userDep != null && userDep.Contains("市场部") && "其它".Equals(bill.market_name)) {
-                throw new Exception("营业员请选择正确的市场部，不能选择其它");
+            try {
+                var userDep = db.vw_ei_users.Where(u => u.card_number == userInfo.cardNo).FirstOrDefault().dep_name;
+                if (userDep != null && userDep.Contains("市场部") && "其它".Equals(bill.market_name)) {
+                    throw new Exception("营业员请选择正确的市场部，不能选择其它");
+                }
+            }
+            catch {
+
             }
 
             bill.applier_name = userInfo.name;

@@ -115,6 +115,11 @@
             });
 
             $("#codeArea").on("blur", function () {
+                //2021-04-07 4栋反馈扫码枪有问题，会将IT2扫描出ITs,暂时在这里处理一下，因为没有新的扫码枪
+                var code = $("#codeArea").val();
+                code = code.replace("ITs", "IT2");
+                $("#codeArea").val(code);
+
                 getITCodeInfo();
             })
 

@@ -32,7 +32,7 @@
 
         uploader.on('fileQueued', function (file) {
             console.log(file);
-            file.name = file.name.replace(/&/g, "_").replace(/ /g, "").replace(/#/g, "_"); //将文件名中的&转化为_，空格去掉
+            file.name = file.name.replace(/&/g, "_").replace(/ /g, "").replace(/#/g, "_").replace(/\+/g, "_"); //将文件名中的&转化为_，空格去掉
         });
 
         uploader.on('uploadSuccess', function (file, res) {

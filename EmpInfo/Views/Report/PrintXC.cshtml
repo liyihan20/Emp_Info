@@ -1,0 +1,125 @@
+﻿@using EmpInfo.Models;
+@{
+    XCCheckApplyModel m = (XCCheckApplyModel)ViewData["m"];
+    var h = m.bill;
+    var al = m.auditorList;
+    int numPerPage = 20;
+    int pageNum = (int)Math.Ceiling((decimal)m.mats.Count() / numPerPage);
+}
+
+@section CSS{
+    <style type="text/css" media="print">
+        .noPrint {
+            display: none;
+        }
+
+        .pageNext {
+            page-break-after: always;
+        }
+    </style>
+    <style type="text/css">
+        #reportTb tr td {
+            text-align: center;
+            border: 1px solid;
+            padding: 2px;
+        }
+
+        #itemTb tr td {
+            text-align: center;
+            border: 1px dashed;
+            padding: 2px;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/JsBarcode.code128.min.js")"></script>
+    <script>
+        $(function () {
+            $(".bar").each(function (index, ele) {
+                JsBarcode(ele, "@h.sys_no", {
+                    width: 1,//设置条之间的宽度
+                    margin: 4,
+                    height: 28,//高度
+                    //text: "@h.sys_no",
+                    displayValue: false,
+                    fontSize: 12,
+                    font: '黑体'
+                });
+            });
+        })
+
+    </script>
+}
+
+<div class="text-center noPrint" style="margin-bottom:8px;">
+    <button type="button" class="btn btn-default btn-sm" onclick="javascript: window.print();"><i class="fa fa-print"></i> 开始打印</button>
+</div>
+@for (var p = 1; p <= pageNum; p++) {
+    <div><img src="@Url.Content("~/Content/images/Truly.gif")" /></div>
+    <div style="text-align:right;padding-right:8px;font-size:10px;">
+        <img class="bar" />
+        <div>申请单号：@h.sys_no</div>
+    </div>
+    <table style="width:100%;" id="reportTb">
+        <tr>
+            <td colspan="4">
+                <div style="font-size:22px;font-weight:bold;padding:6px 2px;">委外加工放行条</div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:20%;">公司:</td>
+            <td style="width:30%;">@h.company</td>
+            <td style="width:20%;">部门:</td>
+            <td style="width:30%;">@h.dep_name</td>
+        </tr>
+        <tr>
+            <td>申请时间:</td>
+            <td>@(((DateTime)h.apply_time).ToString("yyyy-MM-dd HH:mm"))</td>
+            <td>打印时间:</td>
+            <td>@DateTime.Now.ToString("yyyy-MM-dd HH:mm")</td>
+        </tr>
+        <tr>
+            <td>需委外产品:</td>
+            <td>@h.product_model</td>
+            <td>供应商:</td>
+            <td>@h.supplier_name</td>
+        </tr>
+        <tr>
+            <td colspan="4" style="padding:8px;">
+                <table style="width:100%;" id="itemTb">
+                    <tr>
+                        <td style="font-weight:bold;width:10%;">行号</td>
+                        <td style="font-weight:bold;width:60%;">规格型号</td>
+                        <td style="font-weight:bold;width:30%;">实发数量</td>
+                    </tr>
+                    @for (int i = (p - 1) * numPerPage; i < p * numPerPage; i++) {
+                        if (i < m.mats.Count()) {
+                            <tr>                                
+                                <td>@(i+1)</td>
+                                <td>@m.mats[i].item_model</td>
+                                <td>@(((int)m.mats[i].out_qty).ToString("###,###.######"))</td>
+                            </tr>
+                        }
+                    }
+                </table>
+            </td>
+        </tr>
+        
+        <tr>
+            <td>申请人:</td>
+            <td style="font-weight:bold;">@h.applier_name</td>
+            <td>部门总经理:</td>
+            <td style="font-weight:bold;">@al.Where(a => a.stepName.Contains("部门总经理")).Select(a=>a.auditorName).FirstOrDefault()</td>
+        </tr>
+        <tr>
+            <td>营运部:</td>
+            <td style="font-weight:bold;">@al.Where(a => a.stepName.Contains("营运部审批")).Select(a => a.auditorName).FirstOrDefault()</td>
+            <td>打印人:</td>
+            <td style="font-weight:bold;">@ViewData["printer"]</td>
+        </tr>
+    </table>
+    if (p < pageNum) {
+        <div class="pageNext"></div>
+    }
+}   

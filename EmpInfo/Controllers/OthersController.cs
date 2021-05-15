@@ -210,8 +210,8 @@ namespace EmpInfo.Controllers
 
             var k3Datas = db.Database.SqlQuery<k3ReportModel>("select [物料名称],[金额] from v_erp_po where [日期] >= '" + fromDate.ToString("yyyy-MM-dd") + "' and [日期] < '" + toDate.ToString("yyyy-MM-dd") + "'").ToList();
             //加入辅料支出和设备类支出,奇怪的使用参数传参的形式总是报日期转化错误，只能用拼接的方式
-            result.Add(new DormReportModel() { charge_type = "辅料类", type_sum = k3Datas.Where(k => k.物料名称 != "设备维修备件").Sum(k => k.金额) ?? 0m });
-            result.Add(new DormReportModel() { charge_type = "设备类", type_sum = k3Datas.Where(k => k.物料名称 == "设备维修备件").Sum(k => k.金额) ?? 0m });
+            result.Add(new DormReportModel() { charge_type = "辅料类", type_sum = k3Datas.Where(k => !k.物料名称.Contains("设备维修备件")).Sum(k => k.金额) ?? 0m });
+            result.Add(new DormReportModel() { charge_type = "设备类", type_sum = k3Datas.Where(k => k.物料名称.Contains("设备维修备件")).Sum(k => k.金额) ?? 0m });
 
             return Json(new SimpleResultModel(true, "", JsonConvert.SerializeObject(result)));
         }
@@ -251,7 +251,7 @@ namespace EmpInfo.Controllers
                         convert(varchar(20),[日期],23) as [日期],[采购单号],[供应商],[物料名称],
                         [物料型号],[辅助属性],[采购数量],[含税单价],[金额],[摘要]
                         from v_erp_po ";
-                sqltext += string.Format("where [日期] >= '{0:yyyy-MM-dd}' and [日期] < '{1:yyyy-MM-dd}' and [物料名称] {3} '{2}' order by [日期]", fromDate, toDate, "设备维修备件", chargeType.Equals("设备类") ? "=" : "<>");
+                sqltext += string.Format("where [日期] >= '{0:yyyy-MM-dd}' and [日期] < '{1:yyyy-MM-dd}' and [物料名称] {3} '%{2}%' order by [日期]", fromDate, toDate, "设备维修备件", chargeType.Equals("设备类") ? "like" : "not like");
             }
             else if ("工资代扣".Equals(chargeType)) {
                 sqltext = @"declare @tb table(charge_type nvarchar(100), type_sum decimal(12,2))

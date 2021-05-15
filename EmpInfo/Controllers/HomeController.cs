@@ -1,15 +1,15 @@
 ﻿using EmpInfo.Filter;
+using EmpInfo.FlowSvr;
 using EmpInfo.Models;
+using EmpInfo.Services;
 using EmpInfo.Util;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
-using EmpInfo.Services;
-using Newtonsoft.Json;
-using EmpInfo.QywxWebSrv;
 
 
 namespace EmpInfo.Controllers
@@ -626,7 +626,7 @@ namespace EmpInfo.Controllers
 
         [SessionTimeOutFilter]
         public ActionResult WorkGroupIndex()
-        {
+        {            
             ViewData["testVisible"] = HasGotPower("ModuelTest");
             return View();
         }

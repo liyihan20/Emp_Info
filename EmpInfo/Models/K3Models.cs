@@ -32,15 +32,37 @@ namespace EmpInfo.Models
 
     public class POInfoModel
     {
+        public int? entry_id { get; set; }
         public string item_no { get; set; }
         public string item_name { get; set; }
         public string item_modual { get; set; }
-        public int item_id { get; set; }
-        public decimal qty { get; set; }
+        public int? item_id { get; set; }
+        public decimal? qty { get; set; }
         public string unit_name { get; set; }
         public string usage { get; set; }
         public DateTime? latest_arrive_date { get; set; }
         public string brand { get; set; }
     }
+
+    public class K3Product
+    {
+        public int item_id { get; set; }
+        public string item_no { get; set; }
+        public string item_name { get; set; }
+        public string item_model { get; set; }
+        public string unit_name { get; set; }
+
+    }
+    public class K3BomInfo
+    {
+        public string sour { get; set; }
+        public int item_id { get; set; }
+        public string item_no { get; set; }
+        public string item_name { get; set; }
+        public string item_model { get; set; }
+        public string unit_name { get; set; }
+        public decimal per_qty { get; set; }
+    }
+
 
 }

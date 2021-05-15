@@ -399,6 +399,9 @@ namespace EmpInfo.FlowSvr {
         private string billTypeField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string processNameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string titleField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
@@ -479,6 +482,19 @@ namespace EmpInfo.FlowSvr {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string processName {
+            get {
+                return this.processNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.processNameField, value) != true)) {
+                    this.processNameField = value;
+                    this.RaisePropertyChanged("processName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
         public string title {
             get {
                 return this.titleField;
@@ -491,7 +507,7 @@ namespace EmpInfo.FlowSvr {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=5)]
         public string subTitle {
             get {
                 return this.subTitleField;
@@ -504,7 +520,7 @@ namespace EmpInfo.FlowSvr {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=5)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=6)]
         public string applier {
             get {
                 return this.applierField;
@@ -517,7 +533,7 @@ namespace EmpInfo.FlowSvr {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=6)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=7)]
         public System.Nullable<int> step {
             get {
                 return this.stepField;
@@ -530,7 +546,7 @@ namespace EmpInfo.FlowSvr {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=7)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=8)]
         public string stepName {
             get {
                 return this.stepNameField;
@@ -543,7 +559,7 @@ namespace EmpInfo.FlowSvr {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=8)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=9)]
         public string auditResult {
             get {
                 return this.auditResultField;
@@ -556,7 +572,7 @@ namespace EmpInfo.FlowSvr {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=9)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=10)]
         public string finalResult {
             get {
                 return this.finalResultField;
@@ -569,7 +585,7 @@ namespace EmpInfo.FlowSvr {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=10)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=11)]
         public string auditors {
             get {
                 return this.auditorsField;
@@ -582,7 +598,7 @@ namespace EmpInfo.FlowSvr {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=11)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=12)]
         public string finalAuditors {
             get {
                 return this.finalAuditorsField;
@@ -595,7 +611,7 @@ namespace EmpInfo.FlowSvr {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=12)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=13)]
         public bool isUserAobrt {
             get {
                 return this.isUserAobrtField;
@@ -608,7 +624,7 @@ namespace EmpInfo.FlowSvr {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=13)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=14)]
         public string opinion {
             get {
                 return this.opinionField;
@@ -925,6 +941,10 @@ namespace EmpInfo.FlowSvr {
         // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 TestGetAuditQueueResult 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestGetAuditQueue", ReplyAction="*")]
         EmpInfo.FlowSvr.TestGetAuditQueueResponse TestGetAuditQueue(EmpInfo.FlowSvr.TestGetAuditQueueRequest request);
+        
+        // CODEGEN: 命名空间 http://ic.truly.com.cn/ 的元素名称 cardNumber 以后生成的消息协定未标记为 nillable
+        [System.ServiceModel.OperationContractAttribute(Action="http://ic.truly.com.cn/TestGetMyDealingCount", ReplyAction="*")]
+        EmpInfo.FlowSvr.TestGetMyDealingCountResponse TestGetMyDealingCount(EmpInfo.FlowSvr.TestGetMyDealingCountRequest request);
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2942,6 +2962,74 @@ namespace EmpInfo.FlowSvr {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class TestGetMyDealingCountRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="TestGetMyDealingCount", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.TestGetMyDealingCountRequestBody Body;
+        
+        public TestGetMyDealingCountRequest() {
+        }
+        
+        public TestGetMyDealingCountRequest(EmpInfo.FlowSvr.TestGetMyDealingCountRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class TestGetMyDealingCountRequestBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string cardNumber;
+        
+        public TestGetMyDealingCountRequestBody() {
+        }
+        
+        public TestGetMyDealingCountRequestBody(string cardNumber) {
+            this.cardNumber = cardNumber;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class TestGetMyDealingCountResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="TestGetMyDealingCountResponse", Namespace="http://ic.truly.com.cn/", Order=0)]
+        public EmpInfo.FlowSvr.TestGetMyDealingCountResponseBody Body;
+        
+        public TestGetMyDealingCountResponse() {
+        }
+        
+        public TestGetMyDealingCountResponse(EmpInfo.FlowSvr.TestGetMyDealingCountResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://ic.truly.com.cn/")]
+    public partial class TestGetMyDealingCountResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
+        public int TestGetMyDealingCountResult;
+        
+        public TestGetMyDealingCountResponseBody() {
+        }
+        
+        public TestGetMyDealingCountResponseBody(int TestGetMyDealingCountResult) {
+            this.TestGetMyDealingCountResult = TestGetMyDealingCountResult;
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public interface FlowSvrSoapChannel : EmpInfo.FlowSvr.FlowSvrSoap, System.ServiceModel.IClientChannel {
     }
@@ -3365,6 +3453,19 @@ namespace EmpInfo.FlowSvr {
             inValue.Body = new EmpInfo.FlowSvr.TestGetAuditQueueRequestBody();
             EmpInfo.FlowSvr.TestGetAuditQueueResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).TestGetAuditQueue(inValue);
             return retVal.Body.TestGetAuditQueueResult;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        EmpInfo.FlowSvr.TestGetMyDealingCountResponse EmpInfo.FlowSvr.FlowSvrSoap.TestGetMyDealingCount(EmpInfo.FlowSvr.TestGetMyDealingCountRequest request) {
+            return base.Channel.TestGetMyDealingCount(request);
+        }
+        
+        public int TestGetMyDealingCount(string cardNumber) {
+            EmpInfo.FlowSvr.TestGetMyDealingCountRequest inValue = new EmpInfo.FlowSvr.TestGetMyDealingCountRequest();
+            inValue.Body = new EmpInfo.FlowSvr.TestGetMyDealingCountRequestBody();
+            inValue.Body.cardNumber = cardNumber;
+            EmpInfo.FlowSvr.TestGetMyDealingCountResponse retVal = ((EmpInfo.FlowSvr.FlowSvrSoap)(this)).TestGetMyDealingCount(inValue);
+            return retVal.Body.TestGetMyDealingCountResult;
         }
     }
 }

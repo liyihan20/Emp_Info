@@ -3826,7 +3826,7 @@ namespace EmpInfo.Controllers
                 var shares = JsonConvert.DeserializeObject<List<XAFeeShareModel>>(r.x.share_fee_detail);
 
                 foreach (var s in shares) {
-                    var tmpFee = Math.Round((decimal)(s.v * r.price / 100.0m),2);
+                    var tmpFee = Math.Round((decimal)(s.v * r.price / 100.0m), 2);
                     var tmpName = s.n.Split(new char[] { '_' })[1];
                     var item = list.Where(l => l.name == tmpName).FirstOrDefault();
                     if (item == null) {
@@ -3836,7 +3836,6 @@ namespace EmpInfo.Controllers
                         item.value += tmpFee;
                     }
                 }
-
             }
 
             return Json(list.OrderByDescending(l => l.value).ToList());
@@ -3872,7 +3871,7 @@ namespace EmpInfo.Controllers
                 list.Add(new XASummaryDetailModel()
                 {
                     申请人 = r.x.applier_name,
-                    部门名称 = r.x.dept_name,
+                    申请部门 = r.x.dept_name,
                     是否PO = r.x.is_po == true ? "是" : (r.x.is_po == false ? "否" : ""),
                     确认日期 = ((DateTime)r.x.confirm_date).ToString("yyyy-MM-dd HH:mm"),
                     价格 = ((decimal)r.s.price).ToString("###,###.##"),
@@ -3893,7 +3892,7 @@ namespace EmpInfo.Controllers
                     list.Add(new XASummaryDetailModel()
                     {
                         申请人 = r.x.applier_name,
-                        部门名称 = r.x.dept_name,
+                        申请部门 = r.x.dept_name,
                         是否PO = r.x.is_po == true ? "是" : (r.x.is_po == false ? "否" : ""),
                         确认日期 = ((DateTime)r.x.confirm_date).ToString("yyyy-MM-dd HH:mm"),
                         价格 = tmpFee.ToString("###,###.##"),
@@ -4087,6 +4086,220 @@ namespace EmpInfo.Controllers
             xls.Send();
 
         }
+        #endregion
+
+        #region 委外加工
+
+        //放行条
+        [SessionTimeOutFilter]
+        public ActionResult PrintXC(string sysNo)
+        {
+            var m = (from x in db.ei_xcApply
+                     join e in db.ei_xcMatOutDetail on x.sys_no equals e.sys_no
+                     where x.sys_no == sysNo
+                     select new
+                     {
+                         bill = x,
+                         mats = e
+                     }).ToList();
+
+            if (m.Count() < 1) {
+                ViewBag.tip = "不存在需要打印的数据";
+                return View("Error");
+            }
+
+            var bill = m.First().bill;
+            if (bill.out_time != null) {
+                ViewBag.tip = "此放行条已放行，不能再打印";
+                return View("Error");
+            }
+            if (bill.total_price == null) {
+                ViewBag.tip = "此放行条采购未下单或被拒绝，不能打印";
+                return View("Error"); 
+            }
+
+
+            new XCSv(sysNo).UpdatePrintStatus();
+
+            ViewData["m"] = new XCCheckApplyModel()
+            {
+                bill = bill,
+                mats = m.Select(a => a.mats).ToList(),
+                auditorList = GetAuditorList(sysNo)
+            };
+
+            ViewData["printer"] = userInfo.name;
+
+            return View();
+        }
+
+        [SessionTimeOutFilter]
+        public ActionResult XCReport()
+        {
+            return View();
+        }
+
+        public JsonResult SearchXCReport(string obj)
+        {
+            XCSearchReportModel m = JsonConvert.DeserializeObject<XCSearchReportModel>(obj);
+            m.toDate = m.toDate.AddDays(1);
+
+            var result = from x in db.ei_xcApply
+                         join a in db.flow_apply on x.sys_no equals a.sys_no
+                         join aet in db.flow_applyEntry on new { id = a.id, pass = (bool?)null } equals new { id = (int)aet.apply_id, pass = aet.pass } into aettemp
+                         from ae in aettemp.DefaultIfEmpty()
+                         where x.apply_time >= m.fromDate
+                         && x.apply_time < m.toDate
+                         select new
+                         {
+                             sysNo = x.sys_no,
+                             auditStatus = a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : ae.step_name)),
+                             applierName = x.applier_name,
+                             applyTime = x.apply_time,
+                             depName = x.dep_name,
+                             productModel = x.product_model,
+                             qty = x.qty
+                         };
+
+            var canCheckBus = db.ei_flowAuthority.Where(f => f.bill_type == "XC" && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).FirstOrDefault();
+            if (canCheckBus != null && !string.IsNullOrEmpty(canCheckBus.cond1)) {
+                var buses = canCheckBus.cond1.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                result = result.Where(r => buses.Contains(r.depName));
+            }
+            
+            if (!string.IsNullOrEmpty(m.applierName)) {
+                result = result.Where(r => r.applierName.Contains(m.applierName));
+            }
+            if (!string.IsNullOrEmpty(m.sysNo)) {
+                result = result.Where(r => r.sysNo.Contains(m.sysNo));
+            }
+            if (!string.IsNullOrEmpty(m.depName)) {
+                result = result.Where(r => r.depName.Contains(m.depName));
+            }
+            if (!string.IsNullOrEmpty(m.productModel)) {
+                result = result.Where(r => r.productModel.Contains(m.productModel));
+            }
+
+
+            return Json(result.Distinct().ToList());
+
+        }
+
+        public void ExportXCExcel(string obj)
+        {
+            XCSearchReportModel m = JsonConvert.DeserializeObject<XCSearchReportModel>(obj);
+            m.toDate = m.toDate.AddDays(1);
+
+            var result = from x in db.ei_xcApply                         
+                         join a in db.flow_apply on x.sys_no equals a.sys_no
+                         join aet in db.flow_applyEntry on new { id = a.id, pass = (bool?)null } equals new { id = (int)aet.apply_id, pass = aet.pass } into aettemp
+                         from ae in aettemp.DefaultIfEmpty()
+                         where x.apply_time >= m.fromDate
+                         && x.apply_time < m.toDate
+                         select new
+                         {
+                             bill = x,
+                             auditStatus = a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : ae.step_name))                             
+                         };
+
+            var canCheckBus = db.ei_flowAuthority.Where(f => f.bill_type == "XC" && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).FirstOrDefault();
+            if (canCheckBus != null && !string.IsNullOrEmpty(canCheckBus.cond1)) {
+                var buses = canCheckBus.cond1.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                result = result.Where(r => buses.Contains(r.bill.dep_name));
+            }
+
+            if (!string.IsNullOrEmpty(m.applierName)) {
+                result = result.Where(r => r.bill.applier_name.Contains(m.applierName));
+            }
+            if (!string.IsNullOrEmpty(m.sysNo)) {
+                result = result.Where(r => r.bill.sys_no.Contains(m.sysNo));
+            }
+            if (!string.IsNullOrEmpty(m.depName)) {
+                result = result.Where(r => r.bill.dep_name.Contains(m.depName));
+            }
+            if (!string.IsNullOrEmpty(m.productModel)) {
+                result = result.Where(r => r.bill.product_model.Contains(m.productModel));
+            }
+
+            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "联系电话", "申请时间", "公司", "部门", "本月委外目标额度", "地点", "委外产品型号",
+                                              "加工数量", "本月订单需求产能", "本月生产最高产能","本月需委外产能","本次委外加工周期", "预计加工完成时间","备注",
+                                              "计划部负责人","部门主管","采购员", "供应商","单价", "总价" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "委外加工申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("申请详情");
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            var data = result.ToList();
+            foreach (var d in data.Select(r => r.bill).Distinct().ToList()) {
+                colIndex = 1;
+
+                //"处理结果","申请流水号", "申请人", "联系电话", "申请时间", "公司", "部门", "本月委外目标额度", "地点", "委外产品型号",
+                //"加工数量", "本月订单需求产能", "本月生产最高产能","本月需委外产能","本次委外加工周期", "预计加工完成时间","备注",
+                //"计划部负责人","部门主管","采购员", "供应商","单价", "总价"
+                cells.Add(++rowIndex, colIndex, data.Where(a => a.bill == d).First().auditStatus);
+                cells.Add(rowIndex, ++colIndex, d.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.applier_name);
+                cells.Add(rowIndex, ++colIndex, d.applier_phone);
+                cells.Add(rowIndex, ++colIndex, d.apply_time.ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.company);
+                cells.Add(rowIndex, ++colIndex, d.dep_name);
+                cells.Add(rowIndex, ++colIndex, d.current_month_target);
+                cells.Add(rowIndex, ++colIndex, d.addr);
+                cells.Add(rowIndex, ++colIndex, d.product_model);
+
+                cells.Add(rowIndex, ++colIndex, d.qty);
+                cells.Add(rowIndex, ++colIndex, d.order_require_capacity);
+                cells.Add(rowIndex, ++colIndex, d.dep_highest_capacity);
+                cells.Add(rowIndex, ++colIndex, d.need_outsourcing_capacity);
+                cells.Add(rowIndex, ++colIndex, d.outsourcing_cycle);
+                cells.Add(rowIndex, ++colIndex, d.estimate_finish_time.ToString("yyyy-MM-dd"));
+                cells.Add(rowIndex, ++colIndex, d.comment);
+
+                cells.Add(rowIndex, ++colIndex, d.planner_auditor);
+                cells.Add(rowIndex, ++colIndex, d.dep_charger);
+                cells.Add(rowIndex, ++colIndex, d.buyer_auditor);
+                cells.Add(rowIndex, ++colIndex, d.supplier_name);
+                cells.Add(rowIndex, ++colIndex, d.unit_price);
+                cells.Add(rowIndex, ++colIndex, d.total_price);
+                
+            }
+
+            xls.Send();
+        }
+
+
         #endregion
 
     }

@@ -3,8 +3,8 @@
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
     <style type="text/css">
-        .lbText{
-            font-style:italic;
+        .lbText {
+            font-style: italic;
         }
     </style>
 }
@@ -44,26 +44,26 @@
             todayBtn: true,
             startView: 2,
             minView: 2
-        });        
+        });
 
         $("#reportBt").on("click", function () {
             var obj = utils.getFormObj($("#fm"));
-            if (obj.beginDate == "" || obj.endDate == "") {
+            if (obj.fromDate == "" || obj.toDate == "") {
                 toastr.error("日期期间必须填写才能查询");
                 return;
             }
             toastr.info("数据正在导出，请稍等...");
-            window.open("../Report/ExportXAExcel?obj=" + utils.StringifyAndParseCharacter(obj));
+            window.open("../Report/ExportXCExcel?obj=" + utils.StringifyAndParseCharacter(obj));
         });
 
         $("#checkBt").on("click", function () {
             var obj = utils.getFormObj($("#fm"));
-            if (obj.beginDate == "" || obj.endDate == "") {
+            if (obj.fromDate == "" || obj.toDate == "") {
                 toastr.error("日期期间必须填写才能查询");
                 return;
             }
 
-            $.post("@Url.Content("~/Report/SearchXAReport")", {
+            $.post("@Url.Content("~/Report/SearchXCReport")", {
                 obj: JSON.stringify(obj)
             }, function (data) {
                 $('#check_tb').bootstrapTable('load', data);
@@ -96,14 +96,14 @@
                         return utils.parseTDate(row.applyTime);
                     }
                 }, {
-                    field: "classification",
-                    title: "项目大类"
+                    field: "depName",
+                    title: "部门"
                 }, {
-                    field: "projectName",
-                    title: "项目名称"
+                    field: "productModel",
+                    title: "委外型号"
                 }, {
-                    field: "billNo",
-                    title: "项目编号"
+                    field: "qty",
+                    title: "委外数量"
                 }, {
                     field: "auditStatus",
                     title: "处理结果",
@@ -120,17 +120,17 @@
                     }
                 }
             ],
-            onClickCell: function (field, value, row, $element) {                
+            onClickCell: function (field, value, row, $element) {
                 if (row.sysNo) {
                     window.open("@Url.Content("~/Apply/CheckApply?sysNo=")" + row.sysNo);
-                }                
+                }
             },
             rowStyle: function (row, index) {
                 return { css: { cursor: 'pointer' } };
             }
         });
 
-    
+
 
 
 
@@ -144,7 +144,7 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=XA")">项目单申请流程</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=XC")">委外加工流程</a></li>
             <li class="active">查询报表</li>
         </ol>
     </div>
@@ -171,28 +171,15 @@
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-4">
                     <div class="lbText">流水号：</div>
-                    <input type="text" class="form-control" name="sysNo" style="margin:6px 0;" />                
+                    <input type="text" class="form-control" name="sysNo" style="margin:6px 0;" />
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-4">
-                    <div class="lbText">项目大类：</div>
-                    <select class="form-control" name="classification" style="margin:6px 0;">
-                        <option value="">所有</option>
-                        <option value="工程项目">工程项目</option>
-                        <option value="工作项目">工作项目</option>
-                        <option value="后勤项目">后勤项目</option>
-                    </select>
+                    <div class="lbText">部门：</div>
+                    <input type="text" class="form-control" name="depName" style="margin:6px 0;" />
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-4">
-                    <div class="lbText">项目名称：</div>
-                    <input type="text" class="form-control" name="projectName" style="margin:6px 0;" />
-                </div>
-                <div class="col-xs-12 col-sm-6 col-md-4">
-                    <div class="lbText">申请部门：</div>
-                    <input type="text" class="form-control" name="deptName" style="margin:6px 0;" />
-                </div>
-                <div class="col-xs-12 col-sm-6 col-md-4">
-                    <div class="lbText">当前节点：</div>
-                    <input type="text" class="form-control" name="currentNode" style="margin:6px 0;" />
+                    <div class="lbText">委外型号：</div>
+                    <input type="text" class="form-control" name="productModel" style="margin:6px 0;" />
                 </div>
             </div>
         </form>

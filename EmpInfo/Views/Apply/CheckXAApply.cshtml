@@ -68,9 +68,12 @@
         @*if ($("#attList2").length>0) {
             $("#attList2").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "报价单_" });
         }*@
-            if ($("#attList3").length>0) {
-                $("#attList3").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "现场照片_" });
-            }
+        if ($("#attList3").length>0) {
+            $("#attList3").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "现场照片_" });
+        }
+        if ($("#attList4").length>0) {
+            $("#attList4").myDownloader({ sysNum: "@m.bill.sys_no", prefix: "补充附件_" });
+        }
             $("#flowRecordBt").on("click", function () {
                 var box = $("<div></div>");
                 $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.bill.sys_no" }, function () {
@@ -355,6 +358,10 @@
                 <div class="b-label">报价单:</div>
                 <div id="attList2"></div>
             </div>*@
+        <div style="margin-top:6px;">
+            <div class="b-label">补充附件:</div>
+            <div id="attList4"></div>
+        </div>
 
 
     </div>
