@@ -1599,6 +1599,8 @@
           <Property Name="share_fee_managers" Type="varchar" MaxLength="500" />
           <Property Name="is_po" Type="bit" />
           <Property Name="confirm_date" Type="datetime" />
+          <Property Name="dept_manager_name" Type="nvarchar" MaxLength="100" />
+          <Property Name="dept_manager_num" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ei_xaApplySupplier">
           <Key>
@@ -7613,6 +7615,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="share_fee_managers" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="is_po" Type="Boolean" />
           <Property Name="confirm_date" Type="DateTime" Precision="3" />
+          <Property Name="dept_manager_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="dept_manager_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="ei_xaApplySupplier">
           <Key>
@@ -10750,6 +10754,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_xaApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_xaApply">
               <MappingFragment StoreEntitySet="ei_xaApply">
+                <ScalarProperty Name="dept_manager_num" ColumnName="dept_manager_num" />
+                <ScalarProperty Name="dept_manager_name" ColumnName="dept_manager_name" />
                 <ScalarProperty Name="confirm_date" ColumnName="confirm_date" />
                 <ScalarProperty Name="is_po" ColumnName="is_po" />
                 <ScalarProperty Name="share_fee_managers" ColumnName="share_fee_managers" />

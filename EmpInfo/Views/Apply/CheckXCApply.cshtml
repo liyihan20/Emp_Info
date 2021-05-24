@@ -63,7 +63,10 @@
             }, {
                 field: "out_qty",
                 title: "发出数量",
-                width: "12%"
+                width: "12%",
+                formatter: function (value, row, index, field) {
+                    return utils.parseDecimalToThousandBit(row.out_qty);
+                }
             }, {
                 field: "yield_rate",
                 title: "良率",
@@ -229,7 +232,7 @@
                 本月委外目标额度(元):
             </span>
             <span class="b-input">
-                @h.current_month_target
+                @h.current_month_target.ToString("###,##0")
             </span>
         </div>
         <div class="b-div">
@@ -269,7 +272,7 @@
                 加工数量:
             </span>
             <div class="b-input">
-                @h.qty @h.unit_name
+                @h.qty.ToString("###,##0.######") @h.unit_name
             </div>
         </div>
         <div class="b-div">
@@ -342,6 +345,14 @@
             </span>
             <div class="b-input">
                 @h.buyer_auditor
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                物料组:
+            </span>
+            <div class="b-input">
+                @h.mat_group
             </div>
         </div>
         <div class="b-div">

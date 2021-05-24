@@ -1207,8 +1207,9 @@ namespace EmpInfo.Controllers
         {
             var result = db.ei_xcDepTarget
                 .Where(x => x.year_month.CompareTo(fromDate) >= 0 && x.year_month.CompareTo(toDate) <= 0 && x.dep_name.Contains(depName))
-                .OrderByDescending(x => x.year_month).ThenBy(x => x.dep_name)
-                .Select(x => new { 
+                .OrderByDescending(x => x.year_month).ThenBy(x => x.company).ThenBy(x => x.dep_name)
+                .Select(x => new
+                {
                     x.id,
                     x.company,
                     x.year_month,

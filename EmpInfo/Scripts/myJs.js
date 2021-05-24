@@ -100,7 +100,7 @@
         var suc = true;
         var msg = "";
         $fm.find("input:required").each(function (i, v) {
-            if (!v.value || $.trim(v.value) == "") {
+            if ($.trim(v.value) == "") {
                 console.log(v.name);
                 msg = "【" + utils.getLabelName($fm, v.name) + "】必须填写";
                 suc = false;
@@ -111,7 +111,7 @@
 
         //2. select里面的required属性
         $fm.find("select:required").each(function (i, v) {
-            if (!v.value || $.trim(v.value) == "") {
+            if ($.trim(v.value) == "") {
                 msg = "【" + utils.getLabelName($fm, v.name) + "】必须选择";
                 suc = false;
                 return false;
@@ -121,7 +121,7 @@
 
         //3. textarea里面的required属性
         $fm.find("textarea:required").each(function (i, v) {
-            if (!v.value || $.trim(v.value) == "") {
+            if ($.trim(v.value) == "") {
                 console.log(v.name);
                 msg = "【" + utils.getLabelName($fm, v.name) + "】必须填写";
                 suc = false;

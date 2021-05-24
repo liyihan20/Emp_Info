@@ -358,11 +358,6 @@
                 });
             });
 
-            $("#itemModal #saveBt").on("click",function(){
-                var entrys = $("#tb").bootstrapTable('getData');
-                console.log(entrys);
-            });
-
             $("#getBomBt").on("click",function(){
                 var rows = $("#tb").bootstrapTable('getData');
                 if(rows.filter(function(r){return r.sour == "bom"}).length>0){
@@ -371,25 +366,58 @@
                 }
 
                 var company = $("#company").val();
-                var productId=$("input[name='product_id']").val();
+                var k3Account = $("#k3_account").val();
+                var productNo = $("input[name='product_no']").val();
+                var productQty = $("#qty").val();
                 if(company == ""){
                     toastr.error("请先选择公司");
                     return;
                 }
-                if(productId=="" || isNaN(productId)){
+                if(k3Account == ""){
+                    toastr.error("请先选择K3帐套");
+                    return;
+                }
+                if(productNo==""){
                     toastr.error("请先选择委外产品型号");
                     return;
                 }
-                $.post("../Item/GetK3BomInfo",{company:company,productId:productId},function(data){
+                if(productQty==""){
+                    toastr.error("委外加工数量为空");
+                    return;
+                }
+
+                $.post("../Item/GetK3BomInfo",{
+                    company:company,
+                    k3Account:k3Account,
+                    productNo:productNo
+                },function(data){
                     if(data.length<1){
                         toastr.error("此产品型号没有关联BOM");
                         return;
                     }
                     for(var i = 0;i<data.length;i++){
                         data[i].idx = addIndex++;
+                        data[i].out_qty = data[i].per_qty * productQty;
+                        data[i].yield_rate = 1;
                     }
                     $("#tb").bootstrapTable("append",data);
                 });
+            });
+
+            $("#yield_rate").on("blur",function(){
+                var rate = $(this).val();
+                var pQty = $("#qty").val();
+                var perQty = $("#per_qty").val();
+
+                if(rate && perQty){
+                    if(utils.testIsInt(perQty)){
+                        $("#out_qty").val(parseFloat((pQty * perQty / rate).toFixed(0)));
+                    }else{
+                        $("#out_qty").val(parseFloat((pQty * perQty / rate).toFixed(6)));
+                    }
+                    
+                }
+
             });
 
         });
@@ -690,19 +718,19 @@
                         </div>
                         <div class="b-div">
                             <span class="b-label">
-                                发出数量:
-                            </span>
-                            <div class="b-input">
-                                <input type="number" class="form-control" id="out_qty" name="out_qty" required />
-                            </div>
-                        </div>
-                        <div class="b-div">
-                            <span class="b-label">
                                 良率:
                             </span>
                             <span class="b-input">
                                 <input type="text" class="form-control" id="yield_rate" name="yield_rate" />
                             </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                发出数量:
+                            </span>
+                            <div class="b-input">
+                                <input type="number" class="form-control" id="out_qty" name="out_qty" required />
+                            </div>
                         </div>
                         <div class="b-div">
                             <span class="b-label">

@@ -47,5 +47,7 @@ namespace EmpInfo.Models
         public string share_fee_managers { get; set; }
         public Nullable<bool> is_po { get; set; }
         public Nullable<System.DateTime> confirm_date { get; set; }
+        public string dept_manager_name { get; set; }
+        public string dept_manager_num { get; set; }
     }
 }

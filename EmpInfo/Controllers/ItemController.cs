@@ -373,9 +373,13 @@ namespace EmpInfo.Controllers
             return Json(result);
         }
 
-        public JsonResult GetK3BomInfo(string company,int productId)
+        public JsonResult GetK3BomInfo(string company,string k3Account, string productNo)
         {
-            return Json(new K3Sv(company).GetK3BomInfo(productId));
+            var account = company;
+            if (new string[] { "光电仁寿", "光电科技", "电子", "仪器", "工业" }.Contains(k3Account)){
+                account = k3Account;
+            }
+            return Json(new K3Sv(account).GetK3BomInfo(productNo));
         }
 
         public JsonResult GetK3BusPO(string account, string po)

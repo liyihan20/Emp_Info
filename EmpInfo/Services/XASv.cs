@@ -99,6 +99,9 @@ namespace EmpInfo.Services
                 bill.equitment_auditor_num = "";
             }
 
+            bill.dept_manager_num = string.Join(";", db.flow_auditorRelation.Where(f => f.bill_type == BillType && f.relate_name == "部门总经理" && f.relate_text == bill.company + "_" + bill.dept_name).Select(f => f.relate_value).ToArray());
+            bill.dept_manager_name = GetUserNameAndCardByCardNum(bill.dept_manager_num);
+
             //增加部门分摊功能 2020-12-16
             if (bill.is_share_fee) {
                 if (!string.IsNullOrEmpty(bill.share_fee_detail)) {

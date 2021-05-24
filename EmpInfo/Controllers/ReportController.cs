@@ -4221,9 +4221,9 @@ namespace EmpInfo.Controllers
                 result = result.Where(r => r.bill.product_model.Contains(m.productModel));
             }
 
-            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "联系电话", "申请时间", "公司", "部门", "本月委外目标额度", "地点", "委外产品型号",
+            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "联系电话", "申请时间", "公司", "部门", "本月委外目标额度", "地点", "采购单号","委外产品型号",
                                               "加工数量", "本月订单需求产能", "本月生产最高产能","本月需委外产能","本次委外加工周期", "预计加工完成时间","备注",
-                                              "计划部负责人","部门主管","采购员", "供应商","单价", "总价" };
+                                              "计划部负责人","部门主管","采购员", "物料组", "委外加工出库单", "供应商","单价", "总价" };
             ushort[] colWidth = new ushort[colName.Length];
 
             for (var i = 0; i < colWidth.Length; i++) {
@@ -4277,6 +4277,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.dep_name);
                 cells.Add(rowIndex, ++colIndex, d.current_month_target);
                 cells.Add(rowIndex, ++colIndex, d.addr);
+                cells.Add(rowIndex, ++colIndex, d.bus_po_no);
                 cells.Add(rowIndex, ++colIndex, d.product_model);
 
                 cells.Add(rowIndex, ++colIndex, d.qty);
@@ -4290,6 +4291,8 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.planner_auditor);
                 cells.Add(rowIndex, ++colIndex, d.dep_charger);
                 cells.Add(rowIndex, ++colIndex, d.buyer_auditor);
+                cells.Add(rowIndex, ++colIndex, d.mat_group);
+                cells.Add(rowIndex, ++colIndex, d.bus_stock_no);
                 cells.Add(rowIndex, ++colIndex, d.supplier_name);
                 cells.Add(rowIndex, ++colIndex, d.unit_price);
                 cells.Add(rowIndex, ++colIndex, d.total_price);
