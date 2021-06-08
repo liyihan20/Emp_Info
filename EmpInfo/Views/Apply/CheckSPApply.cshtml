@@ -43,7 +43,7 @@
             });
             $("#printBt").on("click", function () {
                 window.open("@Url.Content("~/Report/PrintSP?sysNo=")" + "@m.sys_no");
-            });
+                });
         });
     </script>
 }
@@ -160,19 +160,7 @@
             
             
             @if (m.content_type == "产品" || m.content_type == "原材料") {
-                if (m.content_type == "产品") { 
-                    <div class="col-md-4 col-sm-6 col-xs-12">
-                        <div class="b-div">
-                            <span class="b-label">
-                                是否退补货:
-                            </span>
-                            <div class="b-input">
-                                @m.isReturnBack
-                            </div>
-                        </div>
-                    </div>
-                }
-                else {
+                if (m.content_type == "原材料") {
                     <div class="col-md-4 col-sm-6 col-xs-12">
                         <div class="b-div">
                             <span class="b-label">
@@ -372,7 +360,7 @@
                 </div>
             }
         </div>
-        @if (m.content_type == "产品") { 
+        @if (m.content_type != "文件") { 
         <div class="b-div">
             <div class="panel panel-default">
                 <div class="panel-heading">物品明细</div>

@@ -5,8 +5,8 @@
     XCCheckApplyModel m = ViewData["am"] as XCCheckApplyModel;
     var h = m.bill;
     var matJson = JsonConvert.SerializeObject(m.mats);
-    var proJson = JsonConvert.SerializeObject(m.pros);
-    var stockJson = JsonConvert.SerializeObject(m.k3StockInfo);
+    //var proJson = JsonConvert.SerializeObject(m.pros);
+    //var stockJson = JsonConvert.SerializeObject(m.k3StockInfo);
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
@@ -79,7 +79,7 @@
         ]
     });
 
-    $("#tb2_check").bootstrapTable({
+    @*$("#tb2_check").bootstrapTable({
         data:@Html.Raw(proJson),
             striped: true,
             mobileResponsive: true,
@@ -105,9 +105,9 @@
                     width: "30%"
                 }
             ]
-        });
+        });*@
 
-        $("#tb3_check").bootstrapTable({
+        @*$("#tb3_check").bootstrapTable({
             data:@Html.Raw(stockJson),
             striped: true,
             mobileResponsive: true,
@@ -130,7 +130,7 @@
                     width: "10%"
                 }
             ]
-        });
+        });*@
 
         $(function(){
             $("#flowRecordBt").on("click", function () {
@@ -347,14 +347,14 @@
                 @h.buyer_auditor
             </div>
         </div>
-        <div class="b-div">
+        @*<div class="b-div">
             <span class="b-label">
                 物料组:
             </span>
             <div class="b-input">
                 @h.mat_group
             </div>
-        </div>
+        </div>*@
         <div class="b-div">
             <span class="b-label">
                 原料发出明细:

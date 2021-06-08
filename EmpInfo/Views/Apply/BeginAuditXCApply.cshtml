@@ -40,7 +40,7 @@
                 $("#myUploader1").myUploader({
                     sysNum: "@bam.sysNum",
                     fileNumLimit: 10,
-                    prefix: "营运抽检_",
+                    prefix: "营运部附件_",
                     accept: {
                         title: '*',
                         extensions: '*',
@@ -68,7 +68,7 @@
                 $("#myUploader3").myUploader({
                     sysNum: "@bam.sysNum",
                     fileNumLimit: 10,
-                    prefix: "物流抽检_",
+                    prefix: "统计报表_",
                     accept: {
                         title: '*',
                         extensions: '*',
@@ -77,7 +77,7 @@
                 });
             }
 
-            if ($("#myUploader4").length > 0) {
+            @*if ($("#myUploader4").length > 0) {
                 console.log("4");
                 $("#myUploader4").myUploader({
                     sysNum: "@bam.sysNum",
@@ -89,7 +89,7 @@
                         mimeTypes: '*'
                     }
                 });
-            }
+            }*@
 
             $("#printBt").on("click", function () {
                 window.open("../Report/PrintXC?sysNo=@bam.sysNum");
@@ -111,14 +111,16 @@
                 $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> @bam.billTypeName");
                 $("#waiting").remove();
 
-                doAfterLoad();
+                //doAfterLoad();
 
             });
 
         });
 
         function audit(isPass) {
-
+            if ($("#ck_ceo")) {
+                $("#need_ceo_confirm").val($("#ck_ceo").is(":checked"));
+            }
             $("#isPass").val(isPass);
             openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此申请吗？", function () {
                 $.ajax({
@@ -148,7 +150,7 @@
         </script>
 
     }
-    <script>
+    @*<script>
         function doAfterLoad() {
 
             $("#tb2").bootstrapTable({
@@ -305,7 +307,7 @@
         }
 
 
-    </script>
+    </script>*@
 
 }
 @*通过load获取申请单内容*@
@@ -318,7 +320,7 @@
 
     <div class="panel panel-primary">
         <div class="panel-heading" id="auditHead">
-            <i class='fa fa-pencil'></i> @bam.stepName -- @bam.stepName
+            <i class='fa fa-pencil'></i> @bam.stepName -- @bam.sysNum
         </div>
         <div class="panel-body">
             @if (bam.isPass == null) {
@@ -327,6 +329,7 @@
                     <input type="hidden" name="step" value="@bam.step" />
                     <input type="hidden" name="stepName" value="@bam.stepName" />
                     <input type="hidden" name="isPass" id="isPass" value="true" />
+                    <input type="hidden" name="need_ceo_confirm" id="need_ceo_confirm" value="false" />
 
                     @if (bam.stepName.Contains("采购询价")) {
                         <div class="b-div">
@@ -347,16 +350,24 @@
                         </div>
                     }
                     else if (bam.stepName.Contains("营运部审批")) {
-                        <div class="b-div">
+                        @*<div class="b-div">
                             <span class="b-label">
                                 原料抽检结果:
                             </span>
                             <div class="b-input">
                                 <textarea type="text" class="form-control" rows="3" name="check_out_comment" placeholder="此处可填写原料抽检结果">@h.check_out_comment</textarea>
                             </div>
+                        </div>*@
+                        <div class="b-div">
+                            <span class="b-label">
+                                转总裁办审批:
+                            </span>
+                            <div class="b-input">
+                                <input type="checkbox" id="ck_ceo" />
+                            </div>
                         </div>
                         <div style="display:inline-block;">
-                            <div id="picker"> <i class="fa fa-upload"></i> 上传抽检照片 </div>
+                            <div id="picker"> <i class="fa fa-upload"></i> 上传营运部附件 </div>
                         </div>
                         <div id="myUploader1">
 
@@ -370,7 +381,7 @@
 
                         </div>
                     }
-                    else if (bam.stepName.Contains("物料组")) {
+                    @*else if (bam.stepName.Contains("物料组")) {
                         <div class="b-div">
                             <span class="b-label">
                                 委外出库单号:
@@ -440,24 +451,24 @@
                         <div id="myUploader4">
 
                         </div>
-                    }
-                    else if (bam.stepName.Contains("营运部抽检")) {
-                        <div class="b-div">
+                    }*@
+                    else if (bam.stepName.Contains("申请人提交结案")) {
+                        @*<div class="b-div">
                             <span class="b-label">
                                 产品抽检结果:
                             </span>
                             <div class="b-input">
                                 <textarea type="text" class="form-control" rows="3" name="check_in_comment" placeholder="此处可填写产品抽检结果">@h.check_in_comment</textarea>
                             </div>
-                        </div>
+                        </div>*@
                         <div style="display:inline-block;">
-                            <div id="picker"> <i class="fa fa-upload"></i> 上传抽检照片 </div>
+                            <div id="picker"> <i class="fa fa-upload"></i> 上传统计报表 </div>
                         </div>
-                        <div id="myUploader1">
+                        <div id="myUploader3">
 
                         </div>
                     }
-                    else if (bam.stepName.Contains("申请人确认领回")) {
+                    @*else if (bam.stepName.Contains("申请人确认领回")) {
                         <div class="b-div">
                             <span class="b-label">
                                 领回日期:
@@ -471,14 +482,14 @@
                                 </div>
                             </div>
                         </div>
-                    }
+                    }*@
 
                     <textarea class="form-control" rows="2" name="opinion" placeholder="请在此处输入审核意见"></textarea>
 
                 </form>
                 <div style="margin-top:12px;"></div>
-                if (bam.stepName.Contains("申请人确认领回")) {
-                    <button type="button" class="btn btn-block btn-success" onclick="audit(true)"><i class="fa fa-truck"></i> 确认领回</button>
+                if (bam.stepName.Contains("申请人提交结案")) {
+                    <button type="button" class="btn btn-block btn-success" onclick="audit(true)"><i class="fa fa-truck"></i> 提交结案</button>
                 }
                 else {
                     <div class="btn-group btn-group-justified" role="group">
@@ -510,7 +521,7 @@
         <div style="margin-left:18px;padding-top:6px;" class="text-danger">
             <p>
                 1. 流程步骤：流程开始--->提交申请--->计划部负责人审批-->部门主管审批--->部门总经理审批--->采购询价--->营运部审批--->
-                总裁办审批（若部门累计金额超过月度目标）--->采购部下单--->物料组审批--->物流发出原料盘点--->仓库接收产成品--->营运部抽检--->申请人确认领回--->结束
+                总裁办审批（若部门累计金额超过月度目标）--->采购部下单--->申请人提交结案申请--->营运部审批结案申请--->结束
                 <br />
                 2. 委外时间设定为每周一至周五下午五点前，超出则顺延至第二个工作日处理。
                 <br />
@@ -518,14 +529,14 @@
                 <br />
                 4. SMT、CCM等部门，与供应商沟通配套料由其自己购买，本厂不再搭配外发。
                 <br />
-                5. 各个门的委外目标由营运部指定，并每月进行管控。超出目标部门，需总裁办审批。
+                5. 各个门的委外目标由营运部指定，并每月进行管控。
             </p>
         </div>
     </div>
 </div>
 
 @section Modal {
-    <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+    @*<div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -581,7 +592,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>*@
 
     @Html.Partial("_ConfirmDialog")
 }

@@ -1,0 +1,288 @@
+﻿@using EmpInfo.Models;
+
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 25%;
+            vertical-align: top;
+            color: gray;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+
+        #al_file_tb th {
+            font-size: small;
+            text-align: center;
+        }
+
+        #al_file_tb td {
+            font-size: small;
+            text-align: center;
+        }
+
+        #al_file_list i {
+            cursor: pointer;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+
+    <script>
+    var queue;
+    $(function () {
+        $(".datePicker").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd hh:ii",
+            autoclose: true,
+            startView: 2,
+            maxView: 2,
+            minuteStep: 5
+        });        
+
+        //选择部门
+        $("#eDepName").on("click", function () {
+            openSelectDepDialog(0, function (selectedDep) {
+                console.log(selectedDep);
+                $("#eDepName").val(selectedDep.depLongName);
+                $("#eDepNum").val(selectedDep.depNum);
+                $("#eDepId").val(selectedDep.depId);
+            });
+        });
+
+        //提交申请
+        $("#apply_bt").on("click", function () {
+            if (!validateForm()) {
+                return;
+            }
+            var day1 = Date.parse($("#dutyDateFrom").val().replace(/-/g, "/"));
+            var day2 = Date.parse($("#dutyDateTo").val().replace(/-/g, "/"));
+            var day3 = Date.parse($("#vacationDateFrom").val().replace(/-/g, "/"));
+            var day4 = Date.parse($("#vacationDateTo").val().replace(/-/g, "/"));
+            if (isNaN(day1) || isNaN(day2) || isNaN(day3) || isNaN(day4)) {
+                toastr.error("[日期]不合规则");
+                return;
+            }
+            if (day2 < day1) {
+                toastr.error("值班结束日期不能早于开始日期");
+                return;
+            }
+            //if (day3 < day2) {
+            //    toastr.error("调休开始日期不能早于值班结束日期");
+            //    return;
+            //}
+            if (day4 < day3) {
+                toastr.error("调休结束日期不能早于调休开始日期");
+                return;
+            }
+            BeginApply();
+
+        });
+
+    });
+
+
+
+    //验证表单
+    function validateForm() {
+        if ($("#eDepNum").val() == "") {
+            toastr.error("必须选择[所属部门]");
+            return false;
+        }
+        if ($.trim($("#dutyDateFrom").val()) == "") {
+            toastr.error("值班开始日期不能为空");
+            return false;
+        }
+        if ($.trim($("#dutyDateTo").val()) == "") {
+            toastr.error("值班结束日期不能为空");
+            return false;
+        }
+        if ($.trim($("#vacationDateFrom").val()) == "") {
+            toastr.error("调休开始日期不能为空");
+            return false;
+        }
+        if ($.trim($("#vacationDateTo").val()) == "") {
+            toastr.error("调休结束日期不能为空");
+            return false;
+        }
+        if ($.trim($("#days").val()) == "") {
+            toastr.error("调休天数不能为空");
+            return false;
+        }
+        return true;
+    }
+
+    function showDepName() {
+        var name = $("#eDepName").val();
+        var no = $("#eDepNum").val();
+        if (name == "") {
+            toastr.info("请先选择所属部门");
+            return;
+        }
+        openMessageDialog("<div>名称：<span class='text-danger'>" + name + "</span></div><div>编码：<span class='text-danger'>" + no + "</span></div>", "当前所选部门信息");
+    }
+
+    function BeginApply() {
+        $(this).button("loading");
+        var formParam = $("#alForm").serialize();
+        $.ajax({
+            type: 'post',
+            url: '@Url.Content("~/Apply/GetSVFlowQueue")',
+            data: formParam,
+            cache: false,
+            dataType: 'json',
+            success: function (data) {
+                if (data.suc) {
+                    var q = data.list;
+                    queue = q;
+                    var div = "";
+                    var canSelectAuditor = false;
+                    var depNo = $("#eDepNum").val();
+                    for (var i = 0; i < q.length; i++) {
+                        div += "<div>" + q[i].step + ".";
+                        div += "【" + q[i].step_name + "】 <span class='auditors'>" + q[i].auditors + "</span>";
+                        div += "</div>";
+                    }
+                    openConfirmDialog(div, function () {
+                        $("#apply_bt").button("loading");
+                        $.ajax({
+                            type: 'post',
+                            url: '@Url.Content("~/Apply/SaveApplySV")',
+                            data: formParam + "&auditor_queues=" + JSON.stringify(queue),
+                            cache: false,
+                            dataType: 'json',
+                            success: function (data) {
+                                $("#apply_bt").button("reset");
+                                if (data.suc) {
+                                    toastr.success("提交成功:" + data.msg);
+                                    setTimeout(function () { window.location.href = "@Url.Content("~/Apply/ApplyIndex?billType=SV")"; }, 2000);
+                                } else {
+                                    toastr.error("提交失败：" + data.msg);
+                                    $("#apply_bt").button("reset");
+                                }
+
+                            }
+                        });
+                    }, "审批流程预览", "返回修改", "确认提交");
+                } else {
+                    toastr.error(data.msg);
+                }
+                $("#apply_bt").button("reset");
+            }
+        });
+    }
+
+    </script>
+
+}
+
+<div class="row" style="margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                    <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                    <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                    <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=SV")">调休申请单</a></li>
+                    <li class="active">开始申请</li>
+                </ol>
+            </div>
+            <div class="panel-body">
+                <form id="alForm" style="margin-top:-12px;">
+                    <div class="b-div">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>申请流水号</button>
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <input type="text" class="form-control" id="sysNum" value="@ViewData["sysNum"]" disabled />
+                            <input type="hidden" name="sys_no" value="@ViewData["sysNum"]" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>所属部门</button>
+                        </span>
+                        <div style="display:inline-block;width:70%">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="eDepName" name="dep_long_name" value="@ViewData["depName"]" placeholder="点击此处选择部门" />
+                                <span class="input-group-addon" style="cursor:pointer;" onclick="showDepName()"><i class="fa fa-info text-danger"></i></span>
+                            </div>
+                            <input type="hidden" id="eDepNum" name="dep_no" value="@ViewData["depNum"]" />
+                            <input type="hidden" id="eDepId" name="dep_id" value="@ViewData["depId"]" />
+                        </div>
+                    </div>
+                    <div class="b-div" style="vertical-align:middle;">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>值班日期</button>
+                        </span>
+                        <div style="display:inline-block;width:70%;vertical-align:top;">
+                            <div class="input-group date datePicker">
+                                <span class="input-group-addon">从</span>
+                                <input class="form-control" type="text" id="dutyDateFrom" name="duty_date_from" autocomplete="off" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                            </div>
+                            <div class="input-group date datePicker">
+                                <span class="input-group-addon">到</span>
+                                <input class="form-control" type="text" id="dutyDateTo" name="duty_date_to" autocomplete="off" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="b-div" style="vertical-align:middle;">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>调休日期</button>
+                        </span>
+                        <div style="display:inline-block;width:70%;vertical-align:top;">
+                            <div class="input-group date datePicker">
+                                <span class="input-group-addon">从</span>
+                                <input class="form-control" type="text" id="vacationDateFrom" name="vacation_date_from" autocomplete="off" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                            </div>
+                            <div class="input-group date datePicker">
+                                <span class="input-group-addon">到</span>
+                                <input class="form-control" type="text" id="vacationDateTo" name="vacation_date_to" autocomplete="off" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>调休天数</button>
+                        </span>
+                        <div style="display:inline-block;width:70%">
+                            <div class="input-group">
+                                <span class="input-group-addon">共</span>
+                                <input class="form-control" type="number" id="days" name="v_days" />
+                                <span class="input-group-addon">天</span>
+                            </div>
+                        </div>
+                        <p class="small text-danger"><i class="fa fa-info-circle"></i> 备注：调假时间最小单位是0.5天，原则上在当月内完成调假，最迟在次月完成；</p>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            <button class="btn btn-block btn-default" disabled>原因</button>
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <textarea type="text" class="form-control" rows="2" id="reason" name="reason"></textarea>
+                        </span>
+                    </div>
+                </form>
+                <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..."><i class="fa fa-check-circle-o"></i> 提交调休申请</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_SelectDep")
+    @Html.Partial("_SelectUsers")
+    @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_MessageDialog")
+}

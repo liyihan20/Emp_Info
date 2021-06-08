@@ -20,25 +20,35 @@
                     radio: true
                 }, {
                     field: "property_number",
-                    title: "资产编号"
+                    title: "资产编号",
+                    width: "10%"
                 }, {
                     field: "equitment_name",
-                    title: "设备名称"
+                    title: "设备名称",
+                    width: "20%"
                 }, {
                     field: "equitment_modual",
-                    title: "规格型号"
+                    title: "规格型号",
+                    width: "20%"
                 }, {
                     field: "produce_dep_name",
-                    title: "生产部门"
+                    title: "生产部门",
+                    width: "20%"
                 }, {
                     field: "maintenance_status",
-                    title: "保养状态"
+                    title: "保养状态",
+                    width: "8%"
                 }, {
                     field: "next_maintenance_date",
                     title: "下次保养日期",
                     formatter: function (value, row, index, field) {
                         return utils.parseTDate(row.next_maintenance_date);
-                    }
+                    },
+                    width: "15%"
+                }, {
+                    field: "creater_name",
+                    title: "创建人",
+                    width: "7%"
                 }
             ]
         });

@@ -308,7 +308,20 @@
                          </div>
                      </div>
                  </div>
-             </div>
+                 @if (m.info != null) {
+                    <div class="col-xs-12 col-sm-6 col-md-4">
+                        <div class="b-div">
+                            <div class="b-label">
+                                创建人:
+                            </div>
+                            <div class="b-input">
+                                <input type="text" class="form-control" name="creater_name" readonly />
+                            </div>
+                        </div>
+                        </div>
+                  }
+            </div>
+                    
              <div class="b-div">
                 <div class="b-label">
                     保养文件编号:

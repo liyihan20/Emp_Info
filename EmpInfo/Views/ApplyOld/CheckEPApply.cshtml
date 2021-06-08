@@ -1,0 +1,314 @@
+﻿@using EmpInfo.Models;
+@{
+    ei_epApply ep = (ei_epApply)ViewData["ep"];
+}
+@section CSS{
+    <style type="text/css">
+        
+        .contentTb th{
+            color: gray;
+            font-weight:normal;
+            font-style:italic;
+        }
+        </style>
+}
+@section Scripts {
+    <script>        
+        $("#flowRecordBt").on("click", function () {
+            var box = $("<div></div>");
+            $(box).load("@Url.Content("~/Apply/CheckFlowRecord") .list-group", { sysNo: "@ep.sys_no" }, function () {
+                openMessageDialog($(box).html(), "查看流转记录");
+            });
+        });
+    </script>
+    }
+<div class="row" style="margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                    <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                    <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                    <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=EP")">设备故障报修单</a></li>
+                    <li class="active">查看详情</li>
+                </ol>
+            </div>
+            <div class="panel-body">
+                <table style="width:100%;border-collapse:separate; border-spacing:8px;" class="contentTb">
+                    <tr>
+                        <th style="width:28%;">
+                            审核状态
+                        </th>
+                        <td style="width:72%;">
+                            <span class="pull-left" style="margin-top:5px;">@ViewData["auditStatus"]</span>
+                            <button type="button" class="btn btn-default btn-sm pull-right" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>申请流水号</th>
+                        <td>
+                            <span class="pull-left" style="margin-top:5px;">@ep.sys_no</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>报修人</th>
+                        <td>
+                            @ep.applier_name
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>报修时间</th>
+                        <td>@(((DateTime)ep.report_time).ToString("yyyy-MM-dd HH:mm"))</td>
+                    </tr>
+                    <tr>
+                        <th>联系电话</th>
+                        <td>@ep.applier_phone</td>
+                    </tr>
+                    <tr>
+                        <th>车间名称</th>
+                        <td>@ep.produce_dep_name</td>
+                    </tr>
+                    <tr>
+                        <th>设备支部</th>
+                        <td>@ep.equitment_dep_name</td>
+                    </tr>
+                    <tr>
+                        <th>事业部</th>
+                        <td>@ep.bus_dep_name</td>
+                    </tr>
+                    <tr>
+                        <th>固定资产类别</th>
+                        <td>@ep.property_type</td>
+                    </tr>
+                    <tr>
+                        <th>固定资产编号</th>
+                        <td>@ep.property_number</td>
+                    </tr>
+                    <tr>
+                        <th>岗位位置</th>
+                        <td>@ep.produce_dep_addr</td>
+                    </tr>
+                    <tr>
+                        <th>设备名称</th>
+                        <td>@ep.equitment_name</td>
+                    </tr>
+                    <tr>
+                        <th>设备型号</th>
+                        <td>@ep.equitment_modual</td>
+                    </tr>
+                    <tr>
+                        <th>设备供应商</th>
+                        <td>@ep.equitment_supplier</td>
+                    </tr>
+                    <tr>
+                        <th>生产主管</th>
+                        <td>@ep.produce_dep_charger_name</td>
+                    </tr>
+                    <tr>
+                        <th>设备经理</th>
+                        <td>@ep.equitment_dep_charger_name</td>
+                    </tr>
+                    <tr>
+                        <th>影响停产程度</th>
+                        <td>@(((EmergencyEnum)ep.emergency_level).ToString())</td>
+                    </tr>
+                    <tr>
+                        <th>故障现象</th>
+                        <td>@ep.faulty_situation</td>
+                    </tr>
+                </table>
+
+                @if (ep.accept_time != null) {
+                    <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">接单维修过程</h4>
+                    <table style="width:100%;border-collapse:separate; border-spacing:8px;" class="contentTb">
+                        <tr>
+                            <th style="width:28%;">
+                                接单时间
+                            </th>
+                            <td style="width:72%;">
+                                @(((DateTime)ep.accept_time).ToString("yyyy-MM-dd HH:mm"))
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                接单人
+                            </th>
+                            <td>
+                                @ep.accept_user_name
+                            </td>
+                        </tr>
+                        @if (ep.confirm_later_flag == true) {
+                                <tr>
+                                    <th>
+                                        延迟处理
+                                    </th>
+                                    <td>
+                                        是
+                                    </td>
+                                </tr>                                
+                            }
+                        @if (!string.IsNullOrEmpty(ep.confirm_later_reason)) {
+                            <tr>
+                                <th>
+                                    延迟处理原因
+                                </th>
+                                <td>
+                                    @ep.confirm_later_reason
+                                </td>
+                            </tr>
+                        }
+                        @if (ep.confirm_register_time != null) {
+                            <tr>
+                                <th>
+                                    处理完成时间
+                                </th>
+                                <td>
+                                    @(((DateTime)ep.confirm_time).ToString("yyyy-MM-dd HH:mm"))
+                                </td>
+                            </tr>
+                            if (ep.confirm_register_time != null) {
+                                <tr>
+                                    <th>
+                                        处理登记时间
+                                    </th>
+                                    <td>
+                                        @(((DateTime)ep.confirm_register_time).ToString("yyyy-MM-dd HH:mm"))
+                                    </td>
+                                </tr>
+                            }
+                            <tr>
+                                <th>
+                                    维修人员
+                                </th>
+                                <td>
+                                    @ep.confirm_user_name
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    故障原因类别
+                                </th>
+                                <td>
+                                    @ep.faulty_type
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    故障原因
+                                </th>
+                                <td>
+                                    @ep.faulty_reason
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    修理方法
+                                </th>
+                                <td>
+                                    @ep.repair_method
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    更换配件
+                                </th>
+                                <td>
+                                    @ep.exchange_parts
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    修理结果
+                                </th>
+                                <td>
+                                    @ep.repair_result
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    协助人员
+                                </th>
+                                <td>
+                                    @ep.other_repairers
+                                </td>
+                            </tr>                            
+                        }
+                    </table>
+                    }
+                    
+                    @if (ep.evaluation_time != null) {
+                        <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">维修服务评价</h4>
+                        <table style="width:100%;border-collapse:separate; border-spacing:8px;" class="contentTb">
+                            <tr>
+                                <th style="width:28%;">
+                                    评价时间
+                                </th>
+                                <td style="width:72%;">
+                                    @(((DateTime)ep.evaluation_time).ToString("yyyy-MM-dd HH:mm"))
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    评价生产主管
+                                </th>
+                                <td>
+                                    @ep.produce_dep_charger_name
+                                </td>
+                            </tr>                  
+                            <tr>
+                                <th>
+                                    评价打分
+                                </th>
+                                <td>
+                                    @(ep.evaluation_score == 2 ? "满意" : (ep.evaluation_score == 1 ? "一般" : (ep.evaluation_score == 0 ? "不满意" : "")))
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    评价内容
+                                </th>
+                                <td>
+                                    @ep.evaluation_content
+                                </td>
+                            </tr>          
+                        </table>
+                    }
+
+                @if (ep.grade_time != null) {
+                        <h4 style="border-bottom:1px solid #337ab7;font-style:italic" class="text-primary">维修难度评分</h4>
+                        <table style="width:100%;border-collapse:separate; border-spacing:8px;" class="contentTb">
+                            <tr>
+                                <th style="width:28%;">
+                                    评分时间
+                                </th>
+                                <td style="width:72%;">
+                                    @(((DateTime)ep.grade_time).ToString("yyyy-MM-dd HH:mm"))
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    评分设备经理
+                                </th>
+                                <td>
+                                    @ep.equitment_dep_charger_name
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    难度分数
+                                </th>
+                                <td>
+                                    @ep.difficulty_score 分
+                                </td>
+                            </tr>  
+                        </table>
+                    }
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}
+

@@ -6,6 +6,7 @@
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
     <style type="text/css">
         .b-label {
             display: inline-block;
@@ -28,6 +29,8 @@
 @section Scripts {
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUploaderPro.js?v=2")"></script>
     <script>
     var ex = {
         ex_company: "",
@@ -59,6 +62,19 @@
 
 
     $(function () {
+
+        if ($("#myUploader1").length > 0) {
+            $("#myUploader1").myUploader({
+                sysNum: "@bam.sysNum",
+                fileNumLimit: 10,
+                accept: {
+                    title: 'Images',
+                    extensions: 'gif,jpg,jpeg,bmp,png',
+                    mimeTypes: 'image/*'
+                }
+            });
+        }
+
         $("#applyContent").load("CheckApply #topContainer", { sysNo: "@bam.sysNum" }, function () {
             $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> @bam.billTypeName 详情");
             $("#waiting").remove();
@@ -184,6 +200,12 @@
                             <span style="display:inline-block;width:70%">
                                 <input type="text" class="form-control" name="ex_no" id="ex_no" value="@sp.ex_no" />
                             </span>
+                        </div>
+                        <div style="display:inline-block;">
+                            <div id="picker"> <i class="fa fa-upload"></i> 上传图片 </div>
+                        </div>
+                        <div id="myUploader1">
+
                         </div>
                     }
                 </form>

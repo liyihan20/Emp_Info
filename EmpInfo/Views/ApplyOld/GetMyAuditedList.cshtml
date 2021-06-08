@@ -1,0 +1,167 @@
+﻿@{
+    List<EmpInfo.FlowSvr.FlowAuditListModel> list = (List<EmpInfo.FlowSvr.FlowAuditListModel>)ViewData["list"];
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <style type="text/css">
+        #auditDiv .subTitle {
+            font-size: small;
+            font-style: italic;
+            color: gray;
+        }
+    </style>
+}
+@section Scripts {
+    @*加入以下js，使IE8支持datetimepicker组件*@
+    <script>
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function (elt /*, from*/) {
+                var len = this.length >>> 0;
+
+                var from = Number(arguments[1]) || 0;
+                from = (from < 0)
+                     ? Math.ceil(from)
+                     : Math.floor(from);
+                if (from < 0)
+                    from += len;
+
+                for (; from < len; from++) {
+                    if (from in this &&
+                        this[from] === elt)
+                        return from;
+                }
+                return -1;
+            };
+        }
+    </script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script>
+    $(function () {
+        $(".form_date").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            todayBtn: true,
+            startView: 2,
+            minView: 2
+        });
+        //设置日期联动，结束日期不能大于起始日期
+        $("#fromDatePicker1").on("changeDate", function (e) {
+            $('#toDatePicker1').datetimepicker('setStartDate', e.date);
+        });
+        $("#toDatePicker1").on("changeDate", function (e) {
+            $('#fromDatePicker1').datetimepicker('setEndDate', e.date);
+        });
+
+        $("#checkBt").on("click", function () {
+            window.location.href = "@Url.Content("~/Apply/CheckMyAuditedList?")"
+            + "billType=" + "@ViewData["billType"]" + "&"
+                + "fromDate=" + $("#from_date").val() + "&"
+                + "toDate=" + $("#to_date").val() + "&"
+                + "sysNo=" + $("#sysNo").val() + "&"
+                + "cardNo=" + $("#cardNo").val();
+            });
+
+            $("#exportExcelBt").on("click", function () {
+                toastr.info("请稍等，不要重复点击，正在导出......");
+                window.location.href = "@Url.Content("~/Report/BeginExportALAuditedExcel?")"
+                + "fromDate=" + $("#from_date").val() + "&"
+                + "toDate=" + $("#to_date").val() + "&"
+                + "sysNo=" + $("#sysNo").val() + "&"
+                + "cardNo=" + $("#cardNo").val();
+            });
+
+        });
+    </script>
+}
+
+<div class="panel panel-success" id="auditDiv">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li class="active">我的已办</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
+                            <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                            <input class="form-control" type="text" id="from_date" name="from_date" placeholder="申请起始日期" readonly value="@ViewData["fromDate"]">
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
+                            <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                            <input class="form-control" type="text" id="to_date" name="to_date" placeholder="申请结束日期" readonly value="@ViewData["toDate"]">
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-6">
+                        <input type="text" class="form-control" placeholder="此处可输入申请流水号" id="sysNo"  value="@ViewData["sysNo"]"/>
+                    </div>
+                    <div class="col-xs-12 col-sm-6">
+                        <input type="text" class="form-control" placeholder="此处可输入申请人厂牌" id="cardNo"  value="@ViewData["cardNo"]"/>
+                    </div>
+                </div>
+                <div style="margin-top:8px;">
+                    <button class="btn btn-block btn-success" id="checkBt"><i class="fa fa-check"></i> 开始查询</button>
+                </div>
+            </div>
+        </div>
+
+        @if (list.Count() == 0) {
+            <p class="text-center text-warning">暂没有我的已办记录</p>
+        }
+        else {
+            <div class="text-danger"><i>以下是符合筛选条件的已办记录:</i> </div>
+            
+            <hr style="margin:4px;" />
+            if ((string)ViewData["billType"]== "AL") {
+                <button class="btn btn-default pull-right" id="exportExcelBt"><i class="fa fa-file-excel-o"></i> 导出到excel</button>
+                <div class="clearfix"></div>
+            }
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <td>申请单号 /<span class="subTitle">申请日期</span></td>
+                        <td>申请人 /<span class="subTitle">申请内容</span></td>
+                        <td>审批结果 / <span class="subTitle">审批节点</span></td>
+                        <td>操作</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var l in list) {
+                        <tr>
+                            <td>@l.sysNo <br /> <span class="subTitle">@(((DateTime)l.applyTime).ToString("MM-dd HH:mm"))</span> </td>
+                            <td>@l.applier <span class="text-danger"> @l.title</span> <br /> <span class="subTitle">@l.subTitle</span></td>
+                            <td><b class="@(l.auditResult == "OK" ? "text-success" : "text-danger")"> @l.auditResult (@l.finalResult) </b><br /> <span class="subTitle">@l.stepName</span></td>
+                            <td style="vertical-align:central;"><a href="CheckApply?sysNo=@l.sysNo">查看详细</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @*if ((string)ViewData["billType"] == "AL") {
+                var group = (from l in list
+                             where l.finalResult == "成功"
+                             group l by l.title into g
+                             select new
+                             {
+                                 title = g.Key,
+                                 count = g.Count()
+                             }).ToList();
+                string groupInfo = "";
+                foreach (var g in group) {
+                    groupInfo += g.title + "：" + g.count + "例； ";
+                }
+                <div class="text-success" style="padding-left:8px;font-size:16px;">汇总信息： @groupInfo</div>
+            }*@
+        }
+
+    </div>
+</div>

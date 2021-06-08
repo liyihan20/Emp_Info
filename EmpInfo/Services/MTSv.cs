@@ -133,7 +133,7 @@ namespace EmpInfo.Services
             else if (stepName.Contains("处理")) {
                 MyUtils.SetFieldValueToModel(fc, bill);
                 bill.maintence_time = DateTime.Now;
-                bill.maintence_hours = (decimal)Math.Round((((DateTime)bill.maintence_end_time) - ((DateTime)bill.maintence_begin_time)).Minutes / 60.0, 1);
+                bill.maintence_hours = (decimal)Math.Round((((DateTime)bill.maintence_end_time) - ((DateTime)bill.maintence_begin_time)).TotalMinutes / 60.0, 1);
             }
             else if (stepName.Contains("确认")) {
                 bill.confirm_time = DateTime.Now;
@@ -142,8 +142,7 @@ namespace EmpInfo.Services
                 eqInfo.last_maintenance_date = bill.maintence_time;
                 eqInfo.next_maintenance_date = ((DateTime)bill.maintence_time).AddMonths(eqInfo.maintenance_cycle);
             }
-
-
+            
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
             var result = flow.BeginAudit(bill.sys_no, step, userInfo.cardNo, true, "", JsonConvert.SerializeObject(bill));
             if (result.suc) {
@@ -338,7 +337,7 @@ namespace EmpInfo.Services
         public object GetEqInfoList(string userNumber)
         {
             bool canSeeAll = db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "查看所有设备" && f.relate_value == userNumber).Count() > 0;
-            var result = (from eq in db.ei_mtEqInfo
+            var list = (from eq in db.ei_mtEqInfo
                           join c in db.ei_mtClass on eq.class_id equals c.id
                           where c.leader_number.Contains(userNumber) || canSeeAll
                           orderby eq.maintenance_status
@@ -351,8 +350,11 @@ namespace EmpInfo.Services
                               eq.next_maintenance_date,
                               eq.maintenance_status,
                               eq.produce_dep_name,
-                              eq.id
+                              eq.id,
+                              eq.creater_name
                           }).ToList();
+            var result = list.Where(l => l.maintenance_status == "正在保养").OrderBy(l => l.next_maintenance_date).ToList();
+            result.AddRange(list.Where(l => l.maintenance_status != "正在保养").OrderBy(l => l.maintenance_status).ThenBy(l => l.next_maintenance_date).ToList());
 
             return result;
         }

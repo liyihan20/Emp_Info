@@ -221,10 +221,16 @@ namespace EmpInfo.Services
                         bill.ex_price = decimal.Parse(exPriceStr);
                     }
                 }
-                if (stepName.Contains("行政部")) {
-                    bill.can_print = true; //可打印放行条并可被扫描
-                    bill.out_status = "已打印";
+                if ( !bill.content_type.Equals("文件") && bill.send_or_receive.Equals("寄件")) {
+                    if (stepName.Contains("事业部负责人")) {
+                        bill.can_print = true; //可打印放行条并可被扫描
+                        bill.out_status = "已打印";
+                    }
                 }
+                //if (stepName.Contains("行政部")) {
+                //    bill.can_print = true; //可打印放行条并可被扫描
+                //    bill.out_status = "已打印";
+                //}
             }
             
             JsonSerializerSettings js = new JsonSerializerSettings();

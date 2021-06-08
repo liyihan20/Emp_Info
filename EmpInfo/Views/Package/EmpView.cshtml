@@ -1,0 +1,112 @@
+﻿@{
+    string areaName = (string)ViewData["areaName"] == "" ? "一区" : (string)ViewData["areaName"];  //测试
+    string dormName = (string)ViewData["dormName"] == "" ? "A100" : (string)ViewData["dormName"];  //测试
+    string livingInfo = string.IsNullOrEmpty(areaName) ? "未住宿" : areaName + "-" + dormName;
+}
+
+@section Scripts{
+    <script>
+        $(function () {
+            $("#registerBt").on("click", function () {
+                if ("" == "@areaName") {
+                    toastr.error("对不起，你没有住宿信息，不能预约快递服务");
+                    return;
+                } else {
+                    var deliveryCop = $("#cop_name").val();
+                    var deliveryNo = $("#delivery_no").val();
+                    var deliveryStuff = $("#delivery_stuff").val();
+                    if (!deliveryCop || deliveryCop == "") {
+                        toastr.error("请先选择快递公司");
+                        return;
+                    }
+                    if (deliveryNo == "") {
+                        toastr.error("请先填写快递编号");
+                        return;
+                    }
+                    $.post("@Url.Content("~/Package/Register")", {
+                        areaName: "@areaName",
+                        dormName: "@dormName",
+                        deliveryCop: deliveryCop,
+                        deliveryNo: deliveryNo,
+                        deliveryStuff: deliveryStuff,
+                    }, function (data) {
+                        if (data.suc) {
+                            toastr.success(data.msg);
+                            $("#cop_name").val("");
+                            $("#delivery_no").val("");
+                            $("#delivery_stuff").val("");
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    });
+                }
+            });
+
+        });
+    </script>
+}
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li class="active">宿舍快件寄存</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#packageRegister" aria-controls="packageRegister" role="tab" data-toggle="tab">快件登记</a></li>
+            <li role="presentation"><a href="#packageCheck" aria-controls="packageCheck" role="tab" data-toggle="tab">快件查询</a></li>
+        </ul>
+        <div class="tab-content">
+            <!-- 登记快递tab -->
+            <div role="tabpanel" class="tab-pane fade in active" id="packageRegister">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xs-6 col-sm-6" style="margin-top:10px;">
+                                <select class="form-control" id="cop_name">
+                                    <option value="" disabled selected>--请选择快递公司--</option>
+                                    <option value="顺丰">顺丰</option>
+                                    <option value="京东">京东</option>
+                                    <option value="EMS">EMS</option>
+                                    <option value="邮政">邮政</option>
+                                    <option value="申通">申通</option>
+                                    <option value="中通">中通</option>
+                                    <option value="圆通">圆通</option>
+                                    <option value="国通">国通</option>
+                                    <option value="韵达">韵达</option>
+                                    <option value="天天">天天</option>
+                                    <option value="百世汇通">百世汇通</option>
+                                    <option value="优速">优速</option>
+                                    <option value="全峰">全峰</option>
+                                    <option value="宅急送">宅急送</option>
+                                    <option value="德邦">德邦</option>
+                                    <option value="其它">其它</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-6 col-sm-6" style="margin-top:10px;">
+                                <input type="text" class="form-control" id="delivery_no" placeholder="请输入快递单号" />
+                            </div>
+                            <div class="col-xs-12" style="margin-top:10px;">
+                                <input type="text" class="form-control" id="delivery_stuff" placeholder="请输入快递内容（选填）" />
+                            </div>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <button class="btn btn-success btn-block" id="registerBt"><span class="fa fa-check"></span> 确认登记(房号：@livingInfo)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 记录查询tab -->
+            <div role="tabpanel" class="tab-pane fade" id="packageCheck">
+                <div class="panel panel-default" style="margin-top:10px;">
+                    <div class="panel-body">
+                        b
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

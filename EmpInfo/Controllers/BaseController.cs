@@ -208,13 +208,14 @@ namespace EmpInfo.Controllers
         protected void setcookie(ei_users user,int days)
         {
             Session.Clear(); //必须清空session，否则如果没有点退出按钮，会导致下一登录用户还是前一用户
+                        
             var cookie = new HttpCookie(ConfigurationManager.AppSettings["cookieName"]);
             cookie.Expires = DateTime.Now.AddDays(days);
             cookie.Values.Add("userid", user.id.ToString());
             cookie.Values.Add("cardno", user.card_number);
             cookie.Values.Add("code", MyUtils.getMD5(user.id.ToString()));
             cookie.Values.Add("username", MyUtils.EncodeToUTF8(user.name));//用于记录日志
-            Response.AppendCookie(cookie);
+            Response.AppendCookie(cookie);            
         }
 
         //获取流水号

@@ -1,0 +1,232 @@
+﻿@using EmpInfo.Models
+@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;            
+            width: 85px;
+            color: gray;            
+            vertical-align: top;
+        }
+
+        .b-input{
+            display:inline-block;
+            width:70%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        var prDepInfo = @Html.Raw(ViewData["procDepInfo"]);
+    for (var i = 0; i < prDepInfo.length; i++) {
+        $("select[name='produce_dep_name']").append("<option value='" + prDepInfo[i].prDepName + "'>" + prDepInfo[i].prDepName + "</option>");
+    }
+    $(function () {       
+
+        $("select[name='produce_dep_name']").on("change", function () {
+            var currentPrDepName = $(this).val();
+            if (currentPrDepName != "") {
+                var currentInfo = prDepInfo.filter(function (v) { return v.prDepName == currentPrDepName });
+                if (currentInfo.length > 0) {
+                    
+                    $("#produce_dep_charger").html(currentInfo[0].prDepChargerName);
+                    $("#equitment_dep_charger").html(currentInfo[0].eqDepChargerName);                    
+                    $("input[name='produce_dep_charger_no']").val(currentInfo[0].prDepChargerNum);
+                    $("input[name='produce_dep_charger_name']").val(currentInfo[0].prDepChargerName);
+                    
+                    $("input[name='equitment_dep_charger_no']").val(currentInfo[0].eqDepChargerNum);
+                    $("input[name='equitment_dep_charger_name']").val(currentInfo[0].eqDepChargerName);
+                    
+                    $("input[name='bus_dep_name']").val(currentInfo[0].busDepName);                    
+                    $("input[name='equitment_dep_name']").val(currentInfo[0].equitmentName);                    
+                }
+            }
+        });
+
+        $("#property_number").on("blur", function () {
+            var v = $.trim($(this).val());
+            $.post("@Url.Content("~/ep/GetRepairInfoByPropertyNumber")", {propertyNum:v}, function (data) {
+                if (data.suc) {
+                    var info=data.info;
+                    $("#produce_dep_addr").val(info.produce_dep_addr);
+                    $("#equitment_name").val(info.equitment_name);
+                    $("#equitment_supplier").val(info.equitment_supplier);
+                    $("#equitment_modual").val(info.equitment_modual);                    
+                }
+            });
+        });
+
+        $("#apply_bt").on("click", function () {
+            var propertyType=$("#property_type").val();
+            if(propertyType=="生产设备" && $.trim($("#property_number").val())==""){
+                toastr.error("类型是生产设备的固定资产，资产编号是必填的");
+                return;
+            }
+
+            $.ajax({
+                type: "post",
+                url: "@Url.Content("~/Apply/SaveApplyEP")",
+                data: $("#chForm").serialize(),
+                cache: false,
+                dataType: "json",
+                success: function (data) {
+                    if (data.suc) {
+                        toastr.success("提交申请成功，请等待页面跳转...");
+                        setTimeout(function () { window.location.href="@Url.Content("~/Apply/CheckApply?sysNo=")" +"@ViewData["sysNum"]" }, 1000);
+                    } else {
+                        toastr.error("提交申请失败，原因：" + data.msg);
+                    }
+                }
+            });
+
+        });
+
+    });
+    </script>
+}
+<div class="row" style="margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                    <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                    <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                    <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=EP")">设备故障报修单</a></li>
+                    <li class="active">开始申请</li>
+                </ol>
+            </div>
+            <div class="panel-body">
+                <form id="chForm">
+                    <div class="b-div">
+                        <span class="b-label">
+                            申请流水号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" id="sysNum" value="@ViewData["sysNum"]" disabled />
+                            <input type="hidden" name="sys_no" value="@ViewData["sysNum"]" />
+                        </span>
+                    </div>    
+                    <div class="b-div">
+                        <span class="b-label">
+                            联系电话:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="applier_phone" value="@ViewData["applierPhone"]" placeholder="必填项" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            生产车间:
+                        </span>
+                        <div class="b-input">
+                            <select class="form-control" name="produce_dep_name">
+                                <option value="" selected disabled>----请在下拉列表中选择（必选）----</option>
+                            </select>
+                            <div class="small text-danger"><i class="fa fa-info-circle"></i> 生产主管(<span id="produce_dep_charger"></span>) 设备经理(<span id="equitment_dep_charger"></span>)</div>
+                            <input type="hidden" name="produce_dep_charger_no" />
+                            <input type="hidden" name="produce_dep_charger_name" />
+                            <input type="hidden" name="equitment_dep_charger_no" />
+                            <input type="hidden" name="equitment_dep_charger_name" />
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            设备支部:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="equitment_dep_name" placeholder="选择生产车间后自动带出" readonly />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            事业部:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="bus_dep_name" placeholder="选择生产车间后自动带出" readonly />
+                        </span>
+                    </div>                    
+                    <div class="b-div">
+                        <span class="b-label">
+                            固定资产类别:
+                        </span>
+                        <div class="b-input">
+                            <select class="form-control" name="property_type" id="property_type">
+                                <option value="" selected disabled>----请在下拉列表中选择（必选）----</option>
+                                <option value="生产设备">生产设备</option>
+                                <option value="厂房设备">厂房设备</option>
+                                <option value="其它设备">其它设备</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            固定资产编号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="property_number" id="property_number" placeholder="生产设备类的资产编号必填，其它可不填" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            岗位位置:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="produce_dep_addr" id="produce_dep_addr" placeholder="故障设备所在位置（必填项）"/>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            设备名称:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="equitment_name" id="equitment_name" placeholder="必填项"/>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            设备型号:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="equitment_modual" id="equitment_modual" placeholder="必填项"/>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            设备供应商:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="equitment_supplier" id="equitment_supplier" placeholder="必填项"/>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            影响停产程度:
+                        </span>
+                        <span class="b-input">
+                            <select class="form-control" name="emergency_level">
+                                <option value="0" selected disabled>----请在下拉列表中选择（必选）----</option>
+                                <option value="@((int)EmergencyEnum.影响多岗位停产)">@EmergencyEnum.影响多岗位停产.ToString()</option>
+                                <option value="@((int)EmergencyEnum.影响单岗位停产)">@EmergencyEnum.影响单岗位停产.ToString()</option>
+                                <option value="@((int)EmergencyEnum.不停产)">@EmergencyEnum.不停产.ToString()</option>
+                            </select>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            故障现象:
+                        </span>
+                        <span class="b-input">
+                            <textarea class="form-control" rows="3" name="faulty_situation" placeholder="必填项"></textarea>
+                        </span>
+                    </div>
+                </form>
+
+                    <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..."><i class="fa fa-check-circle-o"></i> 提交设备故障维修单</button>
+            </div>
+        </div>
+    </div>
+</div>

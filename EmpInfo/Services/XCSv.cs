@@ -161,31 +161,29 @@ namespace EmpInfo.Services
             bool isPass = bool.Parse(fc.Get("isPass"));
             string opinion = fc.Get("opinion");
 
-            if (stepName.Contains("营运部审批")) {
-                bill.check_out_comment = fc.Get("check_out_comment");
-            }
-            else if (stepName.Contains("物料组")) {
-                bill.bus_stock_no = fc.Get("bus_stock_no");
-                if (string.IsNullOrEmpty(bill.bus_stock_no)) {
-                    throw new Exception("必须录入委外加工出库单号");
-                }
-                if (new K3Sv(bill.k3_account).GetK3BusStockBill(bill.bus_stock_no).Count() < 1) {
-                    throw new Exception("在K3委外加工出库单查询不到此单号的数据");
-                }
+            
+            //else if (stepName.Contains("物料组")) {
+            //    bill.bus_stock_no = fc.Get("bus_stock_no");
+            //    if (string.IsNullOrEmpty(bill.bus_stock_no)) {
+            //        throw new Exception("必须录入委外加工出库单号");
+            //    }
+            //    if (new K3Sv(bill.k3_account).GetK3BusStockBill(bill.bus_stock_no).Count() < 1) {
+            //        throw new Exception("在K3委外加工出库单查询不到此单号的数据");
+            //    }
 
 
-            }
-            else if (stepName.Contains("物流盘点发出")) {
-                bill.stock_out_comment = fc.Get("stock_out_comment");
-            }
-            else if (stepName.Contains("仓库接收成品")) {
-                bill.stock_in_comment = fc.Get("stock_in_comment");
-            }
-            else if (stepName.Contains("营运部抽检")) {
-                bill.check_in_comment = fc.Get("check_in_comment");
-            }
+            //}
+            //else if (stepName.Contains("物流盘点发出")) {
+            //    bill.stock_out_comment = fc.Get("stock_out_comment");
+            //}
+            //else if (stepName.Contains("仓库接收成品")) {
+            //    bill.stock_in_comment = fc.Get("stock_in_comment");
+            //}
+            //else if (stepName.Contains("营运部抽检")) {
+            //    bill.check_in_comment = fc.Get("check_in_comment");
+            //}
 
-            if (isPass) {
+            if (isPass) {                
                 if (stepName.Contains("采购询价")) {
                     string supplierName = fc.Get("supplier_name");
                     string unitPrice = fc.Get("unit_price");
@@ -206,23 +204,27 @@ namespace EmpInfo.Services
                     bill.current_month_total = (int)Math.Round(db.ei_xcApply.Where(x => x.apply_time >= currentMonth && x.apply_time <= nextMonth && x.total_price != null).Sum(x => x.total_price) ?? 0, 0) + (int)Math.Round(bill.total_price ?? 0, 0);
 
                 }
+                else if (stepName.Contains("营运部审批")) {
+                    //bill.check_out_comment = fc.Get("check_out_comment");
+                    bill.need_ceo_confirm = bool.Parse(fc.Get("need_ceo_confirm"));
+                }
                 else if (stepName.Contains("采购下单")) {
                     bill.po_date = DateTime.Now;
                 }
-                else if (stepName.Contains("仓库接收成品")) {
-                    var hasInQty = db.ei_xcProductInDetail.Where(x => x.sys_no == bill.sys_no).Sum(x => x.in_qty) ?? 0;
-                    if (Math.Abs(hasInQty - bill.qty) > 0.001m) {
-                        throw new Exception(string.Format("接收的成品数量【{0}】与委外加工的数量【{1}】必须一致后才能审批通过", hasInQty, bill.qty));
-                    }                    
-                }
-                else if (stepName.Contains("申请人确认领回")) {
-                    var backTime = fc.Get("take_back_time");
-                    DateTime backTimedt;
-                    if (!DateTime.TryParse(backTime, out backTimedt)) {
-                        throw new Exception("请填写正确的领回日期");
-                    }
-                    bill.take_back_time = backTimedt;
-                }
+                //else if (stepName.Contains("仓库接收成品")) {
+                //    var hasInQty = db.ei_xcProductInDetail.Where(x => x.sys_no == bill.sys_no).Sum(x => x.in_qty) ?? 0;
+                //    if (Math.Abs(hasInQty - bill.qty) > 0.001m) {
+                //        throw new Exception(string.Format("接收的成品数量【{0}】与委外加工的数量【{1}】必须一致后才能审批通过", hasInQty, bill.qty));
+                //    }                    
+                //}
+                //else if (stepName.Contains("申请人确认领回")) {
+                //    var backTime = fc.Get("take_back_time");
+                //    DateTime backTimedt;
+                //    if (!DateTime.TryParse(backTime, out backTimedt)) {
+                //        throw new Exception("请填写正确的领回日期");
+                //    }
+                //    bill.take_back_time = backTimedt;
+                //}
             }else{
                 bill.total_price = null;
             }

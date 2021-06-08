@@ -3,7 +3,7 @@
 @{
     SPBeforeApplyModel m = ViewData["infoBeforeApply"] as SPBeforeApplyModel;
     var spJson = JsonConvert.SerializeObject(m);
-    List<string> accountList = new List<string>() { "光电", "半导体", "电子", "仪器", "工业", "信元" };
+    List<string> accountList = new List<string>() { "光电", "半导体", "电子", "仪器", "工业", "信元", "光电科技" };
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
@@ -135,11 +135,11 @@
                 var ty=$(this).val();
                 if (ty == "产品" || ty=="原材料") {
                     $(".product_extra_info").show();
-                    if(ty=="产品"){
-                        $(".isReturnBackDiv").show();
-                    }else{
-                        $(".isReturnBackDiv").hide();
-                    }
+                    //if(ty=="产品"){
+                    //    $(".isReturnBackDiv").show();
+                    //}else{
+                    //    $(".isReturnBackDiv").hide();
+                    //}
                     if(ty=="原材料"){
                         $(".qualityAuditorNameDiv").show();
                         $(".stockAddrDiv").show();
@@ -149,7 +149,7 @@
                     }
                 } else {
                     $(".product_extra_info").hide();
-                    $(".isReturnBackDiv").hide();
+                    //$(".isReturnBackDiv").hide();
                     $(".qualityAuditorNameDiv").hide();
                     $(".stockAddrDiv").hide();
                 }
@@ -187,6 +187,7 @@
                 }
 
                 var obj = utils.getFormObj($("#fm"));
+                obj.isReturnBack = "否";
                 if ($("#al_file_list").children().length == 0) {
                     obj.has_attachment = false;
                 }else{
@@ -206,6 +207,10 @@
                         toastr.error("从汕尾发往外地的，【收寄类型】请选择寄件");
                         return;
                     }
+                }
+                if((obj.from_addr.indexOf("仁寿")>=0 && obj.from_addr.indexOf("眉山")<0) || (obj.to_addr.indexOf("仁寿")>=0 && obj.to_addr.indexOf("眉山")<0)){
+                    toastr.error("仁寿属于眉山市，请在地址中加上眉山市，否则运费计算会有问题");
+                    return;
                 }
                 if (obj.content_type == "产品" || obj.content_type == "原材料") {
                     if(items.length<1){
@@ -581,7 +586,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-6 col-xs-12 isReturnBackDiv">
+                @*<div class="col-md-4 col-sm-6 col-xs-12 isReturnBackDiv">
                     <div class="b-div">
                         <span class="b-label">
                             是否退补货:
@@ -594,7 +599,7 @@
                             </select>
                         </div>
                     </div>
-                </div>                
+                </div>*@                
                 <div class="col-md-4 col-sm-6 col-xs-12 qualityAuditorNameDiv">
                     <div class="b-div">
                         <span class="b-label">
@@ -838,10 +843,13 @@
         <h4 class="text-danger"><i class="fa fa-info-circle"></i> 操作说明 </h4>
         <div style="margin-left:18px;padding-top:6px;" class="text-danger">
             <p>
+                0. 提交时建议在电脑端操作，使用google chrome或360极速浏览器，打开内网网址：http://192.168.90.100/Emp ,登陆移动办公平台提交申请。
+            </p>
+            <p>
                 1. 流程步骤如下：<br/>
                 [1]. 收寄文件：流程开始--->员工提交申请--->部门负责人审批--->流程结束。<br/>
-                [2]. 收寄产品：流程开始--->员工提交申请--->部门负责人审批--->QA审批（如果不是退补货，则跳过此步骤）---> @*行政部审批（如不是寄件，则跳过此步骤）---> 物流部审批（如总毛重小于10KG，则跳过此步骤）*@--->流程结束。<br/>
-                [3]. 收寄原材料：流程开始--->员工提交申请--->品质部审批--->部门负责人审批--->仓管部审批---> @*行政部审批（如不是寄件，则跳过此步骤）---> 物流部审批（如总毛重小于10KG，则跳过此步骤）*@--->流程结束。
+                [2]. 收寄产品：流程开始--->员工提交申请--->部门负责人审批--->物流部审批 --->流程结束。<br/>
+                [3]. 收寄原材料：流程开始--->员工提交申请--->品质部审批--->部门负责人审批--->仓管部审批--->物流部审批--->流程结束。
             </p>
             <p>
                 2. 10KG以内的省内件，默认使用顺丰标快；10KG以内的省外件或港澳台件，时效是次日达的，默认使用顺丰标快；

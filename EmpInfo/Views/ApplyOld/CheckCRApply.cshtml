@@ -1,0 +1,151 @@
+﻿@using EmpInfo.Models;
+@{
+    ei_CRApply cr = (ei_CRApply)ViewData["cr"];
+}
+@section CSS{
+    <style type="text/css">
+        #contentTb th {
+            color: gray;
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        #al_file_tb th {
+            font-size: small;
+            text-align: center;
+        }
+
+        #al_file_tb td {
+            font-size: small;
+            text-align: center;
+        }
+
+        #al_file_list i {
+            cursor: pointer;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        $(function () {
+            $("#al_file_list").on("click", "td i", function () {
+                var fileTD = $(this).parents("tr").find("td")[0];
+                var fileName = $(fileTD).attr("data-fd");
+                var sn = "@cr.sys_no";
+                var path = sn.substr(0, 2) + "/20" + sn.substr(2, 2) + "/" + sn.substr(4, 2) + "/" + sn + "/" + fileName;
+                window.location.href = "@Url.Content("~/Att/")" + path;
+            });
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("@Url.Content("~/Apply/CheckFlowRecord") .list-group", { sysNo: "@cr.sys_no" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+
+            });        
+        });
+    </script>
+}
+<div class="row" style="margin-left:0;margin-right:0;">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="padding-left:0;padding-right:0;">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+                    <li><span class="glyphicon glyphicon-hand-right"></span></li>
+                    <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+                    <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+                    <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=CR")">考勤补记申请单</a></li>
+                    <li class="active">查看详情</li>
+                </ol>
+            </div>
+            <div class="panel-body">                
+
+                <table style="width:100%;border-collapse:separate; border-spacing:8px;" id="contentTb">
+                    <tr>
+                        <th style="width:28%;">
+                            审核状态
+                        </th>
+                        <td style="width:72%;">
+                            <span class="pull-left" style="margin-top:5px;">@ViewData["auditStatus"]</span>
+                            <button type="button" class="btn btn-default btn-sm pull-right" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>申请流水号</th>
+                        <td>
+                            @cr.sys_no
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>申请人</th>
+                        <td>
+                            <span class="pull-left" style="margin-top:5px;">@string.Concat(cr.applier_name,"(",cr.applier_num,")")</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>申请时间</th>
+                        <td>@(((DateTime)cr.apply_time).ToString("yyyy-MM-dd HH:mm"))</td>
+                    </tr>
+                    <tr>
+                        <th>所属部门</th>
+                        <td>@cr.dep_long_name</td>
+                    </tr>
+                    <tr>
+                        <th>漏刷日期</th>
+                        <td>@(((DateTime)cr.forgot_date).ToString("yyyy-MM-dd"))</td>
+                    </tr>
+                    <tr>
+                        <th>漏刷时间</th>
+                        <td>@cr.time1 @cr.time2 @cr.time3 @cr.time4</td>
+                    </tr>
+                    <tr>
+                        <th>漏刷原因</th>
+                        <td>@cr.reason</td>
+                    </tr>
+                    <tr>
+                        <th>备注</th>
+                        <td>@cr.comment</td>
+                    </tr>
+                </table>     
+                @if (cr.has_attachment==true) { 
+                    <div class="b-div">
+                        <div class="panel panel-default" id="al_file_panel">
+                            <div class="panel-heading">附件信息</div>
+                            <div class="panel-body" style="padding:0 8px;">
+                                <table class="table table-condensed table-hover" id="al_file_tb" style="margin:10px 0;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:55%;">名称</th>
+                                            <th style="width:25%;">大小</th>
+                                            <th style="width:20%;">查看</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="al_file_list">                                    
+                                        @foreach (var file in (List<AttachmentModel>)ViewData["attachments"]) {
+                                            <tr>
+                                                <td data-fd="@file.fileName">
+                                                    @if (file.fileName.Length > 20) {
+                                                        var ext = file.fileName.Substring(file.fileName.IndexOf("."));
+                                                        var showName = file.fileName.Substring(0, 14) + ".." + ext;
+                                                        <span>@showName</span>
+                                                    }
+                                                    else {
+                                                        <span>@file.fileName</span>
+                                                    }
+                                                </td>
+                                                <td>@file.fileSize</td>
+                                                <td><i class="fa fa-file-picture-o text-success"></i></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }                          
+            </div>
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

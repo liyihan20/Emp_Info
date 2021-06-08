@@ -1709,6 +1709,7 @@
           <Property Name="bus_po_no" Type="varchar" MaxLength="50" />
           <Property Name="bus_po_entry" Type="int" />
           <Property Name="bus_stock_no" Type="varchar" MaxLength="50" />
+          <Property Name="need_ceo_confirm" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="ei_xcDepTarget">
           <Key>
@@ -7940,6 +7941,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="bus_stock_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="k3_account" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="bus_po_entry" Type="Int32" />
+          <Property Name="need_ceo_confirm" Type="Boolean" Nullable="false" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -11039,6 +11041,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_xcApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_xcApply">
               <MappingFragment StoreEntitySet="ei_xcApply">
+                <ScalarProperty Name="need_ceo_confirm" ColumnName="need_ceo_confirm" />
                 <ScalarProperty Name="bus_po_entry" ColumnName="bus_po_entry" />
                 <ScalarProperty Name="k3_account" ColumnName="k3_account" />
                 <ScalarProperty Name="bus_stock_no" ColumnName="bus_stock_no" />
