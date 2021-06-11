@@ -1233,12 +1233,12 @@ namespace EmpInfo.Controllers
             var myData = GetEPDatas(fromDate, toDate, applyStatus, propertyNumber, procDepName, equitmentDepName).ToList();
             ushort[] colWidth = new ushort[] { 12, 16, 10, 10, 12, 18, 18, 12, 18, 24,
                                                16, 16, 16, 16, 16, 16, 16, 16,
-                                               16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+                                               16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
                                                16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16 };
 
             string[] colName = new string[] { "状态", "申请流水号", "报修日期", "报修时间", "报修人", "联系电话", "设备支部", "事业部", "车间名称", "岗位位置", 
                                               "设备名称", "设备型号", "固定资产类别", "固定资产编号","设备供应商","生产主管","设备经理","影响停产程度",
-                                              "故障现象", "接单时间","接单人", "延迟处理原因","处理登记时间","处理完成时间","维修用时(分)", "维修人员","故障原因类别","故障原因",
+                                              "故障现象", "接单时间","接单人", "延迟处理原因","处理登记时间","处理完成时间","接单用时(分)","维修用时(分)","维修总用时(分)", "维修人员","故障原因类别","故障原因",
                                               "处理方法","更换配件","修理结果","协助人员","评价时间","评价生产主管","评价打分","评价内容","评分时间","评分设备经理","难度分数" };                                              
 
             //設置excel文件名和sheet名
@@ -1279,7 +1279,7 @@ namespace EmpInfo.Controllers
 
                 //"状态", "申请流水号", "报修时间", "报修人", "联系电话", "事业部", "车间名称", "车间位置", 
                 //"设备名称", "设备型号", "资产编号","设备供应商","生产主管","设备经理","紧急处理级别",
-                //"故障现象", "接单时间","接单人","处理完成时间","维修人员","故障原因类别","故障原因",
+                //"故障现象", "接单时间","接单人","处理完成时间","接单用时(分)","维修用时(分)","维修总用时(分)","维修人员","故障原因类别","故障原因",
                 //"处理方法","更换配件","修理结果","其他维修人员","评价时间","评价生产主管","评价打分",
                 //"评价内容"
                 cells.Add(++rowIndex, colIndex, d.apply_status);
@@ -1308,14 +1308,26 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.confirm_later_reason);
                 cells.Add(rowIndex, ++colIndex, d.confirm_register_time == null ? "" : ((DateTime)d.confirm_register_time).ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, d.confirm_time == null ? "" : ((DateTime)d.confirm_time).ToString("yyyy-MM-dd HH:mm"));
-                if (d.confirm_time == null || d.confirm_register_time == null) {
+                                
+                var reportTime = DateTime.Parse(((DateTime)d.report_time).ToString("yyyy-MM-dd HH:mm"));
+                if (d.accept_time == null) {
                     cells.Add(rowIndex, ++colIndex, "");
                 }
                 else {
+                    var acceptTime = DateTime.Parse(((DateTime)d.accept_time).ToString("yyyy-MM-dd HH:mm"));
+                    cells.Add(rowIndex, ++colIndex, (acceptTime - reportTime).TotalMinutes);
+                }
+                if (d.confirm_time == null || d.confirm_register_time == null) {
+                    cells.Add(rowIndex, ++colIndex, "");
+                    cells.Add(rowIndex, ++colIndex, "");
+                }
+                else {
+                    var acceptTime = DateTime.Parse(((DateTime)d.accept_time).ToString("yyyy-MM-dd HH:mm"));
                     var confirmTime = DateTime.Parse(((DateTime)d.confirm_time).ToString("yyyy-MM-dd HH:mm"));
-                    var reportTime = DateTime.Parse(((DateTime)d.report_time).ToString("yyyy-MM-dd HH:mm"));
+                    cells.Add(rowIndex, ++colIndex, (confirmTime - acceptTime).TotalMinutes);
                     cells.Add(rowIndex, ++colIndex, (confirmTime - reportTime).TotalMinutes);
                 }
+
                 cells.Add(rowIndex, ++colIndex, d.confirm_user_name);
                 cells.Add(rowIndex, ++colIndex, d.faulty_type);
                 cells.Add(rowIndex, ++colIndex, d.faulty_reason);
@@ -2709,7 +2721,17 @@ namespace EmpInfo.Controllers
         public ActionResult SPReport()
         {
             return View();
-        }        
+        }
+
+        public JsonResult SearchSPReport(DateTime fromDate, DateTime toDate)
+        {
+            toDate = toDate.AddDays(1);
+            var result = (from v in db.vw_spExcel
+                          where v.apply_time >= fromDate
+                          && v.apply_time <= toDate
+                          select v).ToList();
+            return Json(result);
+        }
 
         public void BeginExportSPReport(DateTime fromDate, DateTime toDate)
         {
@@ -2727,7 +2749,7 @@ namespace EmpInfo.Controllers
 
             string[] colName = new string[] { "处理结果", "公司", "部门", "申请人","快递公司","运费","快递单号","快递方式", "收寄类型", "收寄范围", "流水号", "申请时间"
                                             , "联系电话","放行条编号", "收寄内容","产品名称","规格型号","配送数量","件数","总净重","卡板数"
-                                            , "卡板尺寸","装箱尺寸","配送时效","寄件地址","收件地址","收件人","收件人电话","申请原因","是否退补货"
+                                            , "卡板尺寸","装箱尺寸","配送时效","寄件地址","收件地址","收件人","收件人电话","申请原因","是否信利产品"
             };
             ushort[] colWidth = new ushort[colName.Length];
 

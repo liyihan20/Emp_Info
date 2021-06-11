@@ -6,14 +6,14 @@
     <style type="text/css">
         .b-label {
             display: inline-block;
-            width: 85px;
+            width: 90px;
             color: gray;
             vertical-align: top;
         }
 
         .b-input {
             display: inline-block;
-            width: 70%;
+            width: 68%;
         }
 
         .b-div {
@@ -159,7 +159,7 @@
             </div>
             
             
-            @if (m.content_type == "产品" || m.content_type == "原材料") {
+            @if (m.content_type != "文件") {
                 if (m.content_type == "原材料") {
                     <div class="col-md-4 col-sm-6 col-xs-12">
                         <div class="b-div">
@@ -178,6 +178,18 @@
                             </span>
                             <div class="b-input">
                                 @m.stock_addr
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (m.content_type == "产品") {
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="b-div">
+                            <span class="b-label">
+                                是否信利产品:
+                            </span>
+                            <div class="b-input">
+                                @m.isReturnBack
                             </div>
                         </div>
                     </div>

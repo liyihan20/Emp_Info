@@ -221,10 +221,18 @@ namespace EmpInfo.Services
                         bill.ex_price = decimal.Parse(exPriceStr);
                     }
                 }
-                if ( !bill.content_type.Equals("文件") && bill.send_or_receive.Equals("寄件")) {
-                    if (stepName.Contains("事业部负责人")) {
-                        bill.can_print = true; //可打印放行条并可被扫描
-                        bill.out_status = "已打印";
+                if (!bill.content_type.Equals("文件") && bill.send_or_receive.Equals("寄件")) {
+                    if (bill.content_type.Equals("产品") && bill.isReturnBack.Equals("是")) {
+                        if (stepName.Contains("QA")) {
+                            bill.can_print = true; //可打印放行条并可被扫描
+                            bill.out_status = "已打印";
+                        }
+                    }
+                    else {
+                        if (stepName.Contains("事业部负责人")) {
+                            bill.can_print = true; //可打印放行条并可被扫描
+                            bill.out_status = "已打印";
+                        }
                     }
                 }
                 //if (stepName.Contains("行政部")) {
@@ -342,19 +350,23 @@ namespace EmpInfo.Services
                 bill.total_weight ?? 1
                 ).Where(s => s.FReed > 0).ToList();
 
-            if (bill.content_type == "文件") {
-                //文件的只能选择顺丰标快
-                result = result.Where(r => r.FName == "顺丰" && r.FDelivery.Contains("标快")).ToList();
-            }else if (bill.total_weight < 10) {
-                if (bill.scope == "省内") {
+            //老是因为某些城市未维护顺丰信息而被人找，如果没有顺丰的，可以选其他快递。 2021-06-08
+            if (result.Where(r => r.FName == "顺丰").Count() > 0) {
+                if (bill.content_type == "文件") {
+                    //文件的只能选择顺丰标快
                     result = result.Where(r => r.FName == "顺丰" && r.FDelivery.Contains("标快")).ToList();
                 }
-                else if (bill.scope == "省外" || bill.scope=="港澳台") {
-                    if (bill.aging.Contains("次日达")) {
+                else if (bill.total_weight < 10) {
+                    if (bill.scope == "省内") {
                         result = result.Where(r => r.FName == "顺丰" && r.FDelivery.Contains("标快")).ToList();
                     }
-                    else {
-                        result = result.Where(r => r.FName == "顺丰" && r.FDelivery.Contains("特惠")).ToList();
+                    else if (bill.scope == "省外" || bill.scope == "港澳台") {
+                        if (bill.aging.Contains("次日达")) {
+                            result = result.Where(r => r.FName == "顺丰" && r.FDelivery.Contains("标快")).ToList();
+                        }
+                        else {
+                            result = result.Where(r => r.FName == "顺丰" && r.FDelivery.Contains("特惠")).ToList();
+                        }
                     }
                 }
             }

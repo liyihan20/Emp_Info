@@ -105,7 +105,7 @@ namespace EmpInfo.Services
             }
 
             var currentMonth = DateTime.Now.ToString("yyyy-MM");
-            var target = db.ei_xcDepTarget.Where(x => x.dep_name == bill.dep_name && x.year_month == currentMonth).FirstOrDefault();
+            var target = db.ei_xcDepTarget.Where(x =>x.company==bill.company && x.dep_name == bill.dep_name && x.year_month == currentMonth).FirstOrDefault();
             if (target == null) throw new Exception("当前部门目标额度没有维护");
 
             bill.current_month_target = target.month_target;
@@ -201,7 +201,7 @@ namespace EmpInfo.Services
 
                     DateTime currentMonth = DateTime.Parse(bill.apply_time.ToString("yyyy-MM-01"));
                     DateTime nextMonth = currentMonth.AddMonths(1);
-                    bill.current_month_total = (int)Math.Round(db.ei_xcApply.Where(x => x.apply_time >= currentMonth && x.apply_time <= nextMonth && x.total_price != null).Sum(x => x.total_price) ?? 0, 0) + (int)Math.Round(bill.total_price ?? 0, 0);
+                    bill.current_month_total = (int)Math.Round(db.ei_xcApply.Where(x =>x.company==bill.company && x.dep_name==bill.dep_name && x.apply_time >= currentMonth && x.apply_time <= nextMonth && x.total_price != null).Sum(x => x.total_price) ?? 0, 0) + (int)Math.Round(bill.total_price ?? 0, 0);
 
                 }
                 else if (stepName.Contains("营运部审批")) {

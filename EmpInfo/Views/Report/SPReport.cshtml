@@ -1,5 +1,11 @@
 ﻿@section CSS{
-    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />    
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        .lbText {
+            font-style: italic;
+        }
+    </style>
 }
 @section Scripts {
     @*加入以下js，使IE8支持datetimepicker组件*@
@@ -26,35 +32,109 @@
     </script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
     <script>
-        var currentTr;
-        $(function () {            
-            $(".form_date").datetimepicker({
-                language: 'zh-CN',
-                format: "yyyy-mm-dd",
-                autoclose: true,
-                todayBtn: true,
-                startView: 2,
-                minView: 2
-            });
-            //设置日期联动，结束日期不能大于起始日期
-            $("#fromDatePicker1").on("changeDate", function (e) {
-                $('#toDatePicker1').datetimepicker('setStartDate', e.date);
-            });
-            $("#toDatePicker1").on("changeDate", function (e) {
-                $('#fromDatePicker1').datetimepicker('setEndDate', e.date);
-            });
+    $(function () {
+        $(".form_date").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            todayBtn: true,
+            startView: 2,
+            minView: 2
+        });        
 
-            $("#ucReportBt").on("click", function () {
-                toastr.info("数据正在导出，请稍等...");
-                window.location.href = "@Url.Content("~/Report/BeginExportSPReport?")"
+        $("#checkBt").on("click", function () {
+            var fromDate = $("#fromDate").val();
+            var toDate = $("#toDate").val();
+            if (fromDate == "" || toDate == "") {
+                toastr.error("日期期间必须填写才能查询");
+                return;
+            }
+
+            $.post("@Url.Content("~/Report/SearchSPReport")", {
+                fromDate: fromDate,
+                toDate: toDate
+            }, function (data) {
+                $('#check_tb').bootstrapTable('load', data);
+                if (data.length == 0) {
+                    toastr.error("当前时间段查无申请");
+                } else {
+                    toastr.success("已查询到的数据行数：" + data.length);
+                }
+            });
+        });
+
+        $("#reportBt").on("click", function () {
+            toastr.info("数据正在导出，请稍等...");
+            window.location.href = "@Url.Content("~/Report/BeginExportSPReport?")"
                 + "fromDate=" + $("#fromDate").val()
                 + "&toDate=" + $("#toDate").val();
-                ;
-            });
-
+            ;
         });
-    
+
+    });
+
+    $("#check_tb").bootstrapTable({
+        striped: true,
+        pagination: true,
+        pageSize: 40,
+        pageList: [20, 40, 60, 100],
+        search: true,
+        columns: [
+            {
+                field: "sys_no",
+                title: "流水号"
+            }, {
+                field: "applier_name",
+                title: "申请人"
+            },
+            {
+                field: "apply_time",
+                title: "申请时间",
+                formatter: function (value, row, index, field) {
+                    return utils.parseTDate(row.apply_time,true);
+                }
+            }, {
+                field: "bus_name",
+                title: "部门"
+            }, {
+                field: "send_or_receive",
+                title: "收寄类型"
+            }, {
+                field: "content_type",
+                title: "收寄内容"
+            }, {
+                field: "isReturnBack",
+                title: "信利产品"
+            }, {
+                field: "audit_result",
+                title: "处理结果",
+                cellStyle: function (value, row, index, field) {
+                    if (value == "通过") {
+                        return { css: { color: 'green' } };
+                    }
+                    else if (value == "拒绝" || value == "撤销") {
+                        return { css: { color: 'red' } };
+                    }
+                    else {
+                        return { css: { color: '#333' } };
+                    }
+                }
+            }
+        ],
+        onClickCell: function (field, value, row, $element) {
+            if (row.sys_no) {
+                window.open("@Url.Content("~/Apply/CheckApply?sysNo=")" + row.sys_no);
+            }
+        },
+        rowStyle: function (row, index) {
+            return { css: { cursor: 'pointer' } };
+        }
+    });
+
+
     </script>
 
 }
@@ -74,19 +154,30 @@
             <div class="col-xs-12 col-sm-6 col-md-4">
                 <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    <input class="form-control" type="text" id="fromDate" name="fromDate" placeholder="请输入起始日期" readonly />
+                    <input class="form-control" type="text" id="fromDate" name="fromDate" placeholder="请输入起始日期" readonly value="@DateTime.Now.ToString("yyyy-MM-dd")" />
                 </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
                 <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    <input class="form-control" type="text" id="toDate" name="toDate" placeholder="请输入结束日期" readonly />
+                    <input class="form-control" type="text" id="toDate" name="toDate" placeholder="请输入结束日期" readonly value="@DateTime.Now.ToString("yyyy-MM-dd")" />
                 </div>
+            </div>            
+        </div>
+        <div class="btn-group btn-group-justified" role="group" style="margin-bottom:20px;margin-top:4px;">
+            <div class="btn-group" role="group">
+                <button class="btn btn-primary" id="checkBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-4">
-                <button class="btn btn-success btn-block" id="ucReportBt" data-loading-text="导出中..." style="margin:6px 0;"><i class="fa fa-file-excel-o"></i> 导出报表</button>
+            <div class="btn-group" role="group">
+                <button class="btn btn-success" id="reportBt" data-loading-text="导出中..."><i class="fa fa-file-excel-o"></i> 导出报表</button>
             </div>
         </div>
+
+        <table id="check_tb"></table>
+
     </div>
+
+    
+
 </div>
 
