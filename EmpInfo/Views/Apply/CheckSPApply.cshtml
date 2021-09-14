@@ -53,7 +53,7 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-            <li><a href="ApplyIndex?billType=SP">寄/收件申请</a></li>
+            <li><a href="ApplyIndex?billType=SP">寄件申请</a></li>
             <li class="active">查看详情</li>
         </ol>
     </div>
@@ -71,12 +71,12 @@
                     </div>
                 </div>
             </div>
-            @if (m.can_print == true) { 
+            @if (m.can_print == true && m.out_time == null && !"被拒绝".Equals(ViewData["auditStatus"])) { 
             <div class="col-md-4 col-sm-6 col-xs-12">
                 <div>
                     <div class="b-div">
                         <span class="b-label">
-                            放行条:
+                            放行条: 
                         </span>
                         <span class="b-input">
                             <button type="button" class="btn btn-default btn-sm" id="printBt"><i class="fa fa-print"></i> 开始打印</button>

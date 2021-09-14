@@ -57,7 +57,6 @@ namespace EmpInfo.Controllers
         [AuthorityFilter]
         public ActionResult DormAndEmps()
         {
-            
             return View();
         }
 
@@ -205,8 +204,9 @@ namespace EmpInfo.Controllers
             result.Add(new DormReportModel() { charge_type = "工程支出", type_sum = deSum });
 
             //从工资系统查询的后勤工资、宿舍房租和水电等
-            result.Add(new DormReportModel() { charge_type = "后勤工资", type_sum = db.GetLodDepSalarySum(yearMonth.Replace("-", "")).ToList().Where(g => g.charge_type == "工资").Sum(g => g.type_sum) });
-            result.Add(new DormReportModel() { charge_type = "工资代扣", type_sum = db.GetLodDepSalarySum(yearMonth.Replace("-", "")).ToList().Where(g => g.charge_type != "工资").Sum(g => g.type_sum) });
+            var salarySumData = db.GetLodDepSalarySum(yearMonth.Replace("-", "")).ToList();
+            result.Add(new DormReportModel() { charge_type = "后勤工资", type_sum = salarySumData.Where(g => g.charge_type == "工资").Sum(g => g.type_sum) });
+            result.Add(new DormReportModel() { charge_type = "工资代扣", type_sum = salarySumData.Where(g => g.charge_type != "工资").Sum(g => g.type_sum) });
 
             var k3Datas = db.Database.SqlQuery<k3ReportModel>("select [物料名称],[金额] from v_erp_po where [日期] >= '" + fromDate.ToString("yyyy-MM-dd") + "' and [日期] < '" + toDate.ToString("yyyy-MM-dd") + "'").ToList();
             //加入辅料支出和设备类支出,奇怪的使用参数传参的形式总是报日期转化错误，只能用拼接的方式

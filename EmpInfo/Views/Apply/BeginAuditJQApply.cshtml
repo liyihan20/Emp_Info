@@ -202,93 +202,95 @@
                 <input type="hidden" name="stepName" value="@bam.stepName" />
                 <input type="hidden" name="isPass" id="isPass" />
 
-                <div class="b-div">
-                    <span class="b-label" style="vertical-align:top;">
-                        @if (otherInfo.quit_type == "辞职") { 
-                            <span>批准离职时间: </span>
-                        }
-                        else {
-                            <span>自离时间: </span>
-                        }
-                    </span>
-                    <span style="display:inline-block;width:70%">
-                        <span class="input-group date datePicker">
-                            <input class="form-control" type="text" id="leave_date" name="leave_date" autocomplete="off" />
-                            <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                @if (!bam.stepName.Contains("安保部")) {
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;">
+                            @if (otherInfo.quit_type == "辞职") { 
+                                <span>批准离职时间: </span>
+                            }
+                            else {
+                                <span>自离时间: </span>
+                            }
                         </span>
-                    </span>
-                </div>
-                <div class="b-div">
-                    <span class="b-label" style="vertical-align:top;">
-                        工作评价:
-                    </span>
-                    <span style="display:inline-block;width:70%">
-                        <select class="form-control" name="work_evaluation" id="work_evaluation">
-                                <option value="">---- 下拉选择评价 ----</option>
-                                @foreach (var d in new string[] { "良好", "一般", "较差" }) {
-                                    <option value="@d">@d</option>
-                                }
-                        </select>
-                    </span>
-                </div>
-                <div class="b-div">
-                    <span class="b-label" style="vertical-align:top;">
-                        工作评价描述:
-                    </span>
-                    <span style="display:inline-block;width:70%">
-                        <textarea type="text" class="form-control" rows="3" id="work_comment" name="work_comment" placeholder="对离职员工的工作情况进行描述"></textarea>
-                    </span>
-                </div>
-                <div class="b-div">
-                    <span class="b-label" style="vertical-align:top;">
-                        本部是否再录用:
-                    </span>
-                    <span style="display:inline-block;width:70%">
-                        <select class="form-control" name="wanna_employ" id="wanna_employ">
-                                <option value="">---- 下拉进行选择 ----</option>
-                                @foreach (var d in new string[] { "是", "否", "建议公司不再录用" }) {
-                                    <option value="@d">@d</option>
-                                }
-                        </select>
-                    </span>
-                </div>
-                <div class="b-div">
-                    <span class="b-label" style="vertical-align:top;">
-                        是否再录用原因:
-                    </span>
-                    <span style="display:inline-block;width:70%">
-                        <textarea type="text" class="form-control" rows="3" id="employ_comment" name="employ_comment" placeholder="是否愿意再次录用此离职员工的原因"></textarea>
-                    </span>
-                </div>
-                @if (bam.stepName.Contains("组长") && otherInfo.charger_name==null) { 
-                <div class="b-div">
-                    <span class="b-label" style="vertical-align:top;">
-                        主管:
-                    </span>
-                    <span style="display:inline-block;width:70%">
-                        <input type="text" class="form-control selectUser" name="charger_name" placeholder="选择主管" />
-                    </span>
-                </div>
-                }
-                @if (bam.stepName.Contains("主管") && otherInfo.produce_minister_name==null) { 
-                <div class="b-div">
-                    <span class="b-label" style="vertical-align:top;">
-                        生产部长:
-                    </span>
-                    <span style="display:inline-block;width:70%">
-                        <input type="text" class="form-control selectUser" name="produce_minister_name" placeholder="选择生产部长" />
-                    </span>
-                </div>
-                }
-                @if (bam.stepName.Contains("部门负责人") && otherInfo.highest_charger_name==null) { 
-                <div class="b-div">
-                    <span class="b-label" style="vertical-align:top;">
-                        最高负责人:
-                    </span>
-                    <span style="display:inline-block;width:70%">
-                        <input type="text" class="form-control selectUser" name="highest_charger_name" placeholder="选择最高负责人" />
-                    </span>
-                </div>
+                        <span style="display:inline-block;width:70%">
+                            <span class="input-group date datePicker">
+                                <input class="form-control" type="text" id="leave_date" name="leave_date" autocomplete="off" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i> </span>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;">
+                            工作评价:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <select class="form-control" name="work_evaluation" id="work_evaluation">
+                                    <option value="">---- 下拉选择评价 ----</option>
+                                    @foreach (var d in new string[] { "良好", "一般", "较差" }) {
+                                        <option value="@d">@d</option>
+                                    }
+                            </select>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;">
+                            工作评价描述:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <textarea type="text" class="form-control" rows="3" id="work_comment" name="work_comment" placeholder="对离职员工的工作情况进行描述"></textarea>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;">
+                            本部是否再录用:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <select class="form-control" name="wanna_employ" id="wanna_employ">
+                                    <option value="">---- 下拉进行选择 ----</option>
+                                    @foreach (var d in new string[] { "是", "否", "建议公司不再录用" }) {
+                                        <option value="@d">@d</option>
+                                    }
+                            </select>
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;">
+                            是否再录用原因:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <textarea type="text" class="form-control" rows="3" id="employ_comment" name="employ_comment" placeholder="是否愿意再次录用此离职员工的原因"></textarea>
+                        </span>
+                    </div>
+                    if (bam.stepName.Contains("组长") && otherInfo.charger_name==null) { 
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;">
+                            主管:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <input type="text" class="form-control selectUser" name="charger_name" placeholder="选择主管" />
+                        </span>
+                    </div>
+                    }
+                    if (bam.stepName.Contains("主管") && otherInfo.produce_minister_name==null) { 
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;">
+                            生产部长:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <input type="text" class="form-control selectUser" name="produce_minister_name" placeholder="选择生产部长" />
+                        </span>
+                    </div>
+                    }
+                    if (bam.stepName.Contains("部门负责人") && otherInfo.highest_charger_name==null) { 
+                    <div class="b-div">
+                        <span class="b-label" style="vertical-align:top;">
+                            最高负责人:
+                        </span>
+                        <span style="display:inline-block;width:70%">
+                            <input type="text" class="form-control selectUser" name="highest_charger_name" placeholder="选择最高负责人" />
+                        </span>
+                    </div>
+                    }
                 }
                 <div class="b-div">
                     <span class="b-label" style="vertical-align:top;">

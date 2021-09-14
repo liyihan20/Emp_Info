@@ -1,0 +1,257 @@
+﻿@using EmpInfo.Models;
+@{
+    var m = ViewData["infoBeforeApply"] as XDBeforeApplyModel;
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 100px;
+            vertical-align: top;
+            color: gray;
+        }
+        .b-input{
+            display:inline-block;
+            width:65%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
+
+    <script>
+        $(function () {
+            $(".form_date").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd hh:ii",
+                autoclose: true,
+                todayBtn: true,
+                startView: 2,
+                maxView: 2,
+                minuteStep: 5,
+            });
+
+            $(".select-user").on("focus", function () {
+                var self = this;
+                var userNum = $(this).attr("data-user-num") || 1;
+                $.selectUsers({
+                    userLimit: userNum,
+                    userHasSelected: $(self).val(),
+                    callback: function (result) {
+                        $(self).val(result);
+                    }
+                });
+            });
+            
+            //提交申请
+            $("#apply_bt").on("click", function () {
+                var result = utils.validateRequiredField($("#fm"));
+                if (!result.suc) {
+                    toastr.error(result.msg);
+                    return;
+                }
+                var bill = utils.getFormObj($("#fm"));
+
+                if (bill.stock_confirm_people == "" && bill.lod_confirm_people == "") {
+                    toastr.error("仓库或物流确认人至少需填1人");
+                    return;
+                }
+
+                openConfirmDialog("确定要提交申请吗？", function () {
+                    $("#apply_bt").button("loading");
+                    $.ajax({
+                        type: 'post',
+                        url: 'SaveApply',
+                        data: "sys_no=" + bill.sys_no + "&bill=" + utils.StringifyAndParseCharacter(bill),
+                        cache: false,
+                        dataType: 'json',
+                        success: function (data) {
+                            $("#apply_bt").button("reset");
+                            if (data.suc) {
+                                toastr.success("提交成功:" + data.msg);
+                                setTimeout(function () { window.location.href = "CheckApply?sysNo=" + bill.sys_no; }, 2000);
+                            } else {
+                                toastr.error("提交失败：" + data.msg);
+                                $("#apply_bt").button("reset");
+                            }
+
+                        }
+                    });
+                });
+
+            });
+        });
+
+    </script>
+
+}
+
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
+            <li><a href="ApplyIndex?billType=XD">委外超时申请</a></li>
+            <li class="active">开始申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <form id="fm" style="margin-top:-12px;">
+            <div class="b-div">
+                <span class="b-label">
+                    申请流水号:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="sys_no" value="@m.sys_no" readonly />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    申请类型:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="pro_type" required>
+                        <option value="">----下拉选择类型----</option>
+                        <option value="出货">出货</option>
+                        <option value="回货">回货</option>
+                    </select>
+                </span>
+            </div>            
+            <div class="b-div">
+                <span class="b-label">
+                    申请部门:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="process_dep" required>
+                        <option value="">----下拉选择申请部门----</option>
+                        @foreach (var d in m.depList) {
+                            <option value="@d">@d</option>
+                        }
+                    </select>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    超时开始时间:
+                </span>
+                <div class="b-input">
+                    <div class="input-group date form_date" style="margin:6px 0;">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" name="time_from" autocomplete="off" placeholder="选择开始时间" />
+                    </div>               
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    超时结束时间:
+                </span>
+                <div class="b-input">
+                    <div class="input-group date form_date" style="margin:6px 0;">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" name="time_to" autocomplete="off" placeholder="选择结束时间" />
+                    </div>
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    K3帐套:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="k3_account" required>
+                        <option value="">----下拉选择K3帐套----</option>
+                        @foreach (var d in m.k3Accounts) {
+                            <option value="@d">@d</option>
+                        }
+                    </select>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    订单号:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="order_no" required placeholder="填写委外加工订单号" />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    供应商:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="supplier_name" required placeholder="填写供应商全称" />
+                </span>
+            </div>         
+            <div class="b-div">
+                <span class="b-label">
+                    卡板数:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control" name="cardborad_num" required placeholder="填写卡板数量" /> 
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    部门负责人:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control select-user" name="dep_charger" placeholder="选择部门负责人"/>
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    仓库确认人:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control select-user" name="stock_confirm_people" placeholder="需仓库配合时请选择"/>
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    物流确认人:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control select-user" name="lod_confirm_people" placeholder="需物流配合时请选择"/>
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    超时原因:
+                </span>
+                <div class="b-input">
+                    <textarea class="form-control" rows="2" name="reason" placeholder="录入委外超时原因"></textarea>
+                </div>
+            </div>
+
+        </form>
+
+        <button class="btn btn-danger btn-block" type="button" id="apply_bt" data-loading-text="正在提交..." style="margin-top:16px;"><i class="fa fa-check-circle-o"></i> 提交申请单</button>
+    </div>
+</div>
+
+<div class="panel panel-default" style="margin:16px 0;">
+    <div class="panel-body">
+        <h4 class="text-danger"><i class="fa fa-info-circle"></i> 说明 </h4>
+        <div style="margin-left:18px;padding-top:6px;" class="text-danger">
+            <p>                
+                1. 流程步骤：流程开始--->提交申请--->部门负责人审批--->仓库/物流审批-->营运部审批-->结束
+                <br/>
+                2. 如需仓库配合，请选择仓库配合人员；如需物流配合，请选择物流配合人员；至少需选择1人。
+                <br/>
+                3. 营运部每月统计各部门超时申请次数，超时多次可能会进行扣分处罚。
+            </p>
+        </div>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+}

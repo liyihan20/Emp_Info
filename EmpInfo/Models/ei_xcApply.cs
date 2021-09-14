@@ -63,5 +63,8 @@ namespace EmpInfo.Models
         public string k3_account { get; set; }
         public Nullable<int> bus_po_entry { get; set; }
         public bool need_ceo_confirm { get; set; }
+        public string process_dep { get; set; }
+        public string process_planner_auditor { get; set; }
+        public string process_planner_auditor_num { get; set; }
     }
 }

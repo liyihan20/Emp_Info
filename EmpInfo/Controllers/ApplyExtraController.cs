@@ -920,7 +920,16 @@ namespace EmpInfo.Controllers
                                    company = a.relate_text,
                                    userName = u.name
                                }).ToList();
-            ViewData["buyers"] = buyerList;
+            var resultList = new List<XAAuditorsModel>();
+            foreach (var c in buyerList.Select(b=>b.company).Distinct()) {
+                resultList.Add(new XAAuditorsModel()
+                {
+                    company = c,
+                    userName = string.Join("/", buyerList.Where(b => b.company == c).Select(b => b.userName))
+                });
+            }
+
+            ViewData["buyers"] = resultList;
             return View();
         }
 
@@ -1198,25 +1207,26 @@ namespace EmpInfo.Controllers
 
         #region 委外加工
 
+        [SessionTimeOutFilter]
         public ActionResult XCAuditorSetting()
         {
             return View();
         }
 
-        public JsonResult GetXCAuditors(string fromDate, string toDate, string depName)
+        public JsonResult GetXCAuditors(/*string fromDate, string toDate,*/ string depName)
         {
             var result = db.ei_xcDepTarget
-                .Where(x => x.year_month.CompareTo(fromDate) >= 0 && x.year_month.CompareTo(toDate) <= 0 && x.dep_name.Contains(depName))
-                .OrderByDescending(x => x.year_month).ThenBy(x => x.company).ThenBy(x => x.dep_name)
+                .Where(x => /*x.year_month.CompareTo(fromDate) >= 0 && x.year_month.CompareTo(toDate) <= 0 &&*/ x.dep_name.Contains(depName))
+                .OrderByDescending(x => x.company).ThenBy(x => x.dep_name)
                 .Select(x => new
                 {
                     x.id,
                     x.company,
-                    x.year_month,
+                    //x.year_month,
                     x.dep_name,
                     x.manager,
                     x.create_user,
-                    x.month_target
+                    //x.month_target
                 }).ToList();
 
             return Json(result);
@@ -1226,8 +1236,8 @@ namespace EmpInfo.Controllers
         {
             var m = JsonConvert.DeserializeObject<ei_xcDepTarget>(obj);
 
-            if (db.ei_xcDepTarget.Where(x => x.year_month == m.year_month && x.dep_name == m.dep_name && x.id != m.id).Count() > 0) {
-                return Json(new SimpleResultModel(false, "当前月份的部门信息已存在，不能重复增加"));
+            if (db.ei_xcDepTarget.Where(x => /*x.year_month == m.year_month &&*/ x.dep_name == m.dep_name && x.id != m.id).Count() > 0) {
+                return Json(new SimpleResultModel(false, "当前部门信息已存在，不能重复增加"));
             }
 
             m.manager_no = GetUserCardByNameAndCardNum(m.manager);
@@ -1261,10 +1271,10 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel(false, "记录不存在，不能删除"));
             }
 
-            var fd = DateTime.Parse(xc.year_month + "-01");
-            var td = fd.AddMonths(1);
-            if (db.ei_xcApply.Where(x => x.apply_time >= fd && x.apply_time < td && x.dep_name == xc.dep_name).Count() > 0) {
-                return Json(new SimpleResultModel(false, "不能删除，因为当月此部门已有申请记录"));
+            //var fd = DateTime.Parse(xc.year_month + "-01");
+            //var td = fd.AddMonths(1);
+            if (db.ei_xcApply.Where(x => /*x.apply_time >= fd && x.apply_time < td &&*/ x.dep_name == xc.dep_name).Count() > 0) {
+                return Json(new SimpleResultModel(false, "不能删除，因为此部门已有申请记录"));
             }
 
             db.ei_xcDepTarget.Remove(xc);
@@ -1273,11 +1283,199 @@ namespace EmpInfo.Controllers
             return Json(new SimpleResultModel(true));
         }
 
-        public JsonResult CopyXCPreMonthAuditor()
+        //public JsonResult CopyXCPreMonthAuditor()
+        //{
+        //    var nowMonth = DateTime.Now.ToString("yyyy-MM");
+        //    var lastMonth = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-01")).AddMonths(-1).ToString("yyyy-MM");
+        //    var records = db.ei_xcDepTarget.Where(x => x.year_month.CompareTo(lastMonth) >= 0).ToList();
+
+        //    if (records.Where(r => r.year_month == nowMonth).Count() > 0) {
+        //        return Json(new SimpleResultModel(false, "当前月份" + nowMonth + "已有数据，不能复制"));
+        //    }
+        //    if (records.Where(r => r.year_month == lastMonth).Count() == 0) {
+        //        return Json(new SimpleResultModel(false, "上月" + lastMonth + "没有数据，不能复制"));
+        //    }
+
+        //    foreach (var r in records.Where(r => r.year_month == lastMonth)) {
+        //        db.ei_xcDepTarget.Add(new ei_xcDepTarget()
+        //        {
+        //            company = r.company,
+        //            create_date = DateTime.Now,
+        //            create_user = userInfo.name,
+        //            dep_name = r.dep_name,
+        //            manager = r.manager,
+        //            manager_no = r.manager_no,
+        //            month_target = r.month_target,
+        //            update_date = DateTime.Now,
+        //            update_user = userInfo.name,
+        //            year_month = nowMonth
+        //        });
+        //    }
+        //    db.SaveChanges();
+
+        //    return Json(new SimpleResultModel(true, "复制成功"));
+
+        //}
+        /// <summary>
+        /// 录入单价时判断是否已上次录入的一致，不一致时提示
+        /// </summary>
+        /// <param name="productNo">产品编码</param>
+        /// <param name="price">单价</param>
+        /// <returns></returns>
+        public JsonResult XCPriceSameAsLast(string sysNo, string productNo, decimal price)
+        {
+            var lastPrice = (from x in db.ei_xcApply
+                             join e in db.ei_xcProduct on x.sys_no equals e.sys_no
+                             where x.buyer_auditor_num == userInfo.cardNo
+                             && x.sys_no != sysNo && e.product_no == productNo
+                             orderby e.id descending
+                             select e.unit_price).FirstOrDefault();
+            if (lastPrice != null && lastPrice != price) {
+                return Json(new SimpleResultModel(false, "检测到当前型号的单价与上次录入的单价（" + lastPrice.ToString() + "）不一致，是否要继续保存？"));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+        public JsonResult XCSavePrice(string sysNo, int entryId, decimal price)
+        {
+            var item = db.ei_xcProduct.Where(x => x.sys_no == sysNo && x.entry_id == entryId).FirstOrDefault();
+            if (item != null) {
+                item.unit_price = price;
+                item.total_price = price * item.qty;
+                db.SaveChanges();
+            }
+            else {
+                return Json(new SimpleResultModel(false, "数据可能已被删除，找不到对应行"));
+            }
+            return Json(new SimpleResultModel(true));
+        }
+
+        //public JsonResult SaveXCProInRecord(string obj)
+        //{
+        //    ei_xcProductInDetail returnPro;
+        //    var pro = JsonConvert.DeserializeObject<ei_xcProductInDetail>(obj);
+
+        //    var hasInQty = db.ei_xcProductInDetail.Where(x => x.sys_no == pro.sys_no && x.id != pro.id).Sum(x => x.in_qty) ?? 0;
+        //    var xcQty = db.ei_xcApply.Where(x => x.sys_no == pro.sys_no).Select(x => x.qty).FirstOrDefault();
+
+        //    if (hasInQty + pro.in_qty > xcQty) {
+        //        return Json(new SimpleResultModel(false, string.Format("接收数量之和【{0}】不能大于委外加工的产品数量【{1}】", hasInQty + pro.in_qty, xcQty)));
+        //    }
+
+        //    if (pro.id == 0) {
+        //        returnPro = db.ei_xcProductInDetail.Add(pro);
+        //    }
+        //    else {
+        //        var exPro = db.ei_xcProductInDetail.Where(x => x.id == pro.id).FirstOrDefault();
+        //        if (exPro == null) {
+        //            return Json(new SimpleResultModel(false, "修改的记录已不存在"));
+        //        }
+        //        MyUtils.CopyPropertyValue(pro, exPro);
+        //        returnPro = exPro;
+        //    }
+
+        //    try {
+        //        db.SaveChanges();
+        //    }
+        //    catch (Exception ex) {
+        //        return Json(new SimpleResultModel(ex));
+        //    }
+        //    return Json(new SimpleResultModel(true, "保存成功", JsonConvert.SerializeObject(returnPro)));
+        //}
+
+        //public JsonResult RemoveXCProInRecord(int id)
+        //{
+        //    try {
+        //        db.ei_xcProductInDetail.Remove(db.ei_xcProductInDetail.Where(x => x.id == id).FirstOrDefault());
+        //        db.SaveChanges();
+        //        return Json(new SimpleResultModel(true, "删除成功"));
+        //    }
+        //    catch (Exception ex) {
+        //        return Json(new SimpleResultModel(ex));
+        //    }
+        //}               
+
+        [SessionTimeOutFilter]
+        public ActionResult ProcessDep()
+        {
+            return View();
+        }
+
+        public JsonResult GetProcessDep(string fromDate, string toDate, string depName)
+        {
+            var result = db.ei_xcProcessDep
+                .Where(x => x.year_month.CompareTo(fromDate) >= 0 && x.year_month.CompareTo(toDate) <= 0 && x.dep_name.Contains(depName))
+                .OrderByDescending(x => x.year_month).ThenBy(x => x.dep_name)
+                .Select(x => new
+                {
+                    x.id,
+                    x.year_month,
+                    x.dep_name,
+                    x.month_target,
+                    x.extra_amount,
+                    x.current_amount,
+                    x.create_user
+                }).ToList();
+
+            return Json(result);
+        }
+
+        public JsonResult SaveProcessDep(string obj)
+        {
+            var m = JsonConvert.DeserializeObject<ei_xcProcessDep>(obj);
+
+            if (db.ei_xcProcessDep.Where(x => x.year_month == m.year_month && x.dep_name == m.dep_name && x.id != m.id).Count() > 0) {
+                return Json(new SimpleResultModel(false, "当前月份加工部门信息已存在，不能重复增加"));
+            }
+            
+            m.update_date = DateTime.Now;
+            m.update_user = userInfo.name;
+
+            if (m.id == 0) {
+                m.create_user = userInfo.name;
+                m.create_date = DateTime.Now;
+                db.ei_xcProcessDep.Add(m);
+            }
+            else {
+                var xc = db.ei_xcProcessDep.Where(x => x.id == m.id).FirstOrDefault();
+                if (xc == null) {
+                    return Json(new SimpleResultModel(false, "记录不存在，不能修改"));
+                }
+                m.create_date = xc.create_date;
+                m.current_amount = xc.current_amount;
+
+                MyUtils.CopyPropertyValue(m, xc);
+            }
+
+            db.SaveChanges();
+
+            return Json(new SimpleResultModel(true));
+        }
+
+        public JsonResult RemoveProcessDep(int id)
+        {
+            var xc = db.ei_xcProcessDep.Where(x => x.id == id).FirstOrDefault();
+            if (xc == null) {
+                return Json(new SimpleResultModel(false, "记录不存在，不能删除"));
+            }
+
+            var fd = DateTime.Parse(xc.year_month + "-01");
+            var td = fd.AddMonths(1);
+            if (db.ei_xcApply.Where(x => x.apply_time >= fd && x.apply_time < td && x.process_dep == xc.dep_name).Count() > 0) {
+                return Json(new SimpleResultModel(false, "不能删除，因为此加工部门已有申请记录"));
+            }
+
+            db.ei_xcProcessDep.Remove(xc);
+            db.SaveChanges();
+
+            return Json(new SimpleResultModel(true));
+        }
+
+        public JsonResult CopyProcessDep()
         {
             var nowMonth = DateTime.Now.ToString("yyyy-MM");
             var lastMonth = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-01")).AddMonths(-1).ToString("yyyy-MM");
-            var records = db.ei_xcDepTarget.Where(x => x.year_month.CompareTo(lastMonth) >= 0).ToList();
+            var records = db.ei_xcProcessDep.Where(x => x.year_month.CompareTo(lastMonth) >= 0).ToList();
 
             if (records.Where(r => r.year_month == nowMonth).Count() > 0) {
                 return Json(new SimpleResultModel(false, "当前月份" + nowMonth + "已有数据，不能复制"));
@@ -1287,18 +1485,15 @@ namespace EmpInfo.Controllers
             }
 
             foreach (var r in records.Where(r => r.year_month == lastMonth)) {
-                db.ei_xcDepTarget.Add(new ei_xcDepTarget()
-                {
-                    company = r.company,
+                db.ei_xcProcessDep.Add(new ei_xcProcessDep()
+                {                    
                     create_date = DateTime.Now,
                     create_user = userInfo.name,
                     dep_name = r.dep_name,
-                    manager = r.manager,
-                    manager_no = r.manager_no,
                     month_target = r.month_target,
                     update_date = DateTime.Now,
                     update_user = userInfo.name,
-                    year_month = nowMonth
+                    year_month = nowMonth                    
                 });
             }
             db.SaveChanges();
@@ -1307,50 +1502,86 @@ namespace EmpInfo.Controllers
 
         }
 
-        public JsonResult SaveXCProInRecord(string obj)
+        #endregion
+
+        #region 放行条流程
+
+        /// <summary>
+        /// 进入表单填写界面
+        /// </summary>
+        /// <param name="typeNo"></param>
+        /// <returns></returns>
+        public ActionResult FillFxForm(string typeNo)
         {
-            ei_xcProductInDetail returnPro;
-            var pro = JsonConvert.DeserializeObject<ei_xcProductInDetail>(obj);
-
-            var hasInQty = db.ei_xcProductInDetail.Where(x => x.sys_no == pro.sys_no && x.id != pro.id).Sum(x => x.in_qty) ?? 0;
-            var xcQty = db.ei_xcApply.Where(x => x.sys_no == pro.sys_no).Select(x => x.qty).FirstOrDefault();
-
-            if (hasInQty + pro.in_qty > xcQty) {
-                return Json(new SimpleResultModel(false, string.Format("接收数量之和【{0}】不能大于委外加工的产品数量【{1}】", hasInQty + pro.in_qty, xcQty)));
+            if (string.IsNullOrEmpty(typeNo)) {
+                ViewBag.tip = "业务类型编码不存在";
+                return View("Error");
             }
 
-            if (pro.id == 0) {
-                returnPro = db.ei_xcProductInDetail.Add(pro);
-            }
-            else {
-                var exPro = db.ei_xcProductInDetail.Where(x => x.id == pro.id).FirstOrDefault();
-                if (exPro == null) {
-                    return Json(new SimpleResultModel(false, "修改的记录已不存在"));
-                }
-                MyUtils.CopyPropertyValue(pro, exPro);
-                returnPro = exPro;
+            var type = db.ei_fxType.Where(f => f.type_no == typeNo && !f.is_deleted).FirstOrDefault();
+            if (type == null) {
+                ViewBag.tip = "业务类型不存在或已失效";
+                return View("Error");
             }
 
-            try {
-                db.SaveChanges();
+            var ancestorTypes = db.ei_fxType.Where(f => typeNo.StartsWith(f.type_no + ".") || f.type_no == typeNo).ToList();
+
+            var typeNames = string.Join(" # ", ancestorTypes.Select(f => f.type_name).ToList());
+            var typeDemands = JsonConvert.SerializeObject(ancestorTypes.Where(a => a.type_demand != "").Select(a => a.type_demand).ToList());
+
+            var depNameList = (from f in db.flow_auditorRelation
+                               join u in db.ei_users on f.relate_value equals u.card_number
+                               where f.bill_type == "SP" && f.relate_name == "事业部审批"
+                               orderby f.relate_text
+                               select new
+                               {
+                                   f,
+                                   u.name
+                               }).ToList();
+                
+            List<SelectModel> selectList = new List<SelectModel>();
+            foreach (var depName in depNameList.Select(d => d.f.relate_text).Distinct().ToList()) {
+                selectList.Add(new SelectModel()
+                {
+                    text = depName,
+                    stringValue = string.Join(",", depNameList.Where(d => d.f.relate_text == depName).Select(d => d.name).ToList()),
+                    extraValue = string.Join(";", depNameList.Where(d => d.f.relate_text == depName).Select(d => d.f.relate_value).ToList())
+                });
             }
-            catch (Exception ex) {
-                return Json(new SimpleResultModel(ex));
-            }
-            return Json(new SimpleResultModel(true, "保存成功", JsonConvert.SerializeObject(returnPro)));
+
+            ViewData["beforeApplyModel"] = new FXBeforeApplyModel()
+            {
+                applierName = userInfo.name,
+                fxType = type,
+                sysNo = GetNextSysNum("FX"),
+                typeNames = typeNames,
+                depNames = selectList,
+                typeDemands = typeDemands
+            };
+
+            return View();
         }
 
-        public JsonResult RemoveXCProInRecord(int id)
+        public JsonResult FXGetSelectData(string nodeName)
         {
-            try {
-                db.ei_xcProductInDetail.Remove(db.ei_xcProductInDetail.Where(x => x.id == id).FirstOrDefault());
-                db.SaveChanges();
-                return Json(new SimpleResultModel(true, "删除成功"));
+            var result = new List<SelectModel>();
+            switch (nodeName) {
+                case "仓库管理部":
+                    result = (from f in db.flow_auditorRelation
+                               join u in db.ei_users on f.relate_value equals u.card_number
+                               where f.bill_type == "SP" && f.relate_name == "仓管审批"
+                               select new SelectModel()
+                               {
+                                   text = f.relate_text + "（" + u.name + "）",
+                                   stringValue = f.relate_text,
+                                   extraValue = f.relate_value
+                               }).ToList();
+                    break;
             }
-            catch (Exception ex) {
-                return Json(new SimpleResultModel(ex));
-            }
-        }               
+
+            return Json(result);
+
+        }
 
         #endregion
 

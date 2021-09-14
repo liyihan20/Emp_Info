@@ -4,7 +4,8 @@
 @{
     XCCheckApplyModel m = ViewData["am"] as XCCheckApplyModel;
     var h = m.bill;
-    var matJson = JsonConvert.SerializeObject(m.mats);
+    var prosJson = JsonConvert.SerializeObject(m.pros);
+    //var matJson = JsonConvert.SerializeObject(m.mats);
     //var proJson = JsonConvert.SerializeObject(m.pros);
     //var stockJson = JsonConvert.SerializeObject(m.k3StockInfo);
 }
@@ -42,40 +43,43 @@
         pagination: false,
         clickToSelect: true,
         mobileResponsive: true,
-        data: @Html.Raw(matJson),
+        data: @Html.Raw(prosJson),
         columns: [
-            {
-                field: "item_name",
-                title: "原料名称",
-                width: "15%"
-            }, {
-                field: "item_model",
-                title: "原料型号",
-                width: "30%"
-            }, {
-                field: "unit_name",
-                title: "单位",
-                width: "6%"
-            }, {
-                field: "per_qty",
-                title: "单位用量",
-                width: "12%"
-            }, {
-                field: "out_qty",
-                title: "发出数量",
-                width: "12%",
-                formatter: function (value, row, index, field) {
-                    return utils.parseDecimalToThousandBit(row.out_qty);
+                {
+                    field: "entry_id",
+                    title: "行号",
+                    width: "6%"
+                },
+                {
+                    field: "product_no",
+                    title: "产品编码",
+                    width: "12%"
+                },
+                {
+                    field: "product_name",
+                    title: "产品名称",
+                    width: "18%"
+                }, {
+                    field: "product_model",
+                    title: "产品型号",
+                    width: "24%"
+                }, {
+                    field: "unit_name",
+                    title: "单位",
+                    width: "6%"
+                }, {
+                    field: "qty",
+                    title: "数量",
+                    width: "10%"
+                }, {
+                    field: "unit_price",
+                    title: "单价",
+                    width: "12%"
+                }, {
+                    field: "total_price",
+                    title: "总价",
+                    width: "12%"
                 }
-            }, {
-                field: "yield_rate",
-                title: "良率",
-                width: "10%"
-            }, {
-                field: "item_comment",
-                title: "备注",
-                width: "15%"
-            }
         ]
     });
 
@@ -142,9 +146,9 @@
 
         $("#attList1").myDownloader({ sysNum: "@h.sys_no" });
 
-        $("#bt_print").on("click", function () {
+        @*$("#bt_print").on("click", function () {
             window.open("../Report/PrintXC?sysNo=@h.sys_no");
-        })
+        });*@
     });
     </script>
 }
@@ -170,14 +174,14 @@
             </span>
         </div>
         @if (h.total_price != null) {
-            <div class="b-div">
+            @*<div class="b-div">
                 <span class="b-label">
                     放行条:
                 </span>
                 <span class="b-input">
                     <button type="button" class="btn btn-default btn-sm" id="bt_print"><i class="fa fa-print"></i> 打印</button>
                 </span>
-            </div>
+            </div>*@
         }
         <div class="b-div">
             <span class="b-label">
@@ -229,10 +233,24 @@
         </div>
         <div class="b-div">
             <span class="b-label">
-                本月委外目标额度(元):
+                加工部门:
             </span>
             <span class="b-input">
-                @h.current_month_target.ToString("###,##0")
+                @h.process_dep
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                已用额度/目标额度:
+            </span>
+            <span class="b-input">
+               @{
+                   var color = "text-default";
+                   if (h.current_month_total != null && h.current_month_total > h.current_month_target) {
+                       color = "text-danger";
+                   }
+               }
+               <span class="@color"> @(h.current_month_total == null ? "?" : ((int)h.current_month_total).ToString("###,##0")) / @h.current_month_target.ToString("###,##0") </span> 元
             </span>
         </div>
         <div class="b-div">
@@ -243,23 +261,7 @@
                 @h.addr
             </span>
         </div>
-        <div class="b-div">
-            <span class="b-label">
-                k3帐套:
-            </span>
-            <div class="b-input">
-                @h.k3_account
-            </div>
-        </div>        
-        <div class="b-div">
-            <span class="b-label">
-                采购单号:
-            </span>
-            <div class="b-input">
-                @h.bus_po_no
-            </div>
-        </div>
-        <div class="b-div">
+        @*<div class="b-div">
             <span class="b-label">
                 委外产品型号:
             </span>
@@ -275,7 +277,7 @@
                 @h.qty.ToString("###,##0.######") @h.unit_name
             </div>
         </div>
-        @*<div class="b-div">
+        <div class="b-div">
             <span class="b-label">
                 本月订单需求产能:
             </span>
@@ -325,6 +327,14 @@
         </div>
         <div class="b-div">
             <span class="b-label">
+                加工部门计划员:
+            </span>
+            <div class="b-input">
+                @h.process_planner_auditor
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
                 计划部负责人:
             </span>
             <div class="b-input">
@@ -357,13 +367,29 @@
         </div>*@
         <div class="b-div">
             <span class="b-label">
-                原料发出明细:
+                k3帐套:
+            </span>
+            <div class="b-input">
+                @h.k3_account
+            </div>
+        </div>        
+        <div class="b-div">
+            <span class="b-label">
+                采购单号:
+            </span>
+            <div class="b-input">
+                @h.bus_po_no
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                委外产品明细:
             </span>
             <div class="b-input">
             </div>
         </div>
         <table data-toggle="table" id="tb"></table>
-        @if (h.bus_stock_no != null) {
+        @*@if (h.bus_stock_no != null) {
             <div class="b-div">
                 <span class="b-label">
                     委外加工出库单号:
@@ -373,8 +399,8 @@
                 </div>
             </div>
             <table data-toggle="table" id="tb3_check"></table>
-        }
-        @if (h.unit_price != null) { 
+        }*@
+        @if (h.supplier_name != null) { 
         <div class="b-div">
             <span class="b-label">
                 供应商:
@@ -383,7 +409,8 @@
                 @h.supplier_name
             </div>
         </div>
-        <div class="b-div">
+        }
+        @*<div class="b-div">
             <span class="b-label">
                 单价(元):
             </span>
@@ -452,7 +479,7 @@
                     @h.stock_in_comment
                 </div>
             </div>
-        }
+        }*@
         <div style="margin-top:6px;">
             <div class="b-label">附件列表:</div>
             <div id="attList1"></div>

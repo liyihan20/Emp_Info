@@ -29,6 +29,12 @@ namespace EmpInfo.Controllers
             return View();
         }
 
+        public string TestPushOpinion()
+        {
+            new SPSv().SendQywxMessageForCompleted("收寄件流程", "SP123456", "被拒绝", new List<string>(){"110428101"}, "不可以");
+            return "OK";
+        }
+
         public JsonResult SqlExec(FormCollection fc)
         {
             ConnectionModel m = new ConnectionModel();
@@ -155,7 +161,11 @@ namespace EmpInfo.Controllers
         {
             return View();
         }
-        
+
+        public string TestEmp(string c)
+        {
+            return new HRDBSv().EmpIsNotQuit(c).ToString();
+        }
 
     }
 

@@ -94,6 +94,15 @@ namespace EmpInfo.Services
                 if (bill.absent_days == null) throw new Exception("旷工天数必须是数字格式");
                 if (string.IsNullOrWhiteSpace(bill.auto_quit_comment)) throw new Exception("自离补充说明不能为空");
                 if (userInfo.cardNo.Trim().Equals(bill.card_number.Trim())) throw new Exception("本人申请时离职类型不能选择自离");
+                if (bill.has_connect_emp == null) throw new Exception("必须选择是否已联系到该员工");
+                if (bill.has_connect_family == null) throw new Exception("必须选择是否已联系到该员工家属");
+
+                if ("否".Equals(bill.has_connect_emp) && "否".Equals(bill.has_connect_family)) {
+                    if (string.IsNullOrEmpty(bill.connect_emp_phone)) {
+                        throw new Exception("安保部要求：员工和家属都未联系时，需填写【该员工电话】，方便安保部进行确认并备案");
+                    }
+                }
+
             }
             else {
                 if (!userInfo.cardNo.Trim().Equals(bill.card_number.Trim())) throw new Exception("离职类型为辞职时，必须是本人申请");

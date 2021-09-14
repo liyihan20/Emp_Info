@@ -13,18 +13,35 @@
         canSeePrice = true;
     }
     if (!canSeePrice) {
-        m.suppliers.ForEach(s => s.price = null);
+        m.suppliers.Where(s=>!s.is_bidder).ToList().ForEach(s => s.price = null);
     }
 
     var itemsJson = JsonConvert.SerializeObject(m.suppliers);
 
     //可以跳转到之前的节点
-    var canJumpToStep = new List<SelectModel>(){
-        new SelectModel(){ text = "上一步",intValue = -1 },
-        new SelectModel(){ text = "采购部接单",intValue = 1000 },
-        new SelectModel(){ text = "申请人上传施工清单",intValue = 1200 },
-        new SelectModel(){ text = "采购部上传报价单",intValue = 1600 }
-    }.Where(s => s.intValue < bam.step).OrderBy(s => s.intValue).ToList();
+    List<SelectModel> canJumpToStep;
+    if (m.bill.apply_time < DateTime.Parse("2021-08-25")) {
+        canJumpToStep = new List<SelectModel>(){
+            new SelectModel(){ text = "上一步",intValue = -1 },
+            new SelectModel(){ text = "采购部接单",intValue = 1000 },
+            new SelectModel(){ text = "申请人上传施工清单",intValue = 1200 },
+            new SelectModel(){ text = "采购部上传报价单",intValue = 1600 }
+        }.Where(s => s.intValue < bam.step).OrderBy(s => s.intValue).ToList();
+    }
+    else {
+        canJumpToStep = new List<SelectModel>(){
+            new SelectModel(){ text = "上一步",intValue = -1 },
+            new SelectModel(){ text = "采购部接单",intValue = 1200 },
+            new SelectModel(){ text = "申请人上传施工清单",intValue = 1400 },
+            new SelectModel(){ text = "采购部上传报价单",intValue = 2200 }
+        }.Where(s => s.intValue < bam.step).OrderBy(s => s.intValue).ToList();
+    }
+    
+
+    if (bam.stepName.Contains("验收")) {
+        //验收阶段不能退回上一步，只能退回特定步骤。因为退回上一步会导致审核部确认日期清空，报表会有问题
+        canJumpToStep = canJumpToStep.Where(c => c.intValue > 0).OrderBy(s => s.intValue).ToList();
+    }
     
 }
 
@@ -129,11 +146,23 @@
                     return;
                 }
             }
+            if("@bam.stepName".indexOf("上传报价单")>0){
+                if($("#myUploader2").getMyUploaderFilesNum()<1){
+                    toastr.error("请先上传报价单附件");
+                    return;
+                }
+            }
+        }else{
+            if($.trim($("#opinion").val()) == ""){
+                toastr.error("拒绝时必须填写审批意见。")
+                return;
+            }
         }
 
-        $("#isPass").val(isPass);
-        $("#returnBack").val(false);
         openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此申请吗？", function () {
+            $("#isPass").val(isPass);
+            $("#returnBack").val(false);
+
             $.ajax({
                 type: 'post',
                 url: 'HandleApply',
@@ -177,7 +206,7 @@
         });
     }
 
-    </script>
+</script>
 
     <script>
         if($("#tb").length>0){
@@ -385,6 +414,14 @@
             </span>
             <span class="b-input">
                 @m.bill.applier_phone
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                邮箱地址:
+            </span>
+            <span class="b-input">
+                @m.bill.email_addr
             </span>
         </div>
         <div class="b-div">
@@ -693,14 +730,16 @@
                         </div>
                     }
 
-                    <textarea class="form-control" rows="2" name="opinion" placeholder="请在此处输入审核意见"></textarea>
+                    <textarea class="form-control" rows="2" name="opinion" id="opinion" placeholder="请在此处输入审核意见"></textarea>
                 </form>
 
                 <div style="margin-top:12px;"></div>
                 <div class="btn-group btn-group-justified" role="group">
+                    @if (!bam.stepName.Contains("验收")) { 
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
                     </div>
+                    }
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
                     </div>

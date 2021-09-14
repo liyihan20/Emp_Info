@@ -89,8 +89,7 @@
             $("#checkExBtn").on("click",function(){
                 var obj = utils.getFormObj($("#fm"));
                 if (obj.from_addr == "") {
-                    toastr.error("寄件地址必须填写");
-                    return;
+                    obj.from_addr = "广东汕尾";
                 }
                 if (obj.to_addr == "") {
                     toastr.error("收件地址必须填写");
@@ -192,21 +191,17 @@
                 }else{
                     obj.has_attachment = true;
                 }
-                if (obj.send_or_receive == "寄件") {
-                    if (obj.from_addr.indexOf("汕尾") < 0) {
-                        toastr.error("从外地发往汕尾的，【收寄类型】请选择收件");
-                        return;
-                    }
-                    //if (obj.content_type == "产品" && obj.isReturnBack == "是" && obj.has_attachment == false) {
-                    //    toastr.error("寄出产品且是退补货时，必须上传附件证明");
-                    //    return;
-                    //}
-                } else {
-                    if (obj.to_addr.indexOf("汕尾") < 0) {
-                        toastr.error("从汕尾发往外地的，【收寄类型】请选择寄件");
-                        return;
-                    }
-                }
+                //if (obj.send_or_receive == "寄件") {
+                //    if (obj.from_addr.indexOf("汕尾") < 0) {
+                //        toastr.error("从外地发往汕尾的，【收寄类型】请选择收件");
+                //        return;
+                //    }
+                //} else {
+                //    if (obj.to_addr.indexOf("汕尾") < 0) {
+                //        toastr.error("从汕尾发往外地的，【收寄类型】请选择寄件");
+                //        return;
+                //    }
+                //}
                 if((obj.from_addr.indexOf("仁寿")>=0 && obj.from_addr.indexOf("眉山")<0) || (obj.to_addr.indexOf("仁寿")>=0 && obj.to_addr.indexOf("眉山")<0)){
                     toastr.error("仁寿属于眉山市，请在地址中加上眉山市，否则运费计算会有问题");
                     return;
@@ -265,7 +260,7 @@
                 if (!utils.testIsFloat(obj.total_weight, 1)) {
                     toastr.error("总毛重格式不正确，必须是整数或1位小数");
                     return;
-                }                
+                }
 
                 if(obj.scope!="国外"){
                     obj.ex_company = ex.ex_company;
@@ -495,7 +490,7 @@
             <li><span class="glyphicon glyphicon-hand-right"></span></li>
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
-            <li><a href="ApplyIndex?billType=SP">寄/收件申请</a></li>
+            <li><a href="ApplyIndex?billType=SP">寄件申请</a></li>
             <li class="active">开始申请</li>
         </ol>
     </div>
@@ -518,7 +513,7 @@
                             联系电话:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="applier_phone" required />
+                            <input type="text" class="form-control" name="applier_phone" required placeholder="请输入手机短号或长号" />
                         </span>
                     </div>
                 </div>
@@ -544,7 +539,7 @@
                         </span>
                         <div class="b-input">
                             <select class="form-control" name="bus_name" id="bus_name" required>
-                                <option value="">---- 下拉选择事业部 ----</option>
+                                <option value="">---- 下拉选择部门 ----</option>
                                 @foreach (var d in m.busDepList) {
                                     <option value="@d">@d</option>
                                 }
@@ -552,7 +547,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
+                <input type="hidden" name="send_or_receive" value="寄件" />
+                @*<div class="col-md-4 col-sm-6 col-xs-12">
                     <div class="b-div">
                         <span class="b-label">
                             收寄类型:
@@ -569,7 +565,7 @@
                             </select>
                         </div>
                     </div>
-                </div>
+                </div>*@
                 <div class="col-md-4 col-sm-6 col-xs-12">
                     <div class="b-div">
                         <span class="b-label">
@@ -582,7 +578,7 @@
                                 <option value="文件">文件</option>
                                 <option value="原材料">原材料</option>
                                 <option value="辅料/设备配件">辅料/设备配件</option>
-                                
+                                <option value="委外物品">委外物品</option>
                             </select>
                         </div>
                     </div>
@@ -590,15 +586,15 @@
                 <div class="col-md-4 col-sm-6 col-xs-12 isReturnBackDiv">
                     <div class="b-div">
                         <span class="b-label">
-                            是否信利产品:
+                            是否信利产品: 
                         </span>
                         <div class="b-input">
                             <select class="form-control" name="isReturnBack" id="isReturnBack" >
                                 <option value="">---- 下拉选择是否信利产品 ----</option>
                                 <option value="是">是</option>
                                 <option value="否">否</option>
-                            </select>
-                        </div>
+                            </select>                            
+                        </div>                        
                     </div>
                 </div>                
                 <div class="col-md-4 col-sm-6 col-xs-12 qualityAuditorNameDiv">
@@ -607,7 +603,7 @@
                             品质审核人:
                         </span>
                         <div class="b-input">
-                            <input type="text" class="form-control selectUser" name="quality_audior_name" placeholder="请选择品质审核人" />                            
+                            <input type="text" class="form-control selectUser" name="quality_audior_name" placeholder="请选择品质审核人" />
                         </div>
                     </div>
                 </div>              
@@ -642,7 +638,7 @@
                             包装箱尺寸:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="box_size" placeholder="必填" />
+                            <input type="text" class="form-control" name="box_size" placeholder="必填，长*宽*高，单位是cm" />
                         </span>
                     </div>
                 </div>
@@ -652,7 +648,7 @@
                             卡板尺寸:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="cardboard_size" placeholder="选填" />
+                            <input type="text" class="form-control" name="cardboard_size" placeholder="如无卡板可不填" />
                         </span>
                     </div>
                 </div>
@@ -662,7 +658,7 @@
                             卡板数:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="cardboard_num" placeholder="选填" />
+                            <input type="text" class="form-control" name="cardboard_num" placeholder="如无卡板可不填" />
                         </span>
                     </div>
                 </div>
@@ -698,24 +694,24 @@
                         </span>
                         <div class="b-input">
                             <select class="form-control" name="scope" id="scope" required>
-                                <option value="">---- 下拉选择收寄范围 ----</option>
-                                <optgroup label="寄件/收件地址都为广东省内的">
+                                <option value="">---- 下拉选择寄件范围 ----</option>
+                                <optgroup label="收件地址为广东省内的">
                                     <option value="省内">省内</option>
                                 </optgroup>
-                                <optgroup label="寄件/收件地址其中之一是广东省外的">
+                                <optgroup label="收件地址是广东省外的">
                                     <option value="省外">省外</option>
                                 </optgroup>
-                                <optgroup label="寄件/收件地址其中之一是港澳台的">
+                                <optgroup label="收件地址是港澳台的">
                                     <option value="港澳台">港澳台</option>
                                 </optgroup>
-                                <optgroup label="寄件/收件地址其中之一是国外的">
+                                <optgroup label="收件地址是国外的">
                                     <option value="国外">国外</option>
                                 </optgroup>
                             </select>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
+                @*<div class="col-md-4 col-sm-6 col-xs-12">
                     <div class="b-div">
                         <span class="b-label">
                             寄件地址:
@@ -724,7 +720,8 @@
                             <input type="text" class="form-control" name="from_addr" placeholder="必填：至少包含省和市" required />
                         </span>
                     </div>
-                </div>
+                </div>*@
+                <input type="hidden" name="from_addr" value="广东汕尾" />
                 <div class="col-md-4 col-sm-6 col-xs-12">
                     <div class="b-div">
                         <span class="b-label">
@@ -761,7 +758,7 @@
                             申请原因:
                         </span>
                         <span class="b-input">
-                            <input type="text" class="form-control" name="apply_reason" placeholder="选填" />
+                            <input type="text" class="form-control" name="apply_reason" placeholder="必填" required />
                         </span>
                     </div>
                 </div>
@@ -848,24 +845,34 @@
             </p>
             <p>
                 1. 流程步骤如下：<br/>
-                [1]. 收寄文件：流程开始--->员工提交申请--->部门负责人审批--->流程结束。<br/>
-                [2]. 收寄产品：流程开始--->员工提交申请--->部门负责人审批--->QA审批（如果寄信利产品）--->物流部审批 --->流程结束。<br/>
-                [3]. 收寄原材料：流程开始--->员工提交申请--->品质部审批--->部门负责人审批--->仓管部审批--->物流部审批--->流程结束。<br/>
-                [4]. 收集辅料/设备配件：流程开始--->员工提交申请--->部门负责人审批--->物流部审批 --->流程结束。
+                [1]. 寄文件：流程开始--->员工提交申请--->部门负责人审批--->流程结束。<br/>
+                [2]. 寄产品：流程开始--->员工提交申请--->部门负责人审批--->QA审批（如果寄信利产品）--->打印放行条--->物流部审批 --->流程结束。<br/>
+                [3]. 寄原材料：流程开始--->员工提交申请--->品质部审批--->部门负责人审批--->仓管部审批--->打印放行条--->物流部审批--->流程结束。<br/>
+                [4]. 寄辅料/设备配件：流程开始--->员工提交申请--->部门负责人审批--->打印放行条--->物流部审批 --->流程结束。<br/>
+                [5]. 寄委外物品：流程开始--->员工提交申请--->部门负责人审批--->营运部审批--->打印放行条--->物流部审批 --->流程结束。
             </p>
             <p>
-                2. 10KG以内的省内件，默认使用顺丰标快；10KG以内的省外件或港澳台件，时效是次日达的，默认使用顺丰标快；
+                2. 在物流部审批之前，请先在此系统打印好放行条，与物品一起拿到物流中心，物流同事检查没问题之后会在系统确认审批。
+            </p>
+            <p>
+                3. 流程到了物流部审批环节后，如果3天内未到物流中心处理的，系统会后台自动NG此流程。
+            </p>
+            <p>
+                4. 10KG以内的省内件，默认使用顺丰标快；10KG以内的省外件或港澳台件，时效是次日达的，默认使用顺丰标快；
                 10KG以内的省外件或港澳台件，时效是隔日达或其他的，默认使用顺丰特惠；大于10KG的，请先联系物流部周秀花确认后，在系统选择正确的物流公司和快递方式；
                 国外件，系统不计算运费，需要手工填写快递公司；
             </p>
             <p>
-                3. 包装箱尺寸和卡板尺寸的格式是长*宽*高，单位是厘米（CM）；如果没有卡板的，可以不需填写卡板数量和卡板尺寸。
+                5. 包装箱尺寸和卡板尺寸的格式是长*宽*高，单位是厘米（CM）；如果没有卡板的，可以不需填写卡板数量和卡板尺寸。
             </p>
             @*<p>
                 4. 收寄类型是寄件且收寄内容是产品且是退补货的，必须上传附件（图片格式），QA审批后即可在查看界面打印放行条，给门卫扫描后放行，不需再走放行条流程。
             </p>*@
             <p>
-                4. 如有问题，请联系物流部周秀花：13543166052（676052），zhouxh.wlb@truly.com.cn
+                6. 如有问题，请联系物流部周秀花：13543166052（676052），zhouxh.wlb@truly.cn
+            </p>
+            <p>
+                7. 2021-07-26起，取消收件流程，只保留寄件流程。
             </p>
         </div>
     </div>

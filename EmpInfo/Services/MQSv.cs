@@ -89,7 +89,10 @@ namespace EmpInfo.Services
             if (bill.quit_suggestion != null && bill.quit_suggestion.Length > 1000) throw new Exception("离职建议内容太多，请删减");                        
             if (string.IsNullOrWhiteSpace(bill.group_leader_name)) throw new Exception("必须选择组长");
 
-            bill.group_leader_num = GetUserCardByNameAndCardNum(bill.group_leader_name);  
+            bill.group_leader_num = GetUserCardByNameAndCardNum(bill.group_leader_name);
+
+            if (userInfo.cardNo == bill.group_leader_num) throw new Exception("组长审核人不能选择自己");
+
             bill.applier_name = userInfo.name;
             bill.applier_num = userInfo.cardNo;
             bill.apply_time = DateTime.Now;

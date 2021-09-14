@@ -1,12 +1,10 @@
-﻿using System;
+﻿using EmpInfo.FlowSvr;
+using EmpInfo.Interfaces;
+using EmpInfo.Models;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using EmpInfo.Models;
-using EmpInfo.FlowSvr;
-using EmpInfo.Util;
-using Newtonsoft.Json;
-using EmpInfo.Interfaces;
 
 namespace EmpInfo.Services
 {
@@ -58,12 +56,21 @@ namespace EmpInfo.Services
                 });
             }
 
-            if (auth.Where(a => a.relate_type == "部门总经理与目标").Count() > 0) {
+            if (auth.Where(a => a.relate_type == "部门总经理").Count() > 0) {
                 menus.Add(new ApplyMenuItemModel()
                 {
-                    text = "部门总经理与目标维护",
+                    text = "部门总经理维护",
                     iconFont = "fa-user",
                     url = "../ApplyExtra/XCAuditorSetting"
+                });
+            }
+
+            if (auth.Where(a => a.relate_type == "加工部门额度").Count() > 0) {
+                menus.Add(new ApplyMenuItemModel()
+                {
+                    text = "加工部门额度",
+                    iconFont = "fa-bullseye",
+                    url = "../ApplyExtra/ProcessDep"
                 });
             }
 
@@ -76,12 +83,22 @@ namespace EmpInfo.Services
             var m = new XCBeforeApplyModel();
             m.sys_no = GetNextSysNum(BillType);
             m.applierName = userInfo.name;
-            m.depList = db.ei_xcDepTarget.Where(x => x.year_month == yearMonth).ToList();
+            m.depList = db.ei_xcDepTarget.OrderBy(x=>x.dep_name).Distinct().ToList();
+            m.proDepList = db.ei_xcProcessDep.Where(x => x.year_month == yearMonth).OrderBy(x => x.dep_name).ToList();
 
-            if (m.depList.Count() < 1) throw new Exception("本月委外目标额度未维护，请联系营运部处理");
+            if (m.proDepList.Count() < 1) {
+                throw new Exception("本月加工部门的委外目标未维护，请联系营运部处理");
+            }
 
             m.k3Accounts = db.k3_database.Where(k => !new string[] { "光电", "半导体", "香港光电科技" }.Contains(k.account_name))
                 .OrderBy(k => k.account_name).Select(k => k.account_name).ToList();
+
+            var lastApply = db.ei_xcApply.Where(x => x.applier_num == userInfo.cardNo).OrderByDescending(x => x.apply_time).FirstOrDefault();
+            if (lastApply != null) {
+                m.buyer_auditor = lastApply.buyer_auditor;
+                m.dep_charger = lastApply.dep_charger;
+                m.planner_auditor = lastApply.planner_auditor;
+            }
 
             return m;
         }
@@ -89,36 +106,37 @@ namespace EmpInfo.Services
         public override void SaveApply(System.Web.Mvc.FormCollection fc, UserInfo userInfo)
         {
             bill = JsonConvert.DeserializeObject<ei_xcApply>(fc.Get("head"));
-            List<ei_xcMatOutDetail> entrys = JsonConvert.DeserializeObject<List<ei_xcMatOutDetail>>(fc.Get("entrys"));
+            List<ei_xcProduct> entrys = JsonConvert.DeserializeObject<List<ei_xcProduct>>(fc.Get("entrys"));
 
             if (entrys.Count() < 1) {
-                throw new Exception("发出明细至少必须录入一行记录");
+                throw new Exception("请先读取订单对应的产品明细");
             }
 
             foreach (var e in entrys) {
-                if (e.out_qty == null) {
-                    throw new Exception("发出数量不能为空");
-                }
+                //if (e.out_qty == null) {
+                //    throw new Exception("发出数量不能为空");
+                //}
                 e.sys_no = bill.sys_no;
 
-                db.ei_xcMatOutDetail.Add(e);
+                db.ei_xcProduct.Add(e);
             }
 
             var currentMonth = DateTime.Now.ToString("yyyy-MM");
-            var target = db.ei_xcDepTarget.Where(x =>x.company==bill.company && x.dep_name == bill.dep_name && x.year_month == currentMonth).FirstOrDefault();
+            var target = db.ei_xcProcessDep.Where(x =>x.dep_name == bill.dep_name && x.year_month == currentMonth).FirstOrDefault();
             if (target == null) throw new Exception("当前部门目标额度没有维护");
 
-            bill.current_month_target = target.month_target;
+            bill.current_month_target = target.month_target + target.extra_amount;
             bill.applier_name = userInfo.name;
             bill.applier_num = userInfo.cardNo;
             bill.apply_time = DateTime.Now;
             bill.buyer_auditor_num = GetUserCardByNameAndCardNum(bill.buyer_auditor);
             bill.dep_charger_num = GetUserCardByNameAndCardNum(bill.dep_charger);
             bill.planner_auditor_num = GetUserCardByNameAndCardNum(bill.planner_auditor);
-            bill.mat_group_num = GetUserCardByNameAndCardNum(bill.mat_group);
+            bill.process_planner_auditor_num = GetUserCardByNameAndCardNum(bill.process_planner_auditor);
+            //bill.mat_group_num = GetUserCardByNameAndCardNum(bill.mat_group);
 
             FlowSvrSoapClient client = new FlowSvrSoapClient();
-            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.dep_name + "的委外加工", "申请"+bill.product_model + " 委外加工 " + bill.qty + bill.unit_name);
+            var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.dep_name + "的委外加工", "采购单号【"+bill.bus_po_no + "】");
             if (result.suc) {
                 try {
                     db.ei_xcApply.Add(bill);
@@ -143,12 +161,13 @@ namespace EmpInfo.Services
         {
             XCCheckApplyModel m = new XCCheckApplyModel();
             m.bill = bill;
-            m.mats = db.ei_xcMatOutDetail.Where(x => x.sys_no == bill.sys_no).ToList();
-            m.pros = db.ei_xcProductInDetail.Where(x => x.sys_no == bill.sys_no).ToList();
-            m.k3StockInfo = new List<POInfoModel>();
-            if (bill.bus_stock_no != null && bill.k3_account != null) {
-                m.k3StockInfo = new K3Sv(bill.k3_account).GetK3BusStockBill(bill.bus_stock_no);
-            }
+            m.pros = db.ei_xcProduct.Where(x => x.sys_no == bill.sys_no).ToList();
+            //m.mats = db.ei_xcMatOutDetail.Where(x => x.sys_no == bill.sys_no).ToList();
+            //m.pros = db.ei_xcProductInDetail.Where(x => x.sys_no == bill.sys_no).ToList();
+            //m.k3StockInfo = new List<POInfoModel>();
+            //if (bill.bus_stock_no != null && bill.k3_account != null) {
+            //    m.k3StockInfo = new K3Sv(bill.k3_account).GetK3BusStockBill(bill.bus_stock_no);
+            //}
             return m;
         }
 
@@ -183,26 +202,43 @@ namespace EmpInfo.Services
             //    bill.check_in_comment = fc.Get("check_in_comment");
             //}
 
-            if (isPass) {                
-                if (stepName.Contains("采购询价")) {
+            string yearMonth = bill.apply_time.ToString("yyyy-MM");
+            var procDepTarget = db.ei_xcProcessDep.Where(x => x.year_month == yearMonth && x.dep_name == bill.process_dep).FirstOrDefault();
+            if (procDepTarget == null) {
+                throw new Exception("找不到当前加工部门的目标信息，请联系营运部处理");
+            }
+            if (isPass) {
+                if (stepName.Contains("加工部门计划员")) {                    
+                    if (procDepTarget.current_amount >= procDepTarget.month_target + procDepTarget.extra_amount) {
+                        throw new Exception("当前加工部门本月的委外目标已超出，请联系营运部增加委外额度后再处理");
+                    }
+                }
+                else if (stepName.Contains("采购询价")) {
                     string supplierName = fc.Get("supplier_name");
-                    string unitPrice = fc.Get("unit_price");
-                    decimal price;
 
                     if (string.IsNullOrEmpty(supplierName)) {
                         throw new Exception("请录入供应商名称");
                     }
-                    if (!decimal.TryParse(unitPrice, out price)) {
-                        throw new Exception("请输入单价，必须是数字");
-                    }
                     bill.supplier_name = supplierName;
-                    bill.unit_price = price;
-                    bill.total_price = price * bill.qty;
 
                     DateTime currentMonth = DateTime.Parse(bill.apply_time.ToString("yyyy-MM-01"));
                     DateTime nextMonth = currentMonth.AddMonths(1);
-                    bill.current_month_total = (int)Math.Round(db.ei_xcApply.Where(x =>x.company==bill.company && x.dep_name==bill.dep_name && x.apply_time >= currentMonth && x.apply_time <= nextMonth && x.total_price != null).Sum(x => x.total_price) ?? 0, 0) + (int)Math.Round(bill.total_price ?? 0, 0);
 
+                    var pros = db.ei_xcProduct.Where(x => x.sys_no == bill.sys_no).ToList();
+                    if (pros.Where(p => p.unit_price == null).Count() > 0) {
+                        throw new Exception("存在未录入单价的产品明细，请所有行都录入后再同意");
+                    }
+                    bill.total_price = pros.Sum(p => p.total_price);
+                    //var monthTotal = (from x in db.ei_xcApply
+                    //                  join a in db.flow_apply on x.sys_no equals a.sys_no
+                    //                  where (a.success == true || a.success == null)
+                    //                  && x.company == bill.company && x.dep_name == bill.dep_name
+                    //                  && x.apply_time >= currentMonth && x.apply_time < nextMonth
+                    //                  && x.total_price != null
+                    //                  select x.total_price).Sum() ?? 0;
+
+                    bill.current_month_total = (int)(Math.Round(procDepTarget.current_amount + (decimal)bill.total_price, 0));
+                    procDepTarget.current_amount = (int)bill.current_month_total;
                 }
                 else if (stepName.Contains("营运部审批")) {
                     //bill.check_out_comment = fc.Get("check_out_comment");
@@ -226,7 +262,10 @@ namespace EmpInfo.Services
                 //    bill.take_back_time = backTimedt;
                 //}
             }else{
-                bill.total_price = null;
+                if (bill.total_price != null) {
+                    bill.total_price = null;
+                    procDepTarget.current_amount -= (int)Math.Round((decimal)bill.total_price, 0);
+                }
             }
 
             FlowSvrSoapClient flow = new FlowSvrSoapClient();

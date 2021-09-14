@@ -1,0 +1,210 @@
+﻿@using EmpInfo.Models;
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        .lbText{
+            font-style:italic;
+        }
+    </style>
+}
+@section Scripts {
+    @*加入以下js，使IE8支持datetimepicker组件*@
+    <script>
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function (elt /*, from*/) {
+                var len = this.length >>> 0;
+
+                var from = Number(arguments[1]) || 0;
+                from = (from < 0)
+                     ? Math.ceil(from)
+                     : Math.floor(from);
+                if (from < 0)
+                    from += len;
+
+                for (; from < len; from++) {
+                    if (from in this &&
+                        this[from] === elt)
+                        return from;
+                }
+                return -1;
+            };
+        }
+    </script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+    $(function () {
+        $(".form_date").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            todayBtn: true,
+            startView: 2,
+            minView: 2
+        });
+        //设置日期联动，结束日期不能大于起始日期
+        $("#fromDatePicker1").on("changeDate", function (e) {
+            $('#toDatePicker1').datetimepicker('setStartDate', e.date);
+        });
+        $("#toDatePicker1").on("changeDate", function (e) {
+            $('#fromDatePicker1').datetimepicker('setEndDate', e.date);
+        });
+
+        $("#reportBt").on("click", function () {
+            if ($("#fromDate").val() == "") {
+                toastr.error("请先输入开始日期");
+                return;
+            }
+            if ($("#toDate").val() == "") {
+                toastr.error("请先输入结束日期");
+                return;
+            }
+            toastr.info("数据正在导出，请稍等...");
+            window.location.href = "@Url.Content("~/Report/ExportMTExcel?")"
+                + "fromDate=" + $("#fromDate").val()
+                + "&toDate=" + $("#toDate").val()
+                + "&accepterName=" + $("#accepterName").val()
+            ;
+            });
+
+        $("#checkBt").on("click", function () {
+            if ($("#fromDate").val() == "") {
+                toastr.error("请先输入开始日期");
+                return;
+            }
+            if ($("#toDate").val() == "") {
+                toastr.error("请先输入结束日期");
+                return;
+            }
+            
+            $.post("@Url.Content("~/Report/SearchMTReport")", {
+                fromDate: $("#fromDate").val(),
+                toDate: $("#toDate").val(),
+                accepterName: $("#accepterName").val()
+            }, function (data) {
+                $('#check_tb').bootstrapTable('load', data);
+                if (data.length == 0) {
+                    toastr.error("当前时间段查无申请");
+                } else {
+                    toastr.success("已成功加载申请行数：" + data.length);
+                }
+            });
+            
+        });
+    });
+
+        $("#check_tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 40,
+            pageList:[20,40,60,100],
+            search:true,
+            columns: [
+                 {
+                     field: "auditStatus",
+                     title: "处理结果",
+                     cellStyle: function (value, row, index, field) {
+                         if (value == "已办结") {
+                             return { css: { color: 'green' }};
+                         }
+                         else if (value == "已拒绝" || value == "撤销") {
+                             return { css: { color: 'red' } };
+                         }
+                         else {
+                             return { css: { color: '#333' } };
+                         }
+                     }
+                },
+                {
+                    field: "sys_no",
+                    title: "流水号"
+                }, {
+                    field: "apply_time",
+                    title: "发起时间",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value, true);
+                    }
+                }, {
+                    field: "class_name",
+                    title: "设备科室"
+                }, {
+                    field: "produce_dep_name",
+                    title: "生产部门"
+                }, {
+                    field: "equitment_name",
+                    title: "设备名称"
+                }, {
+                    field: "equitment_modual",
+                    title: "规格型号"
+                }, {
+                    field: "accept_member_name",
+                    title: "接单人"
+                }
+            ],
+            onClickRow: function (row, $element, field) {
+                if (row.sys_no) {
+                    window.open("@Url.Content("~/Apply/CheckApply?sysNo=")" + row.sys_no);
+                }
+            },
+            rowStyle: function (row, index) {
+                return { css: { cursor: 'pointer' } };
+            }
+        });
+
+    </script>
+
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=MT")">设备保养申请</a></li>
+            <li class="active">查询报表</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row" style="margin-bottom:6px;">
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">提交日期从：</div>
+                <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    <input class="form-control" type="text" id="fromDate" name="fromDate" readonly value="@DateTime.Now.ToString("yyyy-MM-01")" />
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">提交日期到：</div>
+                <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    <input class="form-control" type="text" id="toDate" name="toDate" readonly value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="lbText">接单人：</div>
+                <input type="text" class="form-control" name="accepterName" id="accepterName" style="margin:6px 0;" />
+            </div>
+        </div>
+        <div class="btn-group btn-group-justified" role="group" style="margin-bottom:20px;">
+            <div class="btn-group" role="group">
+                <button class="btn btn-primary" id="checkBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
+            </div>
+            <div class="btn-group" role="group">
+                <button class="btn btn-success" id="reportBt" data-loading-text="导出中..."><i class="fa fa-file-excel-o"></i> 导出报表</button>
+            </div>
+        </div>
+
+        <table id="check_tb"></table>
+
+    </div>
+</div>
+
+
+
+

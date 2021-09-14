@@ -93,7 +93,7 @@ namespace EmpInfo.Controllers
             };
             var cookie = new HttpCookie("alReport");
             cookie.Values.Add("sm", JsonConvert.SerializeObject(sm));
-            cookie.Expires = DateTime.Now.AddDays(7);
+            cookie.Expires = DateTime.Now.AddDays(60);
             Response.AppendCookie(cookie);
 
             toDate = toDate.AddDays(1);
@@ -436,6 +436,10 @@ namespace EmpInfo.Controllers
             }
             if (!DateTime.TryParse(toDate, out toDateDt)) {
                 return Json(new SimpleResultModel() { suc = false, msg = "结束时间不合法" });
+            }
+
+            if (al.work_days < days) {
+                return Json(new SimpleResultModel() { suc = false, msg = "2021-06-26起：请假天数不能改多，只能改少。如要延假，请联系申请人再提交请假条" });
             }
 
             try {
@@ -2837,9 +2841,10 @@ namespace EmpInfo.Controllers
         {
             var list = db.vw_SPReport.Where(s => s.sys_no == sysNo).ToList();
             if (list.Count()==0) {
-                ViewBag.tip = "单据不存在或行政部还未审批";
+                ViewBag.tip = "此放行条已放行或不能打印";
                 return View("Error");
             }
+            
             ViewData["list"] = list;
             return View();
         }
@@ -3583,6 +3588,7 @@ namespace EmpInfo.Controllers
 
         #region 项目单
 
+        [SessionTimeOutFilter]
         public ActionResult PrintXA(string sysNo)
         {
             var bill = db.ei_xaApply.Where(x => x.sys_no == sysNo).FirstOrDefault();
@@ -3648,11 +3654,11 @@ namespace EmpInfo.Controllers
                              deptName = x.dept_name
                          };
 
-            var buyerRelation = db.flow_auditorRelation.Where(f => f.bill_type == "XA" && f.relate_name == "采购部审批" && f.relate_value == userInfo.cardNo).ToList();
-            if (buyerRelation.Count() > 0) {
-                var companyList = buyerRelation.Select(b => b.relate_text).ToList();
-                result = result.Where(r => companyList.Contains(r.company));
-            }
+            //var buyerRelation = db.flow_auditorRelation.Where(f => f.bill_type == "XA" && f.relate_name == "采购部审批" && f.relate_value == userInfo.cardNo).ToList();
+            //if (buyerRelation.Count() > 0) {
+            //    var companyList = buyerRelation.Select(b => b.relate_text).ToList();
+            //    result = result.Where(r => companyList.Contains(r.company));
+            //}
 
             var canCheckBus = db.ei_flowAuthority.Where(f => f.bill_type == "XA" && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).FirstOrDefault();
             if (canCheckBus != null && !string.IsNullOrEmpty(canCheckBus.cond1)) {
@@ -3703,11 +3709,11 @@ namespace EmpInfo.Controllers
                              auditResult = a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : ae.step_name)),
                          };
 
-            var buyerRelation = db.flow_auditorRelation.Where(f => f.bill_type == "XA" && f.relate_name == "采购部审批" && f.relate_value == userInfo.cardNo).ToList();
-            if (buyerRelation.Count() > 0) {
-                var companyList = buyerRelation.Select(b => b.relate_text).ToList();
-                result = result.Where(r => companyList.Contains(r.x.company));
-            }
+            //var buyerRelation = db.flow_auditorRelation.Where(f => f.bill_type == "XA" && f.relate_name == "采购部审批" && f.relate_value == userInfo.cardNo).ToList();
+            //if (buyerRelation.Count() > 0) {
+            //    var companyList = buyerRelation.Select(b => b.relate_text).ToList();
+            //    result = result.Where(r => companyList.Contains(r.x.company));
+            //}
 
             var canCheckBus = db.ei_flowAuthority.Where(f => f.bill_type == "XA" && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).FirstOrDefault();
             if (canCheckBus != null && !string.IsNullOrEmpty(canCheckBus.cond1)) {
@@ -4113,47 +4119,47 @@ namespace EmpInfo.Controllers
         #region 委外加工
 
         //放行条
-        [SessionTimeOutFilter]
-        public ActionResult PrintXC(string sysNo)
-        {
-            var m = (from x in db.ei_xcApply
-                     join e in db.ei_xcMatOutDetail on x.sys_no equals e.sys_no
-                     where x.sys_no == sysNo
-                     select new
-                     {
-                         bill = x,
-                         mats = e
-                     }).ToList();
+        //[SessionTimeOutFilter]
+        //public ActionResult PrintXC(string sysNo)
+        //{
+        //    var m = (from x in db.ei_xcApply
+        //             join e in db.ei_xcMatOutDetail on x.sys_no equals e.sys_no
+        //             where x.sys_no == sysNo
+        //             select new
+        //             {
+        //                 bill = x,
+        //                 mats = e
+        //             }).ToList();
 
-            if (m.Count() < 1) {
-                ViewBag.tip = "不存在需要打印的数据";
-                return View("Error");
-            }
+        //    if (m.Count() < 1) {
+        //        ViewBag.tip = "不存在需要打印的数据";
+        //        return View("Error");
+        //    }
 
-            var bill = m.First().bill;
-            if (bill.out_time != null) {
-                ViewBag.tip = "此放行条已放行，不能再打印";
-                return View("Error");
-            }
-            if (bill.total_price == null) {
-                ViewBag.tip = "此放行条采购未下单或被拒绝，不能打印";
-                return View("Error"); 
-            }
+        //    var bill = m.First().bill;
+        //    if (bill.out_time != null) {
+        //        ViewBag.tip = "此放行条已放行，不能再打印";
+        //        return View("Error");
+        //    }
+        //    if (bill.total_price == null) {
+        //        ViewBag.tip = "此放行条采购未下单或被拒绝，不能打印";
+        //        return View("Error"); 
+        //    }
 
 
-            new XCSv(sysNo).UpdatePrintStatus();
+        //    new XCSv(sysNo).UpdatePrintStatus();
 
-            ViewData["m"] = new XCCheckApplyModel()
-            {
-                bill = bill,
-                mats = m.Select(a => a.mats).ToList(),
-                auditorList = GetAuditorList(sysNo)
-            };
+        //    ViewData["m"] = new XCCheckApplyModel()
+        //    {
+        //        bill = bill,
+        //        mats = m.Select(a => a.mats).ToList(),
+        //        auditorList = GetAuditorList(sysNo)
+        //    };
 
-            ViewData["printer"] = userInfo.name;
+        //    ViewData["printer"] = userInfo.name;
 
-            return View();
-        }
+        //    return View();
+        //}
 
         [SessionTimeOutFilter]
         public ActionResult XCReport()
@@ -4167,6 +4173,7 @@ namespace EmpInfo.Controllers
             m.toDate = m.toDate.AddDays(1);
 
             var result = from x in db.ei_xcApply
+                         join e in db.ei_xcProduct on x.sys_no equals e.sys_no
                          join a in db.flow_apply on x.sys_no equals a.sys_no
                          join aet in db.flow_applyEntry on new { id = a.id, pass = (bool?)null } equals new { id = (int)aet.apply_id, pass = aet.pass } into aettemp
                          from ae in aettemp.DefaultIfEmpty()
@@ -4179,8 +4186,8 @@ namespace EmpInfo.Controllers
                              applierName = x.applier_name,
                              applyTime = x.apply_time,
                              depName = x.dep_name,
-                             productModel = x.product_model,
-                             qty = x.qty
+                             productModel = e.product_model,
+                             qty = e.qty
                          };
 
             var canCheckBus = db.ei_flowAuthority.Where(f => f.bill_type == "XC" && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).FirstOrDefault();
@@ -4212,7 +4219,8 @@ namespace EmpInfo.Controllers
             XCSearchReportModel m = JsonConvert.DeserializeObject<XCSearchReportModel>(obj);
             m.toDate = m.toDate.AddDays(1);
 
-            var result = from x in db.ei_xcApply                         
+            var result = from x in db.ei_xcApply
+                         join e in db.ei_xcProduct on x.sys_no equals e.sys_no
                          join a in db.flow_apply on x.sys_no equals a.sys_no
                          join aet in db.flow_applyEntry on new { id = a.id, pass = (bool?)null } equals new { id = (int)aet.apply_id, pass = aet.pass } into aettemp
                          from ae in aettemp.DefaultIfEmpty()
@@ -4221,7 +4229,8 @@ namespace EmpInfo.Controllers
                          select new
                          {
                              bill = x,
-                             auditStatus = a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : ae.step_name))                             
+                             pro = e,
+                             auditStatus = a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : ae.step_name))
                          };
 
             var canCheckBus = db.ei_flowAuthority.Where(f => f.bill_type == "XC" && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).FirstOrDefault();
@@ -4240,12 +4249,12 @@ namespace EmpInfo.Controllers
                 result = result.Where(r => r.bill.dep_name.Contains(m.depName));
             }
             if (!string.IsNullOrEmpty(m.productModel)) {
-                result = result.Where(r => r.bill.product_model.Contains(m.productModel));
+                result = result.Where(r => r.pro.product_model.Contains(m.productModel));
             }
 
-            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "联系电话", "申请时间", "公司", "部门", "本月委外目标额度", "地点", "采购单号","委外产品型号",
-                                              "加工数量", "本月订单需求产能", "本月生产最高产能","本月需委外产能","本次委外加工周期", "预计加工完成时间","备注",
-                                              "计划部负责人","部门主管","采购员", "物料组", "委外加工出库单", "供应商","单价", "总价" };
+            string[] colName = new string[] { "处理结果","申请流水号", "申请人", "联系电话", "申请时间", "公司", "部门", "已用额度", "目标额度", "地点", 
+                                              "本次委外加工天数", "预计加工完成时间","备注",
+                                              "计划部负责人","部门主管","采购员", "供应商","采购单号","行号","产品编码","产品名称","产品型号","加工数量","单价", "总价" };
             ushort[] colWidth = new ushort[colName.Length];
 
             for (var i = 0; i < colWidth.Length; i++) {
@@ -4284,12 +4293,12 @@ namespace EmpInfo.Controllers
             }
 
             var data = result.ToList();
-            foreach (var d in data.Select(r => r.bill).Distinct().ToList()) {
+            foreach (var d in data.Select(r => r.bill).Distinct().OrderBy(da=>da.apply_time).ToList()) {
                 colIndex = 1;
 
-                //"处理结果","申请流水号", "申请人", "联系电话", "申请时间", "公司", "部门", "本月委外目标额度", "地点", "委外产品型号",
-                //"加工数量", "本月订单需求产能", "本月生产最高产能","本月需委外产能","本次委外加工周期", "预计加工完成时间","备注",
-                //"计划部负责人","部门主管","采购员", "供应商","单价", "总价"
+                //"处理结果","申请流水号", "申请人", "联系电话", "申请时间", "公司", "部门", "已用额度", "目标额度", "地点", "采购单号",
+                //"本次委外加工天数", "预计加工完成时间","备注",
+                //"计划部负责人","部门主管","采购员", "供应商","产品编码","产品名称","产品型号","加工数量","单价", "总价"
                 cells.Add(++rowIndex, colIndex, data.Where(a => a.bill == d).First().auditStatus);
                 cells.Add(rowIndex, ++colIndex, d.sys_no);
                 cells.Add(rowIndex, ++colIndex, d.applier_name);
@@ -4297,15 +4306,10 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.apply_time.ToString("yyyy-MM-dd HH:mm"));
                 cells.Add(rowIndex, ++colIndex, d.company);
                 cells.Add(rowIndex, ++colIndex, d.dep_name);
+                cells.Add(rowIndex, ++colIndex, d.current_month_total);
                 cells.Add(rowIndex, ++colIndex, d.current_month_target);
                 cells.Add(rowIndex, ++colIndex, d.addr);
-                cells.Add(rowIndex, ++colIndex, d.bus_po_no);
-                cells.Add(rowIndex, ++colIndex, d.product_model);
 
-                cells.Add(rowIndex, ++colIndex, d.qty);
-                cells.Add(rowIndex, ++colIndex, d.order_require_capacity);
-                cells.Add(rowIndex, ++colIndex, d.dep_highest_capacity);
-                cells.Add(rowIndex, ++colIndex, d.need_outsourcing_capacity);
                 cells.Add(rowIndex, ++colIndex, d.outsourcing_cycle);
                 cells.Add(rowIndex, ++colIndex, d.estimate_finish_time.ToString("yyyy-MM-dd"));
                 cells.Add(rowIndex, ++colIndex, d.comment);
@@ -4313,17 +4317,294 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.planner_auditor);
                 cells.Add(rowIndex, ++colIndex, d.dep_charger);
                 cells.Add(rowIndex, ++colIndex, d.buyer_auditor);
-                cells.Add(rowIndex, ++colIndex, d.mat_group);
-                cells.Add(rowIndex, ++colIndex, d.bus_stock_no);
                 cells.Add(rowIndex, ++colIndex, d.supplier_name);
-                cells.Add(rowIndex, ++colIndex, d.unit_price);
-                cells.Add(rowIndex, ++colIndex, d.total_price);
+                cells.Add(rowIndex, ++colIndex, d.bus_po_no);
+
+                int cIndex;
+                foreach (var p in data.Where(a => a.bill == d).Select(a => a.pro).Distinct().ToList()) {
+                    cIndex = colIndex;                    
+                    cells.Add(rowIndex, ++cIndex, p.entry_id);
+                    cells.Add(rowIndex, ++cIndex, p.product_no);
+                    cells.Add(rowIndex, ++cIndex, p.product_name);
+                    cells.Add(rowIndex, ++cIndex, p.product_model);
+                    cells.Add(rowIndex, ++cIndex, p.qty);
+                    cells.Add(rowIndex, ++cIndex, p.unit_price);
+                    cells.Add(rowIndex, ++cIndex, p.total_price);
+                    rowIndex++;
+                }
+                rowIndex--;
                 
             }
 
             xls.Send();
         }
 
+
+        #endregion
+
+        #region 委外超时
+
+        [SessionTimeOutFilter]
+        public ActionResult XDReport()
+        {
+            return View();
+        }
+
+        public JsonResult SearchXDReport(string depName, DateTime fromDate, DateTime toDate)
+        {
+            toDate = toDate.AddDays(1);
+
+            var result = (from d in db.ei_xdApply
+                          join a in db.flow_apply on d.sys_no equals a.sys_no
+                          join aet in db.flow_applyEntry on new { id = a.id, pass = (bool?)null } equals new { id = (int)aet.apply_id, pass = aet.pass } into aettemp
+                          from ae in aettemp.DefaultIfEmpty()
+                          where d.process_dep.Contains(depName)
+                          && d.time_from >= fromDate
+                          && d.time_to <= toDate
+                          orderby d.time_from
+                          select new
+                          {
+                              auditStatus = a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : ae.step_name)),
+                              d.process_dep,
+                              d.time_from,
+                              d.time_to,
+                              d.sys_no,
+                              d.applier_name,
+                              d.pro_type
+                          }).ToList();
+
+            return Json(result);
+        }
+
+        public void ExportXDExcel(string depName, DateTime fromDate, DateTime toDate)
+        {
+            toDate = toDate.AddDays(1);
+
+            var result = (from d in db.ei_xdApply
+                          join a in db.flow_apply on d.sys_no equals a.sys_no
+                          join aet in db.flow_applyEntry on new { id = a.id, pass = (bool?)null } equals new { id = (int)aet.apply_id, pass = aet.pass } into aettemp
+                          from ae in aettemp.DefaultIfEmpty()
+                          where d.process_dep.Contains(depName)
+                          && d.time_from >= fromDate
+                          && d.time_to <= toDate
+                          orderby d.time_from
+                          select new
+                          {
+                              auditStatus = a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : ae.step_name)),
+                              h = d
+                          }).ToList();
+
+            string[] colName = new string[] { "审批结果","申请流水号", "申请人", "申请时间", "申请类型", "申请部门", "超时开始时间", "超时结束时间","K3帐套", "订单号",
+                                              "供应商", "卡板数", "部门负责人", "仓库确认人","物流确认人","超时原因" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "委外超时申请列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("申请详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result.ToList()) {
+                colIndex = 1;
+
+                //"审批结果","申请流水号", "申请人", "申请时间", "申请类型", "申请部门", "超时开始时间", "超时结束时间","K3帐套", "订单号",
+                //"供应商", "卡板数", "部门负责人", "仓库确认人","物流确认人","超时原因"
+                cells.Add(++rowIndex, colIndex, d.auditStatus);
+                cells.Add(rowIndex, ++colIndex, d.h.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.h.applier_name);
+                cells.Add(rowIndex, ++colIndex, d.h.apply_time.ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.h.pro_type);
+                cells.Add(rowIndex, ++colIndex, d.h.process_dep);
+                cells.Add(rowIndex, ++colIndex, d.h.time_from.ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.h.time_to.ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.h.k3_account);
+                cells.Add(rowIndex, ++colIndex, d.h.order_no);
+
+                cells.Add(rowIndex, ++colIndex, d.h.supplier_name);
+                cells.Add(rowIndex, ++colIndex, d.h.cardborad_num);
+                cells.Add(rowIndex, ++colIndex, d.h.dep_charger);
+                cells.Add(rowIndex, ++colIndex, d.h.stock_confirm_people);
+                cells.Add(rowIndex, ++colIndex, d.h.lod_confirm_people);
+                cells.Add(rowIndex, ++colIndex, d.h.reason);
+            }
+
+            xls.Send();
+
+        }
+
+
+        #endregion
+
+        #region 设备保养
+
+        [SessionTimeOutFilter]
+        public ActionResult MTReport()
+        {
+            return View();
+        }
+
+        public JsonResult SearchMTReport(DateTime fromDate, DateTime toDate, string accepterName)
+        {
+            toDate = toDate.AddDays(1);
+
+            bool canSeeAll = db.ei_flowAuthority.Where(f => f.bill_type == "MT" && f.relate_type == "查看所有设备" && f.relate_value == userInfo.cardNo).Count() > 0;
+            var result = (from d in db.ei_mtApply
+                          join i in db.ei_mtEqInfo on d.eqInfo_id equals i.id
+                          join c in db.ei_mtClass on i.class_id equals c.id
+                          join a in db.flow_apply on d.sys_no equals a.sys_no
+                          join aet in db.flow_applyEntry on new { id = a.id, pass = (bool?)null } equals new { id = (int)aet.apply_id, pass = aet.pass } into aettemp
+                          from ae in aettemp.DefaultIfEmpty()
+                          where d.apply_time >= fromDate
+                          && d.apply_time < toDate
+                          && (c.leader_number.Contains(userInfo.cardNo) || canSeeAll)
+                          orderby d.apply_time, d.accept_time
+                          select new
+                          {
+                              auditStatus = a.user_abort == true ? "撤销" : (a.success == true ? "已办结" : (a.success == false ? "已拒绝" : ae.step_name)),
+                              d.accept_member_name,
+                              d.apply_time,
+                              i.produce_dep_name,
+                              c.class_name,
+                              d.sys_no,
+                              i.equitment_name,
+                              i.equitment_modual
+                          });
+            if (!string.IsNullOrEmpty(accepterName)) {
+                result = result.Where(r => r.accept_member_name.Contains(accepterName));
+            }
+
+            return Json(result.ToList());
+
+        }
+
+        public void ExportMTExcel(DateTime fromDate, DateTime toDate, string accepterName)
+        {
+            toDate = toDate.AddDays(1);
+
+            bool canSeeAll = db.ei_flowAuthority.Where(f => f.bill_type == "MT" && f.relate_type == "查看所有设备" && f.relate_value == userInfo.cardNo).Count() > 0;
+            var result = (from d in db.ei_mtApply
+                          join i in db.ei_mtEqInfo on d.eqInfo_id equals i.id
+                          join c in db.ei_mtClass on i.class_id equals c.id
+                          join a in db.flow_apply on d.sys_no equals a.sys_no
+                          join aet in db.flow_applyEntry on new { id = a.id, pass = (bool?)null } equals new { id = (int)aet.apply_id, pass = aet.pass } into aettemp
+                          from ae in aettemp.DefaultIfEmpty()
+                          where d.apply_time >= fromDate
+                          && d.apply_time < toDate
+                          && (c.leader_number.Contains(userInfo.cardNo) || canSeeAll)
+                          orderby d.apply_time, d.accept_time
+                          select new
+                          {
+                              auditStatus = a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : ae.step_name)),
+                              h = d,
+                              i = i,
+                              c = c
+                          });
+            if (!string.IsNullOrEmpty(accepterName)) {
+                result = result.Where(r => r.h.accept_member_name.Contains(accepterName));
+            }
+
+            string[] colName = new string[] { "审批结果","申请流水号","科室名称", "发起人", "发起时间", "资产编号", "设备名称", "规格型号", "制造商","生产部门", "接单人",
+                                              "接单日期", "保养开始时间", "保养结束时间", "保养花费时间","处理时间","协助人","确认时间","备注" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "设备保养列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("保养详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result.ToList()) {
+                colIndex = 1;
+
+                //"审批结果","申请流水号", "发起人", "发起时间", "资产编号", "设备名称", "规格型号", "制造商","生产部门", "接单人",
+                //"接单日期", "保养开始时间", "保养结束时间", "保养花费时间","处理时间","协助人","确认时间","备注"
+                cells.Add(++rowIndex, colIndex, d.auditStatus);
+                cells.Add(rowIndex, ++colIndex, d.h.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.c.class_name);
+                cells.Add(rowIndex, ++colIndex, d.h.applier_name);
+                cells.Add(rowIndex, ++colIndex, d.h.apply_time.ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.i.property_number);
+                cells.Add(rowIndex, ++colIndex, d.i.equitment_name);
+                cells.Add(rowIndex, ++colIndex, d.i.equitment_modual);
+                cells.Add(rowIndex, ++colIndex, d.i.maker);
+                cells.Add(rowIndex, ++colIndex, d.i.produce_dep_name);
+                cells.Add(rowIndex, ++colIndex, d.h.accept_member_name);
+
+                cells.Add(rowIndex, ++colIndex, d.h.accept_time == null ? "" : ((DateTime)d.h.accept_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.h.maintence_begin_time == null ? "" : ((DateTime)d.h.maintence_begin_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.h.maintence_end_time == null ? "" : ((DateTime)d.h.maintence_end_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.h.maintence_hours + " 小时");
+                cells.Add(rowIndex, ++colIndex, d.h.maintence_time == null ? "" : ((DateTime)d.h.maintence_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.h.member_helping);
+                cells.Add(rowIndex, ++colIndex, d.h.confirm_time == null ? "" : ((DateTime)d.h.confirm_time).ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.h.comment);
+            }
+
+            xls.Send();
+
+        }
 
         #endregion
 

@@ -25,16 +25,16 @@ namespace EmpInfo.Services
                 return true; //光能办
             }
             try {
-                if (db.GetHREmpInfo(cardNumber).Count() > 0) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
+                foreach (var cn in cardNumber.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
+                    if (db.GetHREmpInfo(cn).Count() == 0) {
+                        return false;
+                    }
+                }                
             }
             catch {
                 return true; //人事系统连接不失败就当做是在职
             }
+            return true;
         }
 
         // 获取人事系统信息

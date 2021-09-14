@@ -35,6 +35,7 @@ namespace EmpInfo.Models
         public string text { get; set; }
         public int intValue { get; set; }
         public string stringValue { get; set; }
+        public string extraValue { get; set; }
     }
 
     public class stringDecimalModel

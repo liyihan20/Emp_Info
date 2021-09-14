@@ -406,15 +406,20 @@ namespace EmpInfo.Models
         public string applierName { get; set; }
         public List<string> k3Accounts { get; set; }
         public List<ei_xcDepTarget> depList { get; set; }
+        public List<ei_xcProcessDep> proDepList { get; set; }
+        public string planner_auditor { get; set; }
+        public string dep_charger { get; set; }
+        public string buyer_auditor { get; set; }
     }
 
     public class XCCheckApplyModel
     {
         public ei_xcApply bill { get; set; }
-        public List<ei_xcMatOutDetail> mats { get; set; }
-        public List<ei_xcProductInDetail> pros { get; set; }
+        //public List<ei_xcMatOutDetail> mats { get; set; }
+        //public List<ei_xcProductInDetail> pros { get; set; }
         public List<StepNameAndAuditor> auditorList { get; set; }
-        public List<POInfoModel> k3StockInfo { get; set; }
+        //public List<POInfoModel> k3StockInfo { get; set; }
+        public List<ei_xcProduct> pros { get; set; }
     }
 
     public class XCSearchReportModel
@@ -425,6 +430,23 @@ namespace EmpInfo.Models
         public DateTime toDate { get; set; }
         public string depName { get; set; }
         public string productModel { get; set; }
+    }
+
+    public class XDBeforeApplyModel
+    {
+        public string sys_no { get; set; }
+        public List<string> k3Accounts { get; set; }
+        public List<string> depList { get; set; }
+    }
+
+    public class FXBeforeApplyModel
+    {
+        public string sysNo { get; set; }
+        public ei_fxType fxType { get; set; }
+        public List<SelectModel> depNames { get; set; }
+        public string typeNames { get; set; }
+        public string applierName { get; set; }
+        public string typeDemands { get; set; }
     }
 
 }

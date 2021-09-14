@@ -103,8 +103,8 @@
         });
 
         //请假类型变更
-        $("input[name='leave_type']").on("change", function () {
-            var tp = $("input[name='leave_type']:checked").val();
+        $("#leave_type").on("change", function () {
+            var tp = $(this).val();
             if (tp == "年假") {
                 $("#vacationInfo").slideDown(400);
             } else {
@@ -149,7 +149,8 @@
 
 
     //验证表单
-    function validateForm() {
+        function validateForm() {
+            var leaveType = $("#leave_type").val();
         if ($("#eDepNum").val() == "") {
             toastr.error("必须选择[所属部门]");
             return false;
@@ -158,7 +159,7 @@
             toastr.error("必须选择[职位级别]");
             return false;
         }
-        if ($("input[name='leave_type']:checked").length < 1) {
+        if (leaveType == "") {
             toastr.error("必须选择[请假类型]");
             return false;
         }
@@ -198,7 +199,7 @@
             toastr.error("[小时]必须少于12小时,如果请假2天，写2天0小时即可，不需要写2天16小时");
             return false;
         }
-        if ($($("input[name='leave_type']:checked")[0]).val() == "年假") {
+        if (leaveType == "年假") {
             if (hours % 4 != 0) {
                 toastr.error("当[请假类型]是年假时，[小时]数必须是4的整数倍");
                 return false;
@@ -226,7 +227,7 @@
             toastr.error("行政部规定：请假事由必须填写");
             return false;
         }
-        if ($($("input[name='leave_type']:checked")[0]).val() == "病假") {
+        if (leaveType == "病假") {
             if ($("#al_file_list tr").length < 1) {
                 toastr.error("当[请假类型]是病假时，必须上传医院诊断证明等附件");
                 return false;
@@ -236,7 +237,7 @@
                 return false;
             }
         }
-        if ($($("input[name='leave_type']:checked")[0]).val() == "产检假") {
+        if (leaveType == "产检假") {
             if ($("#al_file_list tr").length < 1) {
                 toastr.error("当[请假类型]是产检假时，必须上传医院诊断证明等附件");
                 return false;
@@ -479,7 +480,13 @@
                             <button class="btn btn-block btn-default" disabled>请假类型</button>
                         </span>
                         <div style="display:inline-block;width:70%">
-                            <span style="display:block;margin:0;" class="row">
+                            <select class="form-control" name="leave_type" id="leave_type">
+                                <option value="" disabled selected></option>
+                                @foreach (var t in new string[] { "事假", "年假", "探亲", "婚假", "产假", "病假", "工伤", "丧假", "产检假", "产假延期", "疫情隔离" }) {                                    
+                                    <option value="@t">@t</option>
+                                }
+                            </select>
+                            @*<span style="display:block;margin:0;" class="row">
                                 @{
                                     string[] types = new string[] { "事假", "病假", "年假", "探亲", "婚假", "产假", "工伤", "丧假", "产检假", "产假延期", "疫情隔离" };
                                     foreach (var ty in types) {
@@ -495,7 +502,7 @@
                                         }
                                     }
                                 }
-                            </span>
+                            </span>*@
                             <p class="small text-danger" style="margin:4px 0;"><i class="fa fa-info-circle"></i> 最近30天累计请假 @ba.times 次，合计 @ba.days 天 @ba.hours 小时。</p>
                             <p class="small text-danger" style="display:none;" id="vacationInfo"><i class="fa fa-info-circle"></i> 你当前年休假天数剩余 @ba.vacationDaysLeft 天 </p>
                         </div>

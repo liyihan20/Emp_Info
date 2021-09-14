@@ -30,6 +30,9 @@ namespace EmpInfo.FlowSvr {
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string nextAuditorsField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string opinionField;
+        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -75,6 +78,19 @@ namespace EmpInfo.FlowSvr {
                 if ((object.ReferenceEquals(this.nextAuditorsField, value) != true)) {
                     this.nextAuditorsField = value;
                     this.RaisePropertyChanged("nextAuditors");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string opinion {
+            get {
+                return this.opinionField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.opinionField, value) != true)) {
+                    this.opinionField = value;
+                    this.RaisePropertyChanged("opinion");
                 }
             }
         }

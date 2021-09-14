@@ -88,9 +88,10 @@ namespace EmpInfo.Services
                 }
             }
 
-            if (!"预约维修".Equals(bill.repair_type)) {
-                bill.repair_time = null;
-            }
+            bill.repair_time = null;
+            //if (!"预约维修".Equals(bill.repair_type)) {
+            //    bill.repair_time = null;
+            //}
 
             FlowSvrSoapClient client = new FlowSvrSoapClient();
             var result = client.StartWorkFlow(JsonConvert.SerializeObject(bill), BillType, userInfo.cardNo, bill.sys_no, bill.repair_content, bill.area_name + "_" + bill.dorm_num);
@@ -178,7 +179,10 @@ namespace EmpInfo.Services
 
                 bill.repaire_subject = repairSubject;
                 bill.charge_fee = decimal.Parse(repairFee);
-                bill.emp_id_should_pay = new DormSv().GetEmpIdShouldPay((DateTime)bill.apply_time, bill.applier_num, bill.fee_share_peple);
+                if (!bill.is_outside) {
+                    //厂外的不需要重新计算，否则会被覆盖掉，变为空，导致扣不到费
+                    bill.emp_id_should_pay = new DormSv().GetEmpIdShouldPay((DateTime)bill.apply_time, bill.applier_num, bill.fee_share_peple);
+                }
             }
             else if (stepName.Contains("评价")) {
                 string rateScore = fc.Get("rateScore");

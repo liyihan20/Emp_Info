@@ -91,9 +91,9 @@
                 });
             }*@
 
-            $("#printBt").on("click", function () {
+            @*$("#printBt").on("click", function () {
                 window.open("../Report/PrintXC?sysNo=@bam.sysNum");
-            })
+            })*@
 
         });
     </script>
@@ -111,13 +111,27 @@
                 $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> @bam.billTypeName");
                 $("#waiting").remove();
 
-                //doAfterLoad();
+                doAfterLoad();
 
             });
 
         });
 
         function audit(isPass) {
+            if(isPass){
+                if ($("#myUploader2").length > 0) {
+                    if($("#myUploader2").find(".list-group li").length<1){
+                        toastr.error("请先上传采购单附件");
+                        return;
+                    }
+                }
+                if ($("#myUploader3").length > 0) {
+                    if($("#myUploader3").find(".list-group li").length<1){
+                        toastr.error("请先上传统计报表附件");
+                        return;
+                    }
+                }
+            }
             if ($("#ck_ceo")) {
                 $("#need_ceo_confirm").val($("#ck_ceo").is(":checked"));
             }
@@ -150,6 +164,107 @@
         </script>
 
     }
+    <script>
+    function doAfterLoad() {
+        if ($("#tb2")) {
+            $("#tb2").bootstrapTable({
+                striped: true,
+                pagination: false,
+                clickToSelect: true,
+                mobileResponsive: true,
+                data: @Html.Raw(proJson),
+                    idField: "entry_id",
+                    uniqueId: "entry_id",
+                    columns: [{
+                                radio: true
+                            },
+                            {
+                                field: "entry_id",
+                                title: "行号",
+                                width: "6%"
+                            },
+                            {
+                                field: "product_no",
+                                title: "产品编码",
+                                width: "12%"
+                            },
+                            {
+                                field: "product_name",
+                                title: "产品名称",
+                                width: "18%"
+                            }, {
+                                field: "product_model",
+                                title: "产品型号",
+                                width: "24%"
+                            }, {
+                                field: "unit_name",
+                                title: "单位",
+                                width: "6%"
+                            }, {
+                                field: "qty",
+                                title: "数量",
+                                width: "10%"
+                            }, {
+                                field: "unit_price",
+                                title: "单价",
+                                width: "12%"
+                            }, {
+                                field: "total_price",
+                                title: "总价",
+                                width: "12%"
+                            }
+                    ],
+                    onDblClickRow: function (row, $element, field) {
+                        $("#editBt").trigger("click");
+                    }
+                });
+
+                $("#editBt").on("click",function(){
+                    var rows = $('#tb2').bootstrapTable('getSelections');
+                    if (rows.length == 0) {
+                        toastr.error("请先选择一行");
+                        return;
+                    }
+                    var row = rows[0];
+                    openInputDialog("请输入单价（型号："+row.product_model+"；数量："+row.qty+"）：",function(v){
+                        if(!utils.testIsFloat(v,4)){
+                            toastr.error("请录入数字，且小数位不超过4位");
+                            return;
+                        }
+
+                        validatePrice(row.product_no,v,function(){
+                            $.post("../ApplyExtra/XCSavePrice",{sysNo:"@bam.sysNum",entryId:row.entry_id,price:v},function(data){
+                                if(data.suc){
+                                    $('#tb2').bootstrapTable('updateByUniqueId',{
+                                        id:row.entry_id,
+                                        row:{unit_price:v,total_price:(v * row.qty).toFixed(4)}
+                                    });
+                                }else{
+                                    toastr.error(data.msg);                                    
+                                }
+                            })
+                            
+                        });
+
+                    },"单价录入","取消","确定",row.unit_price);
+
+                });
+
+                function validatePrice(productNo,price,callback){
+                    $.post("../ApplyExtra/XCPriceSameAsLast",{sysNo:"@bam.sysNum",productNo:productNo,price:price},function(data){
+                    if(data.suc){
+                        callback();
+                    }else{
+                        openConfirmDialog(data.msg, function () {
+                            callback();
+                        });
+                    }
+                });
+            }
+
+        }
+    }
+    </script>
     @*<script>
         function doAfterLoad() {
 
@@ -337,16 +452,27 @@
                                 供应商名称:
                             </span>
                             <div class="b-input">
-                                <input type="text" class="form-control" name="supplier_name" value="@h.supplier_name" required />
+                                <input type="text" class="form-control" name="supplier_name" value="@h.supplier_name" required placeholder="请输入完整的供应商名称" />
                             </div>
                         </div>
-                        <div class="b-div">
+                        @*<div class="b-div">
                             <span class="b-label">
                                 单价（元）:
                             </span>
                             <div class="b-input">
                                 <input type="text" class="form-control" name="unit_price" id="unit_price" value="@h.unit_price" required />
                             </div>
+                        </div>*@
+                        <div class="b-div">
+                            <span class="b-label">
+                                委外产品明细:
+                            </span>
+                            <div class="b-input">
+                                <button class="btn btn-success btn-sm" type="button" id="editBt" style="margin-bottom:4px;"> <i class="fa fa-plus"></i> 录入单价</button> <span class="text-danger small"> <i class="fa fa-info-circle"></i> 双击行也可录入单价</span>
+                            </div>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <table data-toggle="table" id="tb2"></table>
                         </div>
                     }
                     else if (bam.stepName.Contains("营运部审批")) {
@@ -452,7 +578,7 @@
 
                         </div>
                     }*@
-                    else if (bam.stepName.Contains("申请人提交结案")) {
+                    else if (bam.stepName.Contains("申请人结案")) {
                         @*<div class="b-div">
                             <span class="b-label">
                                 产品抽检结果:
@@ -529,7 +655,7 @@
                 <br />
                 4. SMT、CCM等部门，与供应商沟通配套料由其自己购买，本厂不再搭配外发。
                 <br />
-                5. 各个门的委外目标由营运部指定，并每月进行管控。
+                5. 各个加工部门的委外目标由营运部指定，并每月进行管控。
             </p>
         </div>
     </div>
@@ -595,4 +721,5 @@
     </div>*@
 
     @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_InputDialog")
 }

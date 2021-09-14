@@ -103,10 +103,10 @@ namespace EmpInfo.Services
                 bus_name = sp.bus_name,
                 company = sp.company,
                 content_type = sp.content_type,
-                from_addr = sp.from_addr,
+                from_addr = "广东汕尾",
                 receiver_name = sp.receiver_name,
                 receiver_phone = sp.receiver_phone,
-                send_or_receive = sp.send_or_receive,
+                send_or_receive = "寄件",
                 to_addr = sp.to_addr,
                 aging = sp.aging,
                 scope = sp.scope,
@@ -124,12 +124,15 @@ namespace EmpInfo.Services
             bill.applier_num = userInfo.cardNo;
             bill.apply_time = DateTime.Now;
 
+            bill.from_addr = "广东汕尾"; //取消收件流程
+            bill.send_or_receive = "寄件";
+
             int addrFlag = (bill.from_addr.Contains("广东") ? 1 : 0) + (bill.to_addr.Contains("广东") ? 1 : 0);
             if ("省内".Equals(bill.scope)) {
-                if (addrFlag != 2) throw new Exception("收寄范围是省内时，寄件和收件地址都必须包含广东");
+                if (addrFlag != 2) throw new Exception("收寄范围是省内时，收件地址必须包含广东");
             }
             else {
-                if (addrFlag != 1) throw new Exception("收寄范围是" + bill.scope + "时，寄件和收件地址只能包含一个广东");
+                if (addrFlag != 1) throw new Exception("收寄范围是" + bill.scope + "时，收件地址不能包含广东");
             }
                         
             if (string.IsNullOrEmpty(bill.ex_company)) {
@@ -228,6 +231,18 @@ namespace EmpInfo.Services
                             bill.out_status = "已打印";
                         }
                     }
+                    else if (bill.content_type.Equals("原材料")) {
+                        if (stepName.Contains("仓管部")) {
+                            bill.can_print = true; //可打印放行条并可被扫描
+                            bill.out_status = "已打印";
+                        }
+                    }
+                    else if (bill.content_type.Equals("委外物品")) {
+                        if (stepName.Contains("营运部")) {
+                            bill.can_print = true; //可打印放行条并可被扫描
+                            bill.out_status = "已打印";
+                        }
+                    }
                     else {
                         if (stepName.Contains("事业部负责人")) {
                             bill.can_print = true; //可打印放行条并可被扫描
@@ -281,7 +296,8 @@ namespace EmpInfo.Services
                         BillTypeName,
                         bill.sys_no,
                         (isSuc ? "批准" : "被拒绝"),
-                        new List<string>() { bill.applier_num }
+                        new List<string>() { bill.applier_num },
+                        model.opinion
                         );
                 }
                 else {

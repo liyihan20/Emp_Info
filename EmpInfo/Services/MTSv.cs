@@ -74,6 +74,13 @@ namespace EmpInfo.Services
                     url = "../ApplyExtra/CheckMTClasses",
                     iconFont = "fa-user-circle"
                 });
+
+                menus.Add(new ApplyMenuItemModel()
+                {
+                    text = "查询报表",
+                    iconFont = "fa-file-text-o",
+                    url = "../Report/MTReport",
+                });
             }
 
             return menus;
@@ -139,8 +146,8 @@ namespace EmpInfo.Services
                 bill.confirm_time = DateTime.Now;
                 
                 eqInfo.maintenance_status = "完成保养";
-                eqInfo.last_maintenance_date = bill.maintence_time;
-                eqInfo.next_maintenance_date = ((DateTime)bill.maintence_time).AddMonths(eqInfo.maintenance_cycle);
+                eqInfo.last_maintenance_date = bill.maintence_end_time;
+                eqInfo.next_maintenance_date = ((DateTime)bill.maintence_end_time).AddMonths(eqInfo.maintenance_cycle);
             }
             
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
@@ -201,7 +208,7 @@ namespace EmpInfo.Services
                              create_user = f.create_user,
                              content = f.maintenance_content.Length > 20 ? f.maintenance_content.Substring(0, 20) : f.maintenance_content,
                              steps = f.maintenance_steps.Length > 20 ? f.maintenance_steps.Substring(0, 20) : f.maintenance_steps,
-                             update_user=f.update_user
+                             update_user = f.update_user
                          }).ToList();
             return files;
         }
@@ -339,7 +346,7 @@ namespace EmpInfo.Services
             bool canSeeAll = db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "查看所有设备" && f.relate_value == userNumber).Count() > 0;
             var list = (from eq in db.ei_mtEqInfo
                           join c in db.ei_mtClass on eq.class_id equals c.id
-                          where c.leader_number.Contains(userNumber) || canSeeAll
+                          where c.leader_number.Contains(userNumber) || eq.creater_number == userNumber || canSeeAll
                           orderby eq.maintenance_status
                           select new
                           {

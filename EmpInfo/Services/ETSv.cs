@@ -74,8 +74,8 @@ namespace EmpInfo.Services
 
             ETBeforeApplyModel m = new ETBeforeApplyModel();
             m.sysNum = GetNextSysNum(BillType, 2);
-            m.marketList = db.flow_auditorRelation.Where(a => a.bill_type == BillType && a.relate_name == "市场部审批").Select(a => a.relate_text).ToList().Distinct().ToList();
-            m.busDepList = db.flow_auditorRelation.Where(a => a.bill_type == BillType && a.relate_name == "事业部计划审批").Select(a => a.relate_text).ToList().Distinct().ToList();
+            m.marketList = db.flow_auditorRelation.Where(a => a.bill_type == BillType && a.relate_name == "市场部审批").OrderBy(a=>a.relate_text).Select(a => a.relate_text).Distinct().ToList();
+            m.busDepList = db.flow_auditorRelation.Where(a => a.bill_type == BillType && a.relate_name == "事业部计划审批").OrderBy(a => a.relate_text).Select(a => a.relate_text).Distinct().ToList();
             m.applierPhone = userInfoDetail.phone + (string.IsNullOrEmpty(userInfoDetail.shortPhone) ? "" : ("(" + userInfoDetail.shortPhone + ")"));
             return m;
         }

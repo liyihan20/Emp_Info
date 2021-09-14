@@ -1,8 +1,20 @@
 ﻿@using EmpInfo.Models;
+@using Newtonsoft.Json;
 @{
-    ei_xaApply h = ViewData["bill"] as ei_xaApply;    
+    ei_xaApply h = ViewData["bill"] as ei_xaApply;
     List<StepNameAndAuditor> al = ViewData["auditorList"] as List<StepNameAndAuditor>;
     var bidder = ViewData["bidder"] as ei_xaApplySupplier;
+
+    bool hasClassficationAuditor = al.Where(a => a.stepName.Contains("项目大类")).Count() > 0; //是否有项目大类审核人，工程大类的没有
+
+    List<XAFeeShareModel> shareList = new List<XAFeeShareModel>();
+    if (h.is_share_fee) {
+        shareList = JsonConvert.DeserializeObject<List<XAFeeShareModel>>(h.share_fee_detail);
+    }
+    else {
+        shareList.Add(new XAFeeShareModel() { n = "_" + h.dept_name, v = 100 });
+    }
+    
 }
 
 @section CSS{
@@ -20,10 +32,11 @@
             text-align: center;
             border: 1px solid;
             padding: 4px 12px;
-            font-size:12px;
+            font-size: 12px;
         }
-        .rp_title{
-            background-color:#F3F3F3;
+
+        .rp_title {
+            background-color: #F3F3F3;
         }
     </style>
 }
@@ -33,18 +46,18 @@
         $(function () {
             window.print();
         });
-    </script>    
+    </script>
 }
 @*<div class="text-center noPrint" style="margin-bottom:8px;">
-    <button type="button" class="btn btn-default btn-sm" onclick="javascript: window.print();"><i class="fa fa-print"></i> 开始打印</button>
-</div>*@
-    @*<div><img src="@Url.Content("~/Content/images/Truly.gif")" /></div>*@
-    @*<div style="text-align:right;padding-right:8px;font-size:10px;">        
+        <button type="button" class="btn btn-default btn-sm" onclick="javascript: window.print();"><i class="fa fa-print"></i> 开始打印</button>
+    </div>*@
+@*<div><img src="@Url.Content("~/Content/images/Truly.gif")" /></div>*@
+@*<div style="text-align:right;padding-right:8px;font-size:10px;">
         <div>项目单号：@h.bill_no</div>
     </div>*@
 <div style="width:640px;margin:0 auto;padding-top:18px;">
-    <div style="text-align:center;font-weight:bold;font-size:15px;margin-bottom:20px;">@h.company.Replace("1","").Replace("2","") 项目申请单</div>
-    <table style="width:100%;" id="reportTb">        
+    <div style="text-align:center;font-weight:bold;font-size:15px;margin-bottom:20px;">@h.company.Replace("1", "").Replace("2", "") 项目申请单</div>
+    <table style="width:100%;" id="reportTb">
         <tr>
             <td style="width:20%;" class="rp_title">审批编号:</td>
             <td style="width:30%;">@h.sys_no</td>
@@ -78,11 +91,11 @@
         </tr>
         <tr>
             <td class="rp_title">申请原因:</td>
-            <td colspan="3">@h.reason</td>
+            <td colspan="3" style="text-align:left">@h.reason</td>
         </tr>
         <tr>
             <td class="rp_title">具体要求:</td>
-            <td colspan="3">
+            <td colspan="3" style="text-align:left">
                 @foreach (var d in h.demands.Split(new string[] { "\br" }, StringSplitOptions.RemoveEmptyEntries)) {
                     <div><i class="fa fa-circle"></i> @d</div>
                 }
@@ -94,9 +107,19 @@
             <td class="rp_title">中标价格:</td>
             <td>@bidder.price 元</td>
         </tr>
+
+        <tr>
+            <td class="rp_title">费用分摊明细:</td>
+            <td colspan="3" style="text-align:left">
+                @foreach (var share in shareList) {
+                    <div><i class="fa fa-square"></i> @share.n.Split(new char[]{'_'})[1] : @string.Concat(share.v,"%") </div>
+                }
+            </td>
+        </tr>
+
         <tr>
             <td class="rp_title" colspan="4">审批流程</td>
-        </tr> 
+        </tr>
         <tr>
             <td class="rp_title" rowspan="3">生产部环节：</td>
             <td class="rp_title">设备科:</td>
@@ -118,7 +141,7 @@
                         <text>@step2.auditorName @(((DateTime)step2.auditTime).ToString("MM/dd HH:mm")) </text>
                     }
                 }
-            </td>            
+            </td>
         </tr>
         <tr>
             <td class="rp_title">部门总经理:</td>
@@ -132,7 +155,7 @@
             </td>
         </tr>
         <tr>
-            <td class="rp_title" rowspan="4">职能部门环节：</td>
+            <td class="rp_title" rowspan="@(hasClassficationAuditor?4:3)">职能部门环节：</td>
             <td class="rp_title">采购部:</td>
             <td colspan="2">
                 @{
@@ -143,17 +166,19 @@
                 }
             </td>
         </tr>
-        <tr>
-            <td class="rp_title">项目复核:</td>
-            <td colspan="2">
-                @{
-                    var step5 = al.Where(a => a.stepName.Contains("项目大类")).FirstOrDefault();
-                    if (step5 != null) {
-                        <text>@step5.auditorName @(((DateTime)step5.auditTime).ToString("MM/dd HH:mm")) </text>
+        @if (hasClassficationAuditor) {
+            <tr>
+                <td class="rp_title">项目复核:</td>
+                <td colspan="2">
+                    @{
+            var step5 = al.Where(a => a.stepName.Contains("项目大类")).FirstOrDefault();
+            if (step5 != null) {
+                <text>@step5.auditorName @(((DateTime)step5.auditTime).ToString("MM/dd HH:mm")) </text>
+            }
                     }
-                }
-            </td>
-        </tr>
+                </td>
+            </tr>
+        }
         <tr>
             <td class="rp_title">节省与监督:</td>
             <td colspan="2">
@@ -176,62 +201,66 @@
                 }
             </td>
         </tr>
-        <tr>
-            <td class="rp_title" rowspan="5">验收环节：</td>
-            <td class="rp_title">申请人:</td>
-            <td colspan="2">
-                @{
-                    var step8 = al.Where(a => a.stepName.Contains("申请人验收项目")).FirstOrDefault();
-                    if (step8 != null) {
-                        <text>@step8.auditorName @(((DateTime)step8.auditTime).ToString("MM/dd HH:mm")) </text>
+        @if (al.Where(a => a.stepName.Contains("验收")).Count() > 0) {
+            <tr>
+                <td class="rp_title" rowspan="@(hasClassficationAuditor?5:4)">验收环节：</td>
+                <td class="rp_title">申请人:</td>
+                <td colspan="2">
+                    @{
+            var step8 = al.Where(a => a.stepName.Contains("申请人验收项目")).FirstOrDefault();
+            if (step8 != null) {
+                <text>@step8.auditorName @(((DateTime)step8.auditTime).ToString("MM/dd HH:mm")) </text>
+            }
                     }
-                }
-            </td>
-        </tr>
-        <tr>
-            <td class="rp_title">设备科:</td>
-            <td colspan="2">
-                @{                    
-                    var step9 = al.Where(a => a.stepName.Contains("设备科负责人验收")).FirstOrDefault();
-                    if (step9 != null) {
-                        <text>@step9.auditorName @(((DateTime)step9.auditTime).ToString("MM/dd HH:mm")) </text>
+                </td>
+            </tr>
+            <tr>
+                <td class="rp_title">设备科:</td>
+                <td colspan="2">
+                    @{
+            var step9 = al.Where(a => a.stepName.Contains("设备科负责人验收")).FirstOrDefault();
+            if (step9 != null) {
+                <text>@step9.auditorName @(((DateTime)step9.auditTime).ToString("MM/dd HH:mm")) </text>
+            }
                     }
-                }
-            </td>
-        </tr>
-        <tr>
-            <td class="rp_title">部门主管:</td>
-            <td colspan="2">
-                @{
-                    var step10 = al.Where(a => a.stepName.Contains("生产主管验收")).FirstOrDefault();
-                    if (step10 != null) {
-                        <text>@step10.auditorName @(((DateTime)step10.auditTime).ToString("MM/dd HH:mm")) </text>
+                </td>
+            </tr>
+            <tr>
+                <td class="rp_title">部门主管:</td>
+                <td colspan="2">
+                    @{
+            var step10 = al.Where(a => a.stepName.Contains("生产主管验收")).FirstOrDefault();
+            if (step10 != null) {
+                <text>@step10.auditorName @(((DateTime)step10.auditTime).ToString("MM/dd HH:mm")) </text>
+            }
                     }
-                }
-            </td>
-        </tr>
-        <tr>            
-            <td class="rp_title">总经理:</td>
-            <td colspan="2">
-                @{                    
-                    var step11 = al.Where(a => a.stepName.Contains("部门总经理验收")).FirstOrDefault();
-                    if (step11 != null) {
-                        <text>@step11.auditorName @(((DateTime)step11.auditTime).ToString("MM/dd HH:mm")) </text>
+                </td>
+            </tr>
+            <tr>
+                <td class="rp_title">总经理:</td>
+                <td colspan="2">
+                    @{
+            var step11 = al.Where(a => a.stepName.Contains("部门总经理验收")).FirstOrDefault();
+            if (step11 != null) {
+                <text>@step11.auditorName @(((DateTime)step11.auditTime).ToString("MM/dd HH:mm")) </text>
+            }
                     }
+                </td>
+            </tr>
+            if (hasClassficationAuditor) {
+                <tr>
+                    <td class="rp_title">验收复核:</td>
+                    <td colspan="2">
+                        @{
+                var step12 = al.Where(a => a.stepName.Contains("项目大类负责人验收")).FirstOrDefault();
+                if (step12 != null) {
+                    <text>@step12.auditorName @(((DateTime)step12.auditTime).ToString("MM/dd HH:mm")) </text>
                 }
-            </td>
-        </tr>
-        <tr>
-            <td class="rp_title">验收复核:</td>
-            <td colspan="2">
-                @{                    
-                    var step12 = al.Where(a => a.stepName.Contains("项目大类负责人验收")).FirstOrDefault();
-                    if (step12 != null) {
-                        <text>@step12.auditorName @(((DateTime)step12.auditTime).ToString("MM/dd HH:mm")) </text>
-                    }
-                }
-            </td>
-        </tr>
+                        }
+                    </td>
+                </tr>
+            }
+        }
     </table>
     <div class="pull-right" style="font-size:12px;margin-top:6px;">
         <div>打印时间：@DateTime.Now.ToString("yyyy-MM-dd HH:mm")</div>

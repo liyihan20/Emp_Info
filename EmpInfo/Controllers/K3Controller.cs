@@ -35,8 +35,8 @@ namespace EmpInfo.Controllers
         {
             WriteEventLog("K3重开通/重置", string.Format("k3用户名:{0};账套:{1};操作类型:{2}", k3Name, account, opType));
             if (!k3Name.StartsWith(userInfo.name)) {
-                WriteEventLog("K3重开通/重置", "你填写的K3登录名与你的真实姓名差别过大，不能处理，请走OA流程");
-                return Json(new SimpleResultModel() { suc = false, msg = "你填写的K3登录名与你的真实姓名差别过大，不能处理，请走OA流程" });
+                WriteEventLog("K3重开通/重置", "你填写的K3登录名与你的真实姓名差别过大，不能处理，请走企业微信流程");
+                return Json(new SimpleResultModel() { suc = false, msg = "你填写的K3登录名与你的真实姓名差别过大，不能处理，请走企业微信流程" });
             }
             try {
                 db.ResetK3Emp(k3Name, userInfo.cardNo, userInfoDetail.phone, account, opType);

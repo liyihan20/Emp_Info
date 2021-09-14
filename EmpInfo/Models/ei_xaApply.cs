@@ -49,5 +49,6 @@ namespace EmpInfo.Models
         public Nullable<System.DateTime> confirm_date { get; set; }
         public string dept_manager_name { get; set; }
         public string dept_manager_num { get; set; }
+        public string email_addr { get; set; }
     }
 }

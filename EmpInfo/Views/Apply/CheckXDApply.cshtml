@@ -1,0 +1,191 @@
+﻿@using EmpInfo.Models;
+@{
+    var m = ViewData["am"] as ei_xdApply;
+}
+@section CSS{
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 100px;
+            vertical-align: top;
+            color: gray;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 65%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(function () {
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@m.sys_no" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+            });
+        });
+    </script>
+}
+
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
+            <li><a href="ApplyIndex?billType=XD">委外超时申请</a></li>
+            <li class="active">查看申请单</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="b-div">
+            <span class="b-label">
+                流转记录:
+            </span>
+            <span class="b-input">
+                <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                审核状态:
+            </span>
+            <span class="b-input">
+                @ViewData["auditStatus"]
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请流水号:
+            </span>
+            <span class="b-input">
+                @m.sys_no
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请人:
+            </span>
+            <span class="b-input">
+                @m.applier_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请时间:
+            </span>
+            <span class="b-input">
+                @m.apply_time.ToString("yyyy-MM-dd HH:mm")
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请类型:
+            </span>
+            <span class="b-input">
+                @m.pro_type
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请部门:
+            </span>
+            <span class="b-input">
+                @m.process_dep
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                超时开始时间:
+            </span>
+            <div class="b-input">
+                @m.time_from.ToString("yyyy-MM-dd HH:mm")
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                超时结束时间:
+            </span>
+            <div class="b-input">
+                @m.time_to.ToString("yyyy-MM-dd HH:mm")
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                K3帐套:
+            </span>
+            <span class="b-input">
+                @m.k3_account
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                订单号:
+            </span>
+            <span class="b-input">
+                @m.order_no
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                供应商:
+            </span>
+            <span class="b-input">
+                @m.supplier_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                卡板数:
+            </span>
+            <div class="b-input">
+                @m.cardborad_num
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                部门负责人:
+            </span>
+            <div class="b-input">
+                @m.dep_charger
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                仓库确认人:
+            </span>
+            <div class="b-input">
+                @m.stock_confirm_people
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                物流确认人:
+            </span>
+            <div class="b-input">
+                @m.lod_confirm_people
+            </div>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                超时原因:
+            </span>
+            <div class="b-input">
+                @m.reason
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

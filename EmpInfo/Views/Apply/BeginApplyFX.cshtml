@@ -1,0 +1,404 @@
+﻿@{
+    string typesJson = ViewData["infoBeforeApply"] as string;
+}
+
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/echarts-5.2.0.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/knockout-3.4.0.js")"></script>
+    <script>
+        var typesJson = @Html.Raw(typesJson); //原始数据
+
+        function jumpToForm(type_no){
+            toastr.info("正在进入对应业务流程表单，请稍等...");
+            setTimeout(function(){
+                window.location.href="../ApplyExtra/FillFxForm?typeNo="+type_no;
+            },600);
+        }
+
+    </script>
+
+    @*引导式*@
+    <script>
+
+        $(function(){
+            $("#guide_link").on("click",function(){
+                $("#guideModal").modal("show");
+            });
+        })
+
+        function GuideModel(){
+            var self = this;
+
+            self.currentNodeNo = ko.observable("0"); //当前已选择的节点编号
+            self.btnSelectedNode = ko.observable({}); //当前选中按钮的节点
+            self.btnSelectedTip = ko.observable(""); //选择当前按钮后出现的提示信息
+            self.hasSelectedNodes = ko.observableArray([]); //已选择的节点信息
+
+            //等待选择的下一步所有节点
+            self.nextNodes = ko.pureComputed(function(){
+                if(self.currentNodeNo() == "0"){
+                    return typesJson.filter(function(t){return t.type_no.indexOf(".") < 0;});
+                }
+                return typesJson.filter(function(t){return new RegExp("^" + self.currentNodeNo() + ".[0-9]+$").test(t.type_no);});
+            });
+
+            //已选择的业务名称链条
+            self.hasSelectedTypeNames = ko.pureComputed(function(){
+                if(self.hasSelectedNodes().length==0){
+                    return "";
+                }
+                return self.hasSelectedNodes().map(function(n){return n.type_name}).join(" # ");
+            });
+
+            //选择某一节点按钮，需要更新当前节点
+            self.selectBtn = function(n){
+                self.btnSelectedNode(n);
+                self.btnSelectedTip(n.type_tip);
+            }
+
+            //点击下一步按钮
+            self.nextStep = function(){
+                if(!self.btnSelectedNode().type_no){
+                    toastr.error("请先选择一项业务类型再点击下一步");
+                    return;
+                }
+                self.hasSelectedNodes.push(self.btnSelectedNode()); //这里不能用self.hasSelectedNodes().push(),这是原生push，不会通知ko更新dom
+                self.currentNodeNo(self.btnSelectedNode().type_no);
+                self.btnSelectedNode({});
+                self.btnSelectedTip("");
+            }
+
+            //点击上一步按钮
+            self.preStep = function(){
+                if(self.hasSelectedNodes().length<1){
+                    toastr.error("不能再上一步了");
+                    return;
+                }
+
+                var node = self.hasSelectedNodes.pop();
+                
+                if(self.hasSelectedNodes().length>0){
+                    self.currentNodeNo(self.hasSelectedNodes()[self.hasSelectedNodes().length - 1].type_no);
+                }else{
+                    self.currentNodeNo("0");
+                }
+
+                self.btnSelectedNode(node);
+                self.btnSelectedTip(node.type_tip);
+            }
+
+            //点击确认选择按钮
+            self.finishGuide = function(){
+                jumpToForm(self.currentNodeNo());
+                $("#guideModal").modal("hide");
+            }
+
+        }
+
+        ko.applyBindings(new GuideModel(),$("#guideModal")[0]);
+
+    </script>
+
+    @*流程搜索*@
+    <script>
+        var leaveProcess = [];
+
+        $("#search_tb").bootstrapTable({
+            striped: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [5, 10, 20],
+            clickToSelect: true,
+            columns: [
+                {
+                    radio: true
+                },
+                {
+                    field: "service_name",
+                    title: "业务类型",
+                    width: "30%"
+                }, {
+                    field: "process_name",
+                    title: "流程节点",
+                    width: "30%"
+                }, {
+                    field: "tip",
+                    title: "说明",
+                    width: "40%"
+                }
+            ]
+        });
+
+        $(function(){
+            //进入搜索对话框
+            $("#search_link").on("click",function(){
+                if(leaveProcess.length<1){
+                    GetSearchData();
+                }
+
+                $("#search_tb").bootstrapTable("load",leaveProcess);
+                $("#searchModal").modal("show");
+
+            });
+
+            //确认选择按钮
+            $("#search_bt").on("click",function(){
+                var rows = $('#search_tb').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再确认");
+                    return;
+                }
+
+                jumpToForm(rows[0].type_no);
+                $("#searchModal").modal("hide");
+            });
+
+            //检索列表数据，500毫秒节流检查
+            $("#search_text").on("keyup", utils.Debounce(function () {
+                var text = $("#search_text").val();
+                $("#search_tb").bootstrapTable("load",leaveProcess.filter(function(p){return p.service_name.indexOf(text)>=0 || p.process_name.indexOf(text)>=0;}));
+            },500));
+
+        });
+
+        //获取表格数据
+        function GetSearchData(){
+            var leaves = typesJson.filter(function(t){return t.type_process != ""});
+            for(var i=0;i<leaves.length;i++){
+                var ancestors = typesJson.filter(function(t){return new RegExp("^" + t.type_no + ".").test(leaves[i].type_no) || t.type_no == leaves[i].type_no;}).sort(function(x,y){return x.type_no.length - y.type_no.length;});
+                var serviceName = "",tip = "";
+                for(var j = 0;j<ancestors.length;j++){
+                    if(j>0){
+                        serviceName+=" # ";
+                    }
+                    serviceName+=ancestors[j].type_name;
+                    if(j>1 && ancestors[j].type_tip!=""){
+                        tip+=ancestors[j].type_tip + ";";
+                    }
+                }
+                leaveProcess.push({
+                    service_name :serviceName,
+                    type_no:leaves[i].type_no,
+                    process_name:"提交>"+leaves[i].type_process+">门卫放行",
+                    tip: tip
+                });
+            }
+        }
+
+    </script>
+
+    @*树图*@
+    <script>
+    var treeJson = undefined;
+
+    $(function(){
+        $("#tree_link").click(function(){
+            //构造树需要的json数据
+            if(!treeJson){
+                GetTreeData();
+            }
+
+            //生成树图
+            genTree();
+
+        });
+    });
+
+    function GetTreeData(){
+        treeJson = {};
+        treeJson.name="放行";
+        treeJson.children = [];
+        treeJson.children.push(getChildren("1")); //非自提
+        treeJson.children.push(getChildren("2")); //自提
+
+        //递归获取子节点
+        function getChildren(typ_no){
+            var reg = new RegExp("^"+typ_no+".[0-9]+$"); //只取子节点，不取孙节点
+            var currentType=typesJson.filter(function(t){return t.type_no == typ_no})[0];
+            var node = {};
+            node.name = currentType.type_name;
+            node.no = currentType.type_no;
+            node.tip = currentType.type_tip;
+            if(currentType.type_process){
+                node.value = "提交>"+currentType.type_process+">门卫放行";
+            }
+            node.children = [];
+            var children = typesJson.filter(function(t){return reg.test(t.type_no)});
+
+            for(var i=0;i<children.length;i++){
+                node.children.push(getChildren(children[i].type_no));
+            }
+            return node;
+        }
+    }
+
+    function genTree(){
+
+        if($("#panelWrap").find("#tree").length < 1){
+            $("#panelWrap").append("<div><div class='text-danger' style='padding:12px;'><i class='fa fa-info-circle'></i> 请在以下树形图中点击叶子节点（末端节点）直接进入表单界面： </div> <div id='tree' style='height:800px'>3333</div></div>");
+        }
+
+        var myChart = echarts.init($("#tree")[0]);
+        myChart.setOption({
+            tooltip: {
+                trigger: 'item',
+                triggerOn: 'mousemove'
+            },
+            series: [
+                {
+                    type: 'tree',
+
+                    data: [treeJson],
+
+                    top: '1%',
+                    left: '7%',
+                    bottom: '1%',
+                    right: '20%',
+
+                    symbolSize: 7,
+
+                    label: {
+                        position: 'left',
+                        verticalAlign: 'middle',
+                        align: 'right',
+                        fontSize: 12
+                    },
+
+                    leaves: {
+                        label: {
+                            position: 'right',
+                            verticalAlign: 'middle',
+                            align: 'left'
+                        }
+                    },
+
+                    tooltip:{
+                        formatter: function(p){
+                            var tip =p.name;
+                            if(p.value){
+                                tip+="</br> 审批流程："+p.value;
+                            }
+                            if(p.data.tip){
+                                tip+="</br> 提示："+p.data.tip;
+                            }
+                            return tip;
+                        }
+                    },
+
+                    initialTreeDepth:-1,
+
+                    emphasis: {
+                        focus: 'ancestor'
+                    },
+
+                    expandAndCollapse: true,
+                    animationDuration: 550,
+                    animationDurationUpdate: 750
+                }
+            ]
+        });
+
+        //单击叶子节点，跳转到对应业务类型的表单
+        myChart.on('click', function(params) {
+            if(params.value){
+                jumpToForm(params.data.no);
+            }
+
+        });
+
+    }
+    </script>
+
+}
+<div class="panel panel-danger" id="panelWrap">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
+            <li><a href="ApplyIndex?billType=FX">放行条申请流程</a></li>
+            <li class="active">开始申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <i>请在以下选择一种途径以确认生成放行条的业务类型：</i>
+    </div>
+    <div class="list-group">
+        <a href="#" class="list-group-item" id="guide_link"><span class="text-primary"><i class="fa fa-arrow-circle-right"></i> 1. 通过引导式对话框选择业务类型</span></a>
+        <a href="#" class="list-group-item" id="search_link"><span class="text-primary"><i class="fa fa-search"></i> 2. 通过搜索对话框选择业务类型</span></a>
+        <a href="#" class="list-group-item" id="tree_link"><span class="text-primary"><i class="fa fa-tree"></i> 3. 通过业务类型树状图选择</span></a>
+    </div>
+
+</div>
+
+
+@section Modal {
+    <div class="modal fade" id="searchModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">搜索业务类型</h4>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <input type="text" class="form-control" id="search_text" placeholder="可在此搜索业务类型和申请流程" style="margin-bottom:12px;" />
+                    </div>
+                    <table id="search_tb"></table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 关闭</button>
+                    <button type="button" class="btn btn-success" id="search_bt"><span class="fa fa-check-circle"></span> 确认选择</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="guideModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">业务类型选择引导</h4>
+                </div>
+                <div class="modal-body" style="padding:16px;">
+
+                    <div style="margin-bottom:16px;font-size:14px;" class="text-danger" data-bind="visible:hasSelectedTypeNames().length>0">
+                        <i class="fa fa-lightbulb-o"></i> 当前已选择业务是：<span data-bind="text:hasSelectedTypeNames()"></span>
+                    </div>
+
+                    <div style="margin-bottom:12px;" class="text-primary" data-bind="visible:nextNodes().length>0">
+                        <i><i class="fa fa-question-circle"></i> 请在以下选择一项类型，然后点击下一步按钮</i>
+                    </div>
+
+                    <div style="margin-bottom:16px;font-size:14px;" class="text-primary" data-bind="if:nextNodes().length==0">
+                        <i class="fa fa-steam"></i> 此业务类型对应的审批流程是：
+                        <span data-bind="text:'提交>'+hasSelectedNodes()[hasSelectedNodes().length - 1].type_process+'>门卫放行'"></span>
+                    </div>
+
+                    <!-- ko foreach: nextNodes -->
+                    <button class="btn btn-lg btn-block btn-default" data-bind="css:{'btn-primary':$parent.btnSelectedNode().type_no==$data.type_no},click:$parent.selectBtn" style="margin-bottom:16px;">
+                        <span data-bind="text:$data.type_name"></span>
+                        <i class="fa fa-check-circle" data-bind="visible:$parent.btnSelectedNode().type_no==$data.type_no"></i>
+                    </button>
+                    <!--/ko-->
+
+                    <div class="text-danger" data-bind="visible:btnSelectedTip().length>0"><i class="fa fa-info-circle"></i> <span data-bind="text:btnSelectedTip()"></span></div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bind="visible:hasSelectedNodes().length>0 ,click:preStep"><span class="fa fa-step-backward"></span> 上一步</button>
+                    <button type="button" class="btn btn-primary" data-bind="visible:nextNodes().length>0 ,click:nextStep"><span class="fa fa-step-forward"></span> 下一步</button>
+                    <button type="button" class="btn btn-success" data-bind="visible:nextNodes().length==0,click:finishGuide"><span class="fa fa-check"></span> 确认选择 </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}

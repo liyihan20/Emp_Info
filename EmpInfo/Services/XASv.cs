@@ -205,7 +205,8 @@ namespace EmpInfo.Services
                 }
             }
 
-            if (!isPass) {
+            //2021-07-01 返回的也不要纳入统计
+            if (!isPass || returnBack) {
                 bill.confirm_date = null;
             }
 

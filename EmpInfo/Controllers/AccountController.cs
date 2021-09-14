@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using EmpInfo.EmpWebSvr;
 using EmpInfo.Services;
+using EmpInfo.QywxWebSrv;
 
 namespace EmpInfo.Controllers
 {
@@ -180,6 +181,7 @@ namespace EmpInfo.Controllers
             catch {
                 return Json(new SimpleResultModel(false, "人事系统连接异常，请稍后再注册"));
             }
+            
             if (info == null) {
                 WriteEventLogWithoutLogin(card_no, "用户注册[第一步]:厂牌编号不存在");
                 return Json(new { suc = false, msg = "厂牌编号不存在" });
@@ -417,7 +419,9 @@ namespace EmpInfo.Controllers
                     return Json(new SimpleResultModel(false, "工资系统连接失败，请稍后再试"));
                 }
                 if (!string.IsNullOrEmpty(bankcard) && !bankcard.Equals(bankCardNumber)) {
-                    return Json(new SimpleResultModel() { suc = false, msg = "工资银行卡号错误，验证失败" });
+                    if (!bankcard.StartsWith("200")) { //老员工，一些是存折号，也不验证了 2021-06-15
+                        return Json(new SimpleResultModel() { suc = false, msg = "工资银行卡号错误，验证失败" });
+                    }
                 }
                 
                 //验证成功
@@ -448,6 +452,34 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel() { suc = true, msg = okMsg, extra = isReset });
                 
             }
+        }
+
+        public JsonResult SendValidateQywxMsg()
+        {
+            string code = MyUtils.CreateValidateNumber(6);
+            Session["msgCode"] = code.ToLower();
+
+            try {
+                var msg = new TextMsg();
+                msg.text = new TextContent();
+                msg.text.content = "验证码：" + code + " ,用于移动办公平台的用户验证，如果不是本人操作，请忽略。";
+                msg.touser = userInfo.cardNo;
+
+                new ALSv().SendQYWXMsgImmediately(msg);
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+
+            return Json(new SimpleResultModel(true,"验证码已发送到你的企业微信，请查收"));
+        }
+
+        public JsonResult BeginValidateQywxMsgCode(string code)
+        {
+            if (code.Trim().ToLower().Equals((string)Session["msgCode"])) {
+                return Json(new SimpleResultModel(true));
+            }
+            return Json(new SimpleResultModel(false));
         }
 
     }

@@ -358,6 +358,9 @@
     <Compile Include="Models\ei_flowAuthority.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_fxType.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_groupAuthority.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -493,7 +496,16 @@
     <Compile Include="Models\ei_xcMatOutDetail.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_xcProcessDep.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_xcProduct.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_xcProductInDetail.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_xdApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\EmergencyEnum.cs" />
@@ -780,6 +792,7 @@
     <Compile Include="Services\DPSv.cs" />
     <Compile Include="Services\EPSv.cs" />
     <Compile Include="Services\ETSv.cs" />
+    <Compile Include="Services\FXSv.cs" />
     <Compile Include="Services\HHSv.cs" />
     <Compile Include="Services\HRDBSv.cs" />
     <Compile Include="Services\IESv.cs" />
@@ -802,6 +815,7 @@
     <Compile Include="Services\XBSv.cs" />
     <Compile Include="Services\XASv.cs" />
     <Compile Include="Services\XCSv.cs" />
+    <Compile Include="Services\XDSv.cs" />
     <Compile Include="Util\BillUtils.cs" />
     <Compile Include="Util\MyEmail.cs" />
     <Compile Include="Util\MyUtils.cs" />
@@ -1075,6 +1089,7 @@
     <Content Include="Content\images\xa.png" />
     <Content Include="Content\images\xb.png" />
     <Content Include="Content\images\xc.png" />
+    <Content Include="Content\images\xd.png" />
     <Content Include="Content\login.css" />
     <Content Include="Content\select2.min.css" />
     <Content Include="Content\skins\all.css" />
@@ -1393,6 +1408,7 @@
     </Content>
     <None Include="Properties\PublishProfiles\EmpInfo.pubxml" />
     <Content Include="Scripts\bootstrap-select.js.map" />
+    <Content Include="Scripts\echarts.js.map" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
     <Content Include="Scripts\bootstrap-datetimepicker.min.js" />
     <Content Include="Scripts\bootstrap-datetimepicker.zh-CN.js" />
@@ -1401,6 +1417,8 @@
     <Content Include="Scripts\bootstrap-switch.min.js" />
     <Content Include="Scripts\bootstrap-treeview.min.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\echarts-5.2.0.js" />
+    <Content Include="Scripts\echarts-5.2.0.min.js" />
     <Content Include="Scripts\echarts.js" />
     <Content Include="Scripts\echarts.simple.min.js" />
     <Content Include="Scripts\html5shiv.min.js" />
@@ -1722,6 +1740,13 @@
     <Content Include="Views\Report\PrintXC.cshtml" />
     <Content Include="Views\Apply\GetMyAllAuditingList.cshtml" />
     <Content Include="Views\Report\XCReport.cshtml" />
+    <Content Include="Views\ApplyExtra\ProcessDep.cshtml" />
+    <Content Include="Views\Apply\BeginApplyXD.cshtml" />
+    <Content Include="Views\Apply\CheckXDApply.cshtml" />
+    <Content Include="Views\Report\XDReport.cshtml" />
+    <Content Include="Views\Report\MTReport.cshtml" />
+    <Content Include="Views\Apply\BeginApplyFX.cshtml" />
+    <Content Include="Views\ApplyExtra\FillFxForm.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

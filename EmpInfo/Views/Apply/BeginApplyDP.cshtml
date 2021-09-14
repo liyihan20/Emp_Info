@@ -81,7 +81,7 @@
             self.ownerName = "@dr.contactName";
             self.ownerPhone = "@dr.phoneNumber";
             self.ownerShortPhone = "@dr.shortPhoneNumber";
-            self.repairTime = "";
+            //self.repairTime = "";
             self.repairContent = ko.observable("");
 
             self.roomMates = ko.pureComputed(function () {
@@ -127,10 +127,10 @@
                     toastr.error("请选择维修类型");
                     return;
                 }
-                if (self.repairType() == "预约维修" && self.repairTime == "") {
-                    toastr.error("请选择预约时间");
-                    return;
-                }
+                //if (self.repairType() == "预约维修" && self.repairTime == "") {
+                //    toastr.error("请选择预约时间");
+                //    return;
+                //}
                 if (self.feeShareType() == "") {
                     toastr.error("请选择费用承担方式");
                     return;
@@ -158,7 +158,7 @@
                     area_name: self.areaName,
                     dorm_num: self.dormNumber,
                     repair_type: self.repairType(),
-                    repair_time: self.repairTime,
+                    //repair_time: self.repairTime,
                     fee_share_type: self.feeShareType(),
                     fee_share_peple: self.checkedRoomMates().join(";"),
                     contact_name: self.contactName(), 
@@ -216,7 +216,7 @@
                     </button>
                     <!--/ko-->
                 </div>
-                <div class="b-div" data-bind="visible:repairType()=='预约维修'">
+                @*<div class="b-div" data-bind="visible:repairType()=='预约维修'">
                     <span class="b-label" style="vertical-align:top;">维修时间</span>
                     <span style="display:inline;width:70%;vertical-align:top;">
                         <span class="input-group date" style="display:inline-table;width:70%;" id="repairTimePicker">
@@ -224,7 +224,7 @@
                             <input class="form-control" type="text" readonly data-bind="value:repairTime">
                         </span>
                     </span>
-                </div>
+                </div>*@
                 <div class="b-div">
                     <span class="b-label">
                         费用承担：
@@ -298,19 +298,22 @@
                         1. 流程步骤：开始--->员工申请宿舍维修--->舍友确认（如没有舍友分摊，则跳过此步骤）--->后勤受理人接单--->维修完成--->申请人确认评价--->结束。
                     </p>
                     <p>
-                        2. 维修单一旦确认完成之后，再次发生维修事宜均属于有偿服务，费用另外计算。
+                        2. 如选择【预约维修】，待后勤维修师傅与您联系后再确认具体维修时间。
                     </p>
                     <p>
-                        3. 对本次服务不确认评价，将不能再次申请维修，请配合给予评价。
+                        3. 维修单一旦确认完成之后，再次发生维修事宜均属于有偿服务，费用另外计算。
                     </p>
                     <p>
-                        4. 维修工接单时间起24小时内完成维修，如遇节假日及特殊维修，将延期。
+                        4. 对本次服务不确认评价，将不能再次申请维修，请配合给予评价。
                     </p>
                     <p>
-                        5. 后勤部联系电话：0660-3380021
+                        5. 维修工接单时间起24小时内完成维修，如遇节假日及特殊维修，将延期。
                     </p>
                     <p>
-                        6. 详细操作指引，<a href="@Url.Content("~/Content/doc/宿舍维修申请流程操作指引.pdf")" target="_blank">点此查看下载</a> 。
+                        6. 后勤部联系电话：0660-3380021
+                    </p>
+                    <p>
+                        7. 详细操作指引，<a href="@Url.Content("~/Content/doc/宿舍维修申请流程操作指引.pdf")" target="_blank">点此查看下载</a> 。
                     </p>
                 </div>
             </div>

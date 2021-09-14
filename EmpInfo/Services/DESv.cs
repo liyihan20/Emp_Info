@@ -109,8 +109,13 @@ namespace EmpInfo.Services
                 var entrys = JsonConvert.DeserializeObject<List<ei_DEApplyEntry>>(fc.Get("entry"));
                 if (stepName.Contains("补充信息")) {
                     foreach (var e in entrys) {
-                        if (e.unit_price == null && e.qty != 0) {
-                            throw new Exception("存在数量不为0且单价为空的行，不能继续提交");
+                        if (e.qty != 0) {
+                            if (e.unit_price == null) {
+                                throw new Exception("存在数量不为0且单价为空的行，不能继续处理");
+                            }
+                            if (e.clear_date == null) {
+                                throw new Exception("存在数量不为0且结算日期为空的行，不能继续处理");
+                            }
                         }
                     }
                 }

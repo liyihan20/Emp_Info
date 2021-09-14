@@ -3,6 +3,7 @@
 @{
     XCBeforeApplyModel m = ViewData["infoBeforeApply"] as XCBeforeApplyModel;
     var depJson = JsonConvert.SerializeObject(m.depList);
+    var procDepJson = JsonConvert.SerializeObject(m.proDepList);
 }
 @section CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
@@ -37,6 +38,7 @@
 
     <script>
         var depList = @Html.Raw(depJson);
+        var procDepList = @Html.Raw(procDepJson);
         $(function () {
             $(".form_date").datetimepicker({
                 language: 'zh-CN',
@@ -77,41 +79,44 @@
                     if(data.length<1){
                         toastr.error("查询不到这张PO信息，请检查帐套或单号是否正确");
                         return;
-                    }else if(data.length == 1){
-                        toastr.success("读取成功");
-                        setPOInfo(data[0]);
                     }else{
-                        toastr.info("查询到有多个分录，请选择一行");
-                        //多分录的要给选择
-                        $.selectItemList({
-                            items:data,
-                            titles:[{
-                                field: "entry_id",
-                                title: "行号",
-                                width: "15%"
-                            },
-                            {
-                                field: "item_name",
-                                title: "产品名称",
-                                width: "25%"
-                            }, {
-                                field: "item_modual",
-                                title: "产品型号",
-                                width: "35%"
-                            }, {
-                                field: "unit_name",
-                                title: "单位",
-                                width: "10%"
-                            }, {
-                                field: "qty",
-                                title: "数量",
-                                width: "15%"
-                            }],
-                            callback:function(s){
-                                setPOInfo(s);
-                            }
-                        });
+                        $("#tb").bootstrapTable("load",data);
                     }
+                    //else if(data.length == 1){
+                    //    toastr.success("读取成功");
+                    //    setPOInfo(data[0]);
+                    //}else{
+                    //    toastr.info("查询到有多个分录，请选择一行");
+                    //    //多分录的要给选择
+                    //    $.selectItemList({
+                    //        items:data,
+                    //        titles:[{
+                    //            field: "entry_id",
+                    //            title: "行号",
+                    //            width: "15%"
+                    //        },
+                    //        {
+                    //            field: "item_name",
+                    //            title: "产品名称",
+                    //            width: "25%"
+                    //        }, {
+                    //            field: "item_modual",
+                    //            title: "产品型号",
+                    //            width: "35%"
+                    //        }, {
+                    //            field: "unit_name",
+                    //            title: "单位",
+                    //            width: "10%"
+                    //        }, {
+                    //            field: "qty",
+                    //            title: "数量",
+                    //            width: "15%"
+                    //        }],
+                    //        callback:function(s){
+                    //            setPOInfo(s);
+                    //        }
+                    //    });
+                    //}
                 });
 
             });
@@ -140,25 +145,25 @@
             //    })
             //});
 
-            $("#itemModal #item_model").on("focus",function(){
-                if($("#company").val()==""){
-                    toastr.error("请先选择公司后再操作");
-                    return;
-                }
-                var self = this;
-                $.selectK3Items({
-                    company:$("#company").val(),
-                    itemModel:$(self).val(),
-                    callback:function(result){
-                        console.log(result);
-                        $(self).val(result.item_model);
-                        $("#itemModal #item_no").val(result.item_no);
-                        $("#itemModal #item_name").val(result.item_name);
-                        $("#itemModal #item_id").val(result.item_id);
-                        $("#itemModal #unit_name").val(result.unit_name);
-                    }
-                })
-            });
+            //$("#itemModal #item_model").on("focus",function(){
+            //    if($("#company").val()==""){
+            //        toastr.error("请先选择公司后再操作");
+            //        return;
+            //    }
+            //    var self = this;
+            //    $.selectK3Items({
+            //        company:$("#company").val(),
+            //        itemModel:$(self).val(),
+            //        callback:function(result){
+            //            console.log(result);
+            //            $(self).val(result.item_model);
+            //            $("#itemModal #item_no").val(result.item_no);
+            //            $("#itemModal #item_name").val(result.item_name);
+            //            $("#itemModal #item_id").val(result.item_id);
+            //            $("#itemModal #unit_name").val(result.unit_name);
+            //        }
+            //    })
+            //});
 
             $("#company").on("change", function () {
                 var company = $(this).val();
@@ -174,15 +179,21 @@
 
             });
 
-            $("#dep_name").on("change", function () {
-                var company = $("#company").val();
-                var dep = $(this).val();
-                var monthTarget = depList.filter(function(d){return d.company == company && d.dep_name == dep}).map(function(d){return d.month_target});
-                if(monthTarget.length<1){
-                    toastr.error("目标额度未维护");
-                    return;
-                }
-                $("input[name='current_month_target']").val(monthTarget[0]);
+            //$("#dep_name").on("change", function () {
+            //    var company = $("#company").val();
+            //    var dep = $(this).val();
+            //    var monthTarget = depList.filter(function(d){return d.company == company && d.dep_name == dep}).map(function(d){return d.month_target});
+            //    if(monthTarget.length<1){
+            //        toastr.error("目标额度未维护");
+            //        return;
+            //    }
+            //    $("input[name='current_month_target']").val(monthTarget[0]);
+            //});
+
+            $("#process_dep").on("change",function(){
+                var procDep = $(this).val();
+                var tar = procDepList.filter(function(d){return d.dep_name == procDep}).map(function(d){return d.month_target + d.extra_amount;});
+                $("input[name='current_month_target']").val(tar[0]);
             });
 
             //提交申请
@@ -193,15 +204,33 @@
                     return;
                 }
                 var head = utils.getFormObj($("#fm"));
-                var entrys = $("#tb").bootstrapTable('getData');
+                var entrys = JSON.parse(JSON.stringify($("#tb").bootstrapTable('getData')));
 
-                for(var i = 0;i<entrys.length;i++){
-                    if(entrys[i].out_qty == "" || !utils.testIsFloat(entrys[i].out_qty,6)){
-                        toastr.error("发出数量必须填写，行号："+(i+1));
-                        return;
-                    }
+                //for(var i = 0;i<entrys.length;i++){
+                //    if(entrys[i].out_qty == "" || !utils.testIsFloat(entrys[i].out_qty,6)){
+                //        toastr.error("发出数量必须填写，行号："+(i+1));
+                //        return;
+                //    }
+                //}
+
+                if(entrys.length<1){
+                    toastr.error("请先读取出采购订单明细");
+                    return;
+                }
+                for(var i=0;i<entrys.length;i++){
+                    entrys[i].product_no=entrys[i].item_no;
+                    entrys[i].product_name=entrys[i].item_name;
+                    entrys[i].product_model=entrys[i].item_modual;
+
+                    delete entrys[i].item_no;
+                    delete entrys[i].item_name;
+                    delete entrys[i].item_modual;
+                    delete entrys[i].latest_arrive_date;
+                    delete entrys[i].brand;
+                    delete entrys[i].usage;
                 }
 
+                console.log(entrys);                
                 openConfirmDialog("确定要提交申请吗？", function () {
                     $("#apply_bt").button("loading");
                     $.ajax({
@@ -227,22 +256,60 @@
             });
         });
 
-        function setPOInfo(p){
-            $("#product_model").val(p.item_modual);
-            $("#product_no").html(p.item_no);
-            $("#product_name").html(p.item_name);
-            $("#unit_name").html(p.unit_name);
-            $("#qty").val(p.qty);
-            $("input[name='product_id']").val(p.item_id);
-            $("input[name='product_name']").val(p.item_name);
-            $("input[name='product_no']").val(p.item_no);
-            $("input[name='unit_name']").val(p.unit_name);
-            $("input[name='bus_po_entry']").val(p.entry_id);
-        }
+        //function setPOInfo(p){
+        //    $("#product_model").val(p.item_modual);
+        //    $("#product_no").html(p.item_no);
+        //    $("#product_name").html(p.item_name);
+        //    $("#unit_name").html(p.unit_name);
+        //    $("#qty").val(p.qty);
+        //    $("input[name='product_id']").val(p.item_id);
+        //    $("input[name='product_name']").val(p.item_name);
+        //    $("input[name='product_no']").val(p.item_no);
+        //    $("input[name='unit_name']").val(p.unit_name);
+        //    $("input[name='bus_po_entry']").val(p.entry_id);
+        //}
 
     </script>
 
     <script>
+        $("#tb").bootstrapTable({
+            striped: true,
+            pagination: false,
+            clickToSelect: true,
+            mobileResponsive: true,
+            columns: [    
+                {
+                    field: "entry_id",
+                    title: "行号",
+                    width: "8%"
+                },
+                {
+                    field: "item_no",
+                    title: "产品编码",
+                    width: "15%"
+                },
+                {
+                    field: "item_name",
+                    title: "产品名称",
+                    width: "25%"
+                }, {
+                    field: "item_modual",
+                    title: "产品型号",
+                    width: "30%"
+                }, {
+                    field: "unit_name",
+                    title: "单位",
+                    width: "8%"
+                }, {
+                    field: "qty",
+                    title: "数量",
+                    width: "14%"
+                }
+            ]
+        });
+    </script>
+
+    @*<script>
         var updateIndex = -1;
         var addIndex = 0;
         $("#tb").bootstrapTable({
@@ -422,7 +489,7 @@
 
         });
 
-    </script>
+    </script>*@
 }
 
 
@@ -485,6 +552,19 @@
                         
                     </select>
                 </span>
+            </div>            
+            <div class="b-div">
+                <span class="b-label">
+                    加工部门:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="process_dep" id="process_dep" required>
+                        <option value="">----下拉选择加工部门----</option>
+                        @foreach (var d in m.proDepList) {
+                            <option value="@d.dep_name">@d.dep_name</option>
+                        }
+                    </select>
+                </span>
             </div>
             <div class="b-div">
                 <span class="b-label">
@@ -502,34 +582,7 @@
                     <textarea type="text" class="form-control" rows="2" id="addr" name="addr" placeholder="例如：19栋1楼" required></textarea>
                 </span>
             </div>
-            <div class="b-div">
-                <span class="b-label">
-                    K3帐套:
-                </span>
-                <span class="b-input">
-                    <select class="form-control" name="k3_account" id="k3_account" required>
-                        <option value="">----下拉选择帐套----</option>
-                        @foreach (var k in m.k3Accounts) {
-                            <option value="@k">@k</option>
-                        }
-                    </select>
-                </span>
-            </div>
-            <div class="b-div">
-                <span class="b-label">
-                    采购单号:
-                </span>
-                <div class="b-input">
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="bus_po_no" name="bus_po_no" placeholder="输入采购订单号后点读取按钮">
-                        <span class="input-group-btn">
-                            <button class="btn btn-primary" type="button" id="searchPOBt" data-loading-text="查询中...">读取</button>
-                        </span>
-                    </div>
-                    <input type="hidden" name="bus_po_entry" />
-                </div>
-            </div>
-            <div class="b-div">
+            @*<div class="b-div">
                 <span class="b-label">
                     委外产品型号:
                 </span>
@@ -550,7 +603,7 @@
                     <input type="text" class="form-control" name="qty" id="qty" placeholder="从订单中读取" readonly required />
                     <div class="small text-danger"><i class="fa fa-info-circle"></i> 单位： <span id="unit_name"></span></div>
                 </div>
-            </div>
+            </div>*@
             @*<div class="b-div">
                 <span class="b-label">
                     本月订单需求产能:
@@ -604,10 +657,18 @@
             </div>
             <div class="b-div">
                 <span class="b-label">
+                    加工部门计划员:
+                </span>
+                <div class="b-input">
+                    <input type="text" class="form-control select-user" name="process_planner_auditor" placeholder="选择加工部门计划负责人" required />
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
                     计划部负责人:
                 </span>
                 <div class="b-input">
-                    <input type="text" class="form-control select-user" name="planner_auditor" placeholder="选择计划部负责人" required />
+                    <input type="text" class="form-control select-user" name="planner_auditor" placeholder="选择计划部负责人" value="@m.planner_auditor" required />
                 </div>
             </div>
             <div class="b-div">
@@ -615,7 +676,7 @@
                     部门主管:
                 </span>
                 <div class="b-input">
-                    <input type="text" class="form-control select-user" name="dep_charger" placeholder="选择部门主管" required />
+                    <input type="text" class="form-control select-user" name="dep_charger" placeholder="选择部门主管" value="@m.dep_charger" required />
                 </div>
             </div>
             <div class="b-div">
@@ -623,7 +684,34 @@
                     采购员:
                 </span>
                 <div class="b-input">
-                    <input type="text" class="form-control select-user" name="buyer_auditor" placeholder="选择采购员" required />
+                    <input type="text" class="form-control select-user" name="buyer_auditor" placeholder="选择采购员" value="@m.buyer_auditor" required />
+                </div>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    K3帐套:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="k3_account" id="k3_account" required>
+                        <option value="">----下拉选择帐套----</option>
+                        @foreach (var k in m.k3Accounts) {
+                            <option value="@k">@k</option>
+                        }
+                    </select>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    采购单号:
+                </span>
+                <div class="b-input">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="bus_po_no" name="bus_po_no" placeholder="输入采购订单号后点读取按钮">
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" id="searchPOBt" data-loading-text="查询中...">读取</button>
+                        </span>
+                    </div>
+                    <input type="hidden" name="bus_po_entry" />
                 </div>
             </div>
             @*<div class="b-div">
@@ -634,7 +722,7 @@
                     <input type="text" class="form-control select-user" name="mat_group" placeholder="选择物料组人员" required />
                 </div>
             </div>*@
-            <div class="b-div">
+            @*<div class="b-div">
                 <span class="b-label">
                     原料发出明细:
                 </span>
@@ -644,7 +732,7 @@
                     <button class="btn btn-danger btn-sm" type="button" id="removeBt" style="margin-bottom:4px;"> <i class="fa fa-th"></i> 删除</button>
                     <button class="btn btn-warning btn-sm" type="button" id="getBomBt" style="margin-bottom:4px;"> <i class="fa fa-search"></i> 读取BOM</button>
                 </div>
-            </div>
+            </div>*@
             <table data-toggle="table" id="tb"></table>
         </form>
 
@@ -658,7 +746,7 @@
         <div style="margin-left:18px;padding-top:6px;" class="text-danger">
             <p>                
                 0. 提交时建议在电脑端操作，使用google chrome或360极速浏览器，打开内网网址：http://192.168.90.100/Emp ,登陆移动办公平台提交申请。<br />            
-                1. 流程步骤：流程开始--->提交申请--->计划部负责人审批-->部门主管审批--->部门总经理审批--->采购询价--->营运部审批（若部门累计金额超过月度目标）--->
+                1. 流程步骤：流程开始--->提交申请--->加工部门计划员审批-->计划部负责人审批-->部门主管审批--->部门总经理审批--->采购询价--->营运部审批@*（若部门累计金额超过月度目标）*@--->
                 总裁办审批(由营运部确定是否需要)--->采购部下单--->申请人提交结案申请--->营运部审批结案申请--->结束
                 <br/>
                 2. 委外时间设定为每周一至周五下午五点前，超出则顺延至第二个工作日处理。
@@ -673,7 +761,7 @@
     </div>
 </div>
 @section Modal {
-    <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+    @*<div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -749,6 +837,6 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>*@
     @Html.Partial("_ConfirmDialog")
 }

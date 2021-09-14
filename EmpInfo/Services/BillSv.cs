@@ -338,7 +338,7 @@ namespace EmpInfo.Services
         //    SendWxMessageForCompleted(processName, sysNo, result, new List<vw_push_users>() { pushUser });
         //}
 
-        public void SendQywxMessageForCompleted(string processName, string sysNo, string result, List<string> cardNumberList)
+        public void SendQywxMessageForCompleted(string processName, string sysNo, string result, List<string> cardNumberList, string opinion = null)
         {
             string cardNumber = string.Join("|", cardNumberList);
             string url = "";
@@ -349,12 +349,15 @@ namespace EmpInfo.Services
             msg.textcard.description = " <div class=\"highlight\">流程名称：" + processName + "</div>";
             msg.textcard.description += "<div class=\"highlight\">流程编号：" + sysNo + "</div>";
             msg.textcard.description += "<div class=\"highlight\">审批结果：" + result + "</div>";
+            if (!string.IsNullOrEmpty(opinion)) {
+                msg.textcard.description += "<div class=\"highlight\">审批意见：" + opinion + "</div>";
+            }
             msg.textcard.description += "<div class=\"highlight\">办结时间：" + DateTime.Now.ToString("yyyy-MM-dd HH:mm") + "</div>";
             url = "http://emp.truly.com.cn/emp/QYWX/Login?returnUrl=http://emp.truly.com.cn/emp/Apply/CheckApply?sysNo=" + sysNo;
             msg.textcard.url = GetQYWXOAthLink(url);
 
             SendQYWXCardMsg(msg);
-            
+
         }
         //public void SendWxMessageForCompleted(string processName, string sysNo, string result, List<vw_push_users> pushUsers)
         //{
@@ -554,6 +557,13 @@ namespace EmpInfo.Services
             msg.agentid = "1000007";
             QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();
             wx.PushTextMsg("wZRxdsuqeFAqJDG7VLaCTkImfsuce0qwyLO3ksBUkMY", "李逸焊", msg, whenToPush);
+        }
+
+        public void SendQYWXMsgImmediately(TextMsg msg)
+        {
+            msg.agentid = "1000007";
+            QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();
+            wx.PushTextMsgImmediately("wZRxdsuqeFAqJDG7VLaCTkImfsuce0qwyLO3ksBUkMY", "李逸焊", msg);
         }
 
         public void SendQYWXCardMsg(TextCardMsg msg, DateTime? whenToPush = null)

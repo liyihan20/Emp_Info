@@ -69,7 +69,7 @@
             self.contactName = ko.observable("");
             self.repairTypes = ["直接维修", "预约维修"];
             self.repairType = ko.observable("");
-            self.repairTime = "";
+            //self.repairTime = "";
             self.repairContent = ko.observable("");
 
             //修改维修类型
@@ -91,10 +91,10 @@
                     toastr.error("请选择维修类型");
                     return;
                 }
-                if (self.repairType() == "预约维修" && self.repairTime == "") {
-                    toastr.error("请选择预约时间");
-                    return;
-                }
+                //if (self.repairType() == "预约维修" && self.repairTime == "") {
+                //    toastr.error("请选择预约时间");
+                //    return;
+                //}
                 if (self.contactName() == "") {
                     toastr.error("请填写联系人");
                     return;
@@ -110,7 +110,7 @@
                     area_name: self.areaName,
                     dorm_num: self.dormNumber,
                     repair_type: self.repairType(),
-                    repair_time: self.repairTime,
+                    //repair_time: self.repairTime,
                     fee_share_type: "户主本人",
                     fee_share_peple: "",
                     contact_name: self.contactName(), 
@@ -167,7 +167,7 @@
                     </button>
                     <!--/ko-->
                 </div>
-                <div class="b-div" data-bind="visible:repairType()=='预约维修'">
+                @*<div class="b-div" data-bind="visible:repairType()=='预约维修'">
                     <span class="b-label" style="vertical-align:top;">维修时间</span>
                     <span style="display:inline;width:70%;vertical-align:top;">
                         <span class="input-group date" style="display:inline-table;width:70%;" id="repairTimePicker">
@@ -175,7 +175,7 @@
                             <input class="form-control" type="text" readonly data-bind="value:repairTime">
                         </span>
                     </span>
-                </div>
+                </div>*@
                 <div class="b-div">
                     <span class="b-label">联系人：</span>
                     <span style="display:inline-block;width:70%;">

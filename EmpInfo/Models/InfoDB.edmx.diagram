@@ -172,7 +172,11 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_xcDepTarget" Width="1.5" PointX="2.375" PointY="20.25" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_xcMatOutDetail" Width="1.5" PointX="2.375" PointY="18.75" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_xcProductInDetail" Width="1.5" PointX="2.375" PointY="19.5" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_xcApply" Width="1.5" PointX="2.375" PointY="20.875" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_xcApply" Width="1.5" PointX="0.5" PointY="20.25" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_xcProduct" Width="1.5" PointX="0.5" PointY="19.5" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_xcProcessDep" Width="1.5" PointX="2.375" PointY="21" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_xdApply" Width="1.5" PointX="4.25" PointY="17.25" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_fxType" Width="1.5" PointX="6" PointY="20.25" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

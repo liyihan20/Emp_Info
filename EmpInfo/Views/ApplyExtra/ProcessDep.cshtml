@@ -1,0 +1,273 @@
+﻿@using EmpInfo.Models;
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        .lbText {
+            font-style: italic;
+        }
+    </style>
+}
+@section Scripts {
+    @*加入以下js，使IE8支持datetimepicker组件*@
+    <script>
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function (elt /*, from*/) {
+                var len = this.length >>> 0;
+
+                var from = Number(arguments[1]) || 0;
+                from = (from < 0)
+                     ? Math.ceil(from)
+                     : Math.floor(from);
+                if (from < 0)
+                    from += len;
+
+                for (; from < len; from++) {
+                    if (from in this &&
+                        this[from] === elt)
+                        return from;
+                }
+                return -1;
+            };
+        }
+    </script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+        $(function () {
+            $(".form_date").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm",
+                autoclose: true,
+                todayBtn: true,
+                startView: 3,
+                minView: 3
+            });
+
+            $("#checkBt").on("click", function () {
+                $.post("GetProcessDep", {
+                    fromDate: $("#fromDate").val(),
+                    toDate: $("#toDate").val(),
+                    depName: $("#depName").val()
+                }, function (data) {
+                    $('#tb1').bootstrapTable('load', data);
+                    if (data.length == 0) {
+                        toastr.error("当前时间段查无记录");
+                    }
+                });
+            });
+
+        });
+
+        $("#tb1").bootstrapTable({
+            striped: true,
+            pagination: true,
+            pageSize: 40,
+            pageList: [20, 40, 60, 100],
+            clickToSelect: true,
+            search: true,
+            columns: [
+                {
+                    radio: true
+                },
+                {
+                    field: "year_month",
+                    title: "年月份",
+                    width: "15%"
+                }, {
+                    field: "dep_name",
+                    title: "部门名称",
+                    width: "25%"
+                }, {
+                    field: "month_target",
+                    title: "本月委外目标",
+                    width: "15%",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseDecimalToThousandBit(value);
+                    }
+                }, {
+                    field: "extra_amount",
+                    title: "本月申请额度",
+                    width: "15%",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseDecimalToThousandBit(value);
+                    }
+                }, {
+                    field: "current_amount",
+                    title: "当月已用额度",
+                    width: "15%",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseDecimalToThousandBit(value);
+                    }
+                }, {
+                    field: "create_user",
+                    title: "创建人",
+                    width: "15%"
+                }
+            ]
+        });
+
+    </script>
+    <script>
+        $(function () {
+            $("#tb1AddBt").on("click", function () {
+                $("#tb1Modal .modal-title").html("增加部门信息");
+                utils.resetForm($("#tb1Form"));
+                $("#tb1Modal").modal("show");
+            });
+
+            $("#tb1ModifyBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再查询");
+                    return;
+                }
+                $("#tb1Modal .modal-title").html("修改部门信息");
+                utils.loadObjData($("#tb1Form"), rows[0]);
+                $("#tb1Modal").modal("show");
+            });
+
+            $("#tb1RemoveBt").on("click", function () {
+                var rows = $('#tb1').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                openConfirmDialog("确定要删除选中行吗？", function () {
+                    $.post("RemoveProcessDep", { id: rows[0].id }, function (data) {
+                        if (data.suc) {
+                            toastr.success("删除成功");
+                            $("#checkBt").trigger("click");
+                        } else {
+                            toastr.error("删除失败：" + data.msg);
+                        }
+                    });
+                });
+            });
+
+            $("#saveTb1FormBt").on("click", function () {
+                var obj = utils.getFormObj($("#tb1Form"));
+                if (!utils.testIsInt(obj.month_target) || !utils.testIsInt(obj.extra_amount)) {
+                    toastr.error("金额必须输入整数");
+                    return;
+                }
+                if (obj.year_month == "" || obj.dep_name == "") {
+                    toastr.error("缺少值");
+                    return;
+                }
+                console.log(obj);
+                $.post("SaveProcessDep", { obj: JSON.stringify(obj) }, function (data) {
+                    if (data.suc) {
+                        $("#tb1Modal").modal("hide");
+                        toastr.success("保存成功");
+                        $("#checkBt").trigger("click");
+                    } else {
+                        toastr.error("保存失败：" + data.msg);
+                    }
+                });
+            });
+
+            $("#tb1CopyBt").on("click", function () {
+                openConfirmDialog("确定要复制吗？", function () {
+                    $.post("CopyProcessDep", {}, function (data) {
+                        if (!data.suc) {
+                            toastr.error(data.msg);
+                        } else {
+                            toastr.success(data.msg);
+                            $("#checkBt").trigger("click");
+                        }
+                    })
+                });
+            });
+
+        })
+    </script>
+
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=XD")">委外超时申请</a></li>
+            <li class="active">加工部门额度</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <form id="fm">
+            <div class="row" style="margin-bottom:6px;">
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">年月份从：</div>
+                    <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" id="fromDate" autocomplete="off" value="@DateTime.Now.ToString("yyyy-MM")" />
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">年月份到：</div>
+                    <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" id="toDate" autocomplete="off" value="@DateTime.Now.AddMonths(1).ToString("yyyy-MM")" />
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">部门：</div>
+                    <input type="text" class="form-control" id="depName" style="margin:6px 0;" />
+                </div>
+            </div>
+        </form>
+        <div>
+            <button class="btn btn-primary btn-block" id="checkBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
+        </div>
+
+        <div>
+            <button class="btn btn-success" id="tb1AddBt" style="margin-top:10px;"><i class="fa fa-plus"></i> 增加</button>
+            <button class="btn btn-primary" id="tb1ModifyBt" style="margin-top:10px;"><i class="fa fa-edit"></i> 修改</button>
+            <button class="btn btn-danger" id="tb1RemoveBt" style="margin-top:10px;"><i class="fa fa-plus"></i> 删除</button>
+            <button class="btn btn-warning" id="tb1CopyBt" style="margin-top:10px;"><i class="fa fa-copy"></i> 复制上月配置到本月</button>
+        </div>
+        <table id="tb1"></table>
+
+    </div>
+</div>
+
+@section Modal{
+
+    <div class="modal fade" id="tb1Modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="tb1Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> 增加部门信息</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="tb1Form">
+                        <input type="hidden" name="id" data-value="0" />
+                        <div>年月份：</div>
+                        <div class="input-group date form_date" style="margin:6px 0;">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                            <input class="form-control" type="text" name="year_month" autocomplete="off" />
+                        </div>
+                        <div>加工部门名称：</div>
+                        <input type="text" class="form-control" name="dep_name" style="margin-top:4px;" />                        
+                        <div>本月委外目标(元):</div>
+                        <input type="text" class="form-control" name="month_target" style="margin-top:4px;" />
+                        <div>本月申请额度(元):</div>
+                        <input type="text" class="form-control" name="extra_amount" style="margin-top:4px;" value="0" />
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-reply"></i> 取消</button>
+                    <button id="saveTb1FormBt" type="button" class="btn btn-success"><i class="fa fa-check"></i> 确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @Html.Partial("_ConfirmDialog")
+
+}

@@ -1,0 +1,428 @@
+﻿@using EmpInfo.Models;
+@{
+    var m = ViewData["beforeApplyModel"] as FXBeforeApplyModel;
+    var type_process = string.Format("提交>{0}>门卫放行", m.fxType.type_process).Replace(">", " > ");
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 100px;
+            vertical-align: top;
+            color: gray;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 65%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
+    <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUploaderPro.js?v=2")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/knockout-3.4.0.js")"></script>       
+
+    <script>
+
+        $(function(){
+            //选择用户控件
+            $(".selectUser").on("focus", function () {
+                var self = this;
+                $.selectUsers({
+                    userHasSelected: $(self).val(),
+                    callback: function (result) {
+                        $(self).val(result);
+                    }
+                });
+            });
+
+            //上传附件控件
+            $("#myUploader").myUploader({
+                sysNum: "@m.sysNo",
+                fileNumLimit: 5,
+                accept: {
+                    title: '*',
+                    extensions: '*',
+                    mimeTypes: '*'
+                }
+            });
+
+        });
+
+        //生成动态选择框控件，例如仓库管理部
+        function GenSelectField(nodeName){
+            $.post("FXGetSelectData",{nodeName:nodeName},function(data){
+                var html='<div class="b-div"><span class="b-label">'+nodeName+':</span><span class="b-input">';
+                html+='<select class="form-control" name="'+nodeName+'" required>';
+                html+='<option value="" data-auditor="">----下拉选择'+nodeName+'----</option>';
+                for(var i=0;i<data.length;i++){
+                    html+='<option value="'+data[i].stringValue+'" data-auditor="'+data[i].extraValue+'">'+data[i].text+'</option>';
+                }
+                html+='</select></span></div>';
+                $("#auditorFields").append(html);
+            });
+        }
+
+        //动态生成用户选择控件，例如采购部、品质部
+        function GenSelectUser(nodeName){
+            var html='<div class="b-div"><span class="b-label">'+nodeName+':</span><span class="b-input">';
+            html+='<input type="text" class="form-control selectUser" name="'+nodeName+'" placeholder="请选择对应审批人" required />';
+            html+='</span></div>';
+            $("#auditorFields").append(html);
+        }
+
+        //动态生成表单控件，例如是否返厂
+        function GenFormField(nodeName){
+            var html="";
+            if(nodeName.indexOf("是否")>=0){
+                html+='<div class="b-div"><span class="b-label">'+nodeName+':</span><span class="b-input">';
+                html+='<select class="form-control" name="'+nodeName+'" required>';
+                html+='<option value="">----下拉选择----</option>';
+                html+='<option value="是">是</option>';
+                html+='<option value="否">否</option>';
+                html+='</select></span></div>';
+            }
+            $("#fxTypeFields").append(html);
+        }
+
+        function FormModel() {
+            var self = this;
+
+            self.isSelfTaken = "@m.fxType.type_no".indexOf("2") == 0;//是否自提单
+            self.takeOutPeopleTypes = ["申请人", "信利员工", "外来人员"];//带出人类型
+            self.takeOutPeopleType = ko.observable(""); //自提的带出人类型
+            self.companies = ["光电", "半导体", "电子", "仪器", "工业", "信元", "光电科技"]; //公司
+            self.fromAddrs = ["汕尾信利工业城"]; //放行厂区
+            self.toScopes = ["省内", "省外", "港澳台", "国外"]; //范围
+            self.typeDemands = @Html.Raw(m.typeDemands); //业务类型特定要求
+            self.typeDemandFieldNames = [];//保存额外的表单项name
+            self.attDemand=self.typeDemands.filter(function(t){return t.indexOf("附件")>=0}).join(";"); //附件的要求
+
+            (function () {
+                //自动生成额外字段
+                var formFieldsDemand=self.typeDemands.filter(function(t){return t.indexOf("表单项")>=0});
+                for(var i = 0; i < formFieldsDemand.length; i++){
+                    var nodeName = formFieldsDemand[i].replace("：",":").split(":")[1];
+                    GenFormField(nodeName);
+                    self.typeDemandFieldNames.push(nodeName);
+                }
+
+                //自动生成审核节点字段
+                var processNodes = "@Html.Raw(m.fxType.type_process)".split(">").filter(function (t) { return t != "部门负责人"; }); //部门负责人不用再次选择，每个流程都有
+                var proInfo = @Html.Raw(m.fxType.process_info);
+
+                for(var i=0;i<processNodes.length;i++){
+                    var node = processNodes[i];
+                    if(proInfo.user_select.indexOf(node)>=0){
+                        //从列表选项选择的
+                        GenSelectField(node);
+                        self.typeDemandFieldNames.push(node);
+                    }
+                    if(proInfo.user_input.indexOf(node)>=0){
+                        //直接选择审核人
+                        GenSelectUser(node);
+                        self.typeDemandFieldNames.push(node);
+                    }
+                }
+
+            })();
+
+            //开始提交申请
+            self.beginApply = function(){
+
+                //var validateInfo = utils.validateRequiredField($("#fm"));
+                //if(!validateInfo.suc){
+                //    toastr.error(validateInfo.msg);
+                //    return;
+                //}
+
+                var obj=utils.getFormObj($("#fm"));
+
+                var other_segs = [];
+                for(var i=0;i<self.typeDemandFieldNames.length;i++){
+                    other_segs.push({
+                        n:self.typeDemandFieldNames[i],
+                        v:obj[self.typeDemandFieldNames[i]]
+                    })
+                }
+
+                var auditor_segs=[];
+                var busAuditor={};
+                busAuditor.stepName="部门负责人";
+                var bus=$("select[name='bus_name'] option:selected");
+                busAuditor.auditor = $(bus).attr("data-auditor");
+                auditor_segs.push(busAuditor);
+
+                $("#auditorFields select").each(function(idx,ele){
+                    var selectAuditor={};
+                    selectAuditor.stepName=$(ele).attr("name");
+                    selectAuditor.auditor=$($(ele).find("option:selected")).attr("data-auditor");
+
+                    auditor_segs.push(selectAuditor);
+                });
+
+                $("#auditorFields input").each(function(idx,ele){
+                    var inputAuditor={};
+                    inputAuditor.stepName=$(ele).attr("name");
+                    inputAuditor.auditor="";
+                    var auditors=$(ele).val().split(";").filter(function(a){return a!="";});
+
+                    for(var i=0;i<auditors.length;i++){
+                        if(i>0){
+                            inputAuditor.auditor+=";";
+                        }
+                        inputAuditor.auditor+=auditors[i].match(/.*\((.+)\)/)[1];
+                    }
+                    auditor_segs.push(inputAuditor);
+                });
+
+                obj.other_segs=JSON.stringify(other_segs);
+                obj.auditor_segs=JSON.stringify(auditor_segs);
+
+                obj.has_attachment = parseInt($("#myUploader").getMyUploaderFilesNum()) > 0;
+                
+                if(!obj.has_attachment && self.attDemand!=""){
+                    toastr.error(self.attDemand);
+                    return;
+                }
+
+                console.log(obj);
+            }
+
+        }
+        ko.applyBindings(new FormModel());
+</script>
+
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=FX")">放行条申请流程</a></li>
+            <li><a href="@Url.Content("~/Apply/BeginApply?billType=FX")">选择业务类型</a></li>
+            <li class="active">开始申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <form id="fm" style="margin-top:-12px;">
+            <input type="hidden" name="fx_type_no" value="@m.fxType.type_no" />
+            <input type="hidden" name="fx_type_name" value="@m.typeNames" />
+            <input type="hidden" name="fx_process" value="@type_process" />
+            <input type="hidden" name="sys_no" value="@m.sysNo" />
+            <div class="b-div">
+                <span class="b-label">
+                    业务类型:
+                </span>
+                <span class="b-input">
+                    @m.typeNames
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    申请流程:
+                </span>
+                <span class="b-input">
+                    @type_process
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    申请流水号:
+                </span>
+                <span class="b-input">
+                    @m.sysNo
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    申请人:
+                </span>
+                <span class="b-input">
+                    @m.applierName
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    联系电话:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="applier_phone" placeholder="填写手机号码" required />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    公司:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="company" data-bind="options:companies,optionsCaption:'----下拉选择公司----'" required></select>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    部门:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="bus_name" required>
+                        <option value="" data-auditor="">----下拉选择部门----</option>
+                        @foreach (var d in m.depNames) {
+                            <option value="@d.text" data-auditor="@d.extraValue">@string.Format("{0}（{1}）", d.text, d.stringValue)</option>
+                        }
+                    </select>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    放行厂区:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="from_addr" data-bind="options:fromAddrs,optionsCaption:'----下拉选择放行厂区----',value:fromAddrs[0]" required></select>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    寄/带出范围:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="to_scope" data-bind="options:toScopes,optionsCaption:'----下拉选择范围----'" required></select>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    寄/带出地址:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="to_addr" placeholder="填写地址" required />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    件数:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="total_pack_num" placeholder="填写件数" required />
+                </span>
+            </div>
+            <!--ko if:!isSelfTaken-->
+            <div class="b-div">
+                <span class="b-label">
+                    收件人:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="receiver_name" placeholder="填写收件人" />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    收件人电话:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="receiver_phone" placeholder="填写收件人电话" />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    快递公司:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="ex_company" placeholder="填写快递公司" />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    快递单号:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="ex_no" placeholder="填写快递单号" />
+                </span>
+            </div>
+            <!--/ko-->
+            <!--ko if:isSelfTaken-->
+            <div class="b-div">
+                <span class="b-label">
+                    带出人类型:
+                </span>
+                <span class="b-input">
+                    <select class="form-control" name="take_out_people_type" data-bind="value:takeOutPeopleType,options:takeOutPeopleTypes,optionsCaption:'----下拉选择类型----'"></select>
+                </span>
+            </div>
+            <!--ko if:takeOutPeopleType() == "信利员工" || takeOutPeopleType() == "外来人员"-->
+            <div class="b-div">
+                <span class="b-label">
+                    带出人姓名:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="take_out_people_name" placeholder="填写带出人姓名" />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    带出人电话:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="take_out_people_phone" placeholder="填写带出人电话" />
+                </span>
+            </div>
+            <!--/ko-->
+            <div class="b-div" data-bind="if:takeOutPeopleType()=='外来人员'">
+                <span class="b-label">
+                    带出人预约码:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="take_out_people_code" placeholder="外来人员需填写预约码" />
+                </span>
+            </div>
+            <!--/ko-->
+            <div class="b-div">
+                <span class="b-label">
+                    申请原因:
+                </span>
+                <span class="b-input">
+                    <textarea class="form-control" name="reason" rows="2" placeholder="请填写申请放行的原因" required></textarea>
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    备注:
+                </span>
+                <span class="b-input">
+                    <textarea class="form-control" name="comment" rows="2" placeholder="备注信息"></textarea>
+                </span>
+            </div>
+            <!--存放此业务类型的额外内容-->
+            <div id="fxTypeFields"></div>
+
+            <!--存放选择审批人员的动态字段-->
+            <div id="auditorFields"></div>
+
+            
+            <div class="b-div">
+                <div id="picker"> <i class="fa fa-upload"></i> 上传附件 </div>
+                <div class="small text-danger" data-bind="if:attDemand!=''" style="margin-left:16px;"><i class="fa fa-info-circle"></i> <span data-bind="text:attDemand"></span></div>
+            </div>
+            <div id="myUploader">
+
+            </div>
+            
+        </form>
+        <button class="btn btn-danger btn-block" type="button" data-bind="click:beginApply" data-loading-text="正在提交..." style="margin-top:16px;"><i class="fa fa-check-circle-o"></i> 提交申请单</button>
+    </div>
+</div>
+
+@section Modal {
+    @Html.Partial("_ConfirmDialog")
+}

@@ -13,7 +13,7 @@
             mobileResponsive: true,
             pagination: true,
             pageSize: 50,
-            pageList: [20, 50, 100, 200],
+            pageList: [20, 50, 100, 200],            
             search: true,
             clickToSelect: true,
             columns: [
@@ -35,7 +35,10 @@
                     field: "update_user",
                     title: "最近修改人"
                 }
-            ]
+            ],
+            onDblClickRow: function () {
+                $("#tb1ModifyBt").trigger("click");
+            }
         });
 
         $(function () {
@@ -115,7 +118,7 @@
     <div class="panel-body">        
         <div>
             <button class="btn btn-success" id="tb1AddBt"><i class="fa fa-plus"></i> 新增</button>
-            <button class="btn btn-primary" id="tb1ModifyBt"><i class="fa fa-edit"></i> 修改</button>
+            <button class="btn btn-primary" id="tb1ModifyBt"><i class="fa fa-edit"></i> 修改(或双击行)</button>
             <button class="btn btn-danger" id="tb1RemoveBt"><i class="fa fa-plus"></i> 删除</button>
         </div>
 
@@ -138,9 +141,9 @@
                         <div style="margin-top:6px;">文件编号：</div>
                         <input type="text" class="form-control" name="file_no" />
                         <div style="margin-top:6px;">内容描述：</div>
-                        <textarea class="form-control" rows="6" name="maintenance_content"></textarea>
+                        <textarea class="form-control" rows="2" name="maintenance_content"></textarea>
                         <div style="margin-top:6px;">操作说明：</div>
-                        <textarea class="form-control" rows="6" name="maintenance_steps"></textarea>                        
+                        <textarea class="form-control" rows="10" name="maintenance_steps"></textarea>                        
                     </form>
                 </div>
                 <div class="modal-footer">

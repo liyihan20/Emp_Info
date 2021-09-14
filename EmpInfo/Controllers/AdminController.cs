@@ -47,14 +47,13 @@ namespace EmpInfo.Controllers
 
         [SessionTimeOutJsonFilter]
         public JsonResult GetUsers(string searchContent)
-        {            
-            int total;
+        {
             var users = (from v in db.vw_ei_simple_users
                          where v.card_number.Contains(searchContent)
                         || v.name.Contains(searchContent)
                         || v.salary_no.Contains(searchContent)
                         || v.id_number.Contains(searchContent)
-                        //|| v.dep_name.Contains(searchContent)
+                         //|| v.dep_name.Contains(searchContent)
                          select new UserListModel()
                          {
                              name = v.name,
@@ -64,21 +63,20 @@ namespace EmpInfo.Controllers
                              depName = v.short_dep_name
                          }).ToList();
             Session["adminUserList"] = users;
-            total = users.Count();
+            int total = users.Count();
             if (total == 0) {
                 return Json(new SimpleResultModel() { suc = false, msg = "没有符合条件的注册员工" });
             }
-            return Json(new {suc = true, rows = users.Take(pageNumber), pages = Math.Ceiling((total * 1.0) / pageNumber) });
+            return Json(new { suc = true, rows = users.Take(pageNumber), pages = Math.Ceiling((total * 1.0) / pageNumber) });
         }
 
         [SessionTimeOutJsonFilter]
         public JsonResult GetUsersPage(int page)
         {
-            if(Session["adminUserList"]==null){
+            if(Session["adminUserList"] == null){
                 return Json(new { suc = false });
             }
-            List<UserListModel> users = (List<UserListModel>)Session["adminUserList"];
-            
+            List<UserListModel> users = (List<UserListModel>)Session["adminUserList"]; 
 
             return Json(new { suc = true, rows = users.Skip((page - 1) * pageNumber).Take(pageNumber).ToList() });
         }
