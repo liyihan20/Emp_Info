@@ -1549,6 +1549,8 @@ namespace EmpInfo.Controllers
                 });
             }
 
+            var lastApply = db.ei_fxApply.Where(f => f.applier_num == userInfo.cardNo).OrderByDescending(f => f.id).FirstOrDefault();
+
             ViewData["beforeApplyModel"] = new FXBeforeApplyModel()
             {
                 applierName = userInfo.name,
@@ -1556,7 +1558,10 @@ namespace EmpInfo.Controllers
                 sysNo = GetNextSysNum("FX"),
                 typeNames = typeNames,
                 depNames = selectList,
-                typeDemands = typeDemands
+                typeDemands = typeDemands,
+                applierPhone = (lastApply == null ? "" : lastApply.applier_phone),
+                busName = (lastApply == null ? "" : lastApply.bus_name),
+                company = (lastApply == null ? "" : lastApply.company)
             };
 
             return View();

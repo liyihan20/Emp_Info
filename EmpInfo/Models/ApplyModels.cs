@@ -439,6 +439,13 @@ namespace EmpInfo.Models
         public List<string> depList { get; set; }
     }
 
+    public class FXSelectTypeNameModel
+    {
+        public List<ei_fxType> fxTypes { get; set; }
+        public string lastTypeName { get; set; }
+        public string lastTypeNo { get; set; }
+    }
+
     public class FXBeforeApplyModel
     {
         public string sysNo { get; set; }
@@ -447,6 +454,15 @@ namespace EmpInfo.Models
         public string typeNames { get; set; }
         public string applierName { get; set; }
         public string typeDemands { get; set; }
+        public string applierPhone { get; set; }
+        public string company { get; set; }
+        public string busName { get; set; }
+    }
+
+    public class FXCheckApplyModel
+    {
+        public ei_fxApply bill { get; set; }
+        public List<ei_fxApplyEntry> entrys { get; set; }
     }
 
 }

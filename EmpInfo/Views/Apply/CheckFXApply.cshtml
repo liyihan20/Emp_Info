@@ -1,0 +1,326 @@
+﻿@using EmpInfo.Models;
+@using Newtonsoft.Json;
+@{
+    UserInfo currentUser = ViewData["currentUser"] as UserInfo;
+    var m = ViewData["am"] as FXCheckApplyModel;
+    var h = m.bill;
+    var entryJson = JsonConvert.SerializeObject(m.entrys);
+    bool isSelfTaken = h.fx_type_no.StartsWith("2");
+
+}
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+
+    <style type="text/css">
+        .b-label {
+            display: inline-block;
+            width: 100px;
+            vertical-align: top;
+            color: gray;
+        }
+
+        .b-input {
+            display: inline-block;
+            width: 65%;
+        }
+
+        .b-div {
+            margin: 10px 0;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myDownloaderPro.js")"></script>
+
+    <script>
+        $("#tb").bootstrapTable({
+            striped: true,
+            data:@Html.Raw(entryJson),
+            columns: [
+                {
+                    field: "item_name",
+                    title: "物品名称"
+                }, {
+                    field: "item_model",
+                    title: "物品型号"
+                }, {
+                    field: "item_qty",
+                    title: "数量"
+                }, {
+                    field: "item_unit",
+                    title: "单位"
+                }
+            ]
+        });
+
+        $(function () {
+            $("#attList").myDownloader({ sysNum: "@h.sys_no" });
+
+            $("#flowRecordBt").on("click", function () {
+                var box = $("<div></div>");
+                $(box).load("CheckFlowRecord .list-group", { sysNo: "@h.sys_no" }, function () {
+                    openMessageDialog($(box).html(), "查看流转记录");
+                });
+            });
+            
+            genOtherSeg();
+        });
+
+        function genOtherSeg(){
+            var segs=@Html.Raw(h.other_segs);
+            for(var i=0;i<segs.length;i++){
+                var html='<div class="b-div"><span class="b-label">'+segs[i].n+':</span><span class="b-input">'+segs[i].v+'</span></div>';
+                $("#fxExtraFields").append(html);
+            }
+        }
+
+    </script>
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=FX")">放行条申请流程</a></li>
+            <li class="active">查看申请</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="b-div">
+            <span class="b-label">
+                流转记录:
+            </span>
+            <span class="b-input">
+                <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
+            </span>
+        </div>
+        @if (h.can_print && h.out_time == null && !"被拒绝".Equals(ViewData["auditStatus"])) {
+            if (isSelfTaken) {
+                if (currentUser.cardNo.Equals(h.applier_num)) {
+                    <div class="b-div">
+                        <span class="b-label">
+                            出示:
+                        </span>
+                        <span class="b-input">
+                            <button type="button" class="btn btn-default btn-sm" id="showCode"><i class="fa fa-qrcode"></i> 放行二维码</button>
+                        </span>
+                    </div>
+                }
+            }
+            else {
+                <div class="b-div">
+                    <span class="b-label">
+                        打印:
+                    </span>
+                    <span class="b-input">
+                        <button type="button" class="btn btn-default btn-sm" id="printBt"><i class="fa fa-print"></i> 打印放行条</button>
+                    </span>
+                </div>
+            }
+        }
+
+
+        <div class="b-div">
+            <span class="b-label">
+                业务类型:
+            </span>
+            <span class="b-input">
+                @h.fx_type_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请流程:
+            </span>
+            <span class="b-input">
+                @h.fx_process
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请流水号:
+            </span>
+            <span class="b-input">
+                @h.sys_no
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                申请人:
+            </span>
+            <span class="b-input">
+                @h.applier_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                联系电话:
+            </span>
+            <span class="b-input">
+                @h.applier_phone
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                公司:
+            </span>
+            <span class="b-input">
+                @h.company
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                部门:
+            </span>
+            <span class="b-input">
+                @h.bus_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                放行厂区:
+            </span>
+            <span class="b-input">
+                @h.from_addr
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                <text>@(isSelfTaken ? "带" : "寄")</text>出范围:
+            </span>
+            <span class="b-input">
+                @h.to_scope
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                <text>@(isSelfTaken ? "带" : "寄")</text>出地址:
+            </span>
+            <span class="b-input">
+                @h.to_addr
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                件数:
+            </span>
+            <span class="b-input">
+                @h.total_pack_num
+            </span>
+        </div>
+        @if (!isSelfTaken) {
+            <div class="b-div">
+                <span class="b-label">
+                    收件人:
+                </span>
+                <span class="b-input">
+                    @h.receiver_name
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    收件人电话:
+                </span>
+                <span class="b-input">
+                    @h.receiver_phone
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    快递公司:
+                </span>
+                <span class="b-input">
+                    @h.ex_company
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    快递单号:
+                </span>
+                <span class="b-input">
+                    @h.ex_no
+                </span>
+            </div>
+        }
+        @if (isSelfTaken) {
+            <div class="b-div">
+                <span class="b-label">
+                    带出人类型:
+                </span>
+                <span class="b-input">
+                    @h.take_out_people_type
+                </span>
+            </div>
+            if (h.take_out_people_type != "申请人") {
+                <div class="b-div">
+                    <span class="b-label">
+                        带出人姓名:
+                    </span>
+                    <span class="b-input">
+                        @h.take_out_people_name
+                    </span>
+                </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        带出人电话:
+                    </span>
+                    <span class="b-input">
+                        @h.take_out_people_phone
+                    </span>
+                </div>
+            }
+            if (h.take_out_people_type == "外来人员") {
+                <div class="b-div">
+                    <span class="b-label">
+                        带出人预约码:
+                    </span>
+                    <span class="b-input">
+                        @h.take_out_people_code
+                    </span>
+                </div>
+            }
+        }
+        <div class="b-div">
+            <span class="b-label">
+                申请原因:
+            </span>
+            <span class="b-input">
+                @h.reason
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                备注:
+            </span>
+            <span class="b-input">
+                @h.comment
+            </span>
+        </div>
+        <!--存放此业务类型的额外内容-->
+        <div id="fxExtraFields"></div>
+
+        <div style="margin-top:6px;">
+            <div class="b-label">附件列表:</div>
+            <div id="attList"></div>
+        </div>
+
+
+        <div class="b-div" style="margin-top:16px;">
+            <span class="b-label">
+                放行物品:
+            </span>
+            <div class="b-input">
+            </div>
+        </div>
+        <table data-toggle="table" id="tb"></table>
+    </div>
+</div>
+@section Modal {
+    @Html.Partial("_MessageDialog")
+}

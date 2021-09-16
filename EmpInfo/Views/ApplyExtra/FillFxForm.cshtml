@@ -32,7 +32,7 @@
     <script src="@Url.Content("~/Scripts/myUploaderPro.js?v=2")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
-    <script src="@Url.Content("~/Scripts/knockout-3.4.0.js")"></script>       
+    <script src="@Url.Content("~/Scripts/knockout-3.4.0.js")"></script>
 
     <script>
 
@@ -100,9 +100,10 @@
         function FormModel() {
             var self = this;
 
+            self.takeOutPeopleType = ko.observable(""); //自提的带出人类型
+
             self.isSelfTaken = "@m.fxType.type_no".indexOf("2") == 0;//是否自提单
             self.takeOutPeopleTypes = ["申请人", "信利员工", "外来人员"];//带出人类型
-            self.takeOutPeopleType = ko.observable(""); //自提的带出人类型
             self.companies = ["光电", "半导体", "电子", "仪器", "工业", "信元", "光电科技"]; //公司
             self.fromAddrs = ["汕尾信利工业城"]; //放行厂区
             self.toScopes = ["省内", "省外", "港澳台", "国外"]; //范围
@@ -142,13 +143,18 @@
             //开始提交申请
             self.beginApply = function(){
 
-                //var validateInfo = utils.validateRequiredField($("#fm"));
-                //if(!validateInfo.suc){
-                //    toastr.error(validateInfo.msg);
-                //    return;
-                //}
+                var validateInfo = utils.validateRequiredField($("#fm"));
+                if(!validateInfo.suc){
+                    toastr.error(validateInfo.msg);
+                    return;
+                }
 
                 var obj=utils.getFormObj($("#fm"));
+
+                if(!utils.testIsInt(obj.total_pack_num)){
+                    toastr.error("件数必须填写整数");
+                    return;
+                }
 
                 var other_segs = [];
                 for(var i=0;i<self.typeDemandFieldNames.length;i++){
@@ -192,18 +198,141 @@
                 obj.auditor_segs=JSON.stringify(auditor_segs);
 
                 obj.has_attachment = parseInt($("#myUploader").getMyUploaderFilesNum()) > 0;
-                
+
                 if(!obj.has_attachment && self.attDemand!=""){
                     toastr.error(self.attDemand);
                     return;
                 }
 
                 console.log(obj);
+
+                var entrys = $("#tb").bootstrapTable('getData');
+                
+                if (entrys.length < 1) {
+                    toastr.error("请至少填写一行物品明细再提交");
+                    return;
+                }
+
+                console.log(entrys);
+
+                openConfirmDialog("确定要提交申请吗？", function () {
+                    $("#apply_bt").button("loading");
+                    $.ajax({
+                        type: 'post',
+                        url: '../Apply/SaveApply',
+                        data: "sys_no=" + obj.sys_no + "&head=" + utils.StringifyAndParseCharacter(obj) + "&entrys=" + utils.StringifyAndParseCharacter(entrys),
+                        cache: false,
+                        dataType: 'json',
+                        success: function (data) {
+                            $("#apply_bt").button("reset");
+                            if (data.suc) {
+                                toastr.success("提交成功:" + data.msg);
+                                setTimeout(function () { window.location.href = "../Apply/CheckApply?sysNo=" + obj.sys_no; }, 2000);
+                            } else {
+                                toastr.error("提交失败：" + data.msg);
+                                $("#apply_bt").button("reset");
+                            }
+
+                        }
+                    });
+                });
+
             }
 
         }
         ko.applyBindings(new FormModel());
-</script>
+    </script>
+
+    <script>
+        $("#tb").bootstrapTable({
+            striped: true,
+            clickToSelect: true,
+            idField: "idx", //用于修改
+            uniqueId: "idx", //用于删除
+            columns: [
+                {
+                    radio: true
+                },
+                {
+                    field: "item_name",
+                    title: "物品名称"
+                }, {
+                    field: "item_model",
+                    title: "物品型号"
+                }, {
+                    field: "item_qty",
+                    title: "数量"
+                }, {
+                    field: "item_unit",
+                    title: "单位"
+                }
+            ],
+            onDblClickRow: function (row, $element, field) {
+                $("#editBt").trigger("click");
+            }
+        });
+
+        $(function(){
+            var updateIndex = -1;
+            var addIndex = 0;
+
+            $("#addBt").on("click", function () {
+                $("#itemModal .modal-title").html("新增物品");
+                $("#itemModal").modal("show");
+                utils.resetForm($("#itemFm"));
+                updateIndex = -1;
+            });
+
+            $("#editBt").on("click", function () {
+                var rows = $('#tb').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再修改");
+                    return;
+                }
+                var row = rows[0];
+                updateIndex = row.idx;
+                utils.loadObjData($("#itemFm"), row);
+                $("#itemModal .modal-title").html("修改物品");
+                $("#itemModal").modal("show");
+            });
+
+            $("#saveBt").on("click", function () {
+                var validateResult = utils.validateRequiredField($("#itemFm"));
+                if (!validateResult.suc) {
+                    toastr.error(validateResult.msg);
+                    return;
+                }
+                var obj = utils.getFormObj($("#itemFm"));
+                if (!utils.testIsFloat(obj.item_qty)) {
+                    toastr.error("数量必须输入数字");
+                    return;
+                }
+                if (updateIndex < 0) {
+                    //新增
+                    obj.idx = addIndex++;
+                    $("#tb").bootstrapTable('append', obj);
+                } else {
+                    //修改
+                    obj.idx = updateIndex;
+                    $("#tb").bootstrapTable('updateByUniqueId', { id: updateIndex, row: obj });
+                }
+                $("#itemModal").modal("hide");
+            });
+
+            $("#removeBt").on("click", function () {
+                var rows = $('#tb').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再删除");
+                    return;
+                }
+                openConfirmDialog("确定要删除选中的行吗？", function () {
+                    console.log(rows[0].idx);
+                    $("#tb").bootstrapTable('removeByUniqueId', rows[0].idx);
+                });
+            });
+        });
+
+    </script>
 
 }
 
@@ -261,7 +390,7 @@
                     联系电话:
                 </span>
                 <span class="b-input">
-                    <input type="text" class="form-control" name="applier_phone" placeholder="填写手机号码" required />
+                    <input type="text" class="form-control" name="applier_phone" placeholder="填写手机号码" value="@m.applierPhone" required />
                 </span>
             </div>
             <div class="b-div">
@@ -269,21 +398,22 @@
                     公司:
                 </span>
                 <span class="b-input">
-                    <select class="form-control" name="company" data-bind="options:companies,optionsCaption:'----下拉选择公司----'" required></select>
+                    <select class="form-control" name="company" data-bind="options:companies,optionsCaption:'----下拉选择公司----',value:'@m.company'" required></select>
                 </span>
             </div>
             <div class="b-div">
                 <span class="b-label">
                     部门:
                 </span>
-                <span class="b-input">
-                    <select class="form-control" name="bus_name" required>
+                <div class="b-input">
+                    <select class="form-control" name="bus_name" data-bind="value:'@m.busName'" required>
                         <option value="" data-auditor="">----下拉选择部门----</option>
                         @foreach (var d in m.depNames) {
                             <option value="@d.text" data-auditor="@d.extraValue">@string.Format("{0}（{1}）", d.text, d.stringValue)</option>
                         }
                     </select>
-                </span>
+                    <div class="small text-danger"><i class="fa fa-info-circle"></i> 如部门负责人有变更或需要增加部门，请联系系统管理员处理</div>
+                </div>
             </div>
             <div class="b-div">
                 <span class="b-label">
@@ -295,7 +425,7 @@
             </div>
             <div class="b-div">
                 <span class="b-label">
-                    寄/带出范围:
+                    <span data-bind="text:isSelfTaken?'带':'寄'"></span>出范围:
                 </span>
                 <span class="b-input">
                     <select class="form-control" name="to_scope" data-bind="options:toScopes,optionsCaption:'----下拉选择范围----'" required></select>
@@ -303,7 +433,7 @@
             </div>
             <div class="b-div">
                 <span class="b-label">
-                    寄/带出地址:
+                    <span data-bind="text:isSelfTaken?'带':'寄'"></span>出地址:
                 </span>
                 <span class="b-input">
                     <input type="text" class="form-control" name="to_addr" placeholder="填写地址" required />
@@ -314,7 +444,7 @@
                     件数:
                 </span>
                 <span class="b-input">
-                    <input type="text" class="form-control" name="total_pack_num" placeholder="填写件数" required />
+                    <input type="number" class="form-control" name="total_pack_num" placeholder="填写件数" required />
                 </span>
             </div>
             <!--ko if:!isSelfTaken-->
@@ -323,7 +453,7 @@
                     收件人:
                 </span>
                 <span class="b-input">
-                    <input type="text" class="form-control" name="receiver_name" placeholder="填写收件人" />
+                    <input type="text" class="form-control" name="receiver_name" placeholder="填写收件人" required />
                 </span>
             </div>
             <div class="b-div">
@@ -331,7 +461,7 @@
                     收件人电话:
                 </span>
                 <span class="b-input">
-                    <input type="text" class="form-control" name="receiver_phone" placeholder="填写收件人电话" />
+                    <input type="text" class="form-control" name="receiver_phone" placeholder="填写收件人电话" required />
                 </span>
             </div>
             <div class="b-div">
@@ -339,7 +469,7 @@
                     快递公司:
                 </span>
                 <span class="b-input">
-                    <input type="text" class="form-control" name="ex_company" placeholder="填写快递公司" />
+                    <input type="text" class="form-control" name="ex_company" placeholder="填写快递公司" required />
                 </span>
             </div>
             <div class="b-div">
@@ -347,7 +477,7 @@
                     快递单号:
                 </span>
                 <span class="b-input">
-                    <input type="text" class="form-control" name="ex_no" placeholder="填写快递单号" />
+                    <input type="text" class="form-control" name="ex_no" placeholder="填写快递单号" required />
                 </span>
             </div>
             <!--/ko-->
@@ -357,7 +487,7 @@
                     带出人类型:
                 </span>
                 <span class="b-input">
-                    <select class="form-control" name="take_out_people_type" data-bind="value:takeOutPeopleType,options:takeOutPeopleTypes,optionsCaption:'----下拉选择类型----'"></select>
+                    <select class="form-control" name="take_out_people_type" data-bind="value:takeOutPeopleType,options:takeOutPeopleTypes,optionsCaption:'----下拉选择类型----'" required></select>
                 </span>
             </div>
             <!--ko if:takeOutPeopleType() == "信利员工" || takeOutPeopleType() == "外来人员"-->
@@ -366,7 +496,7 @@
                     带出人姓名:
                 </span>
                 <span class="b-input">
-                    <input type="text" class="form-control" name="take_out_people_name" placeholder="填写带出人姓名" />
+                    <input type="text" class="form-control" name="take_out_people_name" placeholder="填写带出人姓名" required />
                 </span>
             </div>
             <div class="b-div">
@@ -374,7 +504,7 @@
                     带出人电话:
                 </span>
                 <span class="b-input">
-                    <input type="text" class="form-control" name="take_out_people_phone" placeholder="填写带出人电话" />
+                    <input type="text" class="form-control" name="take_out_people_phone" placeholder="填写带出人电话" required />
                 </span>
             </div>
             <!--/ko-->
@@ -383,7 +513,7 @@
                     带出人预约码:
                 </span>
                 <span class="b-input">
-                    <input type="text" class="form-control" name="take_out_people_code" placeholder="外来人员需填写预约码" />
+                    <input type="text" class="form-control" name="take_out_people_code" placeholder="外来人员需填写预约码" required />
                 </span>
             </div>
             <!--/ko-->
@@ -409,7 +539,7 @@
             <!--存放选择审批人员的动态字段-->
             <div id="auditorFields"></div>
 
-            
+
             <div class="b-div">
                 <div id="picker"> <i class="fa fa-upload"></i> 上传附件 </div>
                 <div class="small text-danger" data-bind="if:attDemand!=''" style="margin-left:16px;"><i class="fa fa-info-circle"></i> <span data-bind="text:attDemand"></span></div>
@@ -417,12 +547,94 @@
             <div id="myUploader">
 
             </div>
-            
+
+            <div class="b-div" style="margin-top:16px;">
+                <span class="b-label">
+                    放行物品:
+                </span>
+                <div class="b-input">
+                    <button class="btn btn-success btn-sm" type="button" id="addBt"> <i class="fa fa-plus"></i> 新增</button>
+                    <button class="btn btn-primary btn-sm" type="button" id="editBt" title="双击数据行也可修改"> <i class="fa fa-edit"></i> 修改 </button>
+                    <button class="btn btn-danger btn-sm" type="button" id="removeBt"> <i class="fa fa-th"></i> 删除</button>
+                </div>
+            </div>
+            <table data-toggle="table" id="tb"></table>
+
         </form>
         <button class="btn btn-danger btn-block" type="button" data-bind="click:beginApply" data-loading-text="正在提交..." style="margin-top:16px;"><i class="fa fa-check-circle-o"></i> 提交申请单</button>
     </div>
 </div>
 
+<div class="panel panel-default" style="margin:16px 0;">
+    <div class="panel-body">
+        <h4 class="text-danger"><i class="fa fa-info-circle"></i> 操作说明 </h4>
+        <div style="margin-left:18px;padding-top:6px;" class="text-danger">
+            <p>
+                1. 提交时建议在电脑端操作，使用Google Chrome或Microsoft Edge、360极速浏览器，打开内网网址：http://192.168.90.100/Emp ,登陆移动办公平台提交申请。
+            </p>
+            <p>
+                2. 非自提放行条流程，在物流中心审批之前，请先在此系统打印好放行条，与物品一起拿到物流中心，物流同事检查没问题之后会在系统确认审批。
+            </p>
+            <p>
+                3. 自提放行条流程，在流程审批完结后，可在系统打开放行二维码图片，拿给门卫扫描通过。
+            </p>
+            <p>
+                4. 如对业务流程有疑问，可联系营运部叶佐键或信息管理部赖吉全；如对系统或操作有疑问，可联系开发人员李逸焊。
+            </p>
+        </div>
+    </div>
+</div>
+
 @section Modal {
     @Html.Partial("_ConfirmDialog")
+    <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">新增物品</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="itemFm">
+                        <div class="b-div">
+                            <span class="b-label">
+                                物品名称:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="item_name" required />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                物品型号:
+                            </span>
+                            <div class="b-input">
+                                <input type="text" class="form-control" name="item_model" required />
+                            </div>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                数量:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="item_qty" required />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                单位:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="item_unit" required />
+                            </span>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-remove"></span> 取消</button>
+                    <button type="button" class="btn btn-success" id="saveBt"><span class="fa fa-check-circle"></span> 确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
 }

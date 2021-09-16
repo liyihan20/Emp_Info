@@ -169,6 +169,8 @@ namespace EmpInfo.Models
         public DbSet<ei_xcProcessDep> ei_xcProcessDep { get; set; }
         public DbSet<ei_xdApply> ei_xdApply { get; set; }
         public DbSet<ei_fxType> ei_fxType { get; set; }
+        public DbSet<ei_fxApplyEntry> ei_fxApplyEntry { get; set; }
+        public DbSet<ei_fxApply> ei_fxApply { get; set; }
     
         public virtual ObjectResult<string> GetDormChargeMonth()
         {

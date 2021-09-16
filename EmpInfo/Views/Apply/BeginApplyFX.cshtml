@@ -1,5 +1,8 @@
-﻿@{
-    string typesJson = ViewData["infoBeforeApply"] as string;
+﻿@using EmpInfo.Models;
+@using Newtonsoft.Json;
+@{
+    FXSelectTypeNameModel m = ViewData["infoBeforeApply"] as FXSelectTypeNameModel;
+    string typesJson = JsonConvert.SerializeObject(m.fxTypes);
 }
 
 @section CSS{
@@ -330,9 +333,12 @@
         <i>请在以下选择一种途径以确认生成放行条的业务类型：</i>
     </div>
     <div class="list-group">
-        <a href="#" class="list-group-item" id="guide_link"><span class="text-primary"><i class="fa fa-arrow-circle-right"></i> 1. 通过引导式对话框选择业务类型</span></a>
-        <a href="#" class="list-group-item" id="search_link"><span class="text-primary"><i class="fa fa-search"></i> 2. 通过搜索对话框选择业务类型</span></a>
-        <a href="#" class="list-group-item" id="tree_link"><span class="text-primary"><i class="fa fa-tree"></i> 3. 通过业务类型树状图选择</span></a>
+        <a href="#" class="list-group-item" id="guide_link"><span class="text-primary"><i class="fa fa-arrow-circle-right fa-fw"></i> 1. 通过引导式对话框选择业务类型</span></a>
+        <a href="#" class="list-group-item" id="search_link"><span class="text-primary"><i class="fa fa-search fa-fw"></i> 2. 通过搜索对话框选择业务类型</span></a>
+        <a href="#" class="list-group-item" id="tree_link"><span class="text-primary"><i class="fa fa-tree fa-fw"></i> 3. 通过业务类型树状图选择</span></a>
+        @if (!string.IsNullOrEmpty(m.lastTypeNo)) {
+            <a href="#" class="list-group-item" onclick="jumpToForm('@m.lastTypeNo')"><span class="text-primary"><i class="fa fa-file-o fa-fw"></i> 4. 选择上次提交的业务类型：@m.lastTypeName</span></a>
+        }
     </div>
 
 </div>

@@ -358,6 +358,12 @@
     <Compile Include="Models\ei_flowAuthority.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_fxApply.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_fxApplyEntry.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_fxType.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -1747,6 +1753,8 @@
     <Content Include="Views\Report\MTReport.cshtml" />
     <Content Include="Views\Apply\BeginApplyFX.cshtml" />
     <Content Include="Views\ApplyExtra\FillFxForm.cshtml" />
+    <Content Include="Views\Apply\CheckFXApply.cshtml" />
+    <Content Include="Views\Apply\BeginAuditFXApply.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

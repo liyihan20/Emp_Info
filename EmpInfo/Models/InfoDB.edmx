@@ -795,6 +795,56 @@
           <Property Name="cond1" Type="nvarchar" MaxLength="500" />
           <Property Name="cond2" Type="nvarchar" MaxLength="500" />
         </EntityType>
+        <EntityType Name="ei_fxApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="applier_num" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="applier_name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="applier_phone" Type="varchar" MaxLength="50" />
+          <Property Name="apply_time" Type="datetime" Nullable="false" />
+          <Property Name="fx_type_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="fx_type_no" Type="varchar" MaxLength="50" />
+          <Property Name="fx_process" Type="nvarchar" MaxLength="200" />
+          <Property Name="company" Type="nvarchar" MaxLength="50" />
+          <Property Name="bus_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="total_pack_num" Type="int" Nullable="false" />
+          <Property Name="from_addr" Type="nvarchar" MaxLength="50" />
+          <Property Name="to_scope" Type="nvarchar" MaxLength="50" />
+          <Property Name="to_addr" Type="nvarchar" MaxLength="200" />
+          <Property Name="receiver_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="receiver_phone" Type="varchar" MaxLength="50" />
+          <Property Name="ex_company" Type="nvarchar" MaxLength="100" />
+          <Property Name="ex_no" Type="nvarchar" MaxLength="50" />
+          <Property Name="reason" Type="nvarchar" MaxLength="200" />
+          <Property Name="comment" Type="nvarchar" MaxLength="200" />
+          <Property Name="has_attachment" Type="bit" Nullable="false" />
+          <Property Name="can_print" Type="bit" Nullable="false" />
+          <Property Name="auditor_segs" Type="nvarchar" MaxLength="2000" />
+          <Property Name="other_segs" Type="nvarchar" MaxLength="2000" />
+          <Property Name="cc_users_name" Type="nvarchar" MaxLength="500" />
+          <Property Name="cc_users_num" Type="varchar" MaxLength="500" />
+          <Property Name="out_status" Type="nvarchar" MaxLength="20" />
+          <Property Name="out_time" Type="datetime" />
+          <Property Name="out_guard" Type="nvarchar" MaxLength="50" />
+          <Property Name="take_out_people_type" Type="nvarchar" MaxLength="50" />
+          <Property Name="take_out_people_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="take_out_people_phone" Type="nvarchar" MaxLength="50" />
+          <Property Name="take_out_people_code" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="ei_fxApplyEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="item_name" Type="nvarchar" MaxLength="500" />
+          <Property Name="item_model" Type="nvarchar" MaxLength="500" />
+          <Property Name="item_qty" Type="int" Nullable="false" />
+          <Property Name="item_unit" Type="nvarchar" MaxLength="50" />
+        </EntityType>
         <EntityType Name="ei_fxType">
           <Key>
             <PropertyRef Name="id" />
@@ -3373,6 +3423,8 @@
           <EntitySet Name="ei_etApplyEntry" EntityType="Self.ei_etApplyEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_event_log" EntityType="Self.ei_event_log" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_flowAuthority" EntityType="Self.ei_flowAuthority" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_fxApply" EntityType="Self.ei_fxApply" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_fxApplyEntry" EntityType="Self.ei_fxApplyEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_fxType" EntityType="Self.ei_fxType" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groupAuthority" EntityType="Self.ei_groupAuthority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groups" EntityType="Self.ei_groups" Schema="dbo" store:Type="Tables" />
@@ -4665,6 +4717,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySet Name="ei_xcProcessDep" EntityType="ICAuditModel.ei_xcProcessDep" />
           <EntitySet Name="ei_xdApply" EntityType="ICAuditModel.ei_xdApply" />
           <EntitySet Name="ei_fxType" EntityType="ICAuditModel.ei_fxType" />
+          <EntitySet Name="ei_fxApplyEntry" EntityType="ICAuditModel.ei_fxApplyEntry" />
+          <EntitySet Name="ei_fxApply" EntityType="ICAuditModel.ei_fxApply" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -8095,6 +8149,56 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="process_info" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="is_deleted" Type="Boolean" Nullable="false" />
         </EntityType>
+        <EntityType Name="ei_fxApplyEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="item_name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="item_model" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="item_qty" Type="Int32" Nullable="false" />
+          <Property Name="item_unit" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="ei_fxApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="applier_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="apply_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="fx_type_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="fx_type_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="fx_process" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="company" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="bus_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="total_pack_num" Type="Int32" Nullable="false" />
+          <Property Name="from_addr" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="to_scope" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="to_addr" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="receiver_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="receiver_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ex_company" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="ex_no" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="reason" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="comment" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="has_attachment" Type="Boolean" Nullable="false" />
+          <Property Name="can_print" Type="Boolean" Nullable="false" />
+          <Property Name="auditor_segs" Type="String" MaxLength="2000" FixedLength="false" Unicode="true" />
+          <Property Name="other_segs" Type="String" MaxLength="2000" FixedLength="false" Unicode="true" />
+          <Property Name="cc_users_name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="cc_users_num" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="out_status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="out_time" Type="DateTime" Precision="3" />
+          <Property Name="out_guard" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="take_out_people_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="take_out_people_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="take_out_people_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="take_out_people_code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -11317,6 +11421,58 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="type_tip" ColumnName="type_tip" />
                 <ScalarProperty Name="type_name" ColumnName="type_name" />
                 <ScalarProperty Name="type_no" ColumnName="type_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_fxApplyEntry">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_fxApplyEntry">
+              <MappingFragment StoreEntitySet="ei_fxApplyEntry">
+                <ScalarProperty Name="item_unit" ColumnName="item_unit" />
+                <ScalarProperty Name="item_qty" ColumnName="item_qty" />
+                <ScalarProperty Name="item_model" ColumnName="item_model" />
+                <ScalarProperty Name="item_name" ColumnName="item_name" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_fxApply">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_fxApply">
+              <MappingFragment StoreEntitySet="ei_fxApply">
+                <ScalarProperty Name="take_out_people_code" ColumnName="take_out_people_code" />
+                <ScalarProperty Name="take_out_people_phone" ColumnName="take_out_people_phone" />
+                <ScalarProperty Name="take_out_people_name" ColumnName="take_out_people_name" />
+                <ScalarProperty Name="take_out_people_type" ColumnName="take_out_people_type" />
+                <ScalarProperty Name="out_guard" ColumnName="out_guard" />
+                <ScalarProperty Name="out_time" ColumnName="out_time" />
+                <ScalarProperty Name="out_status" ColumnName="out_status" />
+                <ScalarProperty Name="cc_users_num" ColumnName="cc_users_num" />
+                <ScalarProperty Name="cc_users_name" ColumnName="cc_users_name" />
+                <ScalarProperty Name="other_segs" ColumnName="other_segs" />
+                <ScalarProperty Name="auditor_segs" ColumnName="auditor_segs" />
+                <ScalarProperty Name="can_print" ColumnName="can_print" />
+                <ScalarProperty Name="has_attachment" ColumnName="has_attachment" />
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="reason" ColumnName="reason" />
+                <ScalarProperty Name="ex_no" ColumnName="ex_no" />
+                <ScalarProperty Name="ex_company" ColumnName="ex_company" />
+                <ScalarProperty Name="receiver_phone" ColumnName="receiver_phone" />
+                <ScalarProperty Name="receiver_name" ColumnName="receiver_name" />
+                <ScalarProperty Name="to_addr" ColumnName="to_addr" />
+                <ScalarProperty Name="to_scope" ColumnName="to_scope" />
+                <ScalarProperty Name="from_addr" ColumnName="from_addr" />
+                <ScalarProperty Name="total_pack_num" ColumnName="total_pack_num" />
+                <ScalarProperty Name="bus_name" ColumnName="bus_name" />
+                <ScalarProperty Name="company" ColumnName="company" />
+                <ScalarProperty Name="fx_process" ColumnName="fx_process" />
+                <ScalarProperty Name="fx_type_no" ColumnName="fx_type_no" />
+                <ScalarProperty Name="fx_type_name" ColumnName="fx_type_name" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
+                <ScalarProperty Name="applier_phone" ColumnName="applier_phone" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

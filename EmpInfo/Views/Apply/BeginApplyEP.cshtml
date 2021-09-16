@@ -211,9 +211,9 @@
                         <span class="b-input">
                             <select class="form-control" name="emergency_level">
                                 <option value="0" selected disabled>----请在下拉列表中选择（必选）----</option>
-                                <option value="@((int)EmergencyEnum.影响多岗位停产)">@EmergencyEnum.影响多岗位停产.ToString()</option>
-                                <option value="@((int)EmergencyEnum.影响单岗位停产)">@EmergencyEnum.影响单岗位停产.ToString()</option>
-                                <option value="@((int)EmergencyEnum.不停产)">@EmergencyEnum.不停产.ToString()</option>
+                                @foreach (EmergencyEnum en in Enum.GetValues(typeof(EmergencyEnum))) {
+                                    <option value="@((int)en)">@en.ToString()</option>
+                                }
                             </select>
                         </span>
                     </div>
