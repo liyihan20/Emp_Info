@@ -37,6 +37,7 @@
     <script src="@Url.Content("~/Scripts/myDownloaderPro.js")"></script>
 
     <script>
+        var minutes=30; //自提二维码有效分钟数
         $("#tb").bootstrapTable({
             striped: true,
             data:@Html.Raw(entryJson),
@@ -62,11 +63,24 @@
 
             $("#flowRecordBt").on("click", function () {
                 var box = $("<div></div>");
-                $(box).load("CheckFlowRecord .list-group", { sysNo: "@h.sys_no" }, function () {
+                $(box).load("../Apply/CheckFlowRecord .list-group", { sysNo: "@h.sys_no" }, function () {
                     openMessageDialog($(box).html(), "查看流转记录");
                 });
             });
-            
+
+            $("#printBt").on("click",function(){
+                window.open("../Report/PrintFX?sysNo=@h.sys_no");
+            });
+
+            $("#showCode").on("click",function(){
+                $("#codeModal").modal("show");
+                genQrCode();
+            });
+
+            $("#reGenCodeBt").on("click",function(){
+                genQrCode();
+            })
+
             genOtherSeg();
         });
 
@@ -76,6 +90,14 @@
                 var html='<div class="b-div"><span class="b-label">'+segs[i].n+':</span><span class="b-input">'+segs[i].v+'</span></div>';
                 $("#fxExtraFields").append(html);
             }
+        }
+
+        function genQrCode(){
+            $("#codeDiv").css("background-image","url('../Home/GetFXQrCode?sysNo=@h.sys_no&r="+Math.random()+"')");
+            var time=new Date(Date.now()+minutes*60*1000);
+            var str=utils.parseJsDate(time,true);
+            $("#expire_time").html(str);
+            $("#valid_minutes").html(minutes);
         }
 
     </script>
@@ -305,6 +327,33 @@
         <!--存放此业务类型的额外内容-->
         <div id="fxExtraFields"></div>
 
+        @if (h.out_time != null) {
+            <div class="b-div">
+                <span class="b-label">
+                    放行状态:
+                </span>
+                <span class="b-input">
+                    @h.out_status
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    放行时间:
+                </span>
+                <span class="b-input">
+                    @(((DateTime)h.out_time).ToString("yyyy-MM-dd HH:mm"))
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    放行人:
+                </span>
+                <span class="b-input">
+                    @h.out_guard
+                </span>
+            </div>
+        }
+
         <div style="margin-top:6px;">
             <div class="b-label">附件列表:</div>
             <div id="attList"></div>
@@ -323,4 +372,32 @@
 </div>
 @section Modal {
     @Html.Partial("_MessageDialog")
+
+    <div class="modal fade" id="codeModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="codeModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="fa fa-qrcode"></i> 查看放行二维码(@h.sys_no)</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="codeDiv" style="background-size:200px;background-repeat:no-repeat;background-position:center;height:200px;">
+                        <img src="~/Content/images/Trulyicon.jpg" class="center-block" style="width:32px;height:auto; padding-top:84px;" />
+                    </div>
+                    <div style="margin-top:16px;" class="text-danger small">
+                        <div style="font-weight:bold;margin-bottom:6px;">注意事项：</div>
+                        <div style="padding-left:12px;">
+                            <div>1. 此放行二维码有时效性，生成后仅在<span id="valid_minutes"></span>分钟有效，超过即失效。</div>
+                            <div>2. 重新打开二维码对话框或者点击【刷新二维码】按钮，会重新刷新二维码，并重置失效时间。</div>
+                            <div>3. 当前显示的二维码失效时间为：<span id="expire_time"></span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-close"></i> 关闭</button>
+                    <button id="reGenCodeBt" type="button" class="btn btn-success"><i class="fa fa-refresh"></i> 刷新二维码</button>
+                </div>
+            </div>
+        </div>
+    </div>
 }

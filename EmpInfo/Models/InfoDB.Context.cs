@@ -149,7 +149,6 @@ namespace EmpInfo.Models
         public DbSet<ei_mqHRTalkRecord> ei_mqHRTalkRecord { get; set; }
         public DbSet<ei_spApply> ei_spApply { get; set; }
         public DbSet<ei_PPApply> ei_PPApply { get; set; }
-        public DbSet<ei_xaApply> ei_xaApply { get; set; }
         public DbSet<ei_xaApplySupplier> ei_xaApplySupplier { get; set; }
         public DbSet<all_maxNum> all_maxNum { get; set; }
         public DbSet<ei_mtClass> ei_mtClass { get; set; }
@@ -171,6 +170,7 @@ namespace EmpInfo.Models
         public DbSet<ei_fxType> ei_fxType { get; set; }
         public DbSet<ei_fxApplyEntry> ei_fxApplyEntry { get; set; }
         public DbSet<ei_fxApply> ei_fxApply { get; set; }
+        public DbSet<ei_xaApply> ei_xaApply { get; set; }
     
         public virtual ObjectResult<string> GetDormChargeMonth()
         {

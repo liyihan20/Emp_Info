@@ -200,6 +200,9 @@ namespace EmpInfo.Services
                     bill.can_print = true;
                     bill.confirm_date = DateTime.Now;
                 }
+                if (stepName.Contains("填写PO")) {
+                    bill.po_no = fc.Get("po_no");
+                }
                 if (stepName.Contains("申请人验收")) {
                     bill.check_date = DateTime.Now;
                 }
@@ -250,6 +253,21 @@ namespace EmpInfo.Services
                         (isSuc ? "批准" : "被撤销"),
                         new List<string>() { bill.applier_num }
                         );
+
+                    //if (isSuc) {
+                    //    var notifyUser = db.flow_auditorRelation.Where(f => f.bill_type == BillType && f.relate_name == "采购部审批" && f.relate_text == bill.company).Select(f => f.relate_value).ToList();
+                    //    if (notifyUser.Count() > 0) {
+                    //        SendQywxMessageToCC(
+                    //            BillTypeName + "（审核部已确认）",
+                    //            bill.sys_no,
+                    //            bill.applier_name,
+                    //            ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                    //            string.Format("现可通知中标供应商：项目类别：{0}；项目名称：{1}", bill.project_type, bill.project_name),
+                    //            notifyUser
+                    //            );
+                    //    }
+                    //}
+
                 }
                 else {
                     
@@ -326,20 +344,21 @@ namespace EmpInfo.Services
                             }
                         }
 
-                        //审核部最终确认后，申请人验收前，需要抄送给采购员
-                        if (result.stepName.Contains("申请人验收")) {
-                            var notifyUser = db.flow_auditorRelation.Where(f => f.bill_type == BillType && f.relate_name == "采购部审批" && f.relate_text == bill.company).Select(f => f.relate_value).ToList();
-                            if (notifyUser.Count() > 0) {
-                                SendQywxMessageToCC(
-                                    BillTypeName + "（审核部已确认）",
-                                    bill.sys_no,
-                                    bill.applier_name,
-                                    ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
-                                    string.Format("现可通知中标供应商：项目类别：{0}；项目名称：{1}", bill.project_type, bill.project_name),
-                                    notifyUser
-                                    );
-                            }
-                        }
+                        //申请人验收之前，需通知采购
+                        //if (result.stepName.Contains("申请人验收")) {
+                        //    var notifyUser = db.flow_auditorRelation.Where(f => f.bill_type == BillType && f.relate_name == "采购部审批" && f.relate_text == bill.company).Select(f => f.relate_value).ToList();
+                        //    if (notifyUser.Count() > 0) {
+                        //        SendQywxMessageToCC(
+                        //            BillTypeName + "（审核部已确认）",
+                        //            bill.sys_no,
+                        //            bill.applier_name,
+                        //            ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
+                        //            string.Format("现可通知中标供应商：项目类别：{0}；项目名称：{1}", bill.project_type, bill.project_name),
+                        //            notifyUser
+                        //            );
+                        //    }
+                        //}
+
                     }
 
                 }

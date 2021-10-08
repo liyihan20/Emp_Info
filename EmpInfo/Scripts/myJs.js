@@ -51,6 +51,14 @@
         }
         return newArr;
     },
+    //将js的日期转为年-月-日
+    parseJsDate: function (date, hasHour) {
+        var date_str = date.getFullYear() + '-' + (date.getMonth() < 9 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1)) + '-' + (date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + " ";
+        if (hasHour) {
+            date_str += (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes());
+        }
+        return date_str;
+    },
     //将后台到前台的日期格式化为年-月-日的格式，第二个参数指定是否包含小时和分钟
     parseTDate: function (d, hasHour) {
         if (!d) return "";
@@ -61,12 +69,8 @@
                 return d.split("T")[0];
             }
         } else if (d.indexOf("Date") >= 0) {
-            var date = eval('new ' + eval(d).source)
-            var date_str = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + " ";
-            if (hasHour) {
-                date_str += (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes());
-            }
-            return date_str;
+            var date = eval('new ' + eval(d).source)            
+            return this.parseJsDate(date,hasHour);
         } else {
             return d;
         }
@@ -228,5 +232,4 @@
         }
         return span;
     }
-
 }

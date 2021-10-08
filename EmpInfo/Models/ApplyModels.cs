@@ -457,12 +457,26 @@ namespace EmpInfo.Models
         public string applierPhone { get; set; }
         public string company { get; set; }
         public string busName { get; set; }
+        public string inWay { get; set; }
     }
 
     public class FXCheckApplyModel
     {
         public ei_fxApply bill { get; set; }
         public List<ei_fxApplyEntry> entrys { get; set; }
+        public List<StepNameAndAuditor> auditorList { get; set; }
+    }
+
+    public class FXSearchReportModel
+    {
+        public DateTime fromDate { get; set; }
+        public DateTime toDate { get; set; }
+        public string typeNo { get; set; }
+        public string typeName { get; set; }
+        public string applierName { get; set; }
+        public string sysNo { get; set; }
+        public string busName { get; set; }
+        public string auditStatus { get; set; }
     }
 
 }

@@ -1511,7 +1511,7 @@ namespace EmpInfo.Controllers
         /// </summary>
         /// <param name="typeNo"></param>
         /// <returns></returns>
-        public ActionResult FillFxForm(string typeNo)
+        public ActionResult FillFxForm(string typeNo, string way)
         {
             if (string.IsNullOrEmpty(typeNo)) {
                 ViewBag.tip = "业务类型编码不存在";
@@ -1561,7 +1561,8 @@ namespace EmpInfo.Controllers
                 typeDemands = typeDemands,
                 applierPhone = (lastApply == null ? "" : lastApply.applier_phone),
                 busName = (lastApply == null ? "" : lastApply.bus_name),
-                company = (lastApply == null ? "" : lastApply.company)
+                company = (lastApply == null ? "" : lastApply.company),
+                inWay = way
             };
 
             return View();
@@ -1587,6 +1588,98 @@ namespace EmpInfo.Controllers
             return Json(result);
 
         }
+
+        /// <summary>
+        /// 门卫扫描二维码跳转到的界面
+        /// </summary>
+        /// <param name="sysNo"></param>
+        /// <returns></returns>
+        public ActionResult FXGuardScanResult(string sysNo)
+        {
+            var fx = db.ei_fxApply.Where(f => f.sys_no == sysNo).FirstOrDefault();
+            if (fx == null) {
+                ViewBag.tip = "此放行条不存在";
+                return View("Error");
+            }
+            if (!fx.fx_type_no.StartsWith("2")) {
+                ViewBag.tip = "此放行条不属于自提放行条";
+                return View("Error");
+            }
+            if (db.flow_apply.Where(f => f.sys_no == sysNo && f.success == true).Count() < 1) {
+                ViewBag.tip = "审批流程还未结束，不能放行";
+                return View("Error");
+            }
+            ViewData["fx"] = fx;
+            return View();
+        }
+
+        /// <summary>
+        /// 门卫放行/驳回
+        /// </summary>
+        /// <param name="sysNo"></param>
+        /// <param name="letPass"></param>
+        /// <returns></returns>
+        public JsonResult FXGuardOpApply(string sysNo, bool letPass)
+        {
+            WriteEventLog("门卫放行", letPass.ToString());
+            var fx = db.ei_fxApply.Single(f => f.sys_no == sysNo);
+            if (letPass) {
+                if (fx.out_time != null) {
+                    return Json(new SimpleResultModel(false, "此放行条已放行，不能再次操作"));
+                }
+                fx.out_time = DateTime.Now;
+                fx.out_status = "已放行";
+                fx.out_guard = userInfo.name;
+            }
+            else {
+                if (fx.out_time == null) {
+                    return Json(new SimpleResultModel(false, "此放行条未放行，不能驳回"));
+                }
+                fx.out_time = null;
+                fx.out_status = "已打印";
+                fx.out_guard = "";
+            }
+            db.SaveChanges();
+
+            return Json(new SimpleResultModel(true));
+        }
+
+
+        public ActionResult CheckMyScannedList()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 门卫查看已放行列表
+        /// </summary>
+        /// <param name="fromDate"></param>
+        /// <param name="toDate"></param>
+        /// <param name="applierName"></param>
+        /// <returns></returns>
+        public JsonResult FXGetGuardScanList(DateTime fromDate, DateTime toDate, string applierName)
+        {
+            toDate = toDate.AddDays(1);
+            bool canCheckAll = HasGotPower("CheckFXList");
+            var list = (from f in db.ei_fxApply
+                        where f.out_time >= fromDate
+                        && f.out_time <= toDate
+                        && (f.out_guard == userInfo.name || canCheckAll)
+                        && f.fx_type_no.StartsWith("2")
+                        && f.applier_name.Contains(applierName)
+                        select new
+                        {
+                            f.sys_no,
+                            f.applier_name,
+                            f.out_time,
+                            f.bus_name,
+                            f.total_pack_num,
+                            f.take_out_people_type
+                        }).ToList();
+
+            return Json(list);
+        }
+
 
         #endregion
 

@@ -251,7 +251,7 @@ namespace EmpInfo.Services
             var msg = new QywxWebSrv.TextMsg();
             msg.touser = bill.card_number;
             msg.text = new QywxWebSrv.TextContent();
-            msg.text.content = string.Format("你的编号为【{0}】的辞职申请单被主管【{1}】修改了离职日期，由【{2:yyyy-MM-dd}】改为【{3:yyyy-MM-dd}】。如果没有与你本人协商并同意修改，可发企业微信给行政部刘长青投诉处理。", bill.sys_no, chargerName, leaveDateBefore, newDay);
+            msg.text.content = string.Format("你的编号为【{0}】的辞职申请单被主管【{1}】修改了离职日期，由【{2:yyyy-MM-dd}】改为【{3:yyyy-MM-dd}】。如果没有与你本人协商并同意修改，可发企业微信给行政部陈晓芳投诉处理。", bill.sys_no, chargerName, leaveDateBefore, newDay);
             SendQYWXMsg(msg);
 
         }

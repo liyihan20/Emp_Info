@@ -77,9 +77,16 @@ namespace EmpInfo.Controllers
         }
 
         //获取二维码
-        public ActionResult GetQrCode()
+        public ActionResult GetQrCode(string content)
         {
-            byte[] code = MyUtils.GetQrCode(userInfo.cardNo);
+            byte[] code = MyUtils.GetQrCode(content);
+            return File(code, @"image/jpeg");
+        }
+
+        public ActionResult GetFXQrCode(string sysNo)
+        {
+            var content = string.Format("FXTN_{0}_{1}", MyUtils.GetTimeStamp(DateTime.Now.AddMinutes(20)), sysNo);
+            byte[] code = MyUtils.GetQrCode(content);
             return File(code, @"image/jpeg");
         }
 

@@ -154,7 +154,6 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_spApply" Width="1.5" PointX="6" PointY="14.375" IsExpanded="false" />
         <AssociationConnector Association="ICAuditModel.FK_ei_spApplyEntry_ei_spApply" />
         <EntityTypeShape EntityType="ICAuditModel.ei_PPApply" Width="1.5" PointX="8.25" PointY="17.875" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_xaApply" Width="1.5" PointX="0.5" PointY="18" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_xaApplySupplier" Width="1.5" PointX="2.375" PointY="18" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.all_maxNum" Width="1.5" PointX="5.375" PointY="6.125" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_mtClass" Width="1.5" PointX="10.375" PointY="18.625" IsExpanded="false" />
@@ -179,6 +178,7 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_fxType" Width="1.5" PointX="6" PointY="19.625" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_fxApplyEntry" Width="1.5" PointX="6" PointY="21" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_fxApply" Width="1.5" PointX="6" PointY="20.375" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_xaApply" Width="1.5" PointX="0.5" PointY="18" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -157,6 +157,38 @@ namespace EmpInfo.Controllers
             return View();
         }
 
+        //扫描放行条二维码进入系统查看放行条详情
+        public ActionResult ScanFx(string code)
+        {
+            var m = JsonConvert.DeserializeObject<ScanParamModel>(Uri.UnescapeDataString(code));
+
+            var user = db.ei_users.Where(u => u.card_number == m.name).FirstOrDefault();
+            if (user == null) {
+                ViewBag.tip = "厂牌不存在：" + m.name;
+                return View("Error");
+            }
+            setcookie(user, 1);
+
+            WriteEventLog("门卫扫描自提放行条", m.ToString());
+
+            return RedirectToAction("FXGuardScanResult", "ApplyExtra", new { sysNo = m.no });
+        }
+
+        //查询本人已放行的自提放行条
+        public ActionResult CheckMyScannedList(string code)
+        {
+            var m = JsonConvert.DeserializeObject<ScanParamModel>(Uri.UnescapeDataString(code));
+
+            var user = db.ei_users.Where(u => u.card_number == m.name).FirstOrDefault();
+            if (user == null) {
+                ViewBag.tip = "厂牌不存在：" + m.name;
+                return View("Error");
+            }
+            setcookie(user, 1);
+
+            return RedirectToAction("CheckMyScannedList", "ApplyExtra");
+        }
+
         #endregion
 
         #region js接口
@@ -227,4 +259,15 @@ namespace EmpInfo.Controllers
 
         #endregion
     }
+
+    public class ScanParamModel
+    {
+        public string no { get; set; }
+        public string name { get; set; }
+        public override string ToString()
+        {
+            return string.Format("参数解析结果：no[{0}],name[{1}]", no, name);
+        }
+    }
+
 }

@@ -33,32 +33,6 @@ namespace EmpInfo.Services
         public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
         {
             var list = base.GetApplyMenuItems(userInfo);
-            //var list = new List<ApplyMenuItemModel>();
-            //list.Add(new ApplyMenuItemModel()
-            //{
-            //    url = "../Att/SP/wl_tg.png",
-            //    text = "开始申请",
-            //    iconFont = "fa-pencil",
-            //    colorClass = "text-danger"
-            //});
-            //list.Add(new ApplyMenuItemModel()
-            //{
-            //    url = "GetMyApplyList?billType=" + BillType,
-            //    text = "我申请的",
-            //    iconFont = "fa-th"
-            //});
-            //list.Add(new ApplyMenuItemModel()
-            //{
-            //    url = "GetMyAuditingList?billType=" + BillType,
-            //    text = "我的待办",
-            //    iconFont = "fa-th-list"
-            //});
-            //list.Add(new ApplyMenuItemModel()
-            //{
-            //    url = "GetMyAuditedList?billType=" + BillType,
-            //    text = "我的已办",
-            //    iconFont = "fa-th-large"
-            //});
 
             if (HasGotPower("SPReport", userInfo.id)) {
                 list.Add(new ApplyMenuItemModel()

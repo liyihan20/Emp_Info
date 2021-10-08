@@ -37,6 +37,22 @@ namespace EmpInfo.Services
             return "BeginAuditFXApply";
         }
 
+        public override List<ApplyMenuItemModel> GetApplyMenuItems(UserInfo userInfo)
+        {
+            var list = base.GetApplyMenuItems(userInfo);
+
+            if (db.ei_flowAuthority.Where(a => a.bill_type == BillType && a.relate_type == "查询报表" && a.relate_value == userInfo.cardNo).Count() > 0) {
+
+                list.Add(new ApplyMenuItemModel()
+                {
+                    text = "查询报表",
+                    iconFont = "fa-file-text-o",
+                    url = "../Report/FXReport"
+                });
+            }
+            return list;
+        }
+
         public override object GetInfoBeforeApply(UserInfo userInfo, UserInfoDetail userInfoDetail)
         {
             var m = new FXSelectTypeNameModel();
@@ -101,6 +117,10 @@ namespace EmpInfo.Services
             bool isPass = bool.Parse(fc.Get("isPass"));
             string opinion = fc.Get("opinion");
 
+            if (!isPass && string.IsNullOrEmpty(opinion)) {
+                throw new Exception("必须填写审批意见后才能拒绝");
+            }
+
             string formJson = JsonConvert.SerializeObject(bill);
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
             var result = flow.BeginAudit(bill.sys_no, step, userInfo.cardNo, isPass, opinion, formJson);
@@ -139,7 +159,7 @@ namespace EmpInfo.Services
                         bill.sys_no,
                         (isSuc ? "批准" : "被拒绝"),
                         new List<string>() { bill.applier_num },
-                        model.opinion
+                        bill.fx_type_no.StartsWith("1") && isSuc ? model.opinion : "请在24小时内到大门门卫处出示二维码给门卫扫码放行，逾期失效"
                         );
 
                 }
@@ -164,8 +184,6 @@ namespace EmpInfo.Services
 
                         }
                     }
-
-                    return;
 
                     SendEmailToNextAuditor(
                         bill.sys_no,
@@ -193,5 +211,14 @@ namespace EmpInfo.Services
                 }
             }
         }
+
+        public void UpdatePrintStatus()
+        {
+            if (bill.out_status == null) {
+                bill.out_status = "已打印";
+                db.SaveChanges();
+            }
+        }
+
     }
 }

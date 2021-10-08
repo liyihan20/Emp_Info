@@ -1,0 +1,65 @@
+﻿@using EmpInfo.Models;
+@{
+    ei_fxApply fx = ViewData["fx"] as ei_fxApply;
+}
+
+@section Scripts {
+    <script>
+
+        $(function () {
+            $("#applyContent").load("../Apply/CheckApply", { sysNo: "@fx.sys_no" }, function () {
+                $($("#applyContent .panel-heading")[0]).html("<i class='fa fa-list'></i> 放行条_门卫放行");
+                $("#waiting").remove();
+                $(".auditContent").css("visibility", "visible");                
+            });            
+
+        })
+
+        function op(letPass) {
+            openConfirmDialog("确认要" + (letPass ? "同意放行" : "驳回") + "此申请单吗？", function () {
+                $.post("FXGuardOpApply", { sysNo: "@fx.sys_no", letPass: letPass }, function (data) {
+                    if (!data.suc) {
+                        toastr.error(data.msg);
+                        return;
+                    }
+                    toastr.success("操作成功，请等待页面跳转");
+                    setTimeout(function () { location.href = "CheckMyScannedList" }, 1000);
+                });
+            });
+        }
+
+    </script>
+}
+
+@*通过load获取申请单内容*@
+<div class="text-center text-danger" id="waiting"><i class="fa fa-3x fa-spinner fa-pulse"></i></div>
+<div id="applyContent"></div>
+
+<div class="auditContent">
+    <div class="panel panel-primary">
+        <div class="panel-heading" id="auditHead">
+            <i class='fa fa-pencil'></i> 处理放行条
+        </div>
+        <div class="panel-body">
+            @if (fx.out_time == null) {
+                <div style="margin-top:12px;"></div>    
+                <button type="button" class="btn btn-block btn-success" onclick="op(true)">同意放行</button>               
+            }
+            else {
+                <div style="margin-top:12px;"></div>
+                @*if (DateTime.Now.AddDays(-3) > fx.out_time) {*@
+                <button type="button" class="btn btn-block btn-success disabled">已放行</button>
+            @*}
+                else {
+                    <button type="button" class="btn btn-block btn-danger" onclick="op(false)">驳回申请</button>
+                }*@
+            }
+        </div>
+    </div>
+</div>
+
+
+@section Modal {
+    @Html.Partial("_MessageDialog")
+    @Html.Partial("_ConfirmDialog")
+}

@@ -86,6 +86,10 @@ namespace EmpInfo.Services
                 }
             }
 
+            if (Math.Abs(((DateTime)bill.duty_date_to - (DateTime)bill.duty_date_from).TotalDays - ((DateTime)bill.vacation_date_to - (DateTime)bill.vacation_date_from).TotalDays) >= 1) {
+                throw new Exception("值班日期期间与调休日期期间不一致");
+            }
+
             //处理一下审核队列,将姓名（厂牌）格式更换为厂牌
             if (!string.IsNullOrEmpty(bill.auditor_queues)) {
                 var queueList = JsonConvert.DeserializeObject<List<flow_applyEntryQueue>>(bill.auditor_queues);

@@ -324,6 +324,16 @@
                     @(m.bill.is_po==true?"是":"否")
                 </span>
             </div>
+            if (!string.IsNullOrEmpty(m.bill.po_no)) { 
+                <div class="b-div">
+                    <span class="b-label">
+                        PO单号:
+                    </span>
+                    <span class="b-input">
+                        @m.bill.po_no
+                    </span>
+                </div>
+            }
         }
         @if (m.bill.confirm_date != null) {
             <div class="b-div">

@@ -17,10 +17,10 @@
     <script>
         var typesJson = @Html.Raw(typesJson); //原始数据
 
-        function jumpToForm(type_no){
+        function jumpToForm(type_no,which_way){
             toastr.info("正在进入对应业务流程表单，请稍等...");
             setTimeout(function(){
-                window.location.href="../ApplyExtra/FillFxForm?typeNo="+type_no;
+                window.location.href="../ApplyExtra/FillFxForm?typeNo="+type_no+"&way="+which_way;
             },600);
         }
 
@@ -98,7 +98,7 @@
 
             //点击确认选择按钮
             self.finishGuide = function(){
-                jumpToForm(self.currentNodeNo());
+                jumpToForm(self.currentNodeNo(),"guide");
                 $("#guideModal").modal("hide");
             }
 
@@ -158,14 +158,14 @@
                     return;
                 }
 
-                jumpToForm(rows[0].type_no);
+                jumpToForm(rows[0].type_no,"search");
                 $("#searchModal").modal("hide");
             });
 
             //检索列表数据，500毫秒节流检查
             $("#search_text").on("keyup", utils.Debounce(function () {
                 var text = $("#search_text").val();
-                $("#search_tb").bootstrapTable("load",leaveProcess.filter(function(p){return p.service_name.indexOf(text)>=0 || p.process_name.indexOf(text)>=0;}));
+                $("#search_tb").bootstrapTable("load",leaveProcess.filter(function(p){return p.service_name.indexOf(text)>=0 || p.process_name.indexOf(text)>=0 || p.tip.indexOf(text)>=0;}));
             },500));
 
         });
@@ -310,7 +310,7 @@
         //单击叶子节点，跳转到对应业务类型的表单
         myChart.on('click', function(params) {
             if(params.value){
-                jumpToForm(params.data.no);
+                jumpToForm(params.data.no,"tree");
             }
 
         });
@@ -326,18 +326,18 @@
             <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
             <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
             <li><a href="ApplyIndex?billType=FX">放行条申请流程</a></li>
-            <li class="active">开始申请</li>
+            <li class="active">选择业务类型</li>
         </ol>
     </div>
     <div class="panel-body">
         <i>请在以下选择一种途径以确认生成放行条的业务类型：</i>
     </div>
     <div class="list-group">
-        <a href="#" class="list-group-item" id="guide_link"><span class="text-primary"><i class="fa fa-arrow-circle-right fa-fw"></i> 1. 通过引导式对话框选择业务类型</span></a>
-        <a href="#" class="list-group-item" id="search_link"><span class="text-primary"><i class="fa fa-search fa-fw"></i> 2. 通过搜索对话框选择业务类型</span></a>
-        <a href="#" class="list-group-item" id="tree_link"><span class="text-primary"><i class="fa fa-tree fa-fw"></i> 3. 通过业务类型树状图选择</span></a>
+        <a href="#" class="list-group-item" id="guide_link" style="padding:15px;font-size:16px;"><span class="text-primary"><i class="fa fa-arrow-circle-right fa-fw"></i> 1. 通过引导式对话框选择业务类型</span></a>
+        <a href="#" class="list-group-item" id="search_link" style="padding:15px;font-size:16px;"><span class="text-primary"><i class="fa fa-search fa-fw"></i> 2. 通过搜索对话框选择业务类型</span></a>
+        <a href="#" class="list-group-item" id="tree_link" style="padding:15px;font-size:16px;"><span class="text-primary"><i class="fa fa-tree fa-fw"></i> 3. 通过业务类型树状图选择</span></a>
         @if (!string.IsNullOrEmpty(m.lastTypeNo)) {
-            <a href="#" class="list-group-item" onclick="jumpToForm('@m.lastTypeNo')"><span class="text-primary"><i class="fa fa-file-o fa-fw"></i> 4. 选择上次提交的业务类型：@m.lastTypeName</span></a>
+            <a href="#" class="list-group-item" onclick="jumpToForm('@m.lastTypeNo','pre')"  style="padding:15px;font-size:16px;"><span class="text-primary"><i class="fa fa-file-o fa-fw"></i> 4. 选择上次提交的业务类型：@m.lastTypeName</span></a>
         }
     </div>
 

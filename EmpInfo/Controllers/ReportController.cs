@@ -575,11 +575,15 @@ namespace EmpInfo.Controllers
             return View();
         }
 
-        public void BeginExportSRBills(DateTime fromDate, DateTime toDate)
+        public void BeginExportSRBills(DateTime fromDate, DateTime toDate, int exportType = 0)
         {
             toDate = toDate.AddDays(1);
             var result = db.GetSRBills(fromDate, toDate).ToList().OrderBy(r => r.FOutTimeSpan).ThenBy(r => r.FCompany).ToList();
-            
+
+            if (exportType == 0) {
+                result = result.Where(r => r.FStatus == "平台未确认").ToList();
+            }
+
             string[] colName = new string[] { "公司", "出货期间", "到货日期", "当前状态", "出库单号", "申请单号","申请人", "部门", "客户名称", "出货公司",
                                               "出货地址", "出货联系人", "出货联系电话", "订单号", "规格型号", "出货数量" };
 
@@ -3741,7 +3745,7 @@ namespace EmpInfo.Controllers
             }
 
             string[] colName = new string[] { "处理结果","申请流水号", "申请人", "联系电话", "申请时间","审核部确认时间","公司", "申请部门", "项目编号", "项目名称","地点", "项目大类",
-                                              "项目类别", "申请原因", "具体要求","是否多部门分摊","分摊详情", "项目收益","人员节省","产能收益","其它收益","是否为PO单", "中标供应商","中标价格" };
+                                              "项目类别", "申请原因", "具体要求","是否多部门分摊","分摊详情", "项目收益","人员节省","产能收益","其它收益","是否为PO单","PO单号", "中标供应商","中标价格" };
             ushort[] colWidth = new ushort[colName.Length];
 
             for (var i = 0; i < colWidth.Length; i++) {
@@ -3808,6 +3812,7 @@ namespace EmpInfo.Controllers
                 cells.Add(rowIndex, ++colIndex, d.productivity_profit);
                 cells.Add(rowIndex, ++colIndex, d.other_profit);
                 cells.Add(rowIndex, ++colIndex, d.is_po == null ? "" : (d.is_po == true ? "是" : "否"));
+                cells.Add(rowIndex, ++colIndex, d.po_no);
                 if (data.Where(a => a.x == d && a.s != null).Count() > 0) {
                     cells.Add(rowIndex, ++colIndex, data.Where(a => a.x == d && a.s.is_bidder).Select(a => a.s.supplier_name).FirstOrDefault());
                     cells.Add(rowIndex, ++colIndex, data.Where(a => a.x == d && a.s.is_bidder).Select(a => a.s.price).FirstOrDefault());
@@ -4338,7 +4343,7 @@ namespace EmpInfo.Controllers
 
             xls.Send();
         }
-
+        
 
         #endregion
 
@@ -4604,6 +4609,218 @@ namespace EmpInfo.Controllers
 
             xls.Send();
 
+        }
+
+        #endregion
+
+        #region 放行条流程
+
+        [SessionTimeOutFilter]
+        public ActionResult FXReport()
+        {
+            if (db.ei_flowAuthority.Where(f => f.bill_type == "FX" && f.relate_type == "查询报表" && f.relate_value == userInfo.cardNo).Count() < 1) {
+                ViewBag.tip = "没有查询权限";
+                return View("Error");
+            }
+            return View();
+        }
+
+        public JsonResult SearchFXReport(string obj)
+        {
+            var m = JsonConvert.DeserializeObject<FXSearchReportModel>(obj);
+            m.toDate = m.toDate.AddDays(1);
+
+            var result = from x in db.ei_fxApply
+                         //join e in db.ei_fxApplyEntry on x.sys_no equals e.sys_no
+                         join a in db.flow_apply on x.sys_no equals a.sys_no
+                         join aet in db.flow_applyEntry on new { id = a.id, pass = (bool?)null } equals new { id = (int)aet.apply_id, pass = aet.pass } into aettemp
+                         from ae in aettemp.DefaultIfEmpty()
+                         where x.apply_time >= m.fromDate
+                         && x.apply_time < m.toDate
+                         select new
+                         {
+                             sysNo = x.sys_no,
+                             auditStatus = a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : ae.step_name)),
+                             applierName = x.applier_name,
+                             applyTime = x.apply_time,
+                             busName = x.bus_name,
+                             //itemName = e.item_name,
+                             //itemModel = e.item_model,
+                             //qty = e.item_qty,
+                             typeNo = x.fx_type_no,
+                             typeName = x.fx_type_name
+                         };
+
+            if (!string.IsNullOrEmpty(m.applierName)) {
+                result = result.Where(r => r.applierName.Contains(m.applierName));
+            }
+
+            if (!string.IsNullOrEmpty(m.auditStatus)) {
+                result = result.Where(r => r.auditStatus == m.auditStatus);
+            }
+
+            if (!string.IsNullOrEmpty(m.busName)) {
+                result = result.Where(r => r.busName.Contains(m.busName));
+            }
+
+            if (!string.IsNullOrEmpty(m.typeNo)) {
+                result = result.Where(r => r.typeNo.StartsWith(m.typeNo));
+            }
+
+            if (!string.IsNullOrEmpty(m.typeName)) {
+                result = result.Where(r => r.typeName.Contains(m.typeName));
+            }
+
+            if (!string.IsNullOrEmpty(m.sysNo)) {
+                result = result.Where(r => r.sysNo.Contains(m.sysNo));
+            }
+
+            return Json(result.ToList());
+        }
+
+        public void ExportFXExcel(string obj)
+        {
+            var m = JsonConvert.DeserializeObject<FXSearchReportModel>(obj);
+            m.toDate = m.toDate.AddDays(1);
+
+            var result = from x in db.ei_fxApply
+                         join e in db.ei_fxApplyEntry on x.sys_no equals e.sys_no
+                         join a in db.flow_apply on x.sys_no equals a.sys_no
+                         join aet in db.flow_applyEntry on new { id = a.id, pass = (bool?)null } equals new { id = (int)aet.apply_id, pass = aet.pass } into aettemp
+                         from ae in aettemp.DefaultIfEmpty()
+                         where x.apply_time >= m.fromDate
+                         && x.apply_time < m.toDate
+                         select new
+                         {
+                             x,
+                             e,
+                             auditStatus = a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : ae.step_name))
+                         };
+
+            if (!string.IsNullOrEmpty(m.applierName)) {
+                result = result.Where(r => r.x.applier_name.Contains(m.applierName));
+            }
+
+            if (!string.IsNullOrEmpty(m.auditStatus)) {
+                result = result.Where(r => r.auditStatus == m.auditStatus);
+            }
+
+            if (!string.IsNullOrEmpty(m.busName)) {
+                result = result.Where(r => r.x.bus_name.Contains(m.busName));
+            }
+
+            if (!string.IsNullOrEmpty(m.typeNo)) {
+                result = result.Where(r => r.x.fx_type_no.StartsWith(m.typeNo));
+            }
+
+            if (!string.IsNullOrEmpty(m.typeName)) {
+                result = result.Where(r => r.x.fx_type_name.Contains(m.typeName));
+            }
+
+            if (!string.IsNullOrEmpty(m.sysNo)) {
+                result = result.Where(r => r.x.sys_no.Contains(m.sysNo));
+            }
+
+            string[] colName = new string[] { "审批结果","申请流水号","业务类型", "申请人", "申请时间", "公司", "部门", "件数", "放行厂区","寄/带出范围", "寄/带出地址",
+                                              "申请原因", "备注", "物品名称", "物品型号","数量","单位" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "放行条列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result.ToList()) {
+                colIndex = 1;
+
+                //"审批结果","申请流水号","业务类型", "申请人", "申请时间", "公司", "部门", "件数", "放行厂区","寄/带出范围", "寄/带出地址",
+                //"申请原因", "备注", "物品名称", "物品型号","数量","单位"
+                cells.Add(++rowIndex, colIndex, d.auditStatus);
+                cells.Add(rowIndex, ++colIndex, d.x.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.x.fx_type_name);
+                cells.Add(rowIndex, ++colIndex, d.x.applier_name);
+                cells.Add(rowIndex, ++colIndex, d.x.apply_time.ToString("yyyy-MM-dd HH:mm"));
+                cells.Add(rowIndex, ++colIndex, d.x.company);
+                cells.Add(rowIndex, ++colIndex, d.x.bus_name);
+                cells.Add(rowIndex, ++colIndex, d.x.total_pack_num);
+                cells.Add(rowIndex, ++colIndex, d.x.from_addr);
+                cells.Add(rowIndex, ++colIndex, d.x.to_scope);
+                cells.Add(rowIndex, ++colIndex, d.x.to_addr);
+
+                cells.Add(rowIndex, ++colIndex, d.x.reason);
+                cells.Add(rowIndex, ++colIndex, d.x.comment);
+                cells.Add(rowIndex, ++colIndex, d.e.item_name);
+                cells.Add(rowIndex, ++colIndex, d.e.item_model);
+                cells.Add(rowIndex, ++colIndex, d.e.item_qty);
+                cells.Add(rowIndex, ++colIndex, d.e.item_unit);
+            }
+
+            xls.Send();
+
+        }
+
+        public ActionResult PrintFX(string sysNo)
+        {
+            var fx = db.ei_fxApply.Where(f => f.sys_no == sysNo).FirstOrDefault();
+            if (fx == null) {
+                ViewBag.tip = "放行条不存在";
+                return View("Error");
+            }
+            if (fx.out_time != null) {
+                ViewBag.tip = "已放行不能打印";
+                return View("Error");
+            }
+            if (!fx.can_print) {
+                ViewBag.tip = "不能打印";
+                return View("Error");
+            }
+
+            var entrys = db.ei_fxApplyEntry.Where(f => f.sys_no == sysNo).ToList();
+
+            new FXSv(sysNo).UpdatePrintStatus();
+            WriteEventLog("打印放行条", sysNo);
+
+            ViewData["m"] = new FXCheckApplyModel()
+            {
+                bill = fx,
+                entrys = entrys,
+                auditorList = GetAuditorList(sysNo)
+            };
+            ViewData["printer"] = userInfo.name;
+
+            return View();
         }
 
         #endregion

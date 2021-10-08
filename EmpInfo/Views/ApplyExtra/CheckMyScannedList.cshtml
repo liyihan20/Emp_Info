@@ -1,0 +1,154 @@
+﻿@using EmpInfo.Models;
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+    <style type="text/css">
+        .lbText {
+            font-style: italic;
+        }
+    </style>
+}
+@section Scripts {
+    @*加入以下js，使IE8支持datetimepicker组件*@
+    <script>
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function (elt /*, from*/) {
+                var len = this.length >>> 0;
+
+                var from = Number(arguments[1]) || 0;
+                from = (from < 0)
+                     ? Math.ceil(from)
+                     : Math.floor(from);
+                if (from < 0)
+                    from += len;
+
+                for (; from < len; from++) {
+                    if (from in this &&
+                        this[from] === elt)
+                        return from;
+                }
+                return -1;
+            };
+        }
+    </script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+        $(function () {
+            $(".form_date").datetimepicker({
+                language: 'zh-CN',
+                format: "yyyy-mm-dd",
+                autoclose: true,
+                todayBtn: true,
+                startView: 2,
+                minView: 2
+            });
+
+
+            $("#checkBt").on("click", function () {
+                var obj = utils.getFormObj($("#fm"));
+                if (obj.fromDate == "" || obj.toDate == "") {
+                    toastr.error("日期期间必须填写才能查询");
+                    return;
+                }
+
+                $.post("@Url.Content("~/ApplyExtra/FXGetGuardScanList")", {
+                    fromDate: obj.fromDate,
+                    toDate: obj.toDate,
+                    applierName: obj.applierName
+                }, function (data) {
+                    $('#check_tb').bootstrapTable('load', data);
+                    if (data.length == 0) {
+                        toastr.error("当前时间段查无记录");
+                    }
+                });
+            });
+
+        });
+
+        $("#check_tb").bootstrapTable({
+            striped: true,
+            pagination: true,
+            mobileResponsive: true,
+            pageSize: 40,
+            pageList: [20, 40, 60, 100],
+            search: true,
+            columns: [
+                {
+                    field: "sys_no",
+                    title: "流水号"
+                }, {
+                    field: "applier_name",
+                    title: "申请人"
+                }, {
+                    field: "bus_name",
+                    title: "部门"
+                },
+                {
+                    field: "take_out_people_type",
+                    title: "带出人类型"
+                }, {
+                    field: "total_pack_num",
+                    title: "件数"
+                }, {
+                    field: "out_time",
+                    title: "放行时间",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(row.out_time, true);
+                    }
+                }
+            ],
+            onClickCell: function (field, value, row, $element) {
+                if (row.sys_no) {
+                    window.open("@Url.Content("FXGuardScanResult?sysNo=")" + row.sys_no);
+                }
+            },
+            rowStyle: function (row, index) {
+                return { css: { cursor: 'pointer' } };
+            }
+        });
+
+
+
+
+
+    </script>
+
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        查看已放行申请单
+    </div>
+    <div class="panel-body">
+        <form id="fm">
+            <div class="row" style="margin-bottom:6px;">
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">放行日期从：</div>
+                    <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" name="fromDate" autocomplete="off" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">放行日期到：</div>
+                    <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" name="toDate" autocomplete="off" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">申请人：</div>
+                    <input type="text" class="form-control" name="applierName" style="margin:6px 0;" />
+                </div>
+            </div>
+        </form>
+        <button class="btn btn-block btn-primary" id="checkBt" data-loading-text="搜索中..." style="margin-top:12px 0;"><i class="fa fa-search"></i> 搜索</button>
+
+        <table id="check_tb"></table>
+
+    </div>
+</div>

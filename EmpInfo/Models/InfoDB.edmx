@@ -833,6 +833,7 @@
           <Property Name="take_out_people_name" Type="nvarchar" MaxLength="50" />
           <Property Name="take_out_people_phone" Type="nvarchar" MaxLength="50" />
           <Property Name="take_out_people_code" Type="nvarchar" MaxLength="50" />
+          <Property Name="in_way" Type="varchar" MaxLength="20" />
         </EntityType>
         <EntityType Name="ei_fxApplyEntry">
           <Key>
@@ -1636,7 +1637,7 @@
           <Property Name="apply_time" Type="datetime" Nullable="false" />
           <Property Name="project_name" Type="nvarchar" MaxLength="200" />
           <Property Name="dept_name" Type="nvarchar" MaxLength="50" />
-          <Property Name="addr" Type="nvarchar" MaxLength="100" />
+          <Property Name="addr" Type="nvarchar" MaxLength="300" />
           <Property Name="bill_no" Type="nvarchar" MaxLength="50" />
           <Property Name="classification" Type="nvarchar" MaxLength="50" />
           <Property Name="project_type" Type="nvarchar" MaxLength="50" />
@@ -1665,6 +1666,7 @@
           <Property Name="dept_manager_name" Type="nvarchar" MaxLength="100" />
           <Property Name="dept_manager_num" Type="varchar" MaxLength="50" />
           <Property Name="email_addr" Type="varchar" MaxLength="100" />
+          <Property Name="po_no" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ei_xaApplySupplier">
           <Key>
@@ -4685,7 +4687,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
             <End Role="ei_spApplyEntry" EntitySet="ei_spApplyEntry" />
           </AssociationSet>
           <EntitySet Name="ei_PPApply" EntityType="ICAuditModel.ei_PPApply" />
-          <EntitySet Name="ei_xaApply" EntityType="ICAuditModel.ei_xaApply" />
           <EntitySet Name="ei_xaApplySupplier" EntityType="ICAuditModel.ei_xaApplySupplier" />
           <EntitySet Name="all_maxNum" EntityType="ICAuditModel.all_maxNum" />
           <EntitySet Name="ei_mtClass" EntityType="ICAuditModel.ei_mtClass" />
@@ -4719,6 +4720,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySet Name="ei_fxType" EntityType="ICAuditModel.ei_fxType" />
           <EntitySet Name="ei_fxApplyEntry" EntityType="ICAuditModel.ei_fxApplyEntry" />
           <EntitySet Name="ei_fxApply" EntityType="ICAuditModel.ei_fxApply" />
+          <EntitySet Name="ei_xaApply" EntityType="ICAuditModel.ei_xaApply" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -7713,47 +7715,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="repair_day" Type="DateTime" Precision="0" />
           <Property Name="area_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
-        <EntityType Name="ei_xaApply">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="apply_time" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="project_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="dept_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="addr" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="bill_no" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="classification" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="project_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="project_detail" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="reason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="demands" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
-          <Property Name="save_people" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="productivity_profit" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="other_profit" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="has_profit" Type="Boolean" Nullable="false" />
-          <Property Name="profit_confirm_people_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="profit_confirm_people_num" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="equitment_auditor_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="equitment_auditor_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="dept_charger_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="dept_charger_num" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="can_print" Type="Boolean" Nullable="false" />
-          <Property Name="check_date" Type="DateTime" Precision="3" />
-          <Property Name="company" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
-          <Property Name="applier_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="is_share_fee" Type="Boolean" Nullable="false" />
-          <Property Name="share_fee_detail" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="share_fee_managers" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="is_po" Type="Boolean" />
-          <Property Name="confirm_date" Type="DateTime" Precision="3" />
-          <Property Name="dept_manager_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="dept_manager_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="email_addr" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-        </EntityType>
         <EntityType Name="ei_xaApplySupplier">
           <Key>
             <PropertyRef Name="id" />
@@ -8198,6 +8159,49 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="take_out_people_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="take_out_people_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="take_out_people_code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="in_way" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ei_xaApply">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="applier_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="apply_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="project_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="dept_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="addr" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Name="bill_no" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="classification" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="project_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="project_detail" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="reason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="demands" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="save_people" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="productivity_profit" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="other_profit" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="has_profit" Type="Boolean" Nullable="false" />
+          <Property Name="profit_confirm_people_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="profit_confirm_people_num" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="equitment_auditor_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="equitment_auditor_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="dept_charger_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="dept_charger_num" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="can_print" Type="Boolean" Nullable="false" />
+          <Property Name="check_date" Type="DateTime" Precision="3" />
+          <Property Name="company" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="applier_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="is_share_fee" Type="Boolean" Nullable="false" />
+          <Property Name="share_fee_detail" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="share_fee_managers" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="is_po" Type="Boolean" />
+          <Property Name="confirm_date" Type="DateTime" Precision="3" />
+          <Property Name="dept_manager_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="dept_manager_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="email_addr" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="po_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -11009,48 +11013,6 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="ei_xaApply">
-            <EntityTypeMapping TypeName="ICAuditModel.ei_xaApply">
-              <MappingFragment StoreEntitySet="ei_xaApply">
-                <ScalarProperty Name="email_addr" ColumnName="email_addr" />
-                <ScalarProperty Name="dept_manager_num" ColumnName="dept_manager_num" />
-                <ScalarProperty Name="dept_manager_name" ColumnName="dept_manager_name" />
-                <ScalarProperty Name="confirm_date" ColumnName="confirm_date" />
-                <ScalarProperty Name="is_po" ColumnName="is_po" />
-                <ScalarProperty Name="share_fee_managers" ColumnName="share_fee_managers" />
-                <ScalarProperty Name="share_fee_detail" ColumnName="share_fee_detail" />
-                <ScalarProperty Name="is_share_fee" ColumnName="is_share_fee" />
-                <ScalarProperty Name="applier_phone" ColumnName="applier_phone" />
-                <ScalarProperty Name="company" ColumnName="company" />
-                <ScalarProperty Name="check_date" ColumnName="check_date" />
-                <ScalarProperty Name="can_print" ColumnName="can_print" />
-                <ScalarProperty Name="dept_charger_num" ColumnName="dept_charger_num" />
-                <ScalarProperty Name="dept_charger_name" ColumnName="dept_charger_name" />
-                <ScalarProperty Name="equitment_auditor_num" ColumnName="equitment_auditor_num" />
-                <ScalarProperty Name="equitment_auditor_name" ColumnName="equitment_auditor_name" />
-                <ScalarProperty Name="profit_confirm_people_num" ColumnName="profit_confirm_people_num" />
-                <ScalarProperty Name="profit_confirm_people_name" ColumnName="profit_confirm_people_name" />
-                <ScalarProperty Name="has_profit" ColumnName="has_profit" />
-                <ScalarProperty Name="other_profit" ColumnName="other_profit" />
-                <ScalarProperty Name="productivity_profit" ColumnName="productivity_profit" />
-                <ScalarProperty Name="save_people" ColumnName="save_people" />
-                <ScalarProperty Name="demands" ColumnName="demands" />
-                <ScalarProperty Name="reason" ColumnName="reason" />
-                <ScalarProperty Name="project_detail" ColumnName="project_detail" />
-                <ScalarProperty Name="project_type" ColumnName="project_type" />
-                <ScalarProperty Name="classification" ColumnName="classification" />
-                <ScalarProperty Name="bill_no" ColumnName="bill_no" />
-                <ScalarProperty Name="addr" ColumnName="addr" />
-                <ScalarProperty Name="dept_name" ColumnName="dept_name" />
-                <ScalarProperty Name="project_name" ColumnName="project_name" />
-                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
-                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
-                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
-                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="ei_xaApplySupplier">
             <EntityTypeMapping TypeName="ICAuditModel.ei_xaApplySupplier">
               <MappingFragment StoreEntitySet="ei_xaApplySupplier">
@@ -11440,6 +11402,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_fxApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_fxApply">
               <MappingFragment StoreEntitySet="ei_fxApply">
+                <ScalarProperty Name="in_way" ColumnName="in_way" />
                 <ScalarProperty Name="take_out_people_code" ColumnName="take_out_people_code" />
                 <ScalarProperty Name="take_out_people_phone" ColumnName="take_out_people_phone" />
                 <ScalarProperty Name="take_out_people_name" ColumnName="take_out_people_name" />
@@ -11470,6 +11433,49 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="fx_type_name" ColumnName="fx_type_name" />
                 <ScalarProperty Name="apply_time" ColumnName="apply_time" />
                 <ScalarProperty Name="applier_phone" ColumnName="applier_phone" />
+                <ScalarProperty Name="applier_name" ColumnName="applier_name" />
+                <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_xaApply">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_xaApply">
+              <MappingFragment StoreEntitySet="ei_xaApply">
+                <ScalarProperty Name="po_no" ColumnName="po_no" />
+                <ScalarProperty Name="email_addr" ColumnName="email_addr" />
+                <ScalarProperty Name="dept_manager_num" ColumnName="dept_manager_num" />
+                <ScalarProperty Name="dept_manager_name" ColumnName="dept_manager_name" />
+                <ScalarProperty Name="confirm_date" ColumnName="confirm_date" />
+                <ScalarProperty Name="is_po" ColumnName="is_po" />
+                <ScalarProperty Name="share_fee_managers" ColumnName="share_fee_managers" />
+                <ScalarProperty Name="share_fee_detail" ColumnName="share_fee_detail" />
+                <ScalarProperty Name="is_share_fee" ColumnName="is_share_fee" />
+                <ScalarProperty Name="applier_phone" ColumnName="applier_phone" />
+                <ScalarProperty Name="company" ColumnName="company" />
+                <ScalarProperty Name="check_date" ColumnName="check_date" />
+                <ScalarProperty Name="can_print" ColumnName="can_print" />
+                <ScalarProperty Name="dept_charger_num" ColumnName="dept_charger_num" />
+                <ScalarProperty Name="dept_charger_name" ColumnName="dept_charger_name" />
+                <ScalarProperty Name="equitment_auditor_num" ColumnName="equitment_auditor_num" />
+                <ScalarProperty Name="equitment_auditor_name" ColumnName="equitment_auditor_name" />
+                <ScalarProperty Name="profit_confirm_people_num" ColumnName="profit_confirm_people_num" />
+                <ScalarProperty Name="profit_confirm_people_name" ColumnName="profit_confirm_people_name" />
+                <ScalarProperty Name="has_profit" ColumnName="has_profit" />
+                <ScalarProperty Name="other_profit" ColumnName="other_profit" />
+                <ScalarProperty Name="productivity_profit" ColumnName="productivity_profit" />
+                <ScalarProperty Name="save_people" ColumnName="save_people" />
+                <ScalarProperty Name="demands" ColumnName="demands" />
+                <ScalarProperty Name="reason" ColumnName="reason" />
+                <ScalarProperty Name="project_detail" ColumnName="project_detail" />
+                <ScalarProperty Name="project_type" ColumnName="project_type" />
+                <ScalarProperty Name="classification" ColumnName="classification" />
+                <ScalarProperty Name="bill_no" ColumnName="bill_no" />
+                <ScalarProperty Name="addr" ColumnName="addr" />
+                <ScalarProperty Name="dept_name" ColumnName="dept_name" />
+                <ScalarProperty Name="project_name" ColumnName="project_name" />
+                <ScalarProperty Name="apply_time" ColumnName="apply_time" />
                 <ScalarProperty Name="applier_name" ColumnName="applier_name" />
                 <ScalarProperty Name="applier_num" ColumnName="applier_num" />
                 <ScalarProperty Name="sys_no" ColumnName="sys_no" />

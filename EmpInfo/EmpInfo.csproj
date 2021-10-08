@@ -1019,6 +1019,30 @@
     <Content Include="Content\fontawesome\fontcss\font-awesome.css" />
     <Content Include="Content\fontawesome\fontcss\font-awesome.min.css" />
     <Content Include="Content\fontawesome\fonts\fontawesome-webfont.svg" />
+    <Content Include="Content\fxdoc\img\1632992524462.jpg" />
+    <Content Include="Content\fxdoc\img\FXT.png" />
+    <Content Include="Content\fxdoc\img\image-20210930171200047.png" />
+    <Content Include="Content\fxdoc\img\image-20211005093802879.png" />
+    <Content Include="Content\fxdoc\img\image-20211006103916335.png" />
+    <Content Include="Content\fxdoc\img\image-20211007102637312.png" />
+    <Content Include="Content\fxdoc\img\image-20211007103503798.png" />
+    <Content Include="Content\fxdoc\img\image-20211007103836557.png" />
+    <Content Include="Content\fxdoc\img\image-20211007104248677.png" />
+    <Content Include="Content\fxdoc\img\image-20211007104624771.png" />
+    <Content Include="Content\fxdoc\img\image-20211007104817088.png" />
+    <Content Include="Content\fxdoc\img\image-20211007110609255.png" />
+    <Content Include="Content\fxdoc\img\image-20211007111204095.png" />
+    <Content Include="Content\fxdoc\img\image-20211007111210885.png" />
+    <Content Include="Content\fxdoc\img\image-20211007112534233.png" />
+    <Content Include="Content\fxdoc\img\image-20211007113956390.png" />
+    <Content Include="Content\fxdoc\img\image-20211007114205991.png" />
+    <Content Include="Content\fxdoc\img\image-20211007114208123.png" />
+    <Content Include="Content\fxdoc\img\image-20211007114449136.png" />
+    <Content Include="Content\fxdoc\img\image-20211007114451521.png" />
+    <Content Include="Content\fxdoc\img\image-20211007114504420.png" />
+    <Content Include="Content\fxdoc\img\image-20211007115916840.png" />
+    <Content Include="Content\fxdoc\img\SQSL.jpg" />
+    <Content Include="Content\fxdoc\信利放行条操作指引.html" />
     <Content Include="Content\images\bus_deps.png" />
     <Content Include="Content\images\assist.png" />
     <Content Include="Content\images\auditors.png" />
@@ -1036,6 +1060,7 @@
     <Content Include="Content\images\ep.png" />
     <Content Include="Content\images\fee_report.png" />
     <Content Include="Content\images\file.png" />
+    <Content Include="Content\images\fx.png" />
     <Content Include="Content\images\gear.png" />
     <Content Include="Content\images\hh.png" />
     <Content Include="Content\images\house.png" />
@@ -1083,6 +1108,7 @@
     <Content Include="Content\images\ti.png" />
     <Content Include="Content\images\truck.png" />
     <Content Include="Content\images\Truly.gif" />
+    <Content Include="Content\images\Trulyicon.jpg" />
     <Content Include="Content\images\truly_home.gif" />
     <Content Include="Content\images\uc.png" />
     <Content Include="Content\images\unbind.gif" />
@@ -1755,6 +1781,10 @@
     <Content Include="Views\ApplyExtra\FillFxForm.cshtml" />
     <Content Include="Views\Apply\CheckFXApply.cshtml" />
     <Content Include="Views\Apply\BeginAuditFXApply.cshtml" />
+    <Content Include="Views\Report\FXReport.cshtml" />
+    <Content Include="Views\Report\PrintFX.cshtml" />
+    <Content Include="Views\ApplyExtra\FXGuardScanResult.cshtml" />
+    <Content Include="Views\ApplyExtra\CheckMyScannedList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

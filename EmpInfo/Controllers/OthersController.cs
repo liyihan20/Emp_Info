@@ -197,7 +197,7 @@ namespace EmpInfo.Controllers
             //再加上项目单的 2021-03-09
             deSum += (from a in db.ei_xaApply
                       join e in db.ei_xaApplySupplier on a.sys_no equals e.sys_no
-                      where a.confirm_date != null && e.is_bidder == true && a.dept_name == "后勤部"
+                      where a.confirm_date != null && e.is_bidder == true && a.dept_name.StartsWith("后勤部")
                       && a.confirm_date >= fromDate && a.confirm_date < toDate
                       select e.price).Sum() ?? 0m;
                             

@@ -592,7 +592,12 @@ namespace EmpInfo.Util
 
         public static string GetTimeStamp()
         {
-            TimeSpan ts = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return GetTimeStamp(DateTime.Now);
+        }
+
+        public static string GetTimeStamp(DateTime when)
+        {
+            TimeSpan ts = (DateTime)when - new DateTime(1970, 1, 1, 0, 0, 0, 0);
             return Convert.ToInt64(ts.TotalSeconds).ToString();
         }
 

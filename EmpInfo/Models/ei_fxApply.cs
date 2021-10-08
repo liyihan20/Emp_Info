@@ -48,5 +48,6 @@ namespace EmpInfo.Models
         public string take_out_people_name { get; set; }
         public string take_out_people_phone { get; set; }
         public string take_out_people_code { get; set; }
+        public string in_way { get; set; }
     }
 }

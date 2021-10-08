@@ -1,0 +1,598 @@
+<!doctype html>
+<html>
+<head>
+<meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
+
+<link href='https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext' rel='stylesheet' type='text/css' /><style type='text/css'>html {overflow-x: initial !important;}:root { --bg-color:#ffffff; --text-color:#333333; --select-text-bg-color:#B5D6FC; --select-text-font-color:auto; --monospace:"Lucida Console",Consolas,"Courier",monospace; --title-bar-height:20px; }
+.mac-os-11 { --title-bar-height:28px; }
+html { font-size: 14px; background-color: var(--bg-color); color: var(--text-color); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+body { margin: 0px; padding: 0px; height: auto; inset: 0px; font-size: 1rem; line-height: 1.42857; overflow-x: hidden; background: inherit; tab-size: 4; }
+iframe { margin: auto; }
+a.url { word-break: break-all; }
+a:active, a:hover { outline: 0px; }
+.in-text-selection, ::selection { text-shadow: none; background: var(--select-text-bg-color); color: var(--select-text-font-color); }
+#write { margin: 0px auto; height: auto; width: inherit; word-break: normal; overflow-wrap: break-word; position: relative; white-space: normal; overflow-x: visible; padding-top: 36px; }
+#write.first-line-indent p { text-indent: 2em; }
+#write.first-line-indent li p, #write.first-line-indent p * { text-indent: 0px; }
+#write.first-line-indent li { margin-left: 2em; }
+.for-image #write { padding-left: 8px; padding-right: 8px; }
+body.typora-export { padding-left: 30px; padding-right: 30px; }
+.typora-export .footnote-line, .typora-export li, .typora-export p { white-space: pre-wrap; }
+.typora-export .task-list-item input { pointer-events: none; }
+@media screen and (max-width: 500px) {
+  body.typora-export { padding-left: 0px; padding-right: 0px; }
+  #write { padding-left: 20px; padding-right: 20px; }
+  .CodeMirror-sizer { margin-left: 0px !important; }
+  .CodeMirror-gutters { display: none !important; }
+}
+#write li > figure:last-child { margin-bottom: 0.5rem; }
+#write ol, #write ul { position: relative; }
+img { max-width: 100%; vertical-align: middle; image-orientation: from-image; }
+button, input, select, textarea { color: inherit; font: inherit; }
+input[type="checkbox"], input[type="radio"] { line-height: normal; padding: 0px; }
+*, ::after, ::before { box-sizing: border-box; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p, #write pre { width: inherit; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p { position: relative; }
+p { line-height: inherit; }
+h1, h2, h3, h4, h5, h6 { break-after: avoid-page; break-inside: avoid; orphans: 4; }
+p { orphans: 4; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.6rem; }
+h4 { font-size: 1.4rem; }
+h5 { font-size: 1.2rem; }
+h6 { font-size: 1rem; }
+.md-math-block, .md-rawblock, h1, h2, h3, h4, h5, h6, p { margin-top: 1rem; margin-bottom: 1rem; }
+.hidden { display: none; }
+.md-blockmeta { color: rgb(204, 204, 204); font-weight: 700; font-style: italic; }
+a { cursor: pointer; }
+sup.md-footnote { padding: 2px 4px; background-color: rgba(238, 238, 238, 0.7); color: rgb(85, 85, 85); border-radius: 4px; cursor: pointer; }
+sup.md-footnote a, sup.md-footnote a:hover { color: inherit; text-transform: inherit; text-decoration: inherit; }
+#write input[type="checkbox"] { cursor: pointer; width: inherit; height: inherit; }
+figure { overflow-x: auto; margin: 1.2em 0px; max-width: calc(100% + 16px); padding: 0px; }
+figure > table { margin: 0px; }
+tr { break-inside: avoid; break-after: auto; }
+thead { display: table-header-group; }
+table { border-collapse: collapse; border-spacing: 0px; width: 100%; overflow: auto; break-inside: auto; text-align: left; }
+table.md-table td { min-width: 32px; }
+.CodeMirror-gutters { border-right: 0px; background-color: inherit; }
+.CodeMirror-linenumber { user-select: none; }
+.CodeMirror { text-align: left; }
+.CodeMirror-placeholder { opacity: 0.3; }
+.CodeMirror pre { padding: 0px 4px; }
+.CodeMirror-lines { padding: 0px; }
+div.hr:focus { cursor: none; }
+#write pre { white-space: pre-wrap; }
+#write.fences-no-line-wrapping pre { white-space: pre; }
+#write pre.ty-contain-cm { white-space: normal; }
+.CodeMirror-gutters { margin-right: 4px; }
+.md-fences { font-size: 0.9rem; display: block; break-inside: avoid; text-align: left; overflow: visible; white-space: pre; background: inherit; position: relative !important; }
+.md-fences-adv-panel { width: 100%; margin-top: 10px; text-align: center; padding-top: 0px; padding-bottom: 8px; overflow-x: auto; }
+#write .md-fences.mock-cm { white-space: pre-wrap; }
+.md-fences.md-fences-with-lineno { padding-left: 0px; }
+#write.fences-no-line-wrapping .md-fences.mock-cm { white-space: pre; overflow-x: auto; }
+.md-fences.mock-cm.md-fences-with-lineno { padding-left: 8px; }
+.CodeMirror-line, twitterwidget { break-inside: avoid; }
+.footnotes { opacity: 0.8; font-size: 0.9rem; margin-top: 1em; margin-bottom: 1em; }
+.footnotes + .footnotes { margin-top: 0px; }
+.md-reset { margin: 0px; padding: 0px; border: 0px; outline: 0px; vertical-align: top; background: 0px 0px; text-decoration: none; text-shadow: none; float: none; position: static; width: auto; height: auto; white-space: nowrap; cursor: inherit; -webkit-tap-highlight-color: transparent; line-height: normal; font-weight: 400; text-align: left; box-sizing: content-box; direction: ltr; }
+li div { padding-top: 0px; }
+blockquote { margin: 1rem 0px; }
+li .mathjax-block, li p { margin: 0.5rem 0px; }
+li blockquote { margin: 1rem 0px; }
+li { margin: 0px; position: relative; }
+blockquote > :last-child { margin-bottom: 0px; }
+blockquote > :first-child, li > :first-child { margin-top: 0px; }
+.footnotes-area { color: rgb(136, 136, 136); margin-top: 0.714rem; padding-bottom: 0.143rem; white-space: normal; }
+#write .footnote-line { white-space: pre-wrap; }
+@media print {
+  body, html { border: 1px solid transparent; height: 99%; break-after: avoid; break-before: avoid; font-variant-ligatures: no-common-ligatures; }
+  #write { margin-top: 0px; padding-top: 0px; border-color: transparent !important; }
+  .typora-export * { -webkit-print-color-adjust: exact; }
+  .typora-export #write { break-after: avoid; }
+  .typora-export #write::after { height: 0px; }
+  .is-mac table { break-inside: avoid; }
+  .typora-export-show-outline .typora-export-sidebar { display: none; }
+}
+.footnote-line { margin-top: 0.714em; font-size: 0.7em; }
+a img, img a { cursor: pointer; }
+pre.md-meta-block { font-size: 0.8rem; min-height: 0.8rem; white-space: pre-wrap; background: rgb(204, 204, 204); display: block; overflow-x: hidden; }
+p > .md-image:only-child:not(.md-img-error) img, p > img:only-child { display: block; margin: auto; }
+#write.first-line-indent p > .md-image:only-child:not(.md-img-error) img { left: -2em; position: relative; }
+p > .md-image:only-child { display: inline-block; width: 100%; }
+#write .MathJax_Display { margin: 0.8em 0px 0px; }
+.md-math-block { width: 100%; }
+.md-math-block:not(:empty)::after { display: none; }
+.MathJax_ref { fill: currentcolor; }
+[contenteditable="true"]:active, [contenteditable="true"]:focus, [contenteditable="false"]:active, [contenteditable="false"]:focus { outline: 0px; box-shadow: none; }
+.md-task-list-item { position: relative; list-style-type: none; }
+.task-list-item.md-task-list-item { padding-left: 0px; }
+.md-task-list-item > input { position: absolute; top: 0px; left: 0px; margin-left: -1.2em; margin-top: calc(1em - 10px); border: none; }
+.math { font-size: 1rem; }
+.md-toc { min-height: 3.58rem; position: relative; font-size: 0.9rem; border-radius: 10px; }
+.md-toc-content { position: relative; margin-left: 0px; }
+.md-toc-content::after, .md-toc::after { display: none; }
+.md-toc-item { display: block; color: rgb(65, 131, 196); }
+.md-toc-item a { text-decoration: none; }
+.md-toc-inner:hover { text-decoration: underline; }
+.md-toc-inner { display: inline-block; cursor: pointer; }
+.md-toc-h1 .md-toc-inner { margin-left: 0px; font-weight: 700; }
+.md-toc-h2 .md-toc-inner { margin-left: 2em; }
+.md-toc-h3 .md-toc-inner { margin-left: 4em; }
+.md-toc-h4 .md-toc-inner { margin-left: 6em; }
+.md-toc-h5 .md-toc-inner { margin-left: 8em; }
+.md-toc-h6 .md-toc-inner { margin-left: 10em; }
+@media screen and (max-width: 48em) {
+  .md-toc-h3 .md-toc-inner { margin-left: 3.5em; }
+  .md-toc-h4 .md-toc-inner { margin-left: 5em; }
+  .md-toc-h5 .md-toc-inner { margin-left: 6.5em; }
+  .md-toc-h6 .md-toc-inner { margin-left: 8em; }
+}
+a.md-toc-inner { font-size: inherit; font-style: inherit; font-weight: inherit; line-height: inherit; }
+.footnote-line a:not(.reversefootnote) { color: inherit; }
+.md-attr { display: none; }
+.md-fn-count::after { content: "."; }
+code, pre, samp, tt { font-family: var(--monospace); }
+kbd { margin: 0px 0.1em; padding: 0.1em 0.6em; font-size: 0.8em; color: rgb(36, 39, 41); background: rgb(255, 255, 255); border: 1px solid rgb(173, 179, 185); border-radius: 3px; box-shadow: rgba(12, 13, 14, 0.2) 0px 1px 0px, rgb(255, 255, 255) 0px 0px 0px 2px inset; white-space: nowrap; vertical-align: middle; }
+.md-comment { color: rgb(162, 127, 3); opacity: 0.8; font-family: var(--monospace); }
+code { text-align: left; vertical-align: initial; }
+a.md-print-anchor { white-space: pre !important; border-width: initial !important; border-style: none !important; border-color: initial !important; display: inline-block !important; position: absolute !important; width: 1px !important; right: 0px !important; outline: 0px !important; background: 0px 0px !important; text-decoration: initial !important; text-shadow: initial !important; }
+.os-windows.monocolor-emoji .md-emoji { font-family: "Segoe UI Symbol", sans-serif; }
+.md-diagram-panel > svg { max-width: 100%; }
+[lang="flow"] svg, [lang="mermaid"] svg { max-width: 100%; height: auto; }
+[lang="mermaid"] .node text { font-size: 1rem; }
+table tr th { border-bottom: 0px; }
+video { max-width: 100%; display: block; margin: 0px auto; }
+iframe { max-width: 100%; width: 100%; border: none; }
+.highlight td, .highlight tr { border: 0px; }
+mark { background: rgb(255, 255, 0); color: rgb(0, 0, 0); }
+.md-html-inline .md-plain, .md-html-inline strong, mark .md-inline-math, mark strong { color: inherit; }
+.md-expand mark .md-meta { opacity: 0.3 !important; }
+mark .md-meta { color: rgb(0, 0, 0); }
+@media print {
+  .typora-export h1, .typora-export h2, .typora-export h3, .typora-export h4, .typora-export h5, .typora-export h6 { break-inside: avoid; }
+}
+.md-diagram-panel .messageText { stroke: none !important; }
+.md-diagram-panel .start-state { fill: var(--node-fill); }
+.md-diagram-panel .edgeLabel rect { opacity: 1 !important; }
+.md-fences.md-fences-math { font-size: 1em; }
+.md-fences-advanced:not(.md-focus) { padding: 0px; white-space: nowrap; border: 0px; }
+.md-fences-advanced:not(.md-focus) { background: inherit; }
+.typora-export-show-outline .typora-export-content { max-width: 1440px; margin: auto; display: flex; flex-direction: row; }
+.typora-export-sidebar { width: 300px; font-size: 0.8rem; margin-top: 80px; margin-right: 18px; }
+.typora-export-show-outline #write { --webkit-flex:2; flex: 2 1 0%; }
+.typora-export-sidebar .outline-content { position: fixed; top: 0px; max-height: 100%; overflow: hidden auto; padding-bottom: 30px; padding-top: 60px; width: 300px; }
+@media screen and (max-width: 1024px) {
+  .typora-export-sidebar, .typora-export-sidebar .outline-content { width: 240px; }
+}
+@media screen and (max-width: 800px) {
+  .typora-export-sidebar { display: none; }
+}
+.outline-content li, .outline-content ul { margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px; list-style: none; }
+.outline-content ul { margin-top: 0px; margin-bottom: 0px; }
+.outline-content strong { font-weight: 400; }
+.outline-expander { width: 1rem; height: 1.42857rem; position: relative; display: table-cell; vertical-align: middle; cursor: pointer; padding-left: 4px; }
+.outline-expander::before { content: ""; position: relative; font-family: Ionicons; display: inline-block; font-size: 8px; vertical-align: middle; }
+.outline-item { padding-top: 3px; padding-bottom: 3px; cursor: pointer; }
+.outline-expander:hover::before { content: ""; }
+.outline-h1 > .outline-item { padding-left: 0px; }
+.outline-h2 > .outline-item { padding-left: 1em; }
+.outline-h3 > .outline-item { padding-left: 2em; }
+.outline-h4 > .outline-item { padding-left: 3em; }
+.outline-h5 > .outline-item { padding-left: 4em; }
+.outline-h6 > .outline-item { padding-left: 5em; }
+.outline-label { cursor: pointer; display: table-cell; vertical-align: middle; text-decoration: none; color: inherit; }
+.outline-label:hover { text-decoration: underline; }
+.outline-item:hover { border-color: rgb(245, 245, 245); background-color: var(--item-hover-bg-color); }
+.outline-item:hover { margin-left: -28px; margin-right: -28px; border-left: 28px solid transparent; border-right: 28px solid transparent; }
+.outline-item-single .outline-expander::before, .outline-item-single .outline-expander:hover::before { display: none; }
+.outline-item-open > .outline-item > .outline-expander::before { content: ""; }
+.outline-children { display: none; }
+.info-panel-tab-wrapper { display: none; }
+.outline-item-open > .outline-children { display: block; }
+.typora-export .outline-item { padding-top: 1px; padding-bottom: 1px; }
+.typora-export .outline-item:hover { margin-right: -8px; border-right: 8px solid transparent; }
+.typora-export .outline-expander::before { content: "+"; font-family: inherit; top: -1px; }
+.typora-export .outline-expander:hover::before, .typora-export .outline-item-open > .outline-item > .outline-expander::before { content: "−"; }
+.typora-export-collapse-outline .outline-children { display: none; }
+.typora-export-collapse-outline .outline-item-open > .outline-children, .typora-export-no-collapse-outline .outline-children { display: block; }
+.typora-export-no-collapse-outline .outline-expander::before { content: "" !important; }
+.typora-export-show-outline .outline-item-active > .outline-item .outline-label { font-weight: 700; }
+.md-inline-math-container mjx-container { zoom: 0.95; }
+
+
+:root {
+    --side-bar-bg-color: #fafafa;
+    --control-text-color: #777;
+}
+
+@include-when-export url(https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext);
+
+/* open-sans-regular - latin-ext_latin */
+  /* open-sans-italic - latin-ext_latin */
+    /* open-sans-700 - latin-ext_latin */
+    /* open-sans-700italic - latin-ext_latin */
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    font-family: "Open Sans","Clear Sans", "Helvetica Neue", Helvetica, Arial, 'Segoe UI Emoji', sans-serif;
+    color: rgb(51, 51, 51);
+    line-height: 1.6;
+}
+
+#write {
+    max-width: 860px;
+  	margin: 0 auto;
+  	padding: 30px;
+    padding-bottom: 100px;
+}
+
+@media only screen and (min-width: 1400px) {
+	#write {
+		max-width: 1024px;
+	}
+}
+
+@media only screen and (min-width: 1800px) {
+	#write {
+		max-width: 1200px;
+	}
+}
+
+#write > ul:first-child,
+#write > ol:first-child{
+    margin-top: 30px;
+}
+
+a {
+    color: #4183C4;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    position: relative;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    line-height: 1.4;
+    cursor: text;
+}
+h1:hover a.anchor,
+h2:hover a.anchor,
+h3:hover a.anchor,
+h4:hover a.anchor,
+h5:hover a.anchor,
+h6:hover a.anchor {
+    text-decoration: none;
+}
+h1 tt,
+h1 code {
+    font-size: inherit;
+}
+h2 tt,
+h2 code {
+    font-size: inherit;
+}
+h3 tt,
+h3 code {
+    font-size: inherit;
+}
+h4 tt,
+h4 code {
+    font-size: inherit;
+}
+h5 tt,
+h5 code {
+    font-size: inherit;
+}
+h6 tt,
+h6 code {
+    font-size: inherit;
+}
+h1 {
+    font-size: 2.25em;
+    line-height: 1.2;
+    border-bottom: 1px solid #eee;
+}
+h2 {
+    font-size: 1.75em;
+    line-height: 1.225;
+    border-bottom: 1px solid #eee;
+}
+
+/*@media print {
+    .typora-export h1,
+    .typora-export h2 {
+        border-bottom: none;
+        padding-bottom: initial;
+    }
+
+    .typora-export h1::after,
+    .typora-export h2::after {
+        content: "";
+        display: block;
+        height: 100px;
+        margin-top: -96px;
+        border-top: 1px solid #eee;
+    }
+}*/
+
+h3 {
+    font-size: 1.5em;
+    line-height: 1.43;
+}
+h4 {
+    font-size: 1.25em;
+}
+h5 {
+    font-size: 1em;
+}
+h6 {
+   font-size: 1em;
+    color: #777;
+}
+p,
+blockquote,
+ul,
+ol,
+dl,
+table{
+    margin: 0.8em 0;
+}
+li>ol,
+li>ul {
+    margin: 0 0;
+}
+hr {
+    height: 2px;
+    padding: 0;
+    margin: 16px 0;
+    background-color: #e7e7e7;
+    border: 0 none;
+    overflow: hidden;
+    box-sizing: content-box;
+}
+
+li p.first {
+    display: inline-block;
+}
+ul,
+ol {
+    padding-left: 30px;
+}
+ul:first-child,
+ol:first-child {
+    margin-top: 0;
+}
+ul:last-child,
+ol:last-child {
+    margin-bottom: 0;
+}
+blockquote {
+    border-left: 4px solid #dfe2e5;
+    padding: 0 15px;
+    color: #777777;
+}
+blockquote blockquote {
+    padding-right: 0;
+}
+table {
+    padding: 0;
+    word-break: initial;
+}
+table tr {
+    border: 1px solid #dfe2e5;
+    margin: 0;
+    padding: 0;
+}
+table tr:nth-child(2n),
+thead {
+    background-color: #f8f8f8;
+}
+table th {
+    font-weight: bold;
+    border: 1px solid #dfe2e5;
+    border-bottom: 0;
+    margin: 0;
+    padding: 6px 13px;
+}
+table td {
+    border: 1px solid #dfe2e5;
+    margin: 0;
+    padding: 6px 13px;
+}
+table th:first-child,
+table td:first-child {
+    margin-top: 0;
+}
+table th:last-child,
+table td:last-child {
+    margin-bottom: 0;
+}
+
+.CodeMirror-lines {
+    padding-left: 4px;
+}
+
+.code-tooltip {
+    box-shadow: 0 1px 1px 0 rgba(0,28,36,.3);
+    border-top: 1px solid #eef2f2;
+}
+
+.md-fences,
+code,
+tt {
+    border: 1px solid #e7eaed;
+    background-color: #f8f8f8;
+    border-radius: 3px;
+    padding: 0;
+    padding: 2px 4px 0px 4px;
+    font-size: 0.9em;
+}
+
+code {
+    background-color: #f3f4f4;
+    padding: 0 2px 0 2px;
+}
+
+.md-fences {
+    margin-bottom: 15px;
+    margin-top: 15px;
+    padding-top: 8px;
+    padding-bottom: 6px;
+}
+
+
+.md-task-list-item > input {
+  margin-left: -1.3em;
+}
+
+@media print {
+    html {
+        font-size: 13px;
+    }
+    table,
+    pre {
+        page-break-inside: avoid;
+    }
+    pre {
+        word-wrap: break-word;
+    }
+}
+
+.md-fences {
+	background-color: #f8f8f8;
+}
+#write pre.md-meta-block {
+	padding: 1rem;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f7f7f7;
+    border: 0;
+    border-radius: 3px;
+    color: #777777;
+    margin-top: 0 !important;
+}
+
+.mathjax-block>.code-tooltip {
+	bottom: .375rem;
+}
+
+.md-mathjax-midline {
+    background: #fafafa;
+}
+
+#write>h3.md-focus:before{
+	left: -1.5625rem;
+	top: .375rem;
+}
+#write>h4.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+#write>h5.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+#write>h6.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+.md-image>.md-meta {
+    /*border: 1px solid #ddd;*/
+    border-radius: 3px;
+    padding: 2px 0px 0px 4px;
+    font-size: 0.9em;
+    color: inherit;
+}
+
+.md-tag {
+    color: #a7a7a7;
+    opacity: 1;
+}
+
+.md-toc { 
+    margin-top:20px;
+    padding-bottom:20px;
+}
+
+.sidebar-tabs {
+    border-bottom: none;
+}
+
+#typora-quick-open {
+    border: 1px solid #ddd;
+    background-color: #f8f8f8;
+}
+
+#typora-quick-open-item {
+    background-color: #FAFAFA;
+    border-color: #FEFEFE #e5e5e5 #e5e5e5 #eee;
+    border-style: solid;
+    border-width: 1px;
+}
+
+/** focus mode */
+.on-focus-mode blockquote {
+    border-left-color: rgba(85, 85, 85, 0.12);
+}
+
+header, .context-menu, .megamenu-content, footer{
+    font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+.file-node-content:hover .file-node-icon,
+.file-node-content:hover .file-node-open-state{
+    visibility: visible;
+}
+
+.mac-seamless-mode #typora-sidebar {
+    background-color: #fafafa;
+    background-color: var(--side-bar-bg-color);
+}
+
+.md-lang {
+    color: #b4654d;
+}
+
+/*.html-for-mac {
+    --item-hover-bg-color: #E6F0FE;
+}*/
+
+#md-notification .btn {
+    border: 0;
+}
+
+.dropdown-menu .divider {
+    border-color: #e5e5e5;
+    opacity: 0.4;
+}
+
+.ty-preferences .window-content {
+    background-color: #fafafa;
+}
+
+.ty-preferences .nav-group-item.active {
+    color: white;
+    background: #999;
+}
+
+.menu-item-container a.menu-style-btn {
+    background-color: #f5f8fa;
+    background-image: linear-gradient( 180deg , hsla(0, 0%, 100%, 0.8), hsla(0, 0%, 100%, 0)); 
+}
+
+
+
+</style><title>信利放行条操作指引</title>
+</head>
+<body class='typora-export os-windows'><div class='typora-export-content'>
+<div id='write'  class=''><h1 id='信利放行条操作指引'><strong><span>信利放行条操作指引</span></strong></h1><p><span>编写人：赖吉全</span></p><p><span>版    本：V1.0Bate</span></p><p><span>日    期：2021年10月06日</span></p><h2 id='一系统介绍'><span>一、系统介绍</span></h2><p><span>本次放行条系统是根据目前公司整个放行情况进行系统及流程的整合、优化和迭代。全部52个流程，涉及公司各个方面的放行出厂业务，而这次的系统做到了统一的申请入口，统一的审批入口，统一的记录查询入口；同时系统使用三种创新的申请方式简化了大家放行业务发生时申请的复杂度。让大家有好的使用体验的同时也提高公司放行效率。</span></p><h2 id='二系统路径'><span>二、系统路径</span></h2><p><span>企业微信 — 工作台 — 信利移动办公平台</span></p><p><img src=".\img\1632992524462.jpg" style="zoom:25%;" /></p><p><img src=".\img\image-20211005093802879.png" alt="image-20211005093802879" style="zoom: 67%;" /></p><p>&nbsp;</p><p><img src=".\img\image-20210930171200047.png" referrerpolicy="no-referrer" alt="image-20210930171200047"></p><h5 id='1方式一通过引导式对话框对话框选择业务类型'><span>1).方式一：&quot;通过引导式对话框对话框选择业务类型&quot;</span></h5><p><span>			</span><span>这种方式用通俗点说法就是由系统手把手引导你的整个申请，只要跟随系统一步一步的引导做出</span></p><p><span>相应的选择和补充必要信息，最后系统会根据你所选择及补充的信息产生对应的申请表，进行审批流转。</span></p><h5 id='2方式二通过搜索对话框选择业务类型'><span>2).方式二：&quot;通过搜索对话框选择业务类型&quot;</span></h5><p><span>			</span><span>这种方式就是通过输入相关的字眼进行流程选择，当然输入的信息全则系统帮你搜索的定位就越精准，类似平时上网搜索功能。</span></p><h5 id='3方式三通过业务类型树状图选择'><span>3).方式三：&quot;通过业务类型树状图选择&quot;</span></h5><p><span>			</span><span>这种方式适用于对放行业务比较熟悉的人员，直接从大流程图里面点击进入申请表单填写并提交。此方式能快速定位申请流程。</span></p><h2 id='三术语解释'><span>三、术语解释</span></h2><h5 id='1\t非自提'><span>1).</span><span>	</span><span>非自提：</span></h5><p><span>		</span><span>1.1</span><span>	</span><span>由公司授权部门（比如物流中心、仓库等）委托运输公司（包括但不限于货运、快递）出厂业</span></p><p><span>				</span><span> 务。</span></p><p><span>		</span><span>1.2</span><span>	</span><span>非自提业务需要打印纸质放行条。具体打印环节在业务流程说明里面有明确指出。</span></p><h5 id='2\t自提'><span>2).</span><span>	</span><span>自提：</span></h5><p><span>		</span><span>2.1</span><span>	</span><span>不走公司授权部门直接出厂；比如公司员工自己(包括托付其他员工)带出厂，供应商/加工商/委</span></p><p><span>				</span><span> 外商、客户、工程队、第三方人员/机构等来访人员带出厂。</span></p><p><span>		</span><span>2.2</span><span>	</span><span>自提的放行条一定要拍物品照片。</span></p><p><span>		</span><span>2.3</span><span>	</span><span>自提的放行条全部使用电子版动态二维码，每次生成时效30分钟，过期刷新，出厂时请用有</span></p><p><span>				</span><span> 效期内的二维码给信利门卫扫一扫。</span></p><p><img src=".\img\image-20211006103916335.png" alt="image-20211006103916335" style="zoom: 67%;" /></p><h5 id='3\t研发样品'><span>3).</span><span>	</span><span>研发样品：</span></h5><p><span>				</span><span>指信利研发部范畴所研发出来的各种样品。包括但不限于图纸、参数、工艺、半成品、成品。</span></p><h5 id='4\t非研发样品'><span>4).</span><span>	</span><span>非研发样品：</span></h5><p><span>				</span><span>指信利非研发部范畴所提供的各种样品，包括提供颜色调色样本等。</span></p><h5 id='5\t门卫放行'><span>5).</span><span>	</span><span>门卫放行：</span></h5><p><span>				</span><span>指提供有效合法的放行条（纸质、二维条码）给门卫进行单与实物的核对；</span></p><p><span>				</span><span>电子版放行条门卫仅需要使用企业微信“信利扫一扫”进行二维码扫描核对。</span></p><p><span>				</span><span>经门卫核对和检验合法合规后放行出厂的整套业务。</span></p><h2 id='四申请思路'><span>四、申请思路</span></h2><p><img src=".\img\SQSL.jpg" style="zoom: 67%;" /></p><h4 id='1-什么方式出厂'><span>1 什么方式出厂</span></h4><p><span>	</span><span>确定是用&quot;自提&quot;的方式通过门卫检查出厂还是通过&quot;非自提&quot;通过门卫检查出厂。</span></p><h4 id='2-货物归属'><span>2 货物归属</span></h4><p><span>	</span><span>确定需要出厂的物品，最终的归属（比如供应商、客户、集团内子公司/部门、委外加工商、还是公司</span></p><p><span>	</span><span>固定资产出厂）。</span></p><h4 id='3-什么物品'><span>3 什么物品</span></h4><p><span>1）</span><b><span>退货</span></b><span>：来料不良退回</span></p><p><span>2）</span><b><span>样品</span></b><span>：需要提供样品给供应商、客户、加工商。</span></p><p><span>3）</span><b><span>回收品</span></b><span>： 包材、容器、纸皮、空桶、借用模具、夹具、测试、试用等物品。</span></p><p><span>4） </span><b><span>委外物品</span></b><span>：提供给委外加工商的各种货物。</span></p><p><span>5）</span><b><span>文件</span></b><span>：包括但不限于合同、协议、说明书、采购需求单、确认书、回签书等。</span></p><p><span>6）</span><b><span>固定资产</span></b><span>：包括但不限于生产设备、办公用品、办公设备、劳保用品、配件、模具、夹具等各种资</span></p><p><span>						</span><span> 产。</span><span>	</span></p><p><span>7）</span><b><span>集团内货物</span></b><span>:集团内各公司、部门间生产材料、半成品、成品、辅料、办公、劳保等物品。</span></p><p><span>8）</span><b><span>其他类</span></b><span>：除罗列的类型外</span></p><h4 id='4-有何要求'><span>4 有何要求</span></h4><p><span>1）</span><b><span>退货</span></b><span>：</span></p><p><span>		</span><span>&lt;1&gt;.来料已入库无论是否领料均由仓库退回不良。</span></p><p><span>		</span><span>&lt;2&gt;.供应商物料使用寄件方式到物流中心者，未入库则由物流中心退回来料不良品，</span></p><p><span>			</span><span>    已入库则走&lt;1&gt;流程。</span></p><p><span>		</span><span>&lt;3&gt;.需走物流中心寄来料不良回供应商，加工商业务</span></p><p><span>		</span><span>&lt;4&gt;.从研发仓退来料不良品需会知采购部。</span></p><p><span>2）</span><strong><span>公司产品：</span></strong></p><p><span>				</span><span>只能申请不走K3出货流程的业务（包括换货或特殊出货），正常出货不允许申请，走K3出货流程。</span></p><p><span>3）</span><b><span>样品</span></b><span>：</span></p><p><span>		</span><span>&lt;1&gt;.无论是寄供应商、委外加工商、客户，均严格区分是否是研发样品还是非研发样品。</span></p><p><span>		</span><span>&lt;2&gt;.寄给客户信利研发样品，需要数量管控和多级审核。</span></p><p><span>4）</span><b><span>回收品</span></b><span>：</span></p><p><span>		</span><span>&lt;1&gt;.回收品区分&quot;空桶&quot;、&quot;包材纸箱&quot;、&quot;设备配件&quot;。</span></p><p><span>		</span><span>&lt;2&gt;.设备配件：指供应商或客户借给信利因某种工艺，生产需求的各种模具、夹具、测试物</span></p><p><span>				</span><span>品、试验物品、试用物品</span></p><p><span>5）</span><strong><span>委外物品</span></strong><span>：</span></p><p><span>				</span><span>提供给委外加工商的各种货物但无法在K3单据体现，需手工申请各种配套料、客供料、夹具、</span></p><p><span>				</span><span>模具等。</span></p><p><span>6）</span><b><span>文件</span></b><span>：</span></p><p><span>		</span><span>书面纸质物品。非纸质均不允许走此流程。</span></p><p><span>7）</span><b><span>固定资产</span></b><span>：</span></p><p><span>		</span><span>&lt;1&gt;生产设备及配件   ： 指包括但不限于生产设备、配件维修、外卖、转厂、报废、闲置、更换出</span></p><p><span>												</span><span> 厂业务。</span></p><p><span>		</span><span>&lt;2&gt;非生产设备及配件：除生产设备、配件外的各种办公用品、办公设备、劳保用品、配件、模</span></p><p><span>												</span><span> 具、夹具等出厂维修、外卖、转厂、报废、闲置、更换业务。</span></p><p><span>		</span><span>&lt;3&gt;报废公司固定资产：指除生产设备、配件外其他资产报废业务；</span></p><p><span>												</span><span> 生产设备及配件报废走&lt;1&gt;流程。</span></p><p><span>8）</span><b><span>集团内货物</span></b><span>:</span></p><p><span>		</span><span>1）购销件：指集团内部各公司/部门间买卖货物出厂。</span></p><p><span>		</span><span>2）普通件：指集团内部各公司/部门内部或之间没有买卖的物品非自提出厂。</span></p><p><span>							</span><span>（比如同部门货物调拨、借用）</span></p><p><span>		</span><span>3）同市普通件：指集团内部各公司/部门内部或之间没有买卖的物品出厂,但收货方是信利二厂区、</span></p><p><span>									</span><span> 信利红草厂区。</span></p><p><span>		</span><span>4）异市普通件：指集团内部各公司/部门内部或之间没有买卖的物品出厂,但收货方是信利惠州厂</span></p><p><span>									</span><span> 区、信利四川仁寿厂区。</span></p><p><span>9）</span><b><span>其他类</span></b><span>：除罗列的类型外</span></p><h2 id='五系统操作技巧'><span>五、系统操作技巧</span></h2><h3 id='1操作指引使用'><span>1.操作指引使用</span></h3><p><span>操作指引有相应的书签，可以方便的定位到相应的地方。</span></p><p><img src=".\img\image-20211007115916840.png" referrerpolicy="no-referrer" alt="image-20211007115916840"></p><h3 id='2通过引导式对话框选择业务类型'><span>2.通过引导式对话框选择业务类型</span></h3><p><img src=".\img\image-20211007102637312.png" referrerpolicy="no-referrer" alt="image-20211007102637312"></p><p><span>这种方式按照第四点“申请思路”，根据系统向导一步一步申请。</span></p><p><img src=".\img\image-20211007103503798.png" referrerpolicy="no-referrer"></p><p>&nbsp;</p><p><img src=".\img\image-20211007103836557.png" referrerpolicy="no-referrer" alt="image-20211007103836557"></p><p>&nbsp;</p><p><img src=".\img\image-20211007104248677.png" referrerpolicy="no-referrer"></p><p>&nbsp;</p><p><img src=".\img\image-20211007104624771.png" referrerpolicy="no-referrer" alt="image-20211007104624771"></p><p>&nbsp;</p><p><img src=".\img\image-20211007104817088.png" referrerpolicy="no-referrer" alt="image-20211007104817088"></p><p>&nbsp;</p><p><img src=".\img\image-20211007110609255.png" referrerpolicy="no-referrer" alt="image-20211007110609255"></p><h3 id='3-通过搜索对话框选择业务类型'><span>3 .通过搜索对话框选择业务类型</span></h3><p><img src=".\img\image-20211007111210885.png" referrerpolicy="no-referrer" alt="image-20211007111210885"></p><p><span>下面以一个例子介绍此功能</span></p><p><strong><span>例</span></strong><span>:</span></p><p><span>				</span><span>信利员工张三接到任务，把三个月前借用A客户的模具到公司物流中心寄还回去。</span></p><p><span>				</span><span>这时张三进入放行条系统后，使用了第二种搜索对话框方式进行申请表填写，首先在搜索框里</span></p><p><span>				</span><span>输入“模具”关键字进行搜索，</span></p><p><span>				</span><span>此时看到系统匹配了相关模具的流程；</span></p><p><span>				</span><span>张三通过申请思路进行确认：</span></p><p><span>				</span><span>（1）什么方式出厂：到公司物流中心邮寄，即“非自提&quot;。</span></p><p><span>				</span><span>（2）货物归属：借用客户的，现在要归还，则应该选择“客户方向”。</span></p><p><span>				</span><span>（3） 什么物品：模具</span></p><p><span>				</span><span>（4）有何要求：非自提需要打印纸质放行条到物流中心办理业务。</span></p><p><span>				</span><span> 从思路分析已经可以选择出红框非自提类型，寄给客户选择第二条流程，直接点击既然表单申</span></p><p><span>				</span><span> 请。</span></p><p><img src=".\img\image-20211007112534233.png" referrerpolicy="no-referrer" alt="image-20211007112534233"></p><p><img src=".\img\image-20211007113956390.png" referrerpolicy="no-referrer" alt="image-20211007113956390"></p><p><img src=".\img\image-20211007114208123.png" referrerpolicy="no-referrer" alt="image-20211007114208123"></p><h3 id='4通过业务类型树状图选择'><span>4.通过业务类型树状图选择</span></h3><p><img src=".\img\image-20211007114504420.png" referrerpolicy="no-referrer" alt="image-20211007114504420"></p><p><span>这个方式是整体流程图方式，方便对业务熟悉人员快速进入，比如像2的例子，若张三比较熟悉业务，知道寄模具还给客户在&quot;非自提&quot;—&quot;寄给客户&quot;—&quot;寄回收品&quot;，那么通过这个方式直接点击流程图相应位置就能直接进入申请表单。</span></p><p><img src="img\FXT.png" referrerpolicy="no-referrer"></p><h2 id='六业务流程说明'><span>六、业务流程说明</span></h2><h3 id='1）非自提类'><span>（1）非自提类</span></h3><h4 id='11）寄供应商方向'><span>（1.1）寄供应商方向</span></h4><h5 id='111）退货'><span>（1.1.1）退货</span></h5><h6 id='1111）从仓库车间退回'><span>（1.1.1.1）从仓库/车间退回</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>											</span><span>供应商来料已经到信利仓库或被工序已经领料后发现不良，需要通过公司物流</span></p><p><span>											</span><span>中心委托第三方运输公司退回供应商的业务。</span></p><p><span>											</span><span>仓管部审核该流程后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>											</span><span>提交 &gt;&gt;&gt; 品质部 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 采购部 &gt;&gt;&gt;仓库管理部 &gt;&gt;&gt; 物流中心</span></p><p><span>											</span><span> &gt;&gt;&gt; 门卫放行</span></p><h6 id='1112）从物流未入库）退回'><span>（1.1.1.2）从物流（未入库）退回</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>											</span><span>不经仓库，通过公司物流部委托第三方运输公司，把不良来料退回供应商业</span></p><p><span>											</span><span>务。</span></p><p><span>											</span><span>部门负责人审核该流程后，申请人需要打印纸质放行条到物流中心办理托运业</span></p><p><span>											</span><span>务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>											</span><span>提交 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 物流中心 &gt;&gt;&gt; 门卫放行</span></p><h6 id='1113）从研发仓退回'><span>（1.1.1.3）从研发仓退回</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>											</span><span>研发仓通过公司物流中心委托第三方运输公司，把不良来料退回供应商业务。</span></p><p><span>											</span><span>采购部审核该流程后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>											</span><span>提交 &gt;&gt;&gt; 项目经理 &gt;&gt;&gt; 采购部 &gt;&gt;&gt; 物流中心 &gt;&gt;&gt; 门卫放行</span></p><h5 id='112）寄样品'><span>（1.1.2）寄样品</span></h5><h6 id='1121）研发'><span>（1.1.2.1）研发</span></h6><p><span>						</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>研发部通过公司物流部委托第三方运输公司提供研发样品给供应商；</span></p><p><span>										</span><span>仓库管理部审核该流程后，申请人需要打印纸质放行条到物流中心办理托运业</span></p><p><span>										</span><span>务。</span></p><p><span>						</span><em><strong><span>流程节点：</span></strong></em></p><p><span>										</span><span>提交 &gt;&gt;&gt; 项目经理 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 采购部 &gt;&gt;&gt; 仓库管理部 &gt;&gt; &gt; 物流中心</span></p><p><span>										</span><span> &gt;&gt;&gt; 门卫放行</span></p><h6 id='1122）非研发'><span>（1.1.2.2）非研发</span></h6><p><span>						</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>除研发部外其他部门通过公司物流部委托第三方运输公司提供研发样品寄给供应</span></p><p><span>										</span><span>商；</span></p><p><span>										</span><span>部门负责人审核该流程后，申请人需要打印纸质放行条到物流中心办理托运业</span></p><p><span>										</span><span> 务。</span></p><p><span>						</span><em><strong><span>流程节点：</span></strong></em></p><p><span>										</span><span>提交 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 物流中心 &gt;&gt;&gt; 门卫放行</span></p><h5 id='113）寄回收品'><span>（1.1.3）寄回收品</span></h5><h6 id='1131）空桶类'><span>（1.1.3.1）空桶类</span></h6><p><span>						</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输公司把空桶寄还给供应商；</span></p><p><span>										</span><span>仓库管理部审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>						</span><em><strong><span>流程节点：</span></strong></em></p><p><span>										</span><span>提交 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 采购部 &gt;&gt;&gt; 仓库管理部 &gt;&gt;&gt; 物流中心 &gt;&gt;&gt; 门卫放行</span></p><h6 id='1132）包材纸箱等其他类'><span>（1.1.3.2）包材纸箱等其他类</span></h6><p><span>						</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输公司把包材纸箱等寄还给供应商；</span></p><p><span>										</span><span>采购部审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>						</span><em><strong><span>流程节点：</span></strong></em></p><p><span>										</span><span>提交 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 采购部 &gt;&gt;&gt; 物流中心 &gt;&gt;&gt; 门卫放行</span></p><h6 id='1133）设备配件类'><span>（1.1.3.3）设备配件类</span></h6><p><span>						</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输公司把借用的模具、夹具、测试物品、试验物</span></p><p><span>										</span><span>品、试用物品等寄还给供应商；</span></p><p><span>										</span><span>行政部审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span><span>		</span></p><p><span>						</span><em><strong><span>流程节点：</span></strong></em></p><p><span>									</span><span> </span><span>	</span><span>提交 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 行政部 &gt;&gt;&gt; 物流中心 &gt;&gt;&gt; 门卫放行</span><span>	</span></p><h5 id='114）寄文件'><span>（1.1.4）寄文件</span></h5><p><span>						</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输、快递公司寄文件给供应商，包括但不限于合</span></p><p><span>										</span><span>同、协议、说明书、采购需求单、确认书、回签书等业务；</span></p><p><span>										</span><span>部门负责人审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span><span>	</span></p><p><span>						</span><em><strong><span>流程节点：</span></strong></em></p><p><span>										</span><span>提交 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 物流中心 &gt;&gt;&gt; 门卫放行</span></p><h4 id='12）寄客户方向'><span>（1.2）寄客户方向</span></h4><h5 id='121）寄公司产品'><span>（1.2.1）寄公司产品</span></h5><p><span>						</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输公司寄不走K3出货流程的产品给客户，包括换货</span></p><p><span>										</span><span>或特殊出货；</span></p><p><span>										</span><span>QA部审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>						</span><em><strong><span>流程节点：</span></strong></em></p><p><span>										</span><span>提交 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; QA部 &gt;&gt;&gt; 物流中心 &gt;&gt;&gt; 门卫放行</span></p><h5 id='122）寄样品'><span>（1.2.2）寄样品</span></h5><h6 id='1221）非研发类样品'><span>（1.2.2.1）非研发类样品</span></h6><p><span>						</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>事业部通过公司物流部委托第三方运输公司寄样品给客户；</span></p><p><span>										</span><span>QA部审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>						</span><em><strong><span>流程节点：</span></strong></em></p><p><span>										</span><span> 提交 &gt;&gt;&gt; 品质经理 &gt;&gt;&gt; QA部 &gt;&gt;&gt; 物流中心 &gt;&gt;&gt; 门卫放行</span></p><h6 id='1222）研发类样品'><span>（1.2.2.2）研发类样品</span></h6><p><span>						</span><em><strong><span>（1.2.2.2.1）样品数量小于50</span></strong></em></p><p><span>						</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>研发部通过公司物流部委托第三方运输公司寄样品给客户且寄出总样品</span></p><p><span>										</span><span>数量少于50；</span></p><p><span>										</span><span>研发项目经理审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>						</span><em><strong><span>流程节点：</span></strong></em></p><p><span>										</span><span>提交 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 项目经理 &gt;&gt;&gt; 物流中心 &gt;&gt;&gt; 门卫放行</span></p><p><span>						</span><em><strong><span>（1.2.2.2.1）样品数量50以上</span></strong></em></p><p><span>						</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>研发部通过公司物流部委托第三方运输公司寄样品给客户且寄出总样品数量大于</span></p><p><span>										</span><span>或等于50；</span></p><p><span>										</span><span>研发最高负责人审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>						</span><em><strong><span>流程节点：</span></strong></em></p><p><span>										</span><span>提交 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 项目经理 &gt;&gt;&gt; 研发最高负责人 &gt;&gt;&gt; 物流中心 </span></p><p><span>										</span><span>&gt;&gt;&gt; 门卫放行</span></p><h5 id='123）寄文件'><span>（1.2.3）寄文件</span></h5><p><span>						</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输、快递公司寄给客户文件，包括但不限于合同、</span></p><p><span>										</span><span>协议、说明书、确认书、回签书等业务；</span></p><p><span>										</span><span>部门负责人审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>						</span><em><strong><span>流程节点：</span></strong></em><span>	</span></p><p><span>										</span><span> 提交 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 物流中心 &gt;&gt;&gt; 门卫放行</span><span>	</span></p><h5 id='124）寄回收品'><span>（1.2.4）寄回收品</span></h5><p><span>					</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输公司寄回借用客户的设备，包括但不限于夹具、</span></p><p><span>										</span><span>模具等物品业务；</span></p><p><span>										</span><span>行政部审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>					</span><em><strong><span>流程节点：</span></strong></em><span>	</span></p><p><span>										</span><span>提交 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 行政部 &gt;&gt;&gt; 物流中心 &gt;&gt;&gt; 门卫放行</span></p><h5 id='125）寄其它'><span>（1.2.5）寄其它</span></h5><p><span>					</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输公司寄给客户其他物品；</span></p><p><span>										</span><span>行政部审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>					</span><em><strong><span>流程节点：</span></strong></em><span>	</span></p><p><span>										</span><span>提交 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 行政部 &gt;&gt;&gt; 物流中心  &gt;&gt;&gt; 门卫放行</span></p><h4 id='13）寄集团内方向'><span>（1.3）寄集团内方向</span></h4><h5 id='131）寄货物'><span>（1.3.1）寄货物</span></h5><h6 id='1311）购销件'><span>（1.3.1.1）购销件</span></h6><p><span>					</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输公司邮寄、托运集团内各公司部门间因购销关系</span></p><p><span>										</span><span>的货物；</span></p><p><span>										</span><span>部门负责人审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>					</span><em><strong><span>流程节点：</span></strong></em><span>	</span></p><p><span>										</span><span>提交 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 物流中心 &gt;&gt;&gt; 门卫放行</span></p><h6 id='1312）普通件'><span>（1.3.1.2）普通件</span></h6><p><span>					</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输公司邮寄、托运集团内各公司部门间非购销关系</span></p><p><span>										</span><span>的货物；</span></p><p><span>										</span><span>部门负责人审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>					</span><em><strong><span>流程节点：</span></strong></em><span>	</span></p><p><span>										</span><span>提交 &gt;&gt;&gt; 部门负责人 &gt;&gt;&gt; 物流中心 &gt;&gt;&gt; 门卫放行</span></p><h5 id='132）文件'><span>（1.3.2）文件</span></h5><p><span>					</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输、快递公司邮寄集团内各公司间文件服务;</span></p><p><span>										</span><span>部门负责人审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>					</span><em><strong><span>流程节点：</span></strong></em><span>	</span></p><p><span>										</span><span>提交 &gt; 部门负责人 &gt; 物流中心 &gt; 门卫放行</span></p><h4 id='14）寄委外加工商方向'><span>（1.4）寄委外加工商方向</span></h4><h5 id='141）寄委外物品'><span>（1.4.1）寄委外物品</span></h5><p><span>					</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输公司邮寄、托运无法在K3单据体现的委外业务，</span></p><p><span>										</span><span>需手工申请的各种配套料和客供料、夹具、模具等；</span></p><p><span>										</span><span>营运部审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>					</span><em><strong><span>流程节点：</span></strong></em><span>	</span></p><p><span>										</span><span> 提交 &gt; 部门负责人 &gt; 营运部 &gt; 物流中心 &gt; 门卫放行</span></p><h5 id='142）寄委外回收品'><span>（1.4.2）寄委外回收品</span></h5><p><span>					</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输公司邮寄、托运送货带来的包材或容器还给委外</span></p><p><span>										</span><span>加工商；</span></p><p><span>										</span><span>营运部审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>					</span><em><strong><span>流程节点：</span></strong></em><span>	</span></p><p><span>										</span><span>提交 &gt; 部门负责人 &gt; 营运部 &gt; 老物流 &gt; 门卫放行</span></p><h4 id='15）寄固定资产方向'><span>（1.5）寄固定资产方向</span></h4><h5 id='151）生产设备及配件类'><span>（1.5.1）生产设备及配件类</span></h5><h6 id='1511）设备类'><span>（1.5.1.1）设备类</span></h6><p><span>					</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输公司，运输包括但不限于生产设备出厂维修、外</span></p><p><span>										</span><span>卖、转厂、报废、闲置、更换等业务；</span></p><p><span>										</span><span>设备部总经理审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>					</span><em><strong><span>流程节点：</span></strong></em><span>	</span></p><p><span>										</span><span> 提交 &gt; 部门负责人 &gt; 设备部 &gt; 设备部总经理 &gt; 物流中心 &gt; 门卫放行</span></p><h6 id='1512）-配件类'><span>（1.5.1.2） 配件类</span></h6><p><span>					</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输公司，运输包括但不限于生产设备的配件出厂</span></p><p><span>										</span><span>维修、外卖、转厂、报废、闲置、更换等业务；</span></p><p><span>										</span><span>设备部总经理审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>					</span><em><strong><span>流程节点：</span></strong></em><span>	</span></p><p><span>										</span><span> 提交 &gt; 部门负责人 &gt; 设备部 &gt; 设备部总经理 &gt; 物流中心 &gt; 门卫放行</span></p><h5 id='152）非生产设备或配件'><span>（1.5.2）非生产设备或配件</span></h5><p><span>					</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>										</span><span>通过公司物流部委托第三方运输公司，运输除生产设备、配件外的各种包括但不</span></p><p><span>										</span><span>限于办公设备用品，劳保用品、配件、模具、夹具等转厂出厂、维修出厂、保养</span></p><p><span>										</span><span>出厂、报废出厂等业务；</span></p><p><span>										</span><span>行政部审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>					</span><em><strong><span>流程节点：</span></strong></em><span>	</span></p><p><span>										</span><span> 提交 &gt; 部门负责人 &gt; 行政部 &gt; 物流中心 &gt; 门卫放行</span></p><h5 id='153）-资产报废物品'><span>（1.5.3） 资产报废物品</span></h5><p><span>					</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>											</span><span>通过公司物流部委托第三方运输公司，运输公司某些资产出厂报废</span></p><p><span>											</span><span>外卖等业务；</span></p><p><span>											</span><span>行政部审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>					</span><em><strong><span>流程节点：</span></strong></em><span>	</span></p><p><span>											</span><span> 提交 &gt; 部门负责人 &gt; 总裁办 &gt; 行政部 &gt; 物流中心 &gt; 门卫放行</span></p><h4 id='16）其它类'><span>（1.6）其它类</span></h4><p><span>					</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>											</span><span>通过公司物流部委托第三方运输公司，运输其他类出厂业务；</span></p><p><span>											</span><span>营运部审批后，申请人需要打印纸质放行条到物流中心办理托运业务。</span></p><p><span>					</span><em><strong><span>流程节点：</span></strong></em><span>	</span></p><p><span>											</span><span>提交 &gt; 部门负责人 &gt; 营运部 &gt; 物流中心 &gt; 门卫放行</span></p><p>&nbsp;</p><h3 id='2）自提类'><span>（2）自提类</span></h3><h4 id='21）供应商物品'><span>（2.1）供应商物品</span></h4><h5 id='211）退货'><span>（2.1.1）退货</span></h5><h6 id='2111）从仓库车间退回'><span>（2.1.1.1）从仓库/车间退回</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>供应商来料已经到信利仓库或被工序已经领料后发现不良，需要自提出厂退</span></p><p><span>												</span><span>回业务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;品质部&gt;&gt;&gt;部门负责人&gt;&gt;&gt;采购部&gt;&gt;&gt;仓库管理部&gt;&gt;&gt;门卫放行</span></p><h6 id='2112）从物流未入库）退回'><span>（2.1.1.2）从物流（未入库）退回</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>不经仓库，到公司物流部自提出厂业务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;物流中心&gt;&gt;&gt;门卫放行</span></p><h6 id='2113）从研发仓退回'><span>（2.1.1.3）从研发仓退回</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>到公司研发仓自提不良来料退回业务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;项目经理&gt;&gt;&gt;采购部&gt;&gt;&gt;物流中心&gt;&gt;&gt;门卫放行</span></p><h5 id='212）寄样品'><span>（2.1.2）寄样品</span></h5><h6 id='2121）研发'><span>（2.1.2.1）研发</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提研发样品(信利研发仓、研发部或属于研发管辖的样品）出厂给</span></p><p><span>												</span><span>供应商。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;项目经理&gt;&gt;&gt;部门负责人&gt;&gt;&gt;采购部&gt;&gt;&gt;仓库管理部&gt;&gt;&gt;门卫放行</span></p><h6 id='2121）非研发'><span>（2.1.2.1）非研发</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提非研发管辖样品（包括但不限于提供样品给供应商调色）出厂给</span></p><p><span>												</span><span>供应商。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;门卫放行</span></p><h5 id='213）回收品'><span>（2.1.3）回收品</span></h5><h6 id='2131）空桶类'><span>（2.1.3.1）空桶类</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>到公司仓库自提空桶业务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;采购部&gt;&gt;&gt;仓库管理部&gt;&gt;&gt;老物流&gt;&gt;&gt;门卫放行</span></p><h6 id='2132）包材纸箱等其他类'><span>（2.1.3.2）包材纸箱等其他类</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>到公司老物流自提纸皮箱、包装容器等业务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;采购部&gt;&gt;&gt;老物流&gt;&gt;&gt;门卫放行</span></p><h6 id='2133）设备配件类'><span>（2.1.3.3）设备配件类</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提借给信利用的模具、夹具、测试物品、试验物品、试用物品等。</span><span>	</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;行政部&gt;&gt;&gt;门卫放行</span></p><h5 id='213）文件'><span>（2.1.3）文件</span></h5><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提给供应商的文件，包括但不限于合同、协议、说明书、采购需求单、</span></p><p><span>												</span><span>确认书、回签书等。</span><span>		</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;门卫放行</span></p><h4 id='22）客户'><span>（2.2）客户</span></h4><h5 id='221）公司产品'><span>（2.2.1）公司产品</span></h5><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>		</span><span> </span><span>										</span><span>自提没有走K3出货流程的产品给客户，包括换货或特殊出货业务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;QA部&gt;&gt;&gt;门卫放行</span></p><h5 id='222）样品'><span>（2.2.2）样品</span></h5><h6 id='2221）非研发类样品'><span>（2.2.2.1）非研发类样品</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提事业部非研发范畴样品给客户</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;品质经理&gt;&gt;&gt;QA部&gt;&gt;&gt;门卫放行</span></p><h6 id='2222）研发类样品'><span>（2.2.2.2）研发类样品</span></h6><p><span>						</span><em><strong><span>（2.2.2.2.1）样品数量小于50</span></strong></em></p><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提研发部数量少于50的研发类样品给客户。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;项目经理&gt;&gt;&gt;门卫放行</span></p><p><span>						</span><em><strong><span>（2.2.2.2.2）样品数量50以上</span></strong></em></p><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提研发部数量等于或大于50的研发类样品给客户。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;项目经理&gt;&gt;&gt;研发最高负责人&gt;&gt;&gt;门卫放行</span></p><h5 id='223）文件'><span>（2.2.3）文件</span></h5><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提客户文件，包括但不限于合同、协议、说明书、确认书、</span></p><p><span>												</span><span>回签书等出厂。</span><span>		</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;门卫放行</span></p><h5 id='224）回收品'><span>（2.2.4）回收品</span></h5><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提借用的客户设备（包括但不限于夹具、模具等物品）出厂。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;行政部&gt;&gt;&gt;门卫放行</span></p><h5 id='225）其它'><span>（2.2.5）其它</span></h5><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提客户其他类型的物品出厂。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;行政部&gt;&gt;&gt;门卫放行</span></p><h4 id='23）集团内'><span>（2.3）集团内</span></h4><h5 id='231）货物'><span>（2.3.1）货物</span></h5><h6 id='2311）购销件'><span>（2.3.1.1）购销件</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提集团内各公司部门间因购销关系的货物。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;物流中心&gt;&gt;&gt;门卫放行</span></p><h6 id='2312）异市普通件'><span>（2.3.1.2）异市普通件</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提不同城市的集团内各公司部门间除了购销关系的货物，适用以下</span></p><p><span>												</span><span>（汕尾信利 — 惠州信利 /  汕尾信利 — 仁寿信利  / </span></p><p><span>												</span><span>   汕尾信利 — 香港信利  / 汕尾信利 — 信利各地办事处）。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;物流中心&gt;&gt;&gt;门卫放行</span></p><h6 id='2313）同市普通件'><span>（2.3.1.3）同市普通件</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提同一城市的集团内各公司部门间除了购销关系的货物</span></p><p><span>											</span><span>  （适用于同一个城市不同厂区间货物运输）。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;门卫放行</span></p><h5 id='231）文件'><span>（2.3.1）文件</span></h5><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自带文件出厂给集团内各公司部门。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;门卫放行</span></p><h4 id='24）委外加工商'><span>（2.4）委外加工商</span></h4><h5 id='241）委外物品'><span>（2.4.1）委外物品</span></h5><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提无法在K3单据体现的委外业务，需手工申请的各种配套料和客供料、</span></p><p><span>												</span><span>夹具、模具等出厂委外加工业务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;营运部&gt;&gt;&gt;物流中心&gt;&gt;&gt;门卫放行</span></p><h5 id='241）委外回收品'><span>（2.4.1）委外回收品</span></h5><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提回收因委外入库所附带的各种包装材料、容器等物品出厂。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;营运部&gt;&gt;&gt;老物流&gt;&gt;&gt;门卫放行</span></p><h4 id='25）固定资产'><span>（2.5）固定资产</span></h4><h5 id='251）生产设备及配件类'><span>（2.5.1）生产设备及配件类</span></h5><h6 id='2511）-设备类'><span>（2.5.1.1） 设备类</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提包括但不限于生产设备因维修、外卖、转厂、报废、闲置、</span></p><p><span>												</span><span>更换等出厂业务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;设备部&gt;&gt;&gt;设备部总经理&gt;&gt;&gt;门卫放行</span></p><h6 id='2511）-配件类'><span>（2.5.1.1） 配件类</span></h6><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提包括但不限于生产设备的配件维修、外卖、转厂、报废、闲置、</span></p><p><span>												</span><span>更换等出厂业务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;设备部&gt;&gt;&gt;设备部总经理&gt;&gt;&gt;门卫放行</span></p><h5 id='252）非生产设备或配件'><span>（2.5.2）非生产设备或配件</span></h5><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提除生产设备、配件外的各种包括但不限于办公设备用品，劳保用品、</span></p><p><span>												</span><span>配件、模具、夹具等转厂出厂、维修出厂、保养出厂、报废出厂等业务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;行政部&gt;&gt;&gt;物流中心&gt;&gt;&gt;门卫放行</span></p><h5 id='253）资产报废物品'><span>（2.5.3）资产报废物品</span></h5><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提公司某些资产出厂报废外卖等业务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;总裁办&gt;&gt;&gt;行政部&gt;&gt;&gt;门卫放行</span></p><h4 id='26）其它类'><span>（2.6）其它类</span></h4><p><span>							</span><em><strong><span>业务场景说明：</span></strong></em></p><p><span>												</span><span>自提公司其他类出厂业务。</span></p><p><span>							</span><em><strong><span>流程节点：</span></strong></em></p><p><span>												</span><span>提交&gt;&gt;&gt;部门负责人&gt;&gt;&gt;营运部&gt;&gt;&gt;门卫放行</span></p><p><span>	</span></p></div></div>
+</body>
+</html>
