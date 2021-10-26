@@ -12,16 +12,16 @@ namespace EmpInfo.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class ei_fxType
+    public partial class ei_fxApplySelfItems
     {
         public int id { get; set; }
-        public string type_no { get; set; }
-        public string type_name { get; set; }
-        public string type_tip { get; set; }
-        public string type_demand { get; set; }
-        public string type_process { get; set; }
-        public string process_info { get; set; }
-        public bool is_deleted { get; set; }
-        public string form_segs { get; set; }
+        public string sys_no { get; set; }
+        public int entry_id { get; set; }
+        public string item_name { get; set; }
+        public string item_model { get; set; }
+        public int in_qty { get; set; }
+        public int out_qty { get; set; }
+        public string unit_name { get; set; }
+        public string comment { get; set; }
     }
 }

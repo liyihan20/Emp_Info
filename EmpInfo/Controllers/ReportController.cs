@@ -4640,7 +4640,7 @@ namespace EmpInfo.Controllers
                          select new
                          {
                              sysNo = x.sys_no,
-                             auditStatus = a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : ae.step_name)),
+                             auditStatus = x.out_time == null ? (a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : ae.step_name))) : x.out_status,
                              applierName = x.applier_name,
                              applyTime = x.apply_time,
                              busName = x.bus_name,
@@ -4694,7 +4694,7 @@ namespace EmpInfo.Controllers
                          {
                              x,
                              e,
-                             auditStatus = a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : ae.step_name))
+                             auditStatus = x.out_time == null ? (a.user_abort == true ? "撤销" : (a.success == true ? "已通过" : (a.success == false ? "已拒绝" : ae.step_name))) : x.out_status
                          };
 
             if (!string.IsNullOrEmpty(m.applierName)) {

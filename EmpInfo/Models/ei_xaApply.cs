@@ -51,5 +51,7 @@ namespace EmpInfo.Models
         public string dept_manager_num { get; set; }
         public string email_addr { get; set; }
         public string po_no { get; set; }
+        public string done_before_apply { get; set; }
+        public string has_done_supplier { get; set; }
     }
 }

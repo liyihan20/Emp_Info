@@ -57,6 +57,7 @@ namespace EmpInfo.Models
         public string quality_audior_no { get; set; }
         public string quality_audior_name { get; set; }
         public string stock_addr { get; set; }
+        public string out_gate { get; set; }
     
         public virtual ICollection<ei_spApplyEntry> ei_spApplyEntry { get; set; }
     }

@@ -5,6 +5,7 @@
     var m = ViewData["am"] as FXCheckApplyModel;
     var h = m.bill;
     var entryJson = JsonConvert.SerializeObject(m.entrys);
+    var itemJson = JsonConvert.SerializeObject(m.items);
     bool isSelfTaken = h.fx_type_no.StartsWith("2");
 
 }
@@ -37,10 +38,10 @@
     <script src="@Url.Content("~/Scripts/myDownloaderPro.js")"></script>
 
     <script>
-        var minutes=30; //自提二维码有效分钟数
-        $("#tb").bootstrapTable({
-            striped: true,
-            data:@Html.Raw(entryJson),
+    var minutes=30; //自提二维码有效分钟数
+    $("#tb").bootstrapTable({
+        striped: true,
+        data:@Html.Raw(entryJson),
             columns: [
                 {
                     field: "item_name",
@@ -54,6 +55,35 @@
                 }, {
                     field: "item_unit",
                     title: "单位"
+                }, {
+                    field: "comment",
+                    title: "备注"
+                }
+            ]
+        });
+
+        $("#tb2").bootstrapTable({
+            striped: true,
+            data:@Html.Raw(itemJson),
+            columns: [
+                {
+                    field: "item_name",
+                    title: "物品名称"
+                }, {
+                    field: "item_model",
+                    title: "物品型号"
+                }, {
+                    field: "in_qty",
+                    title: "入厂数量"
+                }, {
+                    field: "out_qty",
+                    title: "出厂数量"
+                }, {
+                    field: "unit_name",
+                    title: "单位"
+                }, {
+                    field: "comment",
+                    title: "备注"
                 }
             ]
         });
@@ -61,44 +91,44 @@
         $(function () {
             $("#attList").myDownloader({ sysNum: "@h.sys_no" });
 
-            $("#flowRecordBt").on("click", function () {
-                var box = $("<div></div>");
-                $(box).load("../Apply/CheckFlowRecord .list-group", { sysNo: "@h.sys_no" }, function () {
-                    openMessageDialog($(box).html(), "查看流转记录");
-                });
+        $("#flowRecordBt").on("click", function () {
+            var box = $("<div></div>");
+            $(box).load("../Apply/CheckFlowRecord .list-group", { sysNo: "@h.sys_no" }, function () {
+                openMessageDialog($(box).html(), "查看流转记录");
             });
-
-            $("#printBt").on("click",function(){
-                window.open("../Report/PrintFX?sysNo=@h.sys_no");
-            });
-
-            $("#showCode").on("click",function(){
-                $("#codeModal").modal("show");
-                genQrCode();
-            });
-
-            $("#reGenCodeBt").on("click",function(){
-                genQrCode();
-            })
-
-            genOtherSeg();
         });
 
-        function genOtherSeg(){
-            var segs=@Html.Raw(h.other_segs);
-            for(var i=0;i<segs.length;i++){
-                var html='<div class="b-div"><span class="b-label">'+segs[i].n+':</span><span class="b-input">'+segs[i].v+'</span></div>';
-                $("#fxExtraFields").append(html);
-            }
-        }
+        $("#printBt").on("click",function(){
+            window.open("../Report/PrintFX?sysNo=@h.sys_no");
+        });
 
-        function genQrCode(){
-            $("#codeDiv").css("background-image","url('../Home/GetFXQrCode?sysNo=@h.sys_no&r="+Math.random()+"')");
-            var time=new Date(Date.now()+minutes*60*1000);
-            var str=utils.parseJsDate(time,true);
-            $("#expire_time").html(str);
-            $("#valid_minutes").html(minutes);
+        $("#showCode").on("click",function(){
+            $("#codeModal").modal("show");
+            genQrCode();
+        });
+
+        $("#reGenCodeBt").on("click",function(){
+            genQrCode();
+        })
+
+        genOtherSeg();
+    });
+
+    function genOtherSeg(){
+        var segs=@Html.Raw(h.other_segs);
+        for(var i=0;i<segs.length;i++){
+            var html='<div class="b-div"><span class="b-label">'+segs[i].n+':</span><span class="b-input">'+segs[i].v+'</span></div>';
+            $("#fxExtraFields").append(html);
         }
+    }
+
+    function genQrCode(){
+        $("#codeDiv").css("background-image","url('../Home/GetFXQrCode?sysNo=@h.sys_no&r="+Math.random()+"')");
+        var time=new Date(Date.now()+minutes*60*1000);
+        var str=utils.parseJsDate(time,true);
+        $("#expire_time").html(str);
+        $("#valid_minutes").html(minutes);
+    }
 
     </script>
 }
@@ -121,7 +151,7 @@
             <span class="b-input">
                 <button type="button" class="btn btn-default btn-sm" id="flowRecordBt"><i class="fa fa-level-down"></i> 流转记录</button>
             </span>
-        </div>
+        </div>    
         @if (h.can_print && h.out_time == null && !"被拒绝".Equals(ViewData["auditStatus"])) {
             if (isSelfTaken) {
                 if (currentUser.cardNo.Equals(h.applier_num)) {
@@ -146,8 +176,11 @@
                 </div>
             }
         }
-
-
+            
+        <div style="margin-top:6px;">
+            <div class="b-label">附件列表:</div>
+            <div id="attList"></div>
+        </div>
         <div class="b-div">
             <span class="b-label">
                 业务类型:
@@ -214,7 +247,7 @@
         </div>
         <div class="b-div">
             <span class="b-label">
-                <text>@(isSelfTaken ? "带" : "寄")</text>出范围:
+                收货区域:
             </span>
             <span class="b-input">
                 @h.to_scope
@@ -222,7 +255,15 @@
         </div>
         <div class="b-div">
             <span class="b-label">
-                <text>@(isSelfTaken ? "带" : "寄")</text>出地址:
+                收货公司全称:
+            </span>
+            <span class="b-input">
+                @h.receiver_cop_name
+            </span>
+        </div>
+        <div class="b-div">
+            <span class="b-label">
+                收货地址:
             </span>
             <span class="b-input">
                 @h.to_addr
@@ -306,6 +347,36 @@
                         @h.take_out_people_code
                     </span>
                 </div>
+                if (!string.IsNullOrEmpty(h.take_out_people_id)) { 
+                    <div class="b-div">
+                        <span class="b-label">
+                            带出人身份证:
+                        </span>
+                        <span class="b-input">
+                            @h.take_out_people_id
+                        </span>
+                    </div>
+                }
+                if (!string.IsNullOrEmpty(h.take_out_people_car)) { 
+                    <div class="b-div">
+                        <span class="b-label">
+                            带出人车牌号:
+                        </span>
+                        <span class="b-input">
+                            @h.take_out_people_car
+                        </span>
+                    </div>
+                }
+                if (!string.IsNullOrEmpty(h.take_out_people_visit_no)) { 
+                    <div class="b-div">
+                        <span class="b-label">
+                            带出人访客证:
+                        </span>
+                        <span class="b-input">
+                            @h.take_out_people_visit_no
+                        </span>
+                    </div>
+                }
             }
         }
         <div class="b-div">
@@ -352,22 +423,37 @@
                     @h.out_guard
                 </span>
             </div>
+            if (!string.IsNullOrEmpty(h.out_gate)) {
+                <div class="b-div">
+                    <span class="b-label">
+                        放行大门:
+                    </span>
+                    <span class="b-input">
+                        @h.out_gate
+                    </span>
+                </div>
+            }
         }
 
-        <div style="margin-top:6px;">
-            <div class="b-label">附件列表:</div>
-            <div id="attList"></div>
-        </div>
-
-
-        <div class="b-div" style="margin-top:16px;">
-            <span class="b-label">
-                放行物品:
-            </span>
-            <div class="b-input">
+        @if (m.entrys.Count() > 0) { 
+            <div class="b-div" style="margin-top:16px;">
+                <span class="b-label">
+                    放行物品:
+                </span>
+                <div class="b-input">
+                </div>
             </div>
-        </div>
-        <table data-toggle="table" id="tb"></table>
+            <table data-toggle="table" id="tb"></table>
+        }
+        @if (m.items.Count() > 0) {
+            <div class="b-div" style="margin-top:24px;">
+                <span class="b-label">
+                    自带物品:
+                </span>
+                <div class="b-input"></div>
+            </div>
+            <table data-toggle="table" id="tb2"></table>
+        }
     </div>
 </div>
 @section Modal {

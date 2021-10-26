@@ -1,9 +1,11 @@
 ﻿@using EmpInfo.Models;
 @{
-    BeginAuditModel bam = (BeginAuditModel)ViewData["bam"];
+    BeginAuditModel bam = ViewData["bam"] as BeginAuditModel;
+    FXAuditOtherInfoModel other = bam.otherInfo as FXAuditOtherInfoModel;
 }
 @section CSS{
-    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />    
+    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
     }
 
 @section Scripts {
@@ -31,6 +33,54 @@
                 });
             }
 
+            $("#getCodeInfoBt").on("click", function () {
+                var code = $.trim($("#outCode").val().replace("_", "-"));
+                $("#outCode").val(code);
+
+                if (code.length != 20) {
+                    toastr.error("请输入正确的预约码后再查询");
+                    return;
+                }
+
+                $("#getCodeInfoBt").button("loading");
+
+                $.post("../Item/GetOuterPeopleInfo", { code: code }, function (data) {
+                    $("#getCodeInfoBt").button("reset");
+                    if (!data.suc) {
+                        toastr.error(data.msg);
+                        return;
+                    }
+                    toastr.success(data.msg);
+                    var info = JSON.parse(data.extra);
+                    $("#outerName").val(info.FName);
+                    $("#outerPhone").val(info.FPhone);
+
+                    $("#outerId").val(info.FCodeId);
+                    $("#outerCar").val(info.FCarNo);
+                    $("#outerVisitNo").val(info.FNO);
+
+                    if (info.items.length > 0) {
+                        $("#itemDiv").show();
+                    } else {
+                        $("#itemDiv").hide();
+                    }
+
+                    $("#tb3").bootstrapTable("load", info.items);
+                });
+
+            });
+
+            $("#outCode").on("keydown", function () {
+                $("#outerName").val("");
+                $("#outerPhone").val("");
+
+                $("#outerId").val("");
+                $("#outerCar").val("");
+                $("#outerVisitNo").val("");
+
+                $("#tb3").bootstrapTable("load", []);
+            });
+
         })
 
         function audit(isPass) {
@@ -46,6 +96,10 @@
                     toastr.error("拒绝时必须填写审批意见。")
                     return;
                 }
+            }
+
+            if ($("#tb3").length > 0 && $("#items").length>0) {
+                $("#items").val(utils.StringifyAndParseCharacter($("#tb3").bootstrapTable('getData')));
             }
 
             openConfirmDialog("确认要" + (isPass ? "同意" : "拒绝") + "此申请吗？", function () {
@@ -72,6 +126,84 @@
         }
 
     </script>
+
+    @if (bam.stepName.Contains("预约码")) {
+        <script>
+            setTimeout(function(){
+                $(function(){
+                    $.getScript("@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")",function(){
+                        $("#tb3").bootstrapTable({
+                            striped: true,
+                            clickToSelect: true,
+                            idField: "entry_id", //用于修改
+                            uniqueId: "entry_id", //用于删除
+                            columns: [
+                                {
+                                    radio: true
+                                },
+                                {
+                                    field: "item_name",
+                                    title: "物品名称"
+                                }, {
+                                    field: "item_model",
+                                    title: "物品型号"
+                                }, {
+                                    field: "in_qty",
+                                    title: "入厂数量"
+                                }, {
+                                    field: "out_qty",
+                                    title: "出厂数量"
+                                }, {
+                                    field: "unit_name",
+                                    title: "单位"
+                                }, {
+                                    field: "comment",
+                                    title: "备注"
+                                }
+                            ],
+                            onDblClickRow: function (row, $element, field) {
+                                $("#editBt2").trigger("click");
+                            }
+                        });
+
+                        $(function () {
+                            $("#editBt2").on("click", function () {
+                                var rows = $('#tb3').bootstrapTable('getSelections');
+                                if (rows.length == 0) {
+                                    toastr.error("请先选择一行后再修改");
+                                    return;
+                                }
+                                var row = rows[0];
+                                var updateIndex = row.entry_id;
+
+
+                                openInputDialog("录入出厂数量：", function (v) {
+                                    if (!utils.testIsInt(v)) {
+                                        toastr.error("必须录入整数");
+                                        return;
+                                    }
+                                    if (parseInt(v) < 0) {
+                                        toastr.error("不能录入负数");
+                                        return;
+                                    }
+                                    if (parseInt(v) > row.in_qty) {
+                                        toastr.error("出厂数量不能大于入厂数量");
+                                        return;
+                                    }
+
+                                    row.out_qty = v;
+                                    $("#tb3").bootstrapTable('updateByUniqueId', { id: updateIndex, row: row });
+
+                                }, "修改出厂数量", "取消", "确认修改", row.out_qty);
+                            });
+
+                        });
+                    });
+                });
+            }, 500);
+        </script>
+    }
+
 }
 
 @*通过load获取申请单内容*@
@@ -91,13 +223,82 @@
                     <input type="hidden" name="step" value="@bam.step" />
                     <input type="hidden" name="stepName" value="@bam.stepName" />
                     <input type="hidden" name="isPass" id="isPass" value="true" />
+                    <input type="hidden" name="isSelfTakeOut" value="@(other.isSelfTakeOut?"true":"false")" />
                     
-                    @if (bam.stepName.Contains("上传")) {
+                    @if (bam.stepName.Contains("预约码")) {
+                        <div class="b-div">
+                            <span class="b-label">
+                                带出人预约码:
+                            </span>
+                            <div class="b-input">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="take_out_people_code" id="outCode" placeholder="外来人员需填写预约码" required value="@other.outerCode" />
+                                    <input type="hidden" name="take_out_people_id" id="outerId" value="@other.outerId" />
+                                    <input type="hidden" name="take_out_people_car" id="outerCar" value="@other.outerCar" />
+                                    <input type="hidden" name="take_out_people_visit_no" id="outerVisitNo" value="@other.outerVisitNo" />
+                                    <input type="hidden" name="items" id="items" value="[]" />
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-primary" type="button" id="getCodeInfoBt" data-loading-text="查询中..."><span class="fa fa-search"></span> 获取信息</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                带出人姓名:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="take_out_people_name" id="outerName" placeholder="获取预约信息后带出" readonly value="@other.outerName" />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                带出人电话:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="take_out_people_phone" id="outerPhone" placeholder="获取预约信息后带出" readonly value="@other.outerPhone" />
+                            </span>
+                        </div>
+
+                        <div id="itemDiv"  style="margin:16px 0;">
+                            <div class="b-div">
+                                <span class="b-label">
+                                    自带物品:
+                                </span>
+                                <div class="b-input">
+                                    <button class="btn btn-primary btn-sm" type="button" id="editBt2" title="双击数据行也可修改" style="margin-top:6px;"> <i class="fa fa-edit"></i> 修改出厂数量 </button>
+                                </div>
+                            </div>
+                            <table id="tb3"></table>
+                            <div class="small text-danger"><i class="fa fa-info"></i> 自动带出外来人员在入厂预约时已备案的自带物品，只可修改出厂数量，且只能改少不能改多。</div>
+                        </div>
+
+                    }
+
+                    @if (bam.stepName.Contains("上传") || bam.stepName.Contains("物流中心") || bam.stepName.Contains("老物流")) {
                         <div style="display:inline-block;">
                             <div id="picker"> <i class="fa fa-upload"></i> 上传物品图片 </div>
                         </div>
                         <div id="myUploader1">
 
+                        </div>
+                    }
+                    @if (bam.stepName.Contains("物流中心") && !other.isSelfTakeOut) {
+                        <div class="b-div">
+                            <span class="b-label">
+                                快递公司:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="ex_company" placeholder="填写快递公司" value="@other.exCompany" required />
+                            </span>
+                        </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                快递单号:
+                            </span>
+                            <span class="b-input">
+                                <input type="text" class="form-control" name="ex_no" placeholder="填写快递单号" value="@other.exNo" required />
+                            </span>
                         </div>
                     }
                     <textarea class="form-control" rows="2" name="opinion" id="opinion" placeholder="请在此处输入审核意见"></textarea>
@@ -128,4 +329,5 @@
 @section Modal {
     @Html.Partial("_MessageDialog")
     @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_InputDialog")
 }

@@ -176,9 +176,10 @@
         <EntityTypeShape EntityType="ICAuditModel.ei_xcProcessDep" Width="1.5" PointX="2.375" PointY="21" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_xdApply" Width="1.5" PointX="4.25" PointY="17.25" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_fxType" Width="1.5" PointX="6" PointY="19.625" IsExpanded="false" />
-        <EntityTypeShape EntityType="ICAuditModel.ei_fxApplyEntry" Width="1.5" PointX="6" PointY="21" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_fxApply" Width="1.5" PointX="6" PointY="20.375" IsExpanded="false" />
         <EntityTypeShape EntityType="ICAuditModel.ei_xaApply" Width="1.5" PointX="0.5" PointY="18" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_fxApplyEntry" Width="1.5" PointX="8.25" PointY="20.25" IsExpanded="false" />
+        <EntityTypeShape EntityType="ICAuditModel.ei_fxApplySelfItems" Width="1.5" PointX="6" PointY="21" IsExpanded="false" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

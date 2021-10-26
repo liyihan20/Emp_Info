@@ -44,6 +44,7 @@ namespace EmpInfo.Models
         public string notify_clerk_name { get; set; }
         public string notify_clerk_no { get; set; }
         public string charge_customers { get; set; }
+        public string out_gate { get; set; }
     
         public virtual ICollection<ei_hhReturnDetail> ei_hhReturnDetail { get; set; }
         public virtual ICollection<ei_hhApplyEntry> ei_hhApplyEntry { get; set; }

@@ -85,6 +85,9 @@ namespace EmpInfo.Services
         public override void SaveApply(System.Web.Mvc.FormCollection fc, UserInfo userInfo)
         {
             bill = JsonConvert.DeserializeObject<ei_xaApply>(fc.Get("head"));
+            if (bill.done_before_apply == "是" && string.IsNullOrWhiteSpace(bill.has_done_supplier)) {
+                throw new Exception("先施工已补单的必须填写【已施工供应商】");
+            }
             if (bill.has_profit && !string.IsNullOrEmpty(bill.profit_confirm_people_name)) {
                 bill.profit_confirm_people_num = GetUserCardByNameAndCardNum(bill.profit_confirm_people_name);
             }

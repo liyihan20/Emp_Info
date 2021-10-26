@@ -1,10 +1,10 @@
 ﻿@using EmpInfo.Models;
 @{
     var m = ViewData["beforeApplyModel"] as FXBeforeApplyModel;
-    var type_process = string.Format("提交>{0}>门卫放行", m.fxType.type_process).Replace(">", " > ");
+    var type_process = string.Format("提交>{0}>门卫放行", m.fxType.type_process).Replace(">", " > ");    
 }
 @section CSS{
-    <link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />
+    @*<link rel="stylesheet" href="@Url.Content("~/Content/webupload/webuploader.css")" />*@
     <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
 
     <style type="text/css">
@@ -24,12 +24,30 @@
             margin: 10px 0;
         }
     </style>
+    <style>
+        .webuploader-container {
+	        position: relative;
+        }
+        .webuploader-element-invisible {
+	        position: absolute !important;
+	        clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+            clip: rect(1px,1px,1px,1px);
+        }
+        .webuploader-pick {
+	        position: relative;
+	        cursor: pointer;
+	        text-align: center;
+	        border-radius: 3px;
+	        overflow: hidden;
+        }
+    </style>
 }
 
 @section Scripts {
     <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
     <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
     <script src="@Url.Content("~/Scripts/myUploaderPro.js?v=2")"></script>
+    <script src="@Url.Content("~/Scripts/myUploaderSim.js?v=1")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
     <script src="@Url.Content("~/Scripts/knockout-3.4.0.js")"></script>
@@ -59,6 +77,40 @@
                 }
             });
 
+            //上传excel并读取存入表格
+            $("<div></div>").myUploaderSim({
+                server: '../File/BeginUpload',
+                pick: "#excelBt",
+                duplicate: true, //可重复上传
+                accept: {
+                    title: 'MS-EXCEL',
+                    extensions: 'xls,xlsx',
+                    mimeTypes: 'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                },
+                //上传成功后的回调
+                successCallback: function (file,res) {
+                    toastr.success("上传成功！正在读取内容...");
+                    $.post("../File/FXReadExcelData",{sysNum:"@m.sysNo",fileName:file.name},function(data){
+                        if(!data.suc){
+                            toastr.error(data.msg);
+                            return;
+                        }
+                        toastr.success(data.msg);
+
+                        var result = JSON.parse(data.extra);
+                        var idx = 0;
+                        result.map(function(r){r.idx=idx++;});
+
+                        $("#tb").bootstrapTable('load',result);
+
+                    });
+                },
+                //上传之前的验证与设置formdata
+                beforeQueued: function (uploader) {                    
+                    uploader.option("formData", { sysNum:"@m.sysNo" });                    
+                }
+            });
+
         });
 
         //生成动态选择框控件，例如仓库管理部
@@ -84,40 +136,92 @@
         }
 
         //动态生成表单控件，例如是否返厂
-        function GenFormField(nodeName){
-            var html="";
-            if(nodeName.indexOf("是否")>=0){
-                html+='<div class="b-div"><span class="b-label">'+nodeName+':</span><span class="b-input">';
-                html+='<select class="form-control" name="'+nodeName+'" required>';
-                html+='<option value="">----下拉选择----</option>';
-                html+='<option value="是">是</option>';
-                html+='<option value="否">否</option>';
-                html+='</select></span></div>';
+        //function GenFormField(nodeNames){
+        //    var html="";
+        //    var nodeNameArr=nodeNames.split(",");
+        //    for(var i = 0;i<nodeNameArr.length;i++){
+        //        var nodeName=nodeNameArr[i];
+        //        if(nodeName.indexOf("是否")>=0){
+        //            html+='<div class="b-div"><span class="b-label">'+nodeName+':</span><span class="b-input">';
+        //            html+='<select class="form-control" name="'+nodeName+'" required>';
+        //            html+='<option value="">----下拉选择----</option>';
+        //            html+='<option value="是">是</option>';
+        //            html+='<option value="否">否</option>';
+        //            html+='</select></span></div>';
+        //        }else{
+        //            //文本类
+        //            html+='<div class="b-div">';
+        //            html+='<span class="b-label">'+nodeName+':</span>';
+        //            html+='<span class="b-input"><input type="text" class="form-control" name="'+nodeName+'" placeholder="填写'+nodeName+'" required /></span>';
+        //        }
+
+        //        $("#fxTypeFields").append(html);
+        //    }
+        //}
+
+        function GenFormField(segs){            
+            var fields=JSON.parse(segs);
+            var fieldNames=[];
+            for(var i = 0;i<fields.length;i++){
+                var html="";
+                if(fields[i].ctype=="select"){
+                    html+='<div class="b-div"><span class="b-label">'+fields[i].name+':</span><span class="b-input">';
+                    html+='<select class="form-control" name="'+fields[i].name+'" '+(fields[i].required?"required":"")+'>';
+                    html+='<option value="">----下拉选择----</option>';
+                    for(var j=0;j<fields[i].options.length;j++){
+                        html+='<option value="'+fields[i].options[j]+'">'+fields[i].options[j]+'</option>';
+                    }
+                    html+='</select></span></div>';
+                }
+                if(fields[i].ctype=="text"){
+                    html+='<div class="b-div">';
+                    html+='<span class="b-label">'+fields[i].name+':</span>';
+                    html+='<span class="b-input"><input type="text" class="form-control" name="'+fields[i].name+'" placeholder="填写'+fields[i].name+'" '+(fields[i].required?"required":"")+' /></span>';
+                }
+                if(html!=""){
+                    $("#fxTypeFields").append(html);
+                    fieldNames.push(fields[i].name);
+                }
             }
-            $("#fxTypeFields").append(html);
+            return fieldNames;
         }
 
         function FormModel() {
             var self = this;
 
             self.takeOutPeopleType = ko.observable(""); //自提的带出人类型
+            self.outerCode = ko.observable("TR-"); //外来人员预约码
+            self.outerName=ko.observable("");
+            self.outerPhone=ko.observable("");
+            self.outerId=ko.observable("");
+            self.outerCar=ko.observable("");
+            self.outerVisitNo=ko.observable("");
+            self.outerHasSelfItems=ko.observable(false);
 
             self.isSelfTaken = "@m.fxType.type_no".indexOf("2") == 0;//是否自提单
-            self.takeOutPeopleTypes = ["申请人", "信利员工", "外来人员"];//带出人类型
+            self.takeOutPeopleTypes = ["申请人", "信利员工", "驻厂人员", "外来人员"];//带出人类型
             self.companies = ["光电", "半导体", "电子", "仪器", "工业", "信元", "光电科技"]; //公司
-            self.fromAddrs = ["汕尾信利工业城"]; //放行厂区
-            self.toScopes = ["省内", "省外", "港澳台", "国外"]; //范围
+            self.fromAddrs = ["汕尾信利工业城一厂区","汕尾信利工业城二厂区","汕尾红草厂区"]; //放行厂区
+            self.toScopes = ["集团内","省内", "省外", "港澳台", "国外"]; //范围
             self.typeDemands = @Html.Raw(m.typeDemands); //业务类型特定要求
-            self.typeDemandFieldNames = [];//保存额外的表单项name
+            self.typeDemandFieldNames = []; //保存额外的表单项name
             self.attDemand=self.typeDemands.filter(function(t){return t.indexOf("附件")>=0}).join(";"); //附件的要求
+            
 
             (function () {
                 //自动生成额外字段
-                var formFieldsDemand=self.typeDemands.filter(function(t){return t.indexOf("表单项")>=0});
-                for(var i = 0; i < formFieldsDemand.length; i++){
-                    var nodeName = formFieldsDemand[i].replace("：",":").split(":")[1];
-                    GenFormField(nodeName);
-                    self.typeDemandFieldNames.push(nodeName);
+                //var formFieldsDemand=self.typeDemands.filter(function(t){return t.indexOf("表单项")>=0});
+                //for(var i = 0; i < formFieldsDemand.length; i++){
+                //    var nodeName = formFieldsDemand[i].replace("：",":").split(":")[1];
+                //    GenFormField(nodeName);
+                //    self.typeDemandFieldNames.push(nodeName);
+                //}
+                if("" != "@m.formSegs"){
+                    var formSegs=@Html.Raw(m.formSegs);
+                    for(var i=0;i<formSegs.length;i++){
+                        var fieldNames = GenFormField(formSegs[i]);
+                        fieldNames.map(function(f){self.typeDemandFieldNames.push(f);}); //加入到额外的表单项数组
+                    }
                 }
 
                 //自动生成审核节点字段
@@ -140,6 +244,48 @@
 
             })();
 
+            //获取预约码对应的姓名和手机号码
+            self.getOuterCodeInfo=function(){
+                self.outerCode($.trim(self.outerCode().replace("_","-")));
+
+                if(self.outerCode().length!=20){
+                    toastr.error("请输入正确的预约码后再查询");
+                    return;
+                }
+
+                $("#getCodeInfoBt").button("loading");
+
+                $.post("../Item/GetOuterPeopleInfo",{code:self.outerCode()},function(data){
+                    $("#getCodeInfoBt").button("reset");
+                    if(!data.suc){
+                        toastr.error(data.msg);
+                        return;
+                    }
+                    toastr.success(data.msg);
+                    var info=JSON.parse(data.extra);
+                    self.outerName(info.FName);
+                    self.outerPhone(info.FPhone);
+                    self.outerId(info.FCodeId);
+                    self.outerCar(info.FCarNo);
+                    self.outerVisitNo(info.FNO);
+                    self.outerHasSelfItems(info.items.length>0);
+
+                    $("#tb2").bootstrapTable("load",info.items);
+                });
+            };
+
+            self.clearOuterCodeInfo=function(){
+                self.outerName("");
+                self.outerPhone("");
+                self.outerId("");
+                self.outerCar("");
+                self.outerVisitNo("");
+                self.outerHasSelfItems(false);
+                $("#tb2").bootstrapTable("load",[]);
+
+                return true;
+            }
+
             //开始提交申请
             self.beginApply = function(){
 
@@ -153,6 +299,9 @@
 
                 if(!utils.testIsInt(obj.total_pack_num)){
                     toastr.error("件数必须填写整数");
+                    return;
+                }else if(parseInt(obj.total_pack_num)<1){
+                    toastr.error("件数必须不少于1件");
                     return;
                 }
 
@@ -207,8 +356,9 @@
                 console.log(obj);
 
                 var entrys = $("#tb").bootstrapTable('getData');
+                var items = $("#tb2").bootstrapTable('getData');
                 
-                if (entrys.length < 1) {
+                if (entrys.length < 1 && items.length < 1) {
                     toastr.error("请至少填写一行物品明细再提交");
                     return;
                 }
@@ -220,7 +370,7 @@
                     $.ajax({
                         type: 'post',
                         url: '../Apply/SaveApply',
-                        data: "sys_no=" + obj.sys_no + "&head=" + utils.StringifyAndParseCharacter(obj) + "&entrys=" + utils.StringifyAndParseCharacter(entrys),
+                        data: "sys_no=" + obj.sys_no + "&head=" + utils.StringifyAndParseCharacter(obj) + "&entrys=" + utils.StringifyAndParseCharacter(entrys)+"&items="+utils.StringifyAndParseCharacter(items),
                         cache: false,
                         dataType: 'json',
                         success: function (data) {
@@ -265,6 +415,9 @@
                 }, {
                     field: "item_unit",
                     title: "单位"
+                }, {
+                    field: "comment",
+                    title: "备注"
                 }
             ],
             onDblClickRow: function (row, $element, field) {
@@ -330,6 +483,76 @@
                     $("#tb").bootstrapTable('removeByUniqueId', rows[0].idx);
                 });
             });
+        });
+
+    </script>
+
+    <script>
+        $("#tb2").bootstrapTable({
+            striped: true,
+            clickToSelect: true,
+            idField: "entry_id", //用于修改
+            uniqueId: "entry_id", //用于删除
+            columns: [
+                {
+                    radio: true
+                },
+                {
+                    field: "item_name",
+                    title: "物品名称"
+                }, {
+                    field: "item_model",
+                    title: "物品型号"
+                }, {
+                    field: "in_qty",
+                    title: "入厂数量"
+                }, {
+                    field: "out_qty",
+                    title: "出厂数量"
+                }, {
+                    field: "unit_name",
+                    title: "单位"
+                }, {
+                    field: "comment",
+                    title: "备注"
+                }
+            ],
+            onDblClickRow: function (row, $element, field) {
+                $("#editBt2").trigger("click");
+            }
+        });
+
+        $(function(){
+            $("#editBt2").on("click", function () {
+                var rows = $('#tb2').bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    toastr.error("请先选择一行后再修改");
+                    return;
+                }
+                var row = rows[0];
+                var updateIndex = row.entry_id;
+
+
+                openInputDialog("录入出厂数量：", function(v){
+                    if(!utils.testIsInt(v)){
+                        toastr.error("必须录入整数");
+                        return;
+                    }
+                    if(parseInt(v)<0){
+                        toastr.error("不能录入负数");
+                        return;
+                    }
+                    if(parseInt(v)>row.in_qty){
+                        toastr.error("出厂数量不能大于入厂数量");
+                        return;
+                    }
+
+                    row.out_qty = v;
+                    $("#tb2").bootstrapTable('updateByUniqueId', { id: updateIndex, row: row });
+
+                }, "修改出厂数量", "取消", "确认修改",row.out_qty);
+            });
+
         });
 
     </script>
@@ -421,20 +644,28 @@
                     放行厂区:
                 </span>
                 <span class="b-input">
-                    <select class="form-control" name="from_addr" data-bind="options:fromAddrs,optionsCaption:'----下拉选择放行厂区----',value:fromAddrs[0]" required></select>
+                    <select class="form-control" name="from_addr" data-bind="options:fromAddrs,optionsCaption:'----下拉选择放行厂区----'" required></select>
                 </span>
             </div>
             <div class="b-div">
                 <span class="b-label">
-                    <span data-bind="text:isSelfTaken?'带':'寄'"></span>出范围:
+                    收货区域:
                 </span>
                 <span class="b-input">
-                    <select class="form-control" name="to_scope" data-bind="options:toScopes,optionsCaption:'----下拉选择范围----'" required></select>
+                    <select class="form-control" name="to_scope" data-bind="options:toScopes,optionsCaption:'----下拉选择----'" required></select>
                 </span>
             </div>
             <div class="b-div">
                 <span class="b-label">
-                    <span data-bind="text:isSelfTaken?'带':'寄'"></span>出地址:
+                    收货公司全称:
+                </span>
+                <span class="b-input">
+                    <input type="text" class="form-control" name="receiver_cop_name" placeholder="请填写最终收货公司完整名称，不能简写" required />
+                </span>
+            </div>
+            <div class="b-div">
+                <span class="b-label">
+                    收货地址:
                 </span>
                 <span class="b-input">
                     <input type="text" class="form-control" name="to_addr" placeholder="填写地址" required />
@@ -483,40 +714,66 @@
             </div>
             <!--/ko-->
             <!--ko if:isSelfTaken-->
-            <div class="b-div">
-                <span class="b-label">
-                    带出人类型:
-                </span>
-                <span class="b-input">
-                    <select class="form-control" name="take_out_people_type" data-bind="value:takeOutPeopleType,options:takeOutPeopleTypes,optionsCaption:'----下拉选择类型----'" required></select>
-                </span>
-            </div>
-            <!--ko if:takeOutPeopleType() == "信利员工" || takeOutPeopleType() == "外来人员"-->
-            <div class="b-div">
-                <span class="b-label">
-                    带出人姓名:
-                </span>
-                <span class="b-input">
-                    <input type="text" class="form-control" name="take_out_people_name" placeholder="填写带出人姓名" required />
-                </span>
-            </div>
-            <div class="b-div">
-                <span class="b-label">
-                    带出人电话:
-                </span>
-                <span class="b-input">
-                    <input type="text" class="form-control" name="take_out_people_phone" placeholder="填写带出人电话" required />
-                </span>
-            </div>
-            <!--/ko-->
-            <div class="b-div" data-bind="if:takeOutPeopleType()=='外来人员'">
-                <span class="b-label">
-                    带出人预约码:
-                </span>
-                <span class="b-input">
-                    <input type="text" class="form-control" name="take_out_people_code" placeholder="外来人员需填写预约码" required />
-                </span>
-            </div>
+                <div class="b-div">
+                    <span class="b-label">
+                        带出人类型:
+                    </span>
+                    <span class="b-input">
+                        <select class="form-control" name="take_out_people_type" data-bind="value:takeOutPeopleType,options:takeOutPeopleTypes,optionsCaption:'----下拉选择类型----'" required></select>
+                    </span>
+                </div>
+                <!--ko if:takeOutPeopleType() == "外来人员"-->
+                    <div class="b-div">
+                        <span class="b-label">
+                            带出人预约码:
+                        </span>
+                        <div class="b-input">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="take_out_people_code" placeholder="外来人员需填写预约码" data-bind="value:outerCode,event:{keypress:clearOuterCodeInfo}">
+                                <input type="hidden" name="take_out_people_id" data-bind="value:outerId" />
+                                <input type="hidden" name="take_out_people_car" data-bind="value:outerCar" />
+                                <input type="hidden" name="take_out_people_visit_no" data-bind="value:outerVisitNo" />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-primary" type="button" id="getCodeInfoBt" data-loading-text="查询中..." data-bind="click:getOuterCodeInfo"><span class="fa fa-search"></span> 获取信息</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            带出人姓名:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="take_out_people_name" placeholder="获取预约信息后带出" readonly data-bind="value:outerName" />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            带出人电话:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="take_out_people_phone" placeholder="获取预约信息后带出" readonly data-bind="value:outerPhone" />
+                        </span>
+                    </div>
+                <!--/ko-->
+                <!--ko if:takeOutPeopleType() == "信利员工" || takeOutPeopleType() == "驻厂人员"-->
+                    <div class="b-div">
+                        <span class="b-label">
+                            带出人姓名:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="take_out_people_name" placeholder="填写带出人姓名" required />
+                        </span>
+                    </div>
+                    <div class="b-div">
+                        <span class="b-label">
+                            带出人电话:
+                        </span>
+                        <span class="b-input">
+                            <input type="text" class="form-control" name="take_out_people_phone" placeholder="填写带出人电话" required />
+                        </span>
+                    </div>
+                <!--/ko-->
             <!--/ko-->
             <div class="b-div">
                 <span class="b-label">
@@ -542,7 +799,8 @@
 
 
             <div class="b-div">
-                <div id="picker"> <i class="fa fa-upload"></i> 上传附件 </div>
+                <button class="btn btn-danger" type="button" id="picker"><i class="fa fa-upload"></i> 上传附件 </button>
+                @*<div id="picker"> <i class="fa fa-upload"></i> 上传附件 </div>*@
                 <div class="small text-danger" data-bind="if:attDemand!=''" style="margin-left:16px;"><i class="fa fa-info-circle"></i> <span data-bind="text:attDemand"></span></div>
             </div>
             <div id="myUploader">
@@ -554,15 +812,29 @@
                     放行物品:
                 </span>
                 <div class="b-input">
-                    <button class="btn btn-success btn-sm" type="button" id="addBt"> <i class="fa fa-plus"></i> 新增</button>
-                    <button class="btn btn-primary btn-sm" type="button" id="editBt" title="双击数据行也可修改"> <i class="fa fa-edit"></i> 修改 </button>
-                    <button class="btn btn-danger btn-sm" type="button" id="removeBt"> <i class="fa fa-th"></i> 删除</button>
+                    <button class="btn btn-success btn-sm" type="button" id="addBt" style="margin-top:6px;"> <i class="fa fa-plus"></i> 新增</button>
+                    <button class="btn btn-warning btn-sm" type="button" id="excelBt" title="导入模板见操作说明" style="margin-top:6px;"> <i class="fa fa-upload"></i> 从excel导入 </button>
+                    <button class="btn btn-primary btn-sm" type="button" id="editBt" title="双击数据行也可修改" style="margin-top:6px;"> <i class="fa fa-edit"></i> 修改 </button>
+                    <button class="btn btn-danger btn-sm" type="button" id="removeBt" style="margin-top:6px;"> <i class="fa fa-th"></i> 删除</button>
                 </div>
             </div>
             <table data-toggle="table" id="tb"></table>
 
+            <div data-bind="visible:outerHasSelfItems">
+                <div class="b-div" style="margin-top:24px;">
+                    <span class="b-label">
+                        自带物品:
+                    </span>
+                    <div class="b-input">
+                        <button class="btn btn-primary btn-sm" type="button" id="editBt2" title="双击数据行也可修改" style="margin-top:6px;"> <i class="fa fa-edit"></i> 修改出厂数量 </button>
+                    </div>
+                </div>
+                <table data-toggle="table" id="tb2"></table>
+                <div class="small text-danger"><i class="fa fa-info"></i> 自动带出外来人员在入厂预约时已备案的自带物品，只可修改出厂数量，且只能改少不能改多。</div>
+            </div>
+
         </form>
-        <button class="btn btn-danger btn-block" type="button" data-bind="click:beginApply" data-loading-text="正在提交..." style="margin-top:16px;"><i class="fa fa-check-circle-o"></i> 提交申请单</button>
+        <button class="btn btn-danger btn-block" id="apply_bt" type="button" data-bind="click:beginApply" data-loading-text="正在提交..." style="margin-top:16px;"><i class="fa fa-check-circle-o"></i> 提交申请单</button>
     </div>
 </div>
 
@@ -580,10 +852,15 @@
                 3. 自提放行条流程，在流程审批完结后，可在24小时内，打开放行二维码图片拿给门卫扫描通过，如逾期未扫码放行，需重新申请。
             </p>
             <p>
-                4. 如对业务流程有疑问，可联系营运部叶佐键或信息管理部赖吉全；如对系统或操作有疑问，可联系开发人员李逸焊。
+                4. 如果需要放行的物品太多，可以通过上传excel实现表格批量填充，不需一行一行手动录入。以下是导入模板，请下载后填写数据然后再上传。<br/>
+                    [1]. 2007以上版本的excel请下载：<a href="~/Content/fxdoc/放行条导入物品模板.xlsx" target="_blank"> 放行条导入物品模板.xlsx </a> <br/>
+                    [2]. 2003版本的excel请下载：<a href="~/Content/fxdoc/放行条导入物品模板.xls" target="_blank"> 放行条导入物品模板.xls </a> <br/>
             </p>
             <p>
-                5. 操作指引：<a href="~/Content/fxdoc/信利放行条操作指引.html" target="_blank">点此查看</a>
+                5. 如对业务流程有疑问，可联系营运部叶佐键或信息管理部赖吉全；如对系统或操作有疑问，可联系开发人员李逸焊。
+            </p>
+            <p>
+                6. 操作指引：<a href="~/Content/fxdoc/信利放行条操作指引.html" target="_blank">点此查看</a>
             </p>
         </div>
     </div>
@@ -591,6 +868,7 @@
 
 @section Modal {
     @Html.Partial("_ConfirmDialog")
+    @Html.Partial("_InputDialog")
     <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -632,6 +910,14 @@
                                 <input type="text" class="form-control" name="item_unit" required />
                             </span>
                         </div>
+                        <div class="b-div">
+                            <span class="b-label">
+                                备注:
+                            </span>
+                            <div class="b-input">
+                                <input type="text" class="form-control" name="comment" />
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -641,4 +927,5 @@
             </div>
         </div>
     </div>
+
 }

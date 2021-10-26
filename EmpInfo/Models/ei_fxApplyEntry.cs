@@ -18,7 +18,8 @@ namespace EmpInfo.Models
         public string sys_no { get; set; }
         public string item_name { get; set; }
         public string item_model { get; set; }
-        public int item_qty { get; set; }
+        public decimal item_qty { get; set; }
         public string item_unit { get; set; }
+        public string comment { get; set; }
     }
 }

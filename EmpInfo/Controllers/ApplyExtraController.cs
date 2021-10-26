@@ -1528,6 +1528,7 @@ namespace EmpInfo.Controllers
 
             var typeNames = string.Join(" # ", ancestorTypes.Select(f => f.type_name).ToList());
             var typeDemands = JsonConvert.SerializeObject(ancestorTypes.Where(a => a.type_demand != "").Select(a => a.type_demand).ToList());
+            var formSegs = JsonConvert.SerializeObject(ancestorTypes.Where(a => a.form_segs != "").Select(a => a.form_segs).ToList());
 
             var depNameList = (from f in db.flow_auditorRelation
                                join u in db.ei_users on f.relate_value equals u.card_number
@@ -1538,7 +1539,7 @@ namespace EmpInfo.Controllers
                                    f,
                                    u.name
                                }).ToList();
-                
+            
             List<SelectModel> selectList = new List<SelectModel>();
             foreach (var depName in depNameList.Select(d => d.f.relate_text).Distinct().ToList()) {
                 selectList.Add(new SelectModel()
@@ -1562,7 +1563,8 @@ namespace EmpInfo.Controllers
                 applierPhone = (lastApply == null ? "" : lastApply.applier_phone),
                 busName = (lastApply == null ? "" : lastApply.bus_name),
                 company = (lastApply == null ? "" : lastApply.company),
-                inWay = way
+                inWay = way,
+                formSegs = formSegs
             };
 
             return View();

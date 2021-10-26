@@ -70,6 +70,10 @@
                 $('#check_tb').bootstrapTable('load', data);
                 if (data.length == 0) {
                     toastr.error("当前时间段查无申请");
+                } else {
+                    toastr.success("成功加载记录数：" + data.length);                    
+                    //放入缓存
+                    window.localStorage.setItem("FXReport.data", JSON.stringify(data));
                 }
             });
         });
@@ -81,7 +85,7 @@
             pagination: true,
             mobileResponsive: true,
             pageSize: 40,
-            pageList: [20, 40, 60, 100],
+            pageList: [40],
             search: true,
             columns: [
                 {
@@ -123,6 +127,8 @@
                         }
                         else if (value == "已拒绝" || value == "撤销") {
                             return { css: { color: 'red' } };
+                        } else if (value == "已放行") {
+                            return { css: { color: 'blue' } };
                         }
                         else {
                             return { css: { color: '#333' } };
@@ -140,7 +146,14 @@
             }
         });
 
-
+        setTimeout(function () {
+            var data = window.localStorage.getItem("FXReport.data");
+            if (data) {
+                var result = JSON.parse(data);
+                $('#check_tb').bootstrapTable('load', result);
+                toastr.success("自动加载上次已查询的数据，行数："+result.length);
+            }
+        }, 100);
 
 
 
@@ -165,7 +178,7 @@
                     <div class="lbText">提交日期从：</div>
                     <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                        <input class="form-control" type="text" name="fromDate" autocomplete="off" value="@DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd")" />
+                        <input class="form-control" type="text" name="fromDate" autocomplete="off" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
                     </div>
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-4">

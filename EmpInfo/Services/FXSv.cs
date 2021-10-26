@@ -6,13 +6,14 @@ using EmpInfo.Models;
 using Newtonsoft.Json;
 using EmpInfo.QywxWebSrv;
 using EmpInfo.FlowSvr;
+using EmpInfo.Interfaces;
 
 namespace EmpInfo.Services
 {
     /// <summary>
     /// 新放行条流程，整合自提与非自提，2021-09
     /// </summary>
-    public class FXSv:BillSv
+    public class FXSv:BillSv,IBeginAuditOtherInfo
     {
         ei_fxApply bill;
 
@@ -60,8 +61,10 @@ namespace EmpInfo.Services
 
             var lastApply = db.ei_fxApply.Where(f => f.applier_num == userInfo.cardNo).OrderByDescending(f => f.id).FirstOrDefault();
             if (lastApply != null) {
-                m.lastTypeName = lastApply.fx_type_name;
-                m.lastTypeNo = lastApply.fx_type_no;
+                if (db.ei_fxType.Where(f => f.type_no == lastApply.fx_type_no && f.is_deleted == false).Count() > 0) {
+                    m.lastTypeName = lastApply.fx_type_name;
+                    m.lastTypeNo = lastApply.fx_type_no;
+                }
             }
 
             return m;
@@ -71,6 +74,7 @@ namespace EmpInfo.Services
         {
             bill = JsonConvert.DeserializeObject<ei_fxApply>(fc.Get("head"));
             List<ei_fxApplyEntry> entrys = JsonConvert.DeserializeObject<List<ei_fxApplyEntry>>(fc.Get("entrys"));
+            List<ei_fxApplySelfItems> items = JsonConvert.DeserializeObject<List<ei_fxApplySelfItems>>(fc.Get("items"));
 
             bill.applier_name = userInfo.name;
             bill.applier_num = userInfo.cardNo;
@@ -80,6 +84,11 @@ namespace EmpInfo.Services
             foreach (var en in entrys) {
                 en.sys_no = bill.sys_no;
                 db.ei_fxApplyEntry.Add(en);
+            }
+
+            foreach (var it in items) {
+                it.sys_no = bill.sys_no;
+                db.ei_fxApplySelfItems.Add(it);
             }
 
             FlowSvrSoapClient client = new FlowSvrSoapClient();
@@ -106,10 +115,12 @@ namespace EmpInfo.Services
             return new FXCheckApplyModel()
             {
                 bill = bill,
-                entrys = db.ei_fxApplyEntry.Where(f => f.sys_no == bill.sys_no).ToList()
+                entrys = db.ei_fxApplyEntry.Where(f => f.sys_no == bill.sys_no).ToList(),
+                items = db.ei_fxApplySelfItems.Where(f => f.sys_no == bill.sys_no && f.out_qty > 0).ToList()
             };
         }
 
+        
         public override SimpleResultModel HandleApply(System.Web.Mvc.FormCollection fc, UserInfo userInfo)
         {
             int step = Int32.Parse(fc.Get("step"));
@@ -117,14 +128,42 @@ namespace EmpInfo.Services
             bool isPass = bool.Parse(fc.Get("isPass"));
             string opinion = fc.Get("opinion");
 
+            bool isSelfTakeOut = bool.Parse(fc.Get("isSelfTakeOut"));
+
             if (!isPass && string.IsNullOrEmpty(opinion)) {
                 throw new Exception("必须填写审批意见后才能拒绝");
+            }
+
+            //非自提单，物流可修改快递公司和快递单号
+            if (!isSelfTakeOut && stepName.Contains("物流中心")) {
+                bill.ex_company = fc.Get("ex_company");
+                bill.ex_no = fc.Get("ex_no");
+            }
+
+            if (stepName.Contains("预约码")) {                
+                bill.take_out_people_code = fc.Get("take_out_people_code");
+                bill.take_out_people_name = fc.Get("take_out_people_name");
+                bill.take_out_people_phone = fc.Get("take_out_people_phone");
+                bill.take_out_people_id = fc.Get("take_out_people_id");
+                bill.take_out_people_car = fc.Get("take_out_people_car");
+                bill.take_out_people_visit_no = fc.Get("take_out_people_visit_no");
+                if (string.IsNullOrEmpty(bill.take_out_people_name)) {
+                    throw new Exception("必须完善预约人信息后才能处理");
+                }
+
+                var items = JsonConvert.DeserializeObject<List<ei_fxApplySelfItems>>(fc.Get("items"));
+                foreach (var it in items) {
+                    it.sys_no = bill.sys_no;
+                    db.ei_fxApplySelfItems.Add(it);
+                }
+
             }
 
             string formJson = JsonConvert.SerializeObject(bill);
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
             var result = flow.BeginAudit(bill.sys_no, step, userInfo.cardNo, isPass, opinion, formJson);
             if (result.suc) {
+                db.SaveChanges();
                 //发送通知到下一级审核人
                 SendNotification(result);
             }
@@ -202,12 +241,9 @@ namespace EmpInfo.Services
                         result.stepName,
                         bill.applier_name,
                         ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
-                        string.Format("{0}的放行条申请，业务类型：{1}", bill.applier_name, bill.fx_type_name),
+                        bill.fx_type_name,
                         nextAuditors.ToList()
                         );
-
-                    
-
                 }
             }
         }
@@ -220,5 +256,23 @@ namespace EmpInfo.Services
             }
         }
 
+
+        public object GetBeginAuditOtherInfo(string sysNo, int step)
+        {
+            var fx = db.ei_fxApply.Where(f => f.sys_no == sysNo).FirstOrDefault();
+            return new FXAuditOtherInfoModel()
+            {
+                isSelfTakeOut = fx.fx_type_no.StartsWith("2"),
+                exCompany = fx.ex_company,
+                exNo = fx.ex_no,
+                outerCode = fx.take_out_people_code,
+                outerName = fx.take_out_people_name,
+                outerPhone = fx.take_out_people_phone,
+                outerType = fx.take_out_people_type,
+                outerCar = fx.take_out_people_car,
+                outerId = fx.take_out_people_id,
+                outerVisitNo = fx.take_out_people_visit_no
+            };
+        }
     }
 }

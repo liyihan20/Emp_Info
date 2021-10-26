@@ -45,9 +45,21 @@
       <HintPath>..\packages\cn.jpush.api.3.3.1\lib\net40\cn.jpush.api.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ExcelDataReader, Version=3.6.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDataReader.3.6.0\lib\net20\ExcelDataReader.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ExcelDataReader.DataSet, Version=3.6.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDataReader.DataSet.3.6.0\lib\net35\ExcelDataReader.DataSet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Gma.QrCodeNet.Encoding.Net35, Version=0.4.0.0, Culture=neutral, PublicKeyToken=e8a75d24b142be49, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Gma.QrCodeNet.Encoding.Net35.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -362,6 +374,9 @@
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_fxApplyEntry.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ei_fxApplySelfItems.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ei_fxType.cs">
@@ -1042,6 +1057,7 @@
     <Content Include="Content\fxdoc\img\image-20211007114504420.png" />
     <Content Include="Content\fxdoc\img\image-20211007115916840.png" />
     <Content Include="Content\fxdoc\img\SQSL.jpg" />
+    <Content Include="Content\fxdoc\img\企业微信截图_16339127041464.png" />
     <Content Include="Content\fxdoc\信利放行条操作指引.html" />
     <Content Include="Content\images\bus_deps.png" />
     <Content Include="Content\images\assist.png" />
@@ -1438,6 +1454,9 @@
       <LastGenOutput>DormDB.designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Content\doc\信利放行条操作指引.pdf" />
+    <Content Include="Content\fxdoc\放行条导入物品模板.xls" />
+    <Content Include="Content\fxdoc\放行条导入物品模板.xlsx" />
     <None Include="Properties\PublishProfiles\EmpInfo.pubxml" />
     <Content Include="Scripts\bootstrap-select.js.map" />
     <Content Include="Scripts\echarts.js.map" />

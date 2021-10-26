@@ -834,6 +834,11 @@
           <Property Name="take_out_people_phone" Type="nvarchar" MaxLength="50" />
           <Property Name="take_out_people_code" Type="nvarchar" MaxLength="50" />
           <Property Name="in_way" Type="varchar" MaxLength="20" />
+          <Property Name="receiver_cop_name" Type="nvarchar" MaxLength="100" />
+          <Property Name="take_out_people_id" Type="nvarchar" MaxLength="50" />
+          <Property Name="take_out_people_car" Type="nvarchar" MaxLength="50" />
+          <Property Name="take_out_people_visit_no" Type="nvarchar" MaxLength="50" />
+          <Property Name="out_gate" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ei_fxApplyEntry">
           <Key>
@@ -843,8 +848,23 @@
           <Property Name="sys_no" Type="varchar" MaxLength="50" />
           <Property Name="item_name" Type="nvarchar" MaxLength="500" />
           <Property Name="item_model" Type="nvarchar" MaxLength="500" />
-          <Property Name="item_qty" Type="int" Nullable="false" />
+          <Property Name="item_qty" Type="decimal" Precision="16" Scale="4" Nullable="false" />
           <Property Name="item_unit" Type="nvarchar" MaxLength="50" />
+          <Property Name="comment" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="ei_fxApplySelfItems">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sys_no" Type="varchar" MaxLength="50" />
+          <Property Name="entry_id" Type="int" Nullable="false" />
+          <Property Name="item_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="item_model" Type="nvarchar" MaxLength="200" />
+          <Property Name="in_qty" Type="int" Nullable="false" />
+          <Property Name="out_qty" Type="int" Nullable="false" />
+          <Property Name="unit_name" Type="nvarchar" MaxLength="200" />
+          <Property Name="comment" Type="nvarchar" MaxLength="200" />
         </EntityType>
         <EntityType Name="ei_fxType">
           <Key>
@@ -858,6 +878,7 @@
           <Property Name="type_process" Type="nvarchar" MaxLength="500" />
           <Property Name="process_info" Type="nvarchar" MaxLength="500" />
           <Property Name="is_deleted" Type="bit" Nullable="false" />
+          <Property Name="form_segs" Type="nvarchar" MaxLength="1000" Nullable="false" />
         </EntityType>
         <EntityType Name="ei_groupAuthority">
           <Key>
@@ -911,6 +932,7 @@
           <Property Name="notify_clerk_name" Type="nvarchar" MaxLength="50" />
           <Property Name="notify_clerk_no" Type="nvarchar" MaxLength="50" />
           <Property Name="charge_customers" Type="nvarchar" MaxLength="200" />
+          <Property Name="out_gate" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ei_hhApplyEntry">
           <Key>
@@ -1453,6 +1475,7 @@
           <Property Name="quality_audior_no" Type="varchar" MaxLength="50" />
           <Property Name="quality_audior_name" Type="nvarchar" MaxLength="50" />
           <Property Name="stock_addr" Type="nvarchar" MaxLength="100" />
+          <Property Name="out_gate" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ei_spApplyEntry">
           <Key>
@@ -1667,6 +1690,8 @@
           <Property Name="dept_manager_num" Type="varchar" MaxLength="50" />
           <Property Name="email_addr" Type="varchar" MaxLength="100" />
           <Property Name="po_no" Type="varchar" MaxLength="50" />
+          <Property Name="done_before_apply" Type="nvarchar" MaxLength="10" />
+          <Property Name="has_done_supplier" Type="nvarchar" MaxLength="100" />
         </EntityType>
         <EntityType Name="ei_xaApplySupplier">
           <Key>
@@ -1779,6 +1804,7 @@
           <Property Name="process_dep" Type="nvarchar" MaxLength="50" />
           <Property Name="process_planner_auditor" Type="nvarchar" MaxLength="50" />
           <Property Name="process_planner_auditor_num" Type="varchar" MaxLength="50" />
+          <Property Name="out_gate" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ei_xcDepTarget">
           <Key>
@@ -3427,6 +3453,7 @@
           <EntitySet Name="ei_flowAuthority" EntityType="Self.ei_flowAuthority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_fxApply" EntityType="Self.ei_fxApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_fxApplyEntry" EntityType="Self.ei_fxApplyEntry" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_fxApplySelfItems" EntityType="Self.ei_fxApplySelfItems" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_fxType" EntityType="Self.ei_fxType" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groupAuthority" EntityType="Self.ei_groupAuthority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_groups" EntityType="Self.ei_groups" Schema="dbo" store:Type="Tables" />
@@ -4718,9 +4745,10 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySet Name="ei_xcProcessDep" EntityType="ICAuditModel.ei_xcProcessDep" />
           <EntitySet Name="ei_xdApply" EntityType="ICAuditModel.ei_xdApply" />
           <EntitySet Name="ei_fxType" EntityType="ICAuditModel.ei_fxType" />
-          <EntitySet Name="ei_fxApplyEntry" EntityType="ICAuditModel.ei_fxApplyEntry" />
           <EntitySet Name="ei_fxApply" EntityType="ICAuditModel.ei_fxApply" />
           <EntitySet Name="ei_xaApply" EntityType="ICAuditModel.ei_xaApply" />
+          <EntitySet Name="ei_fxApplyEntry" EntityType="ICAuditModel.ei_fxApplyEntry" />
+          <EntitySet Name="ei_fxApplySelfItems" EntityType="ICAuditModel.ei_fxApplySelfItems" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -7520,6 +7548,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="notify_clerk_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="notify_clerk_no" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="charge_customers" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="out_gate" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ei_hhReturnDetail">
           <Key>
@@ -7687,6 +7716,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="quality_audior_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="stock_addr" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="ei_spApplyEntry" Relationship="ICAuditModel.FK_ei_spApplyEntry_ei_spApply" FromRole="ei_spApply" ToRole="ei_spApplyEntry" />
+          <Property Name="out_gate" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <Association Name="FK_ei_spApplyEntry_ei_spApply">
           <End Type="ICAuditModel.ei_spApply" Role="ei_spApply" Multiplicity="0..1" />
@@ -8041,6 +8071,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="process_dep" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="process_planner_auditor" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="process_planner_auditor_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="out_gate" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ei_xcProduct">
           <Key>
@@ -8109,17 +8140,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="type_process" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="process_info" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="is_deleted" Type="Boolean" Nullable="false" />
-        </EntityType>
-        <EntityType Name="ei_fxApplyEntry">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="item_name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="item_model" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="item_qty" Type="Int32" Nullable="false" />
-          <Property Name="item_unit" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="form_segs" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ei_fxApply">
           <Key>
@@ -8160,6 +8181,11 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="take_out_people_phone" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="take_out_people_code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="in_way" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="receiver_cop_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="take_out_people_id" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="take_out_people_car" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="take_out_people_visit_no" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="out_gate" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ei_xaApply">
           <Key>
@@ -8202,6 +8228,34 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="dept_manager_num" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="email_addr" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="po_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="done_before_apply" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="has_done_supplier" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="ei_fxApplyEntry">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="item_name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="item_model" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="item_qty" Type="Decimal" Nullable="false" Precision="16" Scale="4" />
+          <Property Name="item_unit" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="comment" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="ei_fxApplySelfItems">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sys_no" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="entry_id" Type="Int32" Nullable="false" />
+          <Property Name="item_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="item_model" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="in_qty" Type="Int32" Nullable="false" />
+          <Property Name="out_qty" Type="Int32" Nullable="false" />
+          <Property Name="unit_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="comment" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -10823,6 +10877,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_hhApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_hhApply">
               <MappingFragment StoreEntitySet="ei_hhApply">
+                <ScalarProperty Name="out_gate" ColumnName="out_gate" />
                 <ScalarProperty Name="charge_customers" ColumnName="charge_customers" />
                 <ScalarProperty Name="notify_clerk_no" ColumnName="notify_clerk_no" />
                 <ScalarProperty Name="notify_clerk_name" ColumnName="notify_clerk_name" />
@@ -10956,6 +11011,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_spApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_spApply">
               <MappingFragment StoreEntitySet="ei_spApply">
+                <ScalarProperty Name="out_gate" ColumnName="out_gate" />
                 <ScalarProperty Name="stock_addr" ColumnName="stock_addr" />
                 <ScalarProperty Name="quality_audior_name" ColumnName="quality_audior_name" />
                 <ScalarProperty Name="quality_audior_no" ColumnName="quality_audior_no" />
@@ -11260,6 +11316,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_xcApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_xcApply">
               <MappingFragment StoreEntitySet="ei_xcApply">
+                <ScalarProperty Name="out_gate" ColumnName="out_gate" />
                 <ScalarProperty Name="process_planner_auditor_num" ColumnName="process_planner_auditor_num" />
                 <ScalarProperty Name="process_planner_auditor" ColumnName="process_planner_auditor" />
                 <ScalarProperty Name="process_dep" ColumnName="process_dep" />
@@ -11376,6 +11433,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_fxType">
             <EntityTypeMapping TypeName="ICAuditModel.ei_fxType">
               <MappingFragment StoreEntitySet="ei_fxType">
+                <ScalarProperty Name="form_segs" ColumnName="form_segs" />
                 <ScalarProperty Name="is_deleted" ColumnName="is_deleted" />
                 <ScalarProperty Name="process_info" ColumnName="process_info" />
                 <ScalarProperty Name="type_process" ColumnName="type_process" />
@@ -11387,21 +11445,14 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="ei_fxApplyEntry">
-            <EntityTypeMapping TypeName="ICAuditModel.ei_fxApplyEntry">
-              <MappingFragment StoreEntitySet="ei_fxApplyEntry">
-                <ScalarProperty Name="item_unit" ColumnName="item_unit" />
-                <ScalarProperty Name="item_qty" ColumnName="item_qty" />
-                <ScalarProperty Name="item_model" ColumnName="item_model" />
-                <ScalarProperty Name="item_name" ColumnName="item_name" />
-                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="ei_fxApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_fxApply">
               <MappingFragment StoreEntitySet="ei_fxApply">
+                <ScalarProperty Name="out_gate" ColumnName="out_gate" />
+                <ScalarProperty Name="take_out_people_visit_no" ColumnName="take_out_people_visit_no" />
+                <ScalarProperty Name="take_out_people_car" ColumnName="take_out_people_car" />
+                <ScalarProperty Name="take_out_people_id" ColumnName="take_out_people_id" />
+                <ScalarProperty Name="receiver_cop_name" ColumnName="receiver_cop_name" />
                 <ScalarProperty Name="in_way" ColumnName="in_way" />
                 <ScalarProperty Name="take_out_people_code" ColumnName="take_out_people_code" />
                 <ScalarProperty Name="take_out_people_phone" ColumnName="take_out_people_phone" />
@@ -11443,6 +11494,8 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_xaApply">
             <EntityTypeMapping TypeName="ICAuditModel.ei_xaApply">
               <MappingFragment StoreEntitySet="ei_xaApply">
+                <ScalarProperty Name="has_done_supplier" ColumnName="has_done_supplier" />
+                <ScalarProperty Name="done_before_apply" ColumnName="done_before_apply" />
                 <ScalarProperty Name="po_no" ColumnName="po_no" />
                 <ScalarProperty Name="email_addr" ColumnName="email_addr" />
                 <ScalarProperty Name="dept_manager_num" ColumnName="dept_manager_num" />
@@ -11478,6 +11531,34 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="apply_time" ColumnName="apply_time" />
                 <ScalarProperty Name="applier_name" ColumnName="applier_name" />
                 <ScalarProperty Name="applier_num" ColumnName="applier_num" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_fxApplyEntry">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_fxApplyEntry">
+              <MappingFragment StoreEntitySet="ei_fxApplyEntry">
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="item_unit" ColumnName="item_unit" />
+                <ScalarProperty Name="item_qty" ColumnName="item_qty" />
+                <ScalarProperty Name="item_model" ColumnName="item_model" />
+                <ScalarProperty Name="item_name" ColumnName="item_name" />
+                <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_fxApplySelfItems">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_fxApplySelfItems">
+              <MappingFragment StoreEntitySet="ei_fxApplySelfItems">
+                <ScalarProperty Name="comment" ColumnName="comment" />
+                <ScalarProperty Name="unit_name" ColumnName="unit_name" />
+                <ScalarProperty Name="out_qty" ColumnName="out_qty" />
+                <ScalarProperty Name="in_qty" ColumnName="in_qty" />
+                <ScalarProperty Name="item_model" ColumnName="item_model" />
+                <ScalarProperty Name="item_name" ColumnName="item_name" />
+                <ScalarProperty Name="entry_id" ColumnName="entry_id" />
                 <ScalarProperty Name="sys_no" ColumnName="sys_no" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>

@@ -42,7 +42,7 @@
             }
             if (options.successCallback) {
                 //有成功回调的话，执行
-                options.successCallback();
+                options.successCallback(file,res);
             }
         });
 
@@ -73,7 +73,7 @@
     }
 
     //对外主接口
-    $.fn.myUploader = function (options) {
+    $.fn.myUploaderSim = function (options) {
         var ele = this;
         init(ele, options);
     }

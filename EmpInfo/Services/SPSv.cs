@@ -52,7 +52,7 @@ namespace EmpInfo.Services
 
         public override object GetInfoBeforeApply(UserInfo userInfo, UserInfoDetail userInfoDetail)
         {
-            //throw new Exception("收寄件服务暂停，待物流确认后再启用");
+            throw new Exception("此流程已停用，请使用放行条申请流程寄件。路径：信利移动办公平台>智慧办公>放行条申请");
             string sysNo = GetNextSysNum(BillType);
             var sp = db.ei_spApply.Where(s => s.applier_num == userInfo.cardNo).OrderByDescending(s => s.id).FirstOrDefault();
             var busDepList = db.flow_auditorRelation.Where(f => f.bill_type == BillType && f.relate_name == "事业部审批").Select(f => f.relate_text).Distinct().ToList();

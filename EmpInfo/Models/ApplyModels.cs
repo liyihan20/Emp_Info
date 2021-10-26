@@ -458,12 +458,14 @@ namespace EmpInfo.Models
         public string company { get; set; }
         public string busName { get; set; }
         public string inWay { get; set; }
+        public string formSegs { get; set; }
     }
 
     public class FXCheckApplyModel
     {
         public ei_fxApply bill { get; set; }
         public List<ei_fxApplyEntry> entrys { get; set; }
+        public List<ei_fxApplySelfItems> items { get; set; }
         public List<StepNameAndAuditor> auditorList { get; set; }
     }
 
@@ -477,6 +479,32 @@ namespace EmpInfo.Models
         public string sysNo { get; set; }
         public string busName { get; set; }
         public string auditStatus { get; set; }
+    }
+
+    public class FXAuditOtherInfoModel
+    {
+        public bool isSelfTakeOut { get; set; }
+        public string exCompany { get; set; }
+        public string exNo { get; set; }
+        public string outerCode { get; set; }
+        public string outerName { get; set; }
+        public string outerPhone { get; set; }
+        public string outerType { get; set; }
+        public string outerId { get; set; }
+        public string outerCar { get; set; }
+        public string outerVisitNo { get; set; }
+    }
+
+    public class FXOuterPeopleInfoModel
+    {
+        public string FPhone { get; set; }
+        public string FName { get; set; }
+        public string FCodeId { get; set; }
+        public string FCarNo { get; set; }
+        public string FNO { get; set; }
+
+        public List<ei_fxApplySelfItems> items { get; set; }
+
     }
 
 }

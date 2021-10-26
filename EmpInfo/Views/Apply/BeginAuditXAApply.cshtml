@@ -480,6 +480,24 @@
                 @m.bill.project_type
             </span>
         </div>
+        <div class="b-div">
+            <span class="b-label">
+                先施工后补单:
+            </span>
+            <span class="b-input">
+                @m.bill.done_before_apply
+            </span>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(m.bill.has_done_supplier)) {
+            <div class="b-div">
+                <span class="b-label">
+                    已施工供应商:
+                </span>
+                <span class="b-input">
+                    @m.bill.has_done_supplier
+                </span>
+            </div>
+        }
         @*<div class="b-div">
                 <span class="b-label">
                     项目类别说明:
@@ -755,7 +773,7 @@
 
                 <div style="margin-top:12px;"></div>
                 <div class="btn-group btn-group-justified" role="group">
-                    @if (!bam.stepName.Contains("验收")) { 
+                    @if ((!bam.stepName.Contains("验收") && !"是".Equals(m.bill.done_before_apply)) || ("项目初审".Equals(bam.stepName))) { 
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-danger" onclick="audit(false)">拒绝</button>
                     </div>
@@ -797,7 +815,7 @@
             <p>
                 1. 流程步骤：流程开始--->提交申请--->收益提供人审批(如没有可跳过)--->设备科负责人审批--->生产部主管审批--->部门总经理审批--->
                 项目初审--->采购部接单--->申请人上传施工清单--->设备科负责人处理--->项目类别负责人(监控类/网络类)--->节省与监督--->采购部上传报价单--->
-                管理部会签（项目大类负责人、申请部门总经理、分摊部门总经理）--->审核部最终确认--->申请人验收项目--->设备负责人验收--->
+                管理部会签（项目大类负责人、申请部门总经理、分摊部门总经理）--->审核部最终确认--->采购填写PO--->申请人验收项目--->设备负责人验收--->
                 生产主管验收--->部门总经理验收--->信息管理部验收（网络类）--->项目大类负责人验收--->流程结束。
                 <br/>
                 2. 审核部要求：2021-08-25之后提交的项目单申请，不需走验收部分审批流程，改回走纸质验收。
@@ -806,7 +824,9 @@
                 <br/>
                 4. 申请人上传施工清单，设备科负责人处理后，采购部上传报价单前，系统会推送通知给项目大类负责人。
                 <br/>
-                5. 审核部最终确认后，申请人验收项目前，系统会推送通知给采购部接单员。
+                5. 2021-10-12，新增先施工后补单选项，如果选是，走此精简流程：流程开始--->提交申请--->部门总经理审批---> 
+                采购部接单--->申请人上传施工清单--->设备科负责人处理--->项目类别负责人(监控类/网络类)--->采购部上传报价单---> 
+                管理部会签（项目大类负责人、申请部门总经理、分摊部门总经理）--->审核部最终确认 --->采购填写PO--->流程结束。
                 <br/>
                 6. 如对此业务流程有疑问，或需要增加部门，请联系审核部陈禹健（chenyujian@trulyopto.cn）或陈俊翰（chenjunhan@trulyopto.cn）。
             </p>

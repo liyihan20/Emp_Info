@@ -209,6 +209,24 @@
                 @m.bill.project_type
             </span>
         </div>
+        <div class="b-div">
+            <span class="b-label">
+                先施工后补单:
+            </span>
+            <span class="b-input">
+                @m.bill.done_before_apply
+            </span>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(m.bill.has_done_supplier)) {
+            <div class="b-div">
+                <span class="b-label">
+                    已施工供应商:
+                </span>
+                <span class="b-input">
+                    @m.bill.has_done_supplier
+                </span>
+            </div>
+        }
         @*<div class="b-div">
                 <span class="b-label">
                     项目类别说明:

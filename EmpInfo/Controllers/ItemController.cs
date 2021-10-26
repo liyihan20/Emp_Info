@@ -392,6 +392,18 @@ namespace EmpInfo.Controllers
             return Json(new K3Sv(account).GetK3BusStockBill(billNo));
         }
 
+        public JsonResult GetOuterPeopleInfo(string code)
+        {
+            var result = db.Database.SqlQuery<FXOuterPeopleInfoModel>("select FName,FPhone,FCodeId,FCarNo,FNO from t_Wx_External_Order where FStatus in ('已审批','已入厂') and FBillNo ='" + code + "'").FirstOrDefault();
+            if (result == null) {
+                return Json(new SimpleResultModel(false, "在预约系统中查询不到此预约码对应的放行人信息，请确认"));
+            }
+            //获取自带物品信息
+            result.items = db.Database.SqlQuery<ei_fxApplySelfItems>("select 0 as id,'' as sys_no, FentryID as entry_id,FItemName as item_name,FItemModel as item_model,CONVERT(int,FItemQty) as in_qty,CONVERT(int,FItemQty) as out_qty,FUnitName as unit_name,FNote as comment from t_Wx_External_ItemList where FBillNo = '" + code + "'").ToList();
+
+            return Json(new SimpleResultModel(true, "已成功查询到放行人信息", JsonConvert.SerializeObject(result)));
+        }
+
         public string test()
         {
             //foreach (var l in db.k3_database.Where(d=>!d.account_name.Contains("总部")).ToList()) {

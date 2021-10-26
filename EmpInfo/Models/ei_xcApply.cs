@@ -66,5 +66,6 @@ namespace EmpInfo.Models
         public string process_dep { get; set; }
         public string process_planner_auditor { get; set; }
         public string process_planner_auditor_num { get; set; }
+        public string out_gate { get; set; }
     }
 }

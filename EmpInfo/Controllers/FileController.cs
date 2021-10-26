@@ -7,6 +7,9 @@ using System.Configuration;
 using System.IO;
 using EmpInfo.Models;
 using EmpInfo.Util;
+using System.Data;
+using ExcelDataReader;
+using Newtonsoft.Json;
 
 namespace EmpInfo.Controllers
 {
@@ -85,7 +88,42 @@ namespace EmpInfo.Controllers
             }
             WriteEventLog("上传厂房平面图", "成功：" + detailId);
             return Json(new SimpleResultModel() { suc = true });
-        } 
+        }
+
+        //放行条流程，读取放行物品excel
+        public JsonResult FXReadExcelData(string sysNum,string fileName)
+        {
+            List<ei_fxApplyEntry> list = new List<ei_fxApplyEntry>();
+
+            var dt = new DataSet();
+            using (var stream = System.IO.File.Open(Path.Combine(MyUtils.GetAttachmentFolder(sysNum), fileName), FileMode.Open, FileAccess.Read)) {
+                using (var reader = ExcelReaderFactory.CreateReader(stream)) {
+                    dt = reader.AsDataSet();
+                }
+            }
+            var tb = dt.Tables[0];
+            DataRow r;
+            decimal qtyTmp;
+            //物品名称 物品型号 数量 单位 备注
+            for (var i = 1; i < tb.Rows.Count; i++) {
+                r = tb.Rows[i];
+                ei_fxApplyEntry en = new ei_fxApplyEntry();
+
+                if (!decimal.TryParse(Convert.ToString(r[2]), out qtyTmp)) {
+                    return Json(new SimpleResultModel(false, "存在不合法的数量[" + Convert.ToString(r[2]) + "]，行号：" + (i + 1)));
+                }
+
+                en.item_name = Convert.ToString(r[0]);
+                en.item_model = Convert.ToString(r[1]);
+                en.item_qty = qtyTmp;
+                en.item_unit = Convert.ToString(r[3]);
+                en.comment = Convert.ToString(r[4]);
+
+                list.Add(en);
+            }
+
+            return Json(new SimpleResultModel(true,"读取成功",JsonConvert.SerializeObject(list)));
+        }
 
     }
 }

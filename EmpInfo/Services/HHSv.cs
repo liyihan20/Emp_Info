@@ -80,6 +80,8 @@ namespace EmpInfo.Services
 
         public override object GetInfoBeforeApply(Models.UserInfo userInfo, Models.UserInfoDetail userInfoDetail)
         {
+            throw new Exception("此流程已停用，如需放行，请走放行条流程：企业微信>移动办公平台>智慧办公>放行条申请");
+
             var list = db.flow_auditorRelation.Where(f => f.bill_type == BillType).ToList();
 
             return new HHBeforeApplyModel()
