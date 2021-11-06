@@ -42,13 +42,23 @@ namespace EmpInfo.Services
         {
             var list = base.GetApplyMenuItems(userInfo);
 
-            if (db.ei_flowAuthority.Where(a => a.bill_type == BillType && a.relate_type == "查询报表" && a.relate_value == userInfo.cardNo).Count() > 0) {
+            var auth = db.ei_flowAuthority.Where(a => a.bill_type == BillType  && a.relate_value == userInfo.cardNo).ToList();
+            if (auth.Where(a => a.relate_type == "查询报表").Count() > 0) {
 
                 list.Add(new ApplyMenuItemModel()
                 {
                     text = "查询报表",
                     iconFont = "fa-file-text-o",
                     url = "../Report/FXReport"
+                });
+            }
+            if (auth.Where(a => a.relate_type == "放行统计").Count() > 0) {
+
+                list.Add(new ApplyMenuItemModel()
+                {
+                    text = "放行统计",
+                    iconFont = "fa-file-text-o",
+                    url = "../Report/FXSummary"
                 });
             }
             return list;
@@ -158,6 +168,31 @@ namespace EmpInfo.Services
                 }
 
             }
+            else if (stepName.Contains("返厂登记")) {
+                var backTime = fc.Get("back_time");
+                var backStatus = fc.Get("back_status");
+                if (string.IsNullOrEmpty(backTime) || string.IsNullOrEmpty(backStatus)) {
+                    throw new Exception("返厂时间和物品状态必须填写");
+                }
+                List<NV> otherSegs = JsonConvert.DeserializeObject<List<NV>>(bill.other_segs);
+
+                otherSegs.Add(new NV()
+                {
+                    n = "返厂时间",
+                    v = backTime
+                });
+                otherSegs.Add(new NV()
+                {
+                    n = "物品状态",
+                    v = backStatus
+                });
+
+                bill.other_segs = JsonConvert.SerializeObject(otherSegs);
+                bill.out_status = "已返厂未确认";
+            }
+            else if (stepName.Contains("返厂确认")) {
+                bill.out_status = "已返厂已确认";
+            }
 
             string formJson = JsonConvert.SerializeObject(bill);
             FlowSvrSoapClient flow = new FlowSvrSoapClient();
@@ -242,7 +277,8 @@ namespace EmpInfo.Services
                         bill.applier_name,
                         ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
                         bill.fx_type_name,
-                        nextAuditors.ToList()
+                        nextAuditors.ToList(),
+                        true
                         );
                 }
             }

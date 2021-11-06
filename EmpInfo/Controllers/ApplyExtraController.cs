@@ -1148,9 +1148,9 @@ namespace EmpInfo.Controllers
             return View();
         }
 
-        public JsonResult CheckMyMTEqInfo()
+        public JsonResult CheckMyMTEqInfo(string className = "", string eqName = "", string fileNo = "")
         {
-            return Json(new MTSv().GetEqInfoList(userInfo.cardNo),JsonRequestBehavior.AllowGet);
+            return Json(new MTSv().GetEqInfoList(userInfo.cardNo, className, eqName, fileNo), JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult GetMTFileDetail(string fileNo)

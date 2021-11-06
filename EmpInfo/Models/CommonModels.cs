@@ -86,4 +86,10 @@ namespace EmpInfo.Models
         public object routetValues { get; set; }
     }
 
+    public class NV
+    {
+        public string n { get; set; }
+        public string v { get; set; }
+    }
+
 }

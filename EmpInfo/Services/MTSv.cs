@@ -341,37 +341,52 @@ namespace EmpInfo.Services
         }
 
         //获取当前用户负责的科室对应的设备资料
-        public object GetEqInfoList(string userNumber)
+        public object GetEqInfoList(string userNumber, string className = "", string eqName = "", string fileNo = "")
         {
             bool canSeeAll = db.ei_flowAuthority.Where(f => f.bill_type == BillType && f.relate_type == "查看所有设备" && f.relate_value == userNumber).Count() > 0;
-            var list = (from eq in db.ei_mtEqInfo
-                          join c in db.ei_mtClass on eq.class_id equals c.id
-                          where c.leader_number.Contains(userNumber) || eq.creater_number == userNumber || canSeeAll
-                          orderby eq.maintenance_status
-                          select new
-                          {
-                              eq.property_number,
-                              eq.equitment_name,
-                              eq.equitment_modual,
-                              eq.important_level,
-                              eq.next_maintenance_date,
-                              eq.maintenance_status,
-                              eq.produce_dep_name,
-                              eq.id,
-                              eq.creater_name
-                          }).ToList();
-            var result = list.Where(l => l.maintenance_status == "正在保养").OrderBy(l => l.next_maintenance_date).ToList();
-            result.AddRange(list.Where(l => l.maintenance_status != "正在保养").OrderBy(l => l.maintenance_status).ThenBy(l => l.next_maintenance_date).ToList());
+            var list = from eq in db.ei_mtEqInfo
+                       join c in db.ei_mtClass on eq.class_id equals c.id
+                       where c.leader_number.Contains(userNumber) || eq.creater_number == userNumber || canSeeAll
+                       orderby eq.maintenance_status
+                       select new
+                       {
+                           eq.property_number,
+                           eq.equitment_name,
+                           eq.equitment_modual,
+                           eq.important_level,
+                           eq.next_maintenance_date,
+                           eq.maintenance_status,
+                           eq.produce_dep_name,
+                           eq.id,
+                           eq.creater_name,
+                           eq.file_no,
+                           c.class_name
+                       };
+
+            if (!string.IsNullOrEmpty(className)) {
+                list = list.Where(l => l.class_name.Contains(className));
+            }
+            if (!string.IsNullOrEmpty(eqName)) {
+                list = list.Where(l => l.equitment_name.Contains(eqName));
+            }
+            if (!string.IsNullOrEmpty(fileNo)) {
+                list = list.Where(l => l.file_no.Contains(fileNo));
+            }
+
+            var result = list.ToList().Where(l => l.maintenance_status == "正在保养").OrderBy(l => l.next_maintenance_date).ToList();
+            result.AddRange(list.ToList().Where(l => l.maintenance_status != "正在保养").OrderBy(l => l.maintenance_status).ThenBy(l => l.next_maintenance_date).ToList());
 
             return result;
         }
+               
 
         //查看设备资料明细
         public object GetEqInfoDetail(int id)
         {
             var result = from eq in db.ei_mtEqInfo
                          join c in db.ei_mtClass on eq.class_id equals c.id
-                         join f in db.ei_mtFile on eq.file_no equals f.file_no
+                         join f in db.ei_mtFile on eq.file_no equals f.file_no into tempf
+                         from fi in tempf.DefaultIfEmpty()
                          join td in db.vw_ep_dep on eq.produce_dep_name equals td.pr_dep_name into tempd
                          from t in tempd.DefaultIfEmpty()
                          where eq.id == id
@@ -398,8 +413,8 @@ namespace EmpInfo.Services
                              eq.class_id,
                              c.leader,
                              c.class_name,                             
-                             f.maintenance_content,
-                             f.maintenance_steps,
+                             fi.maintenance_content,
+                             fi.maintenance_steps,
                              t.bus_dep_name,
                              t.eq_charger_name,
                              t.pr_dep_name,

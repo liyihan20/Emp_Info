@@ -3828,7 +3828,7 @@ namespace EmpInfo.Controllers
             return View();
         }
 
-        public JsonResult SearchXASummary(string year, string month,bool? isPO)
+        public JsonResult SearchXASummary(string year, string month,bool? isPO,string groupName="生产部")
         {
             DateTime fromDate, toDate;
             if ("整年".Equals(month)) {
@@ -3847,34 +3847,40 @@ namespace EmpInfo.Controllers
                           select new
                           {
                               x,
-                              s.price
+                              s
                           }).ToList();
-            
 
-            //先将不是分摊的统计出来
-            var list = result.Where(r => r.x.is_share_fee == false).GroupBy(r => r.x.dept_name).Select(r => new stringDecimalModel { name = r.Key, value = r.Sum(a => a.price) }).ToList();
+            List<stringDecimalModel> list = null;
 
-            //分摊的需要逐条计算
-            foreach (var r in result.Where(r => r.x.is_share_fee == true)) {
-                var shares = JsonConvert.DeserializeObject<List<XAFeeShareModel>>(r.x.share_fee_detail);
+            if (groupName == "生产部") {
+                //先将不是分摊的统计出来
+                list = result.Where(r => r.x.is_share_fee == false).GroupBy(r => r.x.dept_name).Select(r => new stringDecimalModel { name = r.Key, value = r.Sum(a => a.s.price) }).ToList();
 
-                foreach (var s in shares) {
-                    var tmpFee = Math.Round((decimal)(s.v * r.price / 100.0m), 2);
-                    var tmpName = s.n.Split(new char[] { '_' })[1];
-                    var item = list.Where(l => l.name == tmpName).FirstOrDefault();
-                    if (item == null) {
-                        list.Add(new stringDecimalModel() { name = tmpName, value = tmpFee });
-                    }
-                    else {
-                        item.value += tmpFee;
+                //分摊的需要逐条计算
+                foreach (var r in result.Where(r => r.x.is_share_fee == true)) {
+                    var shares = JsonConvert.DeserializeObject<List<XAFeeShareModel>>(r.x.share_fee_detail);
+
+                    foreach (var s in shares) {
+                        var tmpFee = Math.Round((decimal)(s.v * r.s.price / 100.0m), 2);
+                        var tmpName = s.n.Split(new char[] { '_' })[1];
+                        var item = list.Where(l => l.name == tmpName).FirstOrDefault();
+                        if (item == null) {
+                            list.Add(new stringDecimalModel() { name = tmpName, value = tmpFee });
+                        }
+                        else {
+                            item.value += tmpFee;
+                        }
                     }
                 }
             }
-
+            else if (groupName == "供应商") {
+                list = result.GroupBy(r => r.s.supplier_name).Select(r => new stringDecimalModel { name = r.Key, value = r.Sum(a => a.s.price) }).ToList();
+            }
             return Json(list.OrderByDescending(l => l.value).ToList());
         }
 
-        public ActionResult CheckXASummaryDetail(string year, string month, bool? isPO, string depName)
+        //按生产部门查看明细
+        public ActionResult CheckXASummaryDetailByDepName(string year, string month, bool? isPO, string depName)
         {
             DateTime fromDate, toDate;
             if ("整年".Equals(month)) {
@@ -3938,6 +3944,52 @@ namespace EmpInfo.Controllers
             }
 
             TempData["title"] = string.Format("项目申请单明细({0}_{1}-{2})", depName, year, month);
+            TempData["json"] = JsonConvert.SerializeObject(list);
+            return RedirectToAction("JsonTable", "BI");
+        }
+
+        //按供应商查看明细
+        public ActionResult CheckXASummaryDetailBySupplierName(string year, string month, bool? isPO, string supplierName)
+        {
+            DateTime fromDate, toDate;
+            if ("整年".Equals(month)) {
+                fromDate = DateTime.Parse(year + "-01-01");
+                toDate = fromDate.AddYears(1);
+            }
+            else {
+                fromDate = DateTime.Parse(year + "-" + month + "-01");
+                toDate = fromDate.AddMonths(1);
+            }
+
+            var result = (from x in db.ei_xaApply
+                          join s in db.ei_xaApplySupplier on new { x.sys_no, is_bidder = true } equals new { s.sys_no, s.is_bidder }
+                          where x.confirm_date != null && x.confirm_date >= fromDate && x.confirm_date < toDate
+                          && (isPO == null || x.is_po == isPO)
+                          && s.supplier_name == supplierName
+                          select new
+                          {
+                              x,
+                              s
+                          }).ToList();
+
+
+            List<XASummaryDetailModel> list = new List<XASummaryDetailModel>();            
+            foreach (var r in result.OrderBy(re => re.x.confirm_date)) {
+                list.Add(new XASummaryDetailModel()
+                {
+                    申请人 = r.x.applier_name,
+                    申请部门 = r.x.dept_name,
+                    是否PO = r.x.is_po == true ? "是" : (r.x.is_po == false ? "否" : ""),
+                    确认日期 = ((DateTime)r.x.confirm_date).ToString("yyyy-MM-dd HH:mm"),
+                    价格 = ((decimal)r.s.price).ToString("###,###.##"),
+                    项目名称 = r.x.project_name,
+                    中标供应商 = r.s.supplier_name,
+                    流水号 = r.x.sys_no,
+                    是否分摊单 = r.x.is_share_fee == true ? "是" : (r.x.is_po == false ? "否" : "")
+                });
+            }
+
+            TempData["title"] = string.Format("项目申请单明细({0}_{1}-{2})", supplierName, year, month);
             TempData["json"] = JsonConvert.SerializeObject(list);
             return RedirectToAction("JsonTable", "BI");
         }
@@ -4610,6 +4662,102 @@ namespace EmpInfo.Controllers
             xls.Send();
 
         }
+        
+        public void ExportMyMTEqInfo(string className = "", string eqName = "", string fileNo = "")
+        {
+            bool canSeeAll = db.ei_flowAuthority.Where(f => f.bill_type == "MT" && f.relate_type == "查看所有设备" && f.relate_value == userInfo.cardNo).Count() > 0;
+            var list = from eq in db.ei_mtEqInfo
+                       join c in db.ei_mtClass on eq.class_id equals c.id
+                       where c.leader_number.Contains(userInfo.cardNo) || eq.creater_number == userInfo.cardNo || canSeeAll
+                       orderby eq.maintenance_status
+                       select new
+                       {
+                           eq,
+                           c
+                       };
+
+            if (!string.IsNullOrEmpty(className)) {
+                list = list.Where(l => l.c.class_name.Contains(className));
+            }
+            if (!string.IsNullOrEmpty(eqName)) {
+                list = list.Where(l => l.eq.equitment_name.Contains(eqName));
+            }
+            if (!string.IsNullOrEmpty(fileNo)) {
+                list = list.Where(l => l.eq.file_no.Contains(fileNo));
+            }
+
+            var result = list.ToList().Where(l => l.eq.maintenance_status == "正在保养").OrderBy(l => l.eq.next_maintenance_date).ToList();
+            result.AddRange(list.ToList().Where(l => l.eq.maintenance_status != "正在保养").OrderBy(l => l.eq.maintenance_status).ThenBy(l => l.eq.next_maintenance_date).ToList());
+
+            string[] colName = new string[] { "保养状态","设备科室","资产编号","设备名称", "设备型号", "生产部门", "保养文件", "制造商", "使用状态", "盘点部门", "盘点表编号",
+                                              "优先处理级别", "保养周期(月)", "上次保养日期", "下次保养日期", "创建人","创建时间" };
+            ushort[] colWidth = new ushort[colName.Length];
+
+            for (var i = 0; i < colWidth.Length; i++) {
+                colWidth[i] = 16;
+            }
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = "设备信息列表_" + DateTime.Now.ToString("MMddHHmmss");
+            Worksheet sheet = xls.Workbook.Worksheets.Add("设备详情");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+
+            foreach (var d in result.ToList()) {
+                colIndex = 1;
+
+                //"保养状态","设备科室","资产编号","设备名称", "设备型号", "生产部门", "保养文件", "制造商", "使用状态", "盘点部门", "盘点表编号",
+                //"优先处理级别", "保养周期(月)", "上次保养日期", "下次保养日期", "创建人","创建时间"
+                cells.Add(++rowIndex, colIndex, d.eq.maintenance_status);
+                cells.Add(rowIndex, ++colIndex, d.c.class_name);
+                cells.Add(rowIndex, ++colIndex, d.eq.property_number);
+                cells.Add(rowIndex, ++colIndex, d.eq.equitment_name);
+                cells.Add(rowIndex, ++colIndex, d.eq.equitment_modual);
+                cells.Add(rowIndex, ++colIndex, d.eq.produce_dep_name);
+                cells.Add(rowIndex, ++colIndex, d.eq.file_no);
+                cells.Add(rowIndex, ++colIndex, d.eq.maker);
+                cells.Add(rowIndex, ++colIndex, d.eq.using_status);
+                cells.Add(rowIndex, ++colIndex, d.eq.check_dep);
+                cells.Add(rowIndex, ++colIndex, d.eq.check_list_no);
+
+                cells.Add(rowIndex, ++colIndex, d.eq.important_level);
+                cells.Add(rowIndex, ++colIndex, d.eq.maintenance_cycle);
+                cells.Add(rowIndex, ++colIndex, d.eq.last_maintenance_date == null ? "" : ((DateTime)d.eq.last_maintenance_date).ToString("yyyy-MM-dd"));
+                cells.Add(rowIndex, ++colIndex, d.eq.next_maintenance_date == null ? "" : ((DateTime)d.eq.next_maintenance_date).ToString("yyyy-MM-dd"));
+                cells.Add(rowIndex, ++colIndex, d.eq.creater_name);
+                cells.Add(rowIndex, ++colIndex, d.eq.create_time.ToString("yyyy-MM-dd HH:mm"));
+            }
+
+            xls.Send();
+
+        }
 
         #endregion
 
@@ -4791,6 +4939,7 @@ namespace EmpInfo.Controllers
 
         }
 
+        [SessionTimeOutFilter]
         public ActionResult PrintFX(string sysNo)
         {
             var fx = db.ei_fxApply.Where(f => f.sys_no == sysNo).FirstOrDefault();
@@ -4823,7 +4972,61 @@ namespace EmpInfo.Controllers
             return View();
         }
 
+
+        [SessionTimeOutFilter]
+        public ActionResult FXSummary()
+        {
+            return View();
+        }
+
+        public JsonResult SearchFXSummary(DateTime fromDate, DateTime toDate, string groupName, string fxTypeName)
+        {
+            toDate = toDate.AddDays(1);
+
+            var result = db.ei_fxApply.Where(f => f.out_time >= fromDate && f.out_time < toDate && f.fx_type_name.Contains(fxTypeName)).ToList();
+
+            List<stringDecimalModel> list = new List<stringDecimalModel>();
+            if ("出货公司".Equals(groupName)) {
+                list = result.Where(r => r.receiver_cop_name != null).GroupBy(r => r.receiver_cop_name).Select(r => new stringDecimalModel() { name = r.Key, value = r.Count() }).ToList();
+            }
+            if ("需返厂".Equals(groupName)) {
+                list = result.Where(r => r.out_status == "未返厂" || r.out_status == "已返厂未确认").GroupBy(r => r.applier_name).Select(r => new stringDecimalModel() { name = r.Key, value = r.Count() }).ToList();
+            }
+
+            return Json(list.OrderByDescending(l => l.value).ThenBy(l => l.name).ToList());
+        }
+
+        public ActionResult CheckFXSummaryDetail(DateTime fromDate, DateTime toDate, string fxTypeName,string groupName, string groupValue)
+        {
+            toDate = toDate.AddDays(1);
+            var result = db.ei_fxApply.Where(f => f.out_time >= fromDate && f.out_time < toDate && f.fx_type_name.Contains(fxTypeName)).ToList();
+            if("出货公司".Equals(groupName)){
+                result = result.Where(f => f.receiver_cop_name == groupValue).ToList();
+            }
+            if ("需返厂".Equals(groupName)) {
+                result = result.Where(r => r.applier_name==groupValue && (r.out_status == "未返厂" || r.out_status == "已返厂未确认")).ToList();
+            }
+
+            var list = result.OrderBy(r => r.out_time).Select(r => new
+            {
+                流水号 = r.sys_no,
+                申请人 = r.applier_name,
+                部门 = r.bus_name,
+                出货公司 = r.receiver_cop_name,
+                业务类型 = r.fx_type_name,
+                放行时间 = ((DateTime)r.out_time).ToString("yyyy-MM-dd HH:mm"),
+                状态 = r.out_status
+            });
+
+            TempData["title"] = string.Format("放行申请单明细({0}_{1:yyyy-MM-dd}-{2:yyyy-MM-dd})", groupValue, fromDate, toDate);
+            TempData["json"] = JsonConvert.SerializeObject(list);
+            return RedirectToAction("JsonTable", "BI");
+
+        }
+
         #endregion
+
+        
 
     }
 }

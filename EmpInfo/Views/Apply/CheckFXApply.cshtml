@@ -117,7 +117,15 @@
     function genOtherSeg(){
         var segs=@Html.Raw(h.other_segs);
         for(var i=0;i<segs.length;i++){
-            var html='<div class="b-div"><span class="b-label">'+segs[i].n+':</span><span class="b-input">'+segs[i].v+'</span></div>';
+            //要分段填写，不能写成一行，否则会与原有的用html写的字段对不齐
+            var html='<div class="b-div"> \
+                <span class="b-label"> \
+                '+segs[i].n
+                +':</span> \
+                <span class="b-input"> \
+                '+segs[i].v
+                +'</span> \
+                </div>';
             $("#fxExtraFields").append(html);
         }
     }
@@ -153,8 +161,7 @@
             </span>
         </div>    
         @if (h.can_print && h.out_time == null && !"被拒绝".Equals(ViewData["auditStatus"])) {
-            if (isSelfTaken) {
-                if (currentUser.cardNo.Equals(h.applier_num)) {
+            if (isSelfTaken) {                
                     <div class="b-div">
                         <span class="b-label">
                             出示:
@@ -163,7 +170,6 @@
                             <button type="button" class="btn btn-default btn-sm" id="showCode"><i class="fa fa-qrcode"></i> 放行二维码</button>
                         </span>
                     </div>
-                }
             }
             else {
                 <div class="b-div">

@@ -278,7 +278,25 @@ namespace EmpInfo.Services
 
         public List<DormRepairItemModel> SearchRepairItems(string itemName, string opUser)
         {
-            return db.Database.SqlQuery<DormRepairItemModel>("exec DP_SearchInventory @itemName = {0},@opUser = {1}", itemName, opUser).ToList();
+            var list = db.Database.SqlQuery<DormRepairItemModel>("exec DP_SearchInventory @itemName = {0},@opUser = {1}", itemName, opUser).ToList();
+
+            //库存数需要减去【宿舍公共维修】流程中此人已提交但还未审批完成的数量
+            var itemIds = list.Select(l => l.item_id).ToList();
+
+            var auditingPPApply = (from p in db.ei_PPApply
+                                   join i in db.ei_dormRepairIems on p.sys_no equals i.sys_no
+                                   join a in db.flow_apply on p.sys_no equals a.sys_no
+                                   where a.success == null && p.applier_name == opUser && itemIds.Contains(i.item_id)
+                                   select new
+                                   {
+                                       i.item_id,
+                                       i.qty
+                                   }).ToList();
+            foreach (var a in auditingPPApply) {
+                list.Where(l => l.item_id == a.item_id).FirstOrDefault().inventory -= a.qty;
+            }
+
+            return list;
         }
 
         public ei_dormRepairIems SaveRepairItem(DormRepairItemModel im,string opUser){

@@ -416,7 +416,7 @@ namespace EmpInfo.Services
         //    db.SaveChanges();
         //}
 
-        public void SendQywxMessageToNextAuditor(string processName, string sysNo, int step, string auditStepName, string applierName, string applierTime, string applyContent, List<string> cardNumberList)
+        public void SendQywxMessageToNextAuditor(string processName, string sysNo, int step, string auditStepName, string applierName, string applierTime, string applyContent, List<string> cardNumberList, bool pushImmediately = false)
         {
             string cardNumber = string.Join("|", cardNumberList);
             string url = "";
@@ -434,7 +434,7 @@ namespace EmpInfo.Services
             
             msg.textcard.url = GetQYWXOAthLink(url);
 
-            SendQYWXCardMsg(msg);
+            SendQYWXCardMsg(msg,pushImmediately);
         }
 
         /// <summary>
@@ -566,11 +566,17 @@ namespace EmpInfo.Services
             wx.PushTextMsgImmediately("wZRxdsuqeFAqJDG7VLaCTkImfsuce0qwyLO3ksBUkMY", "李逸焊", msg);
         }
 
-        public void SendQYWXCardMsg(TextCardMsg msg, DateTime? whenToPush = null)
+        public void SendQYWXCardMsg(TextCardMsg msg, bool pushImmediately = false, DateTime? whenToPush = null)
         {
             msg.agentid = "1000007";
-            QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();           
-            wx.PushTextCardMsg("wZRxdsuqeFAqJDG7VLaCTkImfsuce0qwyLO3ksBUkMY", "李逸焊", msg, whenToPush);
+            QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();
+
+            if (pushImmediately) {
+                wx.PushTextCardMsgImmediately("wZRxdsuqeFAqJDG7VLaCTkImfsuce0qwyLO3ksBUkMY", "李逸焊", msg);
+            }
+            else {
+                wx.PushTextCardMsg("wZRxdsuqeFAqJDG7VLaCTkImfsuce0qwyLO3ksBUkMY", "李逸焊", msg, whenToPush);
+            }                
         }
 
         public string GetQYWXOAthLink(string url)

@@ -1,0 +1,136 @@
+﻿
+@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <style type="text/css">
+        .gr1,.gr2{
+            cursor:pointer;
+        }
+    </style>
+}
+
+<script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+<script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+<script>
+    $(function () {
+
+        $(".form_date").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            todayBtn: true,
+            startView: 2,
+            minView: 2
+        });
+
+        $("#searchReportBt").on("click", function () {
+            var groupName = $("#groupName").val();
+            var className = "";
+            if (groupName == "出货公司") {
+                className = "gr1";
+            } else if (groupName == "需返厂") {
+                className = "gr2";
+            }
+            $.post("SearchFXSummary", { fromDate: $("#fromDate").val(), toDate: $("#toDate").val(), fxTypeName: $("#fxTypeName").val(), groupName: groupName }, function (data) {
+                if (data.length < 1) {
+                    toastr.error("查询不到符合条件的记录");
+                    return;
+                }
+                $(".btn_yearmonth").html($("#fromDate").val() + "-" + $("#toDate").val());
+                $("#tb").empty();
+
+                var html = "";
+                var sum = 0;
+                var isSmallScreen = $(document).width() < 600; //是否小屏幕，如果是小的，则表格一行只显示两格，否则一行显示四格
+                for (var i = 0; i < data.length; i++) {
+                    if (i % 2 == 0 || isSmallScreen) {
+                        html += "<tr>";
+                    }
+
+                    html += "<td style='width:35%;'><span class='"+className+"'>" + data[i].name + "</span></td><td style='width:15%;'><b class='text-primary'>" + data[i].value + "</b></td>";
+
+                    if (i % 2 == 1 || isSmallScreen) {
+                        html += "</tr>";
+                    }
+
+                    sum += data[i].value;
+                }
+                if (data.length % 2 == 1 && !isSmallScreen) {
+                    html += "</tr>";
+                }
+
+                html += "<tr><td><b class='text-danger'>汇总数量：</b></td><td><b class='text-danger'>" + sum + "</b></td></tr>";
+
+                $("#tb").append(html);
+
+            });
+        });
+
+        $("#tb").on("click", ".gr1", function () {
+            window.open("CheckFXSummaryDetail?fromDate=" + $("#fromDate").val()
+                + "&toDate=" + $("#toDate").val()
+                + "&fxTypeName=" + $("#fxTypeName").val()
+                + "&groupName=出货公司"
+                + "&groupValue=" + $(this).html());
+        });
+
+        $("#tb").on("click", ".gr2", function () {
+            window.open("CheckFXSummaryDetail?fromDate=" + $("#fromDate").val()
+                + "&toDate=" + $("#toDate").val()
+                + "&fxTypeName=" + $("#fxTypeName").val()
+                + "&groupName=需返厂"
+                + "&groupValue="+ $(this).html());
+        });
+
+    })
+
+</script>
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公集合</a></li>
+            <li><a href="@Url.Content("~/Apply/ApplyIndex?billType=FX")">放行条申请</a></li>
+            <li class="active">放行统计</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-sm-4 col-md-3" style="margin-bottom:12px;">
+                <div class="lbText">出厂日期从：</div>
+                <div class="input-group date form_date" id="fromDatePicker1">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    <input class="form-control" type="text" name="fromDate" id="fromDate" autocomplete="off" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-4 col-md-3" style="margin-bottom:12px;">
+                <div class="lbText">出厂日期到：</div>
+                <div class="input-group date form_date" id="toDatePicker1">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    <input class="form-control" type="text" name="toDate" id="toDate" autocomplete="off" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-4 col-md-3" style="margin-bottom:12px;">
+                统计维度：
+                <select class="form-control" id="groupName">   
+                    <option value="出货公司">出货公司</option>                 
+                    <option value="需返厂">需返厂</option>
+                </select>
+            </div>
+            <div class="col-xs-12 col-sm-4 col-md-3" style="margin-bottom:12px;">
+                业务类型：<input type="text" class="form-control" name="fxTypeName" id="fxTypeName" />
+            </div>
+            <div class="col-xs-12 col-sm-3 col-md-2" style="margin-bottom:12px;">
+                <button class="btn btn-primary btn-block" id="searchReportBt" data-loading-text="查询与计算中..."><i class="fa fa-search"></i> 开始统计</button>
+            </div>
+        </div>
+        <div class="small text-danger"><i class="fa fa-info-circle"></i> 2021-10-13后有出货公司数据； 2021-11-03后有返厂数据</div>
+
+        <button class="btn btn-block btn-danger disabled" style="text-align:left;margin-bottom:2px;margin-top:16px;border-radius:0;font-style:italic;"><i class="fa fa-cny"></i> <span class="btn_yearmonth"></span> 放行统计结果</button>
+        <table class="table table-bordered" id="tb">
+
+        </table>
+
+    </div>
+</div>
