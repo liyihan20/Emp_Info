@@ -873,7 +873,7 @@ namespace EmpInfo.Controllers
             }
         }
 
-        public JsonResult UpdateXASupplierPrice(int id, decimal price)
+        public JsonResult UpdateXASupplierPrice(int id, decimal price,int taxRate)
         {
             try {
                 var supplier = db.ei_xaApplySupplier.SingleOrDefault(s => s.id == id);
@@ -884,6 +884,7 @@ namespace EmpInfo.Controllers
                     else {
                         supplier.price = price;
                     }
+                    supplier.tax_rate = taxRate;
                     db.SaveChanges();
                 }
                 return Json(new SimpleResultModel(true));
@@ -1511,6 +1512,7 @@ namespace EmpInfo.Controllers
         /// </summary>
         /// <param name="typeNo"></param>
         /// <returns></returns>
+        [SessionTimeOutFilter]
         public ActionResult FillFxForm(string typeNo, string way)
         {
             if (string.IsNullOrEmpty(typeNo)) {

@@ -42,6 +42,7 @@
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myInputDialog.js")"></script>
     <script>
         var qtyModalParam={item_no:"",bus_name:"@h.bus_name",begin_date:"",end_date:""};
         var canSearch=true;
@@ -175,21 +176,30 @@
         });
 
         function editQty(entry_no,qty,idx){
-            openInputDialog("当前数量是："+qty+"；请在下方输入需要修改的数量：",function(v){
-                if(isNaN(v)){
-                    toastr.error("输入的数量不是数字格式，保存失败");
-                    return;
-                }
-                $.post("@Url.Content("~/Item/UpdateApQty")",{sysNo:"@h.sys_no",entryNo:entry_no,qty:v},function(data){
-                    if(data.suc){
-                        toastr.success("数量修改成功");
-                        $('#tb').bootstrapTable('updateCell',{index: idx, field: 'real_qty', value: v});
-                    }else{
-                        toastr.error(data.msg);
-                    }
-                });
 
-            },"修改数量");
+            var dialog = $.inputDialog({
+                title:"数量修改",
+                confirmButtonText:"开始搜索",
+                controls:[{ text: "数量", name: "qty", defaultValue: qty, placeholder: "请输入需要修改的数量" }],
+                callback: function (result) { 
+                    var v=result.qty;
+                    if(isNaN(v)){
+                        toastr.error("输入的数量不是数字格式，保存失败");
+                    }else{
+                        $.post("@Url.Content("~/Item/UpdateApQty")",{sysNo:"@h.sys_no",entryNo:entry_no,qty:v},function(data){
+                            if(data.suc){
+                                dialog.close();
+                                toastr.success("数量修改成功");
+                                $('#tb').bootstrapTable('updateCell',{index: idx, field: 'real_qty', value: v});
+                            }else{
+                                toastr.error(data.msg);
+                            }
+                        });
+                    }
+                    return false;
+                }
+            });   
+
         }
 
         function checkInfo(item_no,item_name,item_modual){
@@ -509,7 +519,6 @@
 </div>
 @section Modal {
     @Html.Partial("_ConfirmDialog")
-    @Html.Partial("_InputDialog")
     @Html.Partial("_MessageDialog")
 
     <div class="modal fade" id="qtyModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">

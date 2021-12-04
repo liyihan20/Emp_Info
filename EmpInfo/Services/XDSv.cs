@@ -156,6 +156,15 @@ namespace EmpInfo.Services
                         (isSuc ? "批准" : "被拒绝"),
                         new List<string>() { bill.applier_num }
                         );
+                    //2021-11-24 吉全要求流程结束后抄送给张锦生
+                    SendQywxMessageToCC(
+                        BillTypeName,
+                        bill.sys_no,
+                        bill.applier_name,
+                        bill.apply_time.ToShortDateString(),
+                        string.Format("部门：{0}；申请时间段：{1}", bill.process_dep, string.Format("{0:yyyy-MM-dd HH:mm} ~ {1:yyyy-MM-dd HH:mm}", bill.time_from, bill.time_to)),
+                        new List<string>() { "080828041" }
+                        );
                 }
                 else {
                     FlowSvrSoapClient flow = new FlowSvrSoapClient();

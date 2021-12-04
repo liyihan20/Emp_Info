@@ -61,7 +61,7 @@
                         for (var key in rows[i]) {
                             if (key != "经营项目") {                                
                                 rows[i][key] = utils.parseDecimalToThousandBit(rows[i][key]);
-                                if (rows[i].经营项目.indexOf("%") >= 0) {
+                                if (rows[i].经营项目 && rows[i].经营项目.indexOf("%") >= 0) {
                                     rows[i][key] += "%";
                                 }                                
                             }

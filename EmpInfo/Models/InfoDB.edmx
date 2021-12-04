@@ -1386,6 +1386,16 @@
           <Property Name="res_no" Type="varchar" MaxLength="20" />
           <Property Name="visit_date" Type="smalldatetime" />
         </EntityType>
+        <EntityType Name="ei_selectUserLog">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_no" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="select_user_no" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="select_user_name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="select_time" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="ei_sjApply">
           <Key>
             <PropertyRef Name="id" />
@@ -1702,6 +1712,7 @@
           <Property Name="supplier_name" Type="nvarchar" MaxLength="200" />
           <Property Name="price" Type="decimal" Precision="12" Scale="2" />
           <Property Name="is_bidder" Type="bit" Nullable="false" />
+          <Property Name="tax_rate" Type="int" />
         </EntityType>
         <EntityType Name="ei_xbApply">
           <Key>
@@ -3480,6 +3491,7 @@
           <EntitySet Name="ei_pushMsg" EntityType="Self.ei_pushMsg" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_PushResponse" EntityType="Self.ei_PushResponse" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_resVisitLog" EntityType="Self.ei_resVisitLog" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ei_selectUserLog" EntityType="Self.ei_selectUserLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_sjApply" EntityType="Self.ei_sjApply" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_sjApplyEntry" EntityType="Self.ei_sjApplyEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ei_spApply" EntityType="Self.ei_spApply" Schema="dbo" store:Type="Tables" />
@@ -4749,6 +4761,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySet Name="ei_xaApply" EntityType="ICAuditModel.ei_xaApply" />
           <EntitySet Name="ei_fxApplyEntry" EntityType="ICAuditModel.ei_fxApplyEntry" />
           <EntitySet Name="ei_fxApplySelfItems" EntityType="ICAuditModel.ei_fxApplySelfItems" />
+          <EntitySet Name="ei_selectUserLog" EntityType="ICAuditModel.ei_selectUserLog" />
           </EntityContainer>
         <EntityType Name="ei_users">
           <Key>
@@ -7754,6 +7767,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="supplier_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
           <Property Name="price" Type="Decimal" Precision="12" Scale="2" />
           <Property Name="is_bidder" Type="Boolean" Nullable="false" />
+          <Property Name="tax_rate" Type="Int32" />
         </EntityType>
         <EntityType Name="all_maxNum">
           <Key>
@@ -8256,6 +8270,16 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <Property Name="out_qty" Type="Int32" Nullable="false" />
           <Property Name="unit_name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
           <Property Name="comment" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="ei_selectUserLog">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_no" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="select_user_no" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="select_user_name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="select_time" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -11072,6 +11096,7 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
           <EntitySetMapping Name="ei_xaApplySupplier">
             <EntityTypeMapping TypeName="ICAuditModel.ei_xaApplySupplier">
               <MappingFragment StoreEntitySet="ei_xaApplySupplier">
+                <ScalarProperty Name="tax_rate" ColumnName="tax_rate" />
                 <ScalarProperty Name="is_bidder" ColumnName="is_bidder" />
                 <ScalarProperty Name="price" ColumnName="price" />
                 <ScalarProperty Name="supplier_name" ColumnName="supplier_name" />
@@ -11560,6 +11585,17 @@ FROM [dbo].[vw_UCReport] AS [vw_UCReport]</DefiningQuery>
                 <ScalarProperty Name="item_name" ColumnName="item_name" />
                 <ScalarProperty Name="entry_id" ColumnName="entry_id" />
                 <ScalarProperty Name="sys_no" ColumnName="sys_no" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ei_selectUserLog">
+            <EntityTypeMapping TypeName="ICAuditModel.ei_selectUserLog">
+              <MappingFragment StoreEntitySet="ei_selectUserLog">
+                <ScalarProperty Name="select_time" ColumnName="select_time" />
+                <ScalarProperty Name="select_user_name" ColumnName="select_user_name" />
+                <ScalarProperty Name="select_user_no" ColumnName="select_user_no" />
+                <ScalarProperty Name="user_no" ColumnName="user_no" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

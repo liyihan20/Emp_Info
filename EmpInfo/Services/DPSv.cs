@@ -265,7 +265,7 @@ namespace EmpInfo.Services
                         bill.applier_name,
                         ((DateTime)bill.apply_time).ToString("yyyy-MM-dd HH:mm"),
                         string.Format("宿舍号：{0}；维修内容：{1}", bill.dorm_num, bill.repair_content),
-                        model.nextAuditors.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList()
+                        model.nextAuditors.Split(new char[] { ';','；' }, StringSplitOptions.RemoveEmptyEntries).ToList()
                         );
                 }
             }

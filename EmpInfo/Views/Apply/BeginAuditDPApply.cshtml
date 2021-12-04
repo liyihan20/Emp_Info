@@ -46,6 +46,7 @@
     <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
     <script src="@Url.Content("~/Scripts/myUploaderPro.js?v=2")"></script>
     <script src="@Url.Content("~/Scripts/myDownloaderPro.js")"></script>
+    <script src="@Url.Content("~/Scripts/myInputDialog.js")"></script>
     <script>
     $("#tb").bootstrapTable({
         striped: true,
@@ -155,14 +156,19 @@
                 }
                 var row=rows[0];
 
-                openInputDialog("请输入需要修改的数量", 
-                    function(content){
-                        if(!utils.testIsInt(content)){
+                $.inputDialog({
+                    title: "修改数量",
+                    controls: [{ text: "数量", name: "qty", defaultValue: row.qty, placeholder: "请录入数量" }],
+                    callback: function (result) {
+                        var v = result.qty;
+                        if(!utils.testIsInt(v)){
                             toastr.error("数量请输入整数");
-                            return;
+                            return false;
                         }
-                        updateItemQty(row.id,content);
-                    }, "修改数量", "取消", "确认",row.qty);
+                        updateItemQty(row.id,v);
+                        return true;
+                    }
+                });
 
             });
 
@@ -923,7 +929,6 @@
 
 @section modal{
     @Html.Partial("_ConfirmDialog")
-    @Html.Partial("_InputDialog")
     <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">

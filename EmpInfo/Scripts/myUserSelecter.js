@@ -35,6 +35,7 @@
                             </table>\
                         </div>\
                         <div class="modal-footer">\
+                            <div class="text-danger small text-left"><i class="fa fa-info-circle"></i> 默认会带出最近已选择的几位员工信息可供选择，如您所需要的员工不在列表中，请在上面搜索</div> \
                             <div class="text-left" id="u_sel_selected_users">\
                                 已选择人员：&nbsp;&nbsp;\
                                 </div>\
@@ -130,6 +131,10 @@
                 return;
             }
             opts.callback(selectedUsers.join(";"));
+
+            //记录已选择的人员
+            $.post("../Item/RecordSelectedUser", { selectInfos: selectedUsers.join(";") }, function (data) { });
+
             $(target).modal("hide");
         });
 
@@ -145,6 +150,16 @@
         $(target).on('hidden.bs.modal', function (e) {
             target.remove();
         });
+
+        //2021-11-26 可带出最近10个已选择的人员出来，这样就不需要再次搜索
+        $.post("../Item/GetSelectedUser", {}, function (data) {
+            if (data.length > 0) {
+                for (var i = 0; i < data.length; i++) {
+                    queryResultArea.append("<tr><td>" + data[i].select_user_no + "</td><td>" + data[i].select_user_name + "</td><td>" + data[i].select_user_dept + "</td><td><button type='button' class='btn btn-xs btn-default'><i class='fa fa-check'></i></button></td></tr>");
+                }
+            }
+        });
+
     }
 
     //对外主接口,调用方式：$.selectUsers(options);

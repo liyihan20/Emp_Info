@@ -48,8 +48,8 @@
 
         $("#reportBt").on("click", function () {
             var obj = utils.getFormObj($("#fm"));
-            if (obj.beginDate == "" || obj.endDate == "") {
-                toastr.error("日期期间必须填写才能查询");
+            if ((obj.fromDate == "" || obj.toDate == "") && (obj.confirmFromDate == "" || obj.confirmToDate == "")) {
+                toastr.error("提交日期期间或确认日期期间必须至少填写一个才能导出");
                 return;
             }
             toastr.info("数据正在导出，请稍等...");
@@ -58,8 +58,8 @@
 
         $("#checkBt").on("click", function () {
             var obj = utils.getFormObj($("#fm"));
-            if (obj.beginDate == "" || obj.endDate == "") {
-                toastr.error("日期期间必须填写才能查询");
+            if ((obj.fromDate == "" || obj.toDate == "") && (obj.confirmFromDate == "" || obj.confirmToDate == "")) {
+                toastr.error("提交日期期间或确认日期期间必须至少填写一个才能查询");
                 return;
             }
 
@@ -168,6 +168,20 @@
                 <div class="col-xs-12 col-sm-6 col-md-4">
                     <div class="lbText">申请人：</div>
                     <input type="text" class="form-control" name="applierName" style="margin:6px 0;" />
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">确认日期从：</div>
+                    <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker2">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" name="confirmFromDate" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="lbText">确认日期到：</div>
+                    <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker2">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input class="form-control" type="text" name="confirmToDate" autocomplete="off" />
+                    </div>
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-4">
                     <div class="lbText">流水号：</div>

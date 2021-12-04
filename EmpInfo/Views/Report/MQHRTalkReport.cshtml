@@ -39,6 +39,7 @@
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myInputDialog.js")"></script>
     <script>
     var currentTr;
     $(function () {
@@ -150,13 +151,17 @@
         });
         
         function UpdateTalkStatus(id, talkResult) {
-            openInputDialog("面谈结果",
-                    function (content) {                        
-                        $.post("SetHRHasTalked", { id: id, talkResult: content }, function (data) {
-                            $("#check_tb").bootstrapTable("updateCellById", { id: id, field: "t_status", value: "面谈完成" });
-                            $("#check_tb").bootstrapTable("updateCellById", { id: id, field: "talk_result", value: content });
-                        });
-                    }, "请在此填写面谈结果", "取消", "确认", talkResult);            
+            $.inputDialog({
+                title: "面谈结果",
+                controls: [{ text: "面谈结果", name: "content", defaultValue: talkResult, placeholder: "请在此填写面谈结果" }],
+                callback: function (result) {
+                    $.post("SetHRHasTalked", { id: id, talkResult: result.content }, function (data) {
+                        $("#check_tb").bootstrapTable("updateCellById", { id: id, field: "t_status", value: "面谈完成" });
+                        $("#check_tb").bootstrapTable("updateCellById", { id: id, field: "talk_result", value: result.content });
+                    });
+                    return true;
+                }
+            });          
         }
 
     </script>
@@ -217,6 +222,3 @@
 
     </div>
 </div>
-@section Modal {
-    @Html.Partial("_InputDialog")
-}

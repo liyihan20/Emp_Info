@@ -44,27 +44,69 @@
 }
 
 @section Scripts {
-    <script src="@Url.Content("~/Scripts/myUserSelecter.js")"></script>
+    <script src="@Url.Content("~/Scripts/myUserSelecter.js?v=2")"></script>
     <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
     <script src="@Url.Content("~/Scripts/myUploaderPro.js?v=2")"></script>
     <script src="@Url.Content("~/Scripts/myUploaderSim.js?v=1")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
     <script src="@Url.Content("~/Scripts/knockout-3.4.0.js")"></script>
+    <script src="@Url.Content("~/Scripts/myItemsSelecter.js")"></script>
+    <script src="@Url.Content("~/Scripts/myInputDialog.js")"></script>
 
     <script>
 
-        $(function(){
-            //选择用户控件
-            $(".selectUser").on("focus", function () {
-                var self = this;
-                $.selectUsers({
-                    userHasSelected: $(self).val(),
-                    callback: function (result) {
-                        $(self).val(result);
-                    }
-                });
+    $(function(){
+        //选择用户控件
+        $(".selectUser").on("focus", function () {
+            var self = this;
+            $.selectUsers({
+                userHasSelected: $(self).val(),
+                callback: function (result) {
+                    $(self).val(result);
+                }
             });
+        });
+
+        //供应商退货的，需到K3选择供应商名称
+        $("#receiver_cop_name").on("focus",function(){
+            var self = this;
+            if("@m.fxType.type_no".indexOf("1.1.1.")==0 || "@m.fxType.type_no".indexOf("2.1.1.")==0){
+
+                var dialog = $.inputDialog({
+                    title:"查询K3供应商",
+                    confirmButtonText:"开始搜索",
+                    controls:[{ text: "供应商", name: "supplierName", defaultValue: $(self).val(), placeholder: "输入供应商编码或名称搜索" }],
+                    callback: function (result) { 
+                        var v=result.supplierName;
+                        if(v.length<=2){
+                            toastr.error("请至少输入3个字符再搜索");
+                        }else{
+                            $.post("../Item/SearchK3Supplier",{searchValue:v},function(data){
+                                if(data.length==0){
+                                    toastr.error("在K3查询不到相关供应商信息");
+                                }else if(data.length==1){
+                                    dialog.close();
+                                    toastr.success("已成功在K3查询到1条供应商记录，设置成功");
+                                    $(self).val(data[0].name);
+                                }else{
+                                    dialog.close();
+                                    toastr.info("查询到多条符合条件的记录，请在列表中选择");
+                                    $.selectItemList({
+                                        items:data,
+                                        titles:[{ field: 'number', title: '供应商编码' },{ field: 'name', title: '供应商名称' }],
+                                        callback:function(s){
+                                            $(self).val(s.name);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        return false;
+                    }
+                });                    
+            }
+        });
 
             //上传附件控件
             $("#myUploader").myUploader({
@@ -75,158 +117,156 @@
                     extensions: '*',
                     mimeTypes: '*'
                 }
-            });
-
-            //上传excel并读取存入表格
-            $("<div></div>").myUploaderSim({
-                server: '../File/BeginUpload',
-                pick: "#excelBt",
-                duplicate: true, //可重复上传
-                accept: {
-                    title: 'MS-EXCEL',
-                    extensions: 'xls,xlsx',
-                    mimeTypes: 'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                },
-                //上传成功后的回调
-                successCallback: function (file,res) {
-                    toastr.success("上传成功！正在读取内容...");
-                    $.post("../File/FXReadExcelData",{sysNum:"@m.sysNo",fileName:file.name},function(data){
-                        if(!data.suc){
-                            toastr.error(data.msg);
-                            return;
-                        }
-                        toastr.success(data.msg);
-
-                        var result = JSON.parse(data.extra);
-                        var idx = 0;
-                        result.map(function(r){r.idx=idx++;});
-
-                        $("#tb").bootstrapTable('load',result);
-
-                    });
-                },
-                //上传之前的验证与设置formdata
-                beforeQueued: function (uploader) {                    
-                    uploader.option("formData", { sysNum:"@m.sysNo" });                    
-                }
-            });
-
         });
 
-        //生成动态选择框控件，例如仓库管理部
-        function GenSelectField(nodeName){
-            $.post("FXGetSelectData",{nodeName:nodeName},function(data){
-                var html='<div class="b-div"><span class="b-label">'+nodeName+':</span><span class="b-input">';
-                html+='<select class="form-control" name="'+nodeName+'" required>';
-                html+='<option value="" data-auditor="">----下拉选择'+nodeName+'----</option>';
-                for(var i=0;i<data.length;i++){
-                    html+='<option value="'+data[i].stringValue+'" data-auditor="'+data[i].extraValue+'">'+data[i].text+'</option>';
-                }
-                html+='</select></span></div>';
-                $("#auditorFields").append(html);
-            });
-        }
-
-        //动态生成用户选择控件，例如采购部、品质部
-        function GenSelectUser(nodeName){
-            var html='<div class="b-div"><span class="b-label">'+nodeName+':</span><span class="b-input">';
-            html+='<input type="text" class="form-control selectUser" name="'+nodeName+'" placeholder="请选择对应审批人" required />';
-            html+='</span></div>';
-            $("#auditorFields").append(html);
-        }
-
-        //动态生成表单控件，例如是否返厂
-        //function GenFormField(nodeNames){
-        //    var html="";
-        //    var nodeNameArr=nodeNames.split(",");
-        //    for(var i = 0;i<nodeNameArr.length;i++){
-        //        var nodeName=nodeNameArr[i];
-        //        if(nodeName.indexOf("是否")>=0){
-        //            html+='<div class="b-div"><span class="b-label">'+nodeName+':</span><span class="b-input">';
-        //            html+='<select class="form-control" name="'+nodeName+'" required>';
-        //            html+='<option value="">----下拉选择----</option>';
-        //            html+='<option value="是">是</option>';
-        //            html+='<option value="否">否</option>';
-        //            html+='</select></span></div>';
-        //        }else{
-        //            //文本类
-        //            html+='<div class="b-div">';
-        //            html+='<span class="b-label">'+nodeName+':</span>';
-        //            html+='<span class="b-input"><input type="text" class="form-control" name="'+nodeName+'" placeholder="填写'+nodeName+'" required /></span>';
-        //        }
-
-        //        $("#fxTypeFields").append(html);
-        //    }
-        //}
-
-        function GenFormField(segs){            
-            var fields=JSON.parse(segs);
-            var fieldNames=[];
-            for(var i = 0;i<fields.length;i++){
-                var html="";
-                if(fields[i].ctype=="select"){
-                    html+='<div class="b-div"><span class="b-label">'+fields[i].name+':</span><span class="b-input">';
-                    html+='<select class="form-control" name="'+fields[i].name+'" '+(fields[i].required?"required":"")+'>';
-                    html+='<option value="">----下拉选择----</option>';
-                    for(var j=0;j<fields[i].options.length;j++){
-                        html+='<option value="'+fields[i].options[j]+'">'+fields[i].options[j]+'</option>';
+        //上传excel并读取存入表格
+        $("<div></div>").myUploaderSim({
+            server: '../File/BeginUpload',
+            pick: "#excelBt",
+            duplicate: true, //可重复上传
+            accept: {
+                title: 'MS-EXCEL',
+                extensions: 'xls,xlsx',
+                mimeTypes: 'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            },
+            //上传成功后的回调
+            successCallback: function (file,res) {
+                toastr.success("上传成功！正在读取内容...");
+                $.post("../File/FXReadExcelData",{sysNum:"@m.sysNo",fileName:file.name},function(data){
+                    if(!data.suc){
+                        toastr.error(data.msg);
+                        return;
                     }
-                    html+='</select></span></div>';
+                    toastr.success(data.msg);
+
+                    var result = JSON.parse(data.extra);
+                    var idx = 0;
+                    result.map(function(r){r.idx=idx++;});
+
+                    $("#tb").bootstrapTable('load',result);
+
+                });
+            },
+            //上传之前的验证与设置formdata
+            beforeQueued: function (uploader) {
+                uploader.option("formData", { sysNum:"@m.sysNo" });
+            }
+        });
+
+    });
+
+    //生成动态选择框控件，例如仓库管理部
+    function GenSelectField(nodeName){
+        $.post("FXGetSelectData",{nodeName:nodeName},function(data){
+            var html='<div class="b-div">\
+                        <span class="b-label">\
+                            '+nodeName+':\
+                        </span>\
+                        <span class="b-input">\
+                            <select class="form-control" name="'+nodeName+'" required>\
+                                <option value="" data-auditor="">----下拉选择'+nodeName+'----</option>';
+            for(var i=0;i<data.length;i++){
+                html+='<option value="'+data[i].stringValue+'" data-auditor="'+data[i].extraValue+'">'+data[i].text+'</option>';
+            }
+            html+='\
+                            </select>\
+                        </span>\
+                    </div>';
+
+            $("#auditorFields").append(html);
+        });
+    }
+
+    //动态生成用户选择控件，例如采购部、品质部
+    function GenSelectUser(nodeName){
+        var html='<div class="b-div">\
+                    <span class="b-label">\
+                        '+nodeName+':\
+                    </span>\
+                    <span class="b-input">\
+                        <input type="text" class="form-control selectUser" name="'+nodeName+'" placeholder="请选择对应审批人" required /> \
+                    </span>\
+                </div>';
+
+        $("#auditorFields").append(html);
+    }
+
+    function GenFormField(segs){
+        var fields=JSON.parse(segs);
+        var fieldNames=[];
+        for(var i = 0;i<fields.length;i++){
+            var html="";
+            if(fields[i].ctype=="select"){
+                html='<div class="b-div"> \
+                        <span class="b-label"> \
+                            '+fields[i].name+':\
+                        </span>\
+                        <span class="b-input">\
+                            <select class="form-control" name="'+fields[i].name+'" '+(fields[i].required?"required":"")+'>\
+                                <option value="">----下拉选择----</option>';
+                for(var j=0;j<fields[i].options.length;j++){
+                    html+='<option value="'+fields[i].options[j]+'">'+fields[i].options[j]+'</option>';
                 }
-                if(fields[i].ctype=="text"){
-                    html+='<div class="b-div">';
-                    html+='<span class="b-label">'+fields[i].name+':</span>';
-                    html+='<span class="b-input"><input type="text" class="form-control" name="'+fields[i].name+'" placeholder="填写'+fields[i].name+'" '+(fields[i].required?"required":"")+' /></span>';
-                }
-                if(html!=""){
-                    $("#fxTypeFields").append(html);
-                    fieldNames.push(fields[i].name);
+                html+='\
+                            </select>\
+                        </span>\
+                    </div>';
+
+            }
+            if(fields[i].ctype=="text"){
+                html+='<div class="b-div">\
+                            <span class="b-label">\
+                                '+fields[i].name+':\
+                            </span>\
+                            <span class="b-input">\
+                                <input type="text" class="form-control '+(fields[i].cls || "")+'" name="'+fields[i].name+'" placeholder="填写'+fields[i].name+'" '+(fields[i].required?"required":"")+' />\
+                            </span>\
+                        </div>';
+
+            }
+            if(html!=""){
+                $("#fxTypeFields").append(html);
+                fieldNames.push(fields[i].name);
+            }
+        }
+        return fieldNames;
+    }
+
+    function FormModel() {
+        var self = this;
+
+        self.takeOutPeopleType = ko.observable(""); //自提的带出人类型
+        self.outerCode = ko.observable("TR-"); //外来人员预约码
+        self.outerName=ko.observable("");
+        self.outerPhone=ko.observable("");
+        self.outerId=ko.observable("");
+        self.outerCar=ko.observable("");
+        self.outerVisitNo=ko.observable("");
+        self.outerHasSelfItems=ko.observable(false);
+
+        self.isSelfTaken = "@m.fxType.type_no".indexOf("2") == 0;//是否自提单
+        self.takeOutPeopleTypes = ["申请人", "信利员工", "驻厂人员", "外来人员"];//带出人类型
+        self.companies = ["光电", "半导体", "电子", "仪器", "工业", "信元", "光电科技"]; //公司
+        self.fromAddrs = ["汕尾信利工业城一厂区","汕尾信利工业城二厂区","汕尾红草厂区"]; //放行厂区
+        self.toScopes = ["集团内","省内", "省外", "港澳台", "国外"]; //范围
+        self.typeDemands = @Html.Raw(m.typeDemands); //业务类型特定要求
+        self.typeDemandFieldNames = []; //保存额外的表单项name
+        self.attDemand=self.typeDemands.filter(function(t){return t.indexOf("附件")>=0}).join(";"); //附件的要求
+
+
+        (function () {
+            //自动生成额外字段
+            if("" != "@m.formSegs"){
+                var formSegs=@Html.Raw(m.formSegs);
+                for(var i=0;i<formSegs.length;i++){
+                    var fieldNames = GenFormField(formSegs[i]);
+                    fieldNames.map(function(f){self.typeDemandFieldNames.push(f);}); //加入到额外的表单项数组
                 }
             }
-            return fieldNames;
-        }
 
-        function FormModel() {
-            var self = this;
-
-            self.takeOutPeopleType = ko.observable(""); //自提的带出人类型
-            self.outerCode = ko.observable("TR-"); //外来人员预约码
-            self.outerName=ko.observable("");
-            self.outerPhone=ko.observable("");
-            self.outerId=ko.observable("");
-            self.outerCar=ko.observable("");
-            self.outerVisitNo=ko.observable("");
-            self.outerHasSelfItems=ko.observable(false);
-
-            self.isSelfTaken = "@m.fxType.type_no".indexOf("2") == 0;//是否自提单
-            self.takeOutPeopleTypes = ["申请人", "信利员工", "驻厂人员", "外来人员"];//带出人类型
-            self.companies = ["光电", "半导体", "电子", "仪器", "工业", "信元", "光电科技"]; //公司
-            self.fromAddrs = ["汕尾信利工业城一厂区","汕尾信利工业城二厂区","汕尾红草厂区"]; //放行厂区
-            self.toScopes = ["集团内","省内", "省外", "港澳台", "国外"]; //范围
-            self.typeDemands = @Html.Raw(m.typeDemands); //业务类型特定要求
-            self.typeDemandFieldNames = []; //保存额外的表单项name
-            self.attDemand=self.typeDemands.filter(function(t){return t.indexOf("附件")>=0}).join(";"); //附件的要求
-            
-
-            (function () {
-                //自动生成额外字段
-                //var formFieldsDemand=self.typeDemands.filter(function(t){return t.indexOf("表单项")>=0});
-                //for(var i = 0; i < formFieldsDemand.length; i++){
-                //    var nodeName = formFieldsDemand[i].replace("：",":").split(":")[1];
-                //    GenFormField(nodeName);
-                //    self.typeDemandFieldNames.push(nodeName);
-                //}
-                if("" != "@m.formSegs"){
-                    var formSegs=@Html.Raw(m.formSegs);
-                    for(var i=0;i<formSegs.length;i++){
-                        var fieldNames = GenFormField(formSegs[i]);
-                        fieldNames.map(function(f){self.typeDemandFieldNames.push(f);}); //加入到额外的表单项数组
-                    }
-                }
-
-                //自动生成审核节点字段
-                var processNodes = "@Html.Raw(m.fxType.type_process)".split(">").filter(function (t) { return t != "部门负责人"; }); //部门负责人不用再次选择，每个流程都有
-                var proInfo = @Html.Raw(m.fxType.process_info);
+            //自动生成审核节点字段
+            var processNodes = "@Html.Raw(m.fxType.type_process)".split(">").filter(function (t) { return t != "部门负责人"; }); //部门负责人不用再次选择，每个流程都有
+            var proInfo = @Html.Raw(m.fxType.process_info);
 
                 for(var i=0;i<processNodes.length;i++){
                     var node = processNodes[i];
@@ -242,155 +282,155 @@
                     }
                 }
 
-            })();
+        })();
 
-            //获取预约码对应的姓名和手机号码
-            self.getOuterCodeInfo=function(){
-                self.outerCode($.trim(self.outerCode().replace("_","-")));
+        //获取预约码对应的姓名和手机号码
+        self.getOuterCodeInfo=function(){
+            self.outerCode($.trim(self.outerCode().replace("_","-")));
 
-                if(self.outerCode().length!=20){
-                    toastr.error("请输入正确的预约码后再查询");
-                    return;
-                }
-
-                $("#getCodeInfoBt").button("loading");
-
-                $.post("../Item/GetOuterPeopleInfo",{code:self.outerCode()},function(data){
-                    $("#getCodeInfoBt").button("reset");
-                    if(!data.suc){
-                        toastr.error(data.msg);
-                        return;
-                    }
-                    toastr.success(data.msg);
-                    var info=JSON.parse(data.extra);
-                    self.outerName(info.FName);
-                    self.outerPhone(info.FPhone);
-                    self.outerId(info.FCodeId);
-                    self.outerCar(info.FCarNo);
-                    self.outerVisitNo(info.FNO);
-                    self.outerHasSelfItems(info.items.length>0);
-
-                    $("#tb2").bootstrapTable("load",info.items);
-                });
-            };
-
-            self.clearOuterCodeInfo=function(){
-                self.outerName("");
-                self.outerPhone("");
-                self.outerId("");
-                self.outerCar("");
-                self.outerVisitNo("");
-                self.outerHasSelfItems(false);
-                $("#tb2").bootstrapTable("load",[]);
-
-                return true;
+            if(self.outerCode().length!=20){
+                toastr.error("请输入正确的预约码后再查询");
+                return;
             }
 
-            //开始提交申请
-            self.beginApply = function(){
+            $("#getCodeInfoBt").button("loading");
 
-                var validateInfo = utils.validateRequiredField($("#fm"));
-                if(!validateInfo.suc){
-                    toastr.error(validateInfo.msg);
+            $.post("../Item/GetOuterPeopleInfo",{code:self.outerCode()},function(data){
+                $("#getCodeInfoBt").button("reset");
+                if(!data.suc){
+                    toastr.error(data.msg);
                     return;
                 }
+                toastr.success(data.msg);
+                var info=JSON.parse(data.extra);
+                self.outerName(info.FName);
+                self.outerPhone(info.FPhone);
+                self.outerId(info.FCodeId);
+                self.outerCar(info.FCarNo);
+                self.outerVisitNo(info.FNO);
+                self.outerHasSelfItems(info.items.length>0);
 
-                var obj=utils.getFormObj($("#fm"));
+                $("#tb2").bootstrapTable("load",info.items);
+            });
+        };
 
-                if(!utils.testIsInt(obj.total_pack_num)){
-                    toastr.error("件数必须填写整数");
-                    return;
-                }else if(parseInt(obj.total_pack_num)<1){
-                    toastr.error("件数必须不少于1件");
-                    return;
-                }
+        self.clearOuterCodeInfo=function(){
+            self.outerName("");
+            self.outerPhone("");
+            self.outerId("");
+            self.outerCar("");
+            self.outerVisitNo("");
+            self.outerHasSelfItems(false);
+            $("#tb2").bootstrapTable("load",[]);
 
-                var other_segs = [];
-                for(var i=0;i<self.typeDemandFieldNames.length;i++){
-                    other_segs.push({
-                        n:self.typeDemandFieldNames[i],
-                        v:obj[self.typeDemandFieldNames[i]]
-                    })
-                }
+            return true;
+        }
 
-                var auditor_segs=[];
-                var busAuditor={};
-                busAuditor.stepName="部门负责人";
-                var bus=$("select[name='bus_name'] option:selected");
-                busAuditor.auditor = $(bus).attr("data-auditor");
-                auditor_segs.push(busAuditor);
+        //开始提交申请
+        self.beginApply = function(){
 
-                $("#auditorFields select").each(function(idx,ele){
-                    var selectAuditor={};
-                    selectAuditor.stepName=$(ele).attr("name");
-                    selectAuditor.auditor=$($(ele).find("option:selected")).attr("data-auditor");
+            var validateInfo = utils.validateRequiredField($("#fm"));
+            if(!validateInfo.suc){
+                toastr.error(validateInfo.msg);
+                return;
+            }
 
-                    auditor_segs.push(selectAuditor);
-                });
+            var obj=utils.getFormObj($("#fm"));
 
-                $("#auditorFields input").each(function(idx,ele){
-                    var inputAuditor={};
-                    inputAuditor.stepName=$(ele).attr("name");
-                    inputAuditor.auditor="";
-                    var auditors=$(ele).val().split(";").filter(function(a){return a!="";});
+            if(!utils.testIsInt(obj.total_pack_num)){
+                toastr.error("件数必须填写整数");
+                return;
+            }else if(parseInt(obj.total_pack_num)<1){
+                toastr.error("件数必须不少于1件");
+                return;
+            }
 
-                    for(var i=0;i<auditors.length;i++){
-                        if(i>0){
-                            inputAuditor.auditor+=";";
-                        }
-                        inputAuditor.auditor+=auditors[i].match(/.*\((.+)\)/)[1];
+            var other_segs = [];
+            for(var i=0;i<self.typeDemandFieldNames.length;i++){
+                other_segs.push({
+                    n:self.typeDemandFieldNames[i],
+                    v:obj[self.typeDemandFieldNames[i]]
+                })
+            }
+
+            var auditor_segs=[];
+            var busAuditor={};
+            busAuditor.stepName="部门负责人";
+            var bus=$("select[name='bus_name'] option:selected");
+            busAuditor.auditor = $(bus).attr("data-auditor");
+            auditor_segs.push(busAuditor);
+
+            $("#auditorFields select").each(function(idx,ele){
+                var selectAuditor={};
+                selectAuditor.stepName=$(ele).attr("name");
+                selectAuditor.auditor=$($(ele).find("option:selected")).attr("data-auditor");
+
+                auditor_segs.push(selectAuditor);
+            });
+
+            $("#auditorFields input").each(function(idx,ele){
+                var inputAuditor={};
+                inputAuditor.stepName=$(ele).attr("name");
+                inputAuditor.auditor="";
+                var auditors=$(ele).val().split(";").filter(function(a){return a!="";});
+
+                for(var i=0;i<auditors.length;i++){
+                    if(i>0){
+                        inputAuditor.auditor+=";";
                     }
-                    auditor_segs.push(inputAuditor);
-                });
-
-                obj.other_segs=JSON.stringify(other_segs);
-                obj.auditor_segs=JSON.stringify(auditor_segs);
-
-                obj.has_attachment = parseInt($("#myUploader").getMyUploaderFilesNum()) > 0;
-
-                if(!obj.has_attachment && self.attDemand!=""){
-                    toastr.error(self.attDemand);
-                    return;
+                    inputAuditor.auditor+=auditors[i].match(/.*\((.+)\)/)[1];
                 }
+                auditor_segs.push(inputAuditor);
+            });
 
-                console.log(obj);
+            obj.other_segs=JSON.stringify(other_segs);
+            obj.auditor_segs=JSON.stringify(auditor_segs);
 
-                var entrys = $("#tb").bootstrapTable('getData');
-                var items = $("#tb2").bootstrapTable('getData');
-                
-                if (entrys.length < 1 && items.length < 1) {
-                    toastr.error("请至少填写一行物品明细再提交");
-                    return;
-                }
+            obj.has_attachment = parseInt($("#myUploader").getMyUploaderFilesNum()) > 0;
 
-                console.log(entrys);
+            if(!obj.has_attachment && self.attDemand!=""){
+                toastr.error(self.attDemand);
+                return;
+            }
 
-                openConfirmDialog("确定要提交申请吗？", function () {
-                    $("#apply_bt").button("loading");
-                    $.ajax({
-                        type: 'post',
-                        url: '../Apply/SaveApply',
-                        data: "sys_no=" + obj.sys_no + "&head=" + utils.StringifyAndParseCharacter(obj) + "&entrys=" + utils.StringifyAndParseCharacter(entrys)+"&items="+utils.StringifyAndParseCharacter(items),
-                        cache: false,
-                        dataType: 'json',
-                        success: function (data) {
+            console.log(obj);
+
+            var entrys = $("#tb").bootstrapTable('getData');
+            var items = $("#tb2").bootstrapTable('getData');
+
+            if (entrys.length < 1 && items.length < 1) {
+                toastr.error("请至少填写一行物品明细再提交");
+                return;
+            }
+
+            console.log(entrys);
+
+            openConfirmDialog("确定要提交申请吗？", function () {
+                $("#apply_bt").button("loading");
+                $.ajax({
+                    type: 'post',
+                    url: '../Apply/SaveApply',
+                    data: "sys_no=" + obj.sys_no + "&head=" + utils.StringifyAndParseCharacter(obj) + "&entrys=" + utils.StringifyAndParseCharacter(entrys)+"&items="+utils.StringifyAndParseCharacter(items),
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        $("#apply_bt").button("reset");
+                        if (data.suc) {
+                            toastr.success("提交成功:" + data.msg);
+                            setTimeout(function () { window.location.href = "../Apply/CheckApply?sysNo=" + obj.sys_no; }, 2000);
+                        } else {
+                            toastr.error("提交失败：" + data.msg);
                             $("#apply_bt").button("reset");
-                            if (data.suc) {
-                                toastr.success("提交成功:" + data.msg);
-                                setTimeout(function () { window.location.href = "../Apply/CheckApply?sysNo=" + obj.sys_no; }, 2000);
-                            } else {
-                                toastr.error("提交失败：" + data.msg);
-                                $("#apply_bt").button("reset");
-                            }
-
                         }
-                    });
-                });
 
-            }
+                    }
+                });
+            });
 
         }
-        ko.applyBindings(new FormModel());
+
+    }
+    ko.applyBindings(new FormModel());
     </script>
 
     <script>
@@ -532,25 +572,31 @@
                 var row = rows[0];
                 var updateIndex = row.entry_id;
 
+                $.inputDialog({
+                    title:"录入出厂数量",
+                    confirmButtonText:"确认修改",
+                    controls:[{ text: "出厂数量", name: "outQty", defaultValue: row.out_qty, placeholder: "请录入实际出厂数量" }],
+                    callback: function (result) { 
+                        var v=result.outQty;
+                        if(!utils.testIsInt(v)){
+                            toastr.error("必须录入整数");
+                            return false;
+                        }
+                        if(parseInt(v)<0){
+                            toastr.error("不能录入负数");
+                            return false;
+                        }
+                        if(parseInt(v)>row.in_qty){
+                            toastr.error("出厂数量不能大于入厂数量");
+                            return false;
+                        }
 
-                openInputDialog("录入出厂数量：", function(v){
-                    if(!utils.testIsInt(v)){
-                        toastr.error("必须录入整数");
-                        return;
+                        row.out_qty = v;
+                        $("#tb2").bootstrapTable('updateByUniqueId', { id: updateIndex, row: row });
+                        return true;
                     }
-                    if(parseInt(v)<0){
-                        toastr.error("不能录入负数");
-                        return;
-                    }
-                    if(parseInt(v)>row.in_qty){
-                        toastr.error("出厂数量不能大于入厂数量");
-                        return;
-                    }
+                });
 
-                    row.out_qty = v;
-                    $("#tb2").bootstrapTable('updateByUniqueId', { id: updateIndex, row: row });
-
-                }, "修改出厂数量", "取消", "确认修改",row.out_qty);
             });
 
         });
@@ -660,7 +706,7 @@
                     收货公司全称:
                 </span>
                 <span class="b-input">
-                    <input type="text" class="form-control" name="receiver_cop_name" placeholder="请填写最终收货公司完整名称，不能简写" required />
+                    <input type="text" class="form-control" name="receiver_cop_name" id="receiver_cop_name" placeholder="请填写最终收货公司完整名称，不能简写" required />
                 </span>
             </div>
             <div class="b-div">
@@ -868,7 +914,6 @@
 
 @section Modal {
     @Html.Partial("_ConfirmDialog")
-    @Html.Partial("_InputDialog")
     <div class="modal fade" id="itemModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

@@ -14,6 +14,7 @@
     <script src="@Url.Content("~/Scripts/myUploaderPro.js?v=2")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Scripts/myInputDialog.js")"></script>
     <script>
 
         $(function () {
@@ -188,25 +189,31 @@
                                 var row = rows[0];
                                 var updateIndex = row.entry_id;
 
+                                $.inputDialog({
+                                    title: "录入出厂数量",
+                                    confirmButtonText: "确认修改",
+                                    controls: [{ text: "出厂数量", name: "outQty", defaultValue: row.out_qty, placeholder: "请录入实际出厂数量" }],
+                                    callback: function (result) {
+                                        var v = result.outQty;
+                                        if (!utils.testIsInt(v)) {
+                                            toastr.error("必须录入整数");
+                                            return false;
+                                        }
+                                        if (parseInt(v) < 0) {
+                                            toastr.error("不能录入负数");
+                                            return false;
+                                        }
+                                        if (parseInt(v) > row.in_qty) {
+                                            toastr.error("出厂数量不能大于入厂数量");
+                                            return false;
+                                        }
 
-                                openInputDialog("录入出厂数量：", function (v) {
-                                    if (!utils.testIsInt(v)) {
-                                        toastr.error("必须录入整数");
-                                        return;
+                                        row.out_qty = v;
+                                        $("#tb3").bootstrapTable('updateByUniqueId', { id: updateIndex, row: row });
+                                        return true;
                                     }
-                                    if (parseInt(v) < 0) {
-                                        toastr.error("不能录入负数");
-                                        return;
-                                    }
-                                    if (parseInt(v) > row.in_qty) {
-                                        toastr.error("出厂数量不能大于入厂数量");
-                                        return;
-                                    }
-
-                                    row.out_qty = v;
-                                    $("#tb3").bootstrapTable('updateByUniqueId', { id: updateIndex, row: row });
-
-                                }, "修改出厂数量", "取消", "确认修改", row.out_qty);
+                                });
+                                
                             });
 
                         });
@@ -346,7 +353,10 @@
                 <div style="margin-top:12px;"></div>
 
                 if (bam.stepName.Contains("返厂")) {
-                    <button type="button" class="btn btn-block btn-success" onclick="audit(true)">同意</button>
+                    <button type="button" class="btn btn-block btn-success" onclick="audit(true)">@bam.stepName</button>
+                }
+                else if (bam.stepName.Contains("接收确认")) {
+                    <button type="button" class="btn btn-block btn-success" onclick="audit(true)">实物确认已接收</button>
                 }
                 else {
                     <div class="btn-group btn-group-justified" role="group">                        
@@ -357,6 +367,7 @@
                             <button type="button" class="btn btn-success" onclick="audit(true)">同意</button>
                         </div>
                     </div>
+                
                 }
             }
             else {
@@ -374,5 +385,4 @@
 @section Modal {
     @Html.Partial("_MessageDialog")
     @Html.Partial("_ConfirmDialog")
-    @Html.Partial("_InputDialog")
 }

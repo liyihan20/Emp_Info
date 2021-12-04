@@ -102,7 +102,7 @@
         target.find(".modal-title").html("选择K3物料/产品(公司：" + opts.company + "）");
         $(target).modal("show");
 
-        // 对话框打开之后，输入框自动获取焦点
+        //对话框打开之后，输入框自动获取焦点
         $(target).on('shown.bs.modal', function (e) {
             queryBox.focus();
             $(queryBox).val(opts.itemModel);

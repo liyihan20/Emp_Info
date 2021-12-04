@@ -102,5 +102,11 @@ namespace EmpInfo.Services
             return list;
         }
 
+        //搜索所有总部帐套的供应商信息
+        public List<K3AccountModel> SearchK3Supplier(string searchValue)
+        {
+            return db.Database.SqlQuery<K3AccountModel>("exec SearchK3Suppier @searchValue = {0}", searchValue).ToList();
+        }
+
     }
 }

@@ -172,6 +172,7 @@ namespace EmpInfo.Models
         public DbSet<ei_xaApply> ei_xaApply { get; set; }
         public DbSet<ei_fxApplyEntry> ei_fxApplyEntry { get; set; }
         public DbSet<ei_fxApplySelfItems> ei_fxApplySelfItems { get; set; }
+        public DbSet<ei_selectUserLog> ei_selectUserLog { get; set; }
     
         public virtual ObjectResult<string> GetDormChargeMonth()
         {

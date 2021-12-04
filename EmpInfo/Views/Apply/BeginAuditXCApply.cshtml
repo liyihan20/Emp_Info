@@ -33,6 +33,7 @@
     <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
     <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
     <script src="@Url.Content("~/Scripts/myUploaderPro.js?v=2")"></script>
+    <script src="@Url.Content("~/Scripts/myInputDialog.js")"></script>
     <script>
         $(function () {
             if ($("#myUploader1").length > 0) {
@@ -226,27 +227,33 @@
                         return;
                     }
                     var row = rows[0];
-                    openInputDialog("请输入单价（型号："+row.product_model+"；数量："+row.qty+"）：",function(v){
-                        if(!utils.testIsFloat(v,4)){
-                            toastr.error("请录入数字，且小数位不超过4位");
-                            return;
+
+                    $.inputDialog({
+                        title:"价钱输入",
+                        controls:[{ text: "单价", name: "price", defaultValue: row.unit_price, placeholder: "请输入单价（型号："+row.product_model+"；数量："+row.qty+"）" }],
+                        callback: function (result) {
+                            var v=result.price;
+                            if(!utils.testIsFloat(v,4)){
+                                toastr.error("请录入数字，且小数位不超过4位");
+                                return false;
+                            }
+
+                            validatePrice(row.product_no,v,function(){
+                                $.post("../ApplyExtra/XCSavePrice",{sysNo:"@bam.sysNum",entryId:row.entry_id,price:v},function(data){
+                                    if(data.suc){
+                                        $('#tb2').bootstrapTable('updateByUniqueId',{
+                                            id:row.entry_id,
+                                            row:{unit_price:v,total_price:(v * row.qty).toFixed(4)}
+                                        });
+                                    }else{
+                                        toastr.error(data.msg);                                    
+                                    }
+                                });                            
+                            });
+                            return true;
                         }
+                    });
 
-                        validatePrice(row.product_no,v,function(){
-                            $.post("../ApplyExtra/XCSavePrice",{sysNo:"@bam.sysNum",entryId:row.entry_id,price:v},function(data){
-                                if(data.suc){
-                                    $('#tb2').bootstrapTable('updateByUniqueId',{
-                                        id:row.entry_id,
-                                        row:{unit_price:v,total_price:(v * row.qty).toFixed(4)}
-                                    });
-                                }else{
-                                    toastr.error(data.msg);                                    
-                                }
-                            })
-                            
-                        });
-
-                    },"单价录入","取消","确定",row.unit_price);
 
                 });
 
@@ -721,5 +728,4 @@
     </div>*@
 
     @Html.Partial("_ConfirmDialog")
-    @Html.Partial("_InputDialog")
 }

@@ -11,6 +11,7 @@
     <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
     <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/myInputDialog.js")"></script>
     <script>
         $("#applyTb").bootstrapTable({
             data:@Html.Raw(json),
@@ -82,9 +83,16 @@
                 });
             }
             function AbortApplyAfterFinish(sysNo) {
-                openInputDialog("请输入撤销请假申请的原因：", function (reason) {
-                    AbortApply(sysNo, reason);
-                },"撤销原因输入");
+                $.inputDialog({
+                    title: "撤销原因输入",
+                    controls: [{ text: "原因", name: "reason", defaultValue: "", placeholder: "请输入撤销请假申请的原因" }],
+                    callback: function (result) {
+                        var v = result.reason;
+                        AbortApply(sysNo, v);
+                        return true;
+                    }
+                });
+
             }
         </script>
     }
@@ -108,5 +116,4 @@
     </div>
     @section modal{
         @Html.Partial("_ConfirmDialog")
-        @Html.Partial("_InputDialog")
     }

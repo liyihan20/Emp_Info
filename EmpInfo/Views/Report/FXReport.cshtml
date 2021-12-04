@@ -129,6 +129,8 @@
                             return { css: { color: 'red' } };
                         } else if (value == "已放行") {
                             return { css: { color: 'blue' } };
+                        } else if (value == "已返厂已确认" || value == "已放行已接收") {
+                            return { css: { color: 'darkmagenta' } };
                         }
                         else {
                             return { css: { color: '#333' } };

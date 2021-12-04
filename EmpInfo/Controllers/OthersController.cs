@@ -240,10 +240,10 @@ namespace EmpInfo.Controllers
                 sqltext += @"union all
                         select 
 	                        '项目单' as [类别],t1.project_type as [项目],t1.project_name as [名称],isnull(t2.price,0) as [金额],
-                            t1.addr as [摘要],convert(varchar(10),t1.confirm_date,23) as [结算日期]
+                            (t1.sys_no + ':' + t1.addr) as [摘要],convert(varchar(10),t1.confirm_date,23) as [结算日期]
                         from ei_xaApply t1
                         inner join ei_xaApplySupplier t2 on t1.sys_no = t2.sys_no and t2.is_bidder = 1
-                        where t1.confirm_date is not null and t1.dept_name='后勤部'";
+                        where t1.confirm_date is not null and t1.dept_name like '后勤部%'";
                 sqltext += string.Format(" and t1.confirm_date >= '{0:yyyy-MM-dd}' and t1.confirm_date < '{1:yyyy-MM-dd}'", fromDate, toDate);
             }
             else if (new string[] { "辅料类", "设备类" }.Contains(chargeType)) {
@@ -510,6 +510,139 @@ namespace EmpInfo.Controllers
                 return Json(new SimpleResultModel(ex));
             }            
 
+        }
+
+        #endregion
+
+
+        #region 市场部接单汇总查询
+
+        public ActionResult MarketingReport()
+        {
+            if (db.ei_flowAuthority.Where(f => f.bill_type == "MarketingR" && f.relate_value == userInfo.cardNo && f.relate_type == "查看报表").Count() < 1) {
+                return View("Warn");
+            }
+            return View();
+        }
+
+        public JsonResult GetMarketingReportData(DateTime fromDate,DateTime toDate)
+        {
+            var result = new List<MarketingData>();
+            try {
+                result = db.Database.SqlQuery<MarketingData>("exec [192.168.100.205].[truly_data].dbo.tpro_k3_sale_sum @sdate={0},@edate={1}", fromDate, toDate).ToList();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+
+            result.ForEach(r=>{
+                r.profit = r.sale_sum - r.cost_sum;
+                if (r.cost_sum != 0) {
+                    r.profit_rate = Math.Round((r.profit * 100) / r.cost_sum, 6) + "%";
+                }
+            });
+
+            MarketingData md = new MarketingData();
+            md.dept_name = "合计：";
+            md.fqty = result.Sum(r => r.fqty);
+            md.cost_sum = result.Sum(r => r.cost_sum);
+            md.sale_sum = result.Sum(r => r.sale_sum);
+            md.profit = result.Sum(r => r.profit);
+            if (md.cost_sum != 0) {
+                md.profit_rate = Math.Round((md.profit * 100) / md.cost_sum, 6) + "%";
+            }
+
+            result.Add(md);
+            return Json(new SimpleResultModel(true, "", JsonConvert.SerializeObject(result)));
+        }
+
+        public class MarketingData
+        {
+            public string dept_name { get; set; }
+            public decimal fqty { get; set; }
+            public decimal cost_sum { get; set; }
+            public decimal sale_sum { get; set; }
+            public decimal profit { get; set; }
+            public string profit_rate { get; set; }
+        }
+
+
+        #endregion
+
+        #region 采购部开出PO汇总查询
+
+        public ActionResult PurchasingReport()
+        {
+            if (db.ei_flowAuthority.Where(f => f.bill_type == "PurR" && f.relate_value == userInfo.cardNo && f.relate_type == "查看报表").Count() < 1) {
+                return View("Warn");
+            }
+            return View();
+        }
+
+        public JsonResult GetPurchasingReportData(DateTime fromDate, DateTime toDate)
+        {
+            var result = new List<PurchasingData>();
+            try {
+                result = db.Database.SqlQuery<PurchasingData>("exec [192.168.100.205].[truly_data].dbo.tpro_k3_PO_sum @sdate={0},@edate={1}", fromDate, toDate).ToList();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+
+            PurchasingData pd = new PurchasingData();
+            pd.dept_name = "合计：";
+            pd.po_sum = result.Sum(r => r.po_sum);
+            pd.ww_sum = result.Sum(r => r.ww_sum);
+
+            result.Add(pd);
+
+            return Json(new SimpleResultModel(true, "", JsonConvert.SerializeObject(result)));
+        }
+
+
+        public class PurchasingData
+        {
+            public string dept_name { get; set; }
+            public decimal po_sum { get; set; }
+            public decimal ww_sum { get; set; }
+        }
+
+        #endregion
+
+        #region 会计部付款汇总查询
+
+        public ActionResult AccountingReport()
+        {
+            if (db.ei_flowAuthority.Where(f => f.bill_type == "AccR" && f.relate_value == userInfo.cardNo && f.relate_type == "查看报表").Count() < 1) {
+                return View("Warn");
+            }
+            return View();
+        }
+
+        public JsonResult GetAccountingReportData(DateTime fromDate, DateTime toDate)
+        {
+            var result = new List<AccountingData>();
+            try {
+                result = db.Database.SqlQuery<AccountingData>("exec [192.168.100.205].[truly_data].dbo.tpro_pay_sum @sdate={0},@edate={1}", fromDate, toDate).ToList();
+            }
+            catch (Exception ex) {
+                return Json(new SimpleResultModel(ex));
+            }
+
+            AccountingData ad = new AccountingData();
+            ad.公司 = "合计：";
+            ad.付款金额 = result.Sum(r => r.付款金额);
+
+            result.Add(ad);
+            return Json(new SimpleResultModel(true, "", JsonConvert.SerializeObject(result)));
+        }
+
+
+        public class AccountingData
+        {
+            public string 公司 { get; set; }
+            public string 币别 { get; set; }
+            public decimal 付款金额 { get; set; }
         }
 
         #endregion

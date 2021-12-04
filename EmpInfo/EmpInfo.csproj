@@ -455,6 +455,9 @@
     <Compile Include="Models\ei_resVisitLog.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ei_selectUserLog.cs">
+      <DependentUpon>InfoDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ei_sjApply.cs">
       <DependentUpon>InfoDB.tt</DependentUpon>
     </Compile>
@@ -1088,6 +1091,7 @@
     <Content Include="Content\images\office.png" />
     <Content Include="Content\images\paint.png" />
     <Content Include="Content\images\paper.png" />
+    <Content Include="Content\images\pay.png" />
     <Content Include="Content\images\post.png" />
     <Content Include="Content\images\PO_48.png" />
     <Content Include="Content\images\admin.png" />
@@ -1107,6 +1111,7 @@
     <Content Include="Content\images\pp.png" />
     <Content Include="Content\images\public_fund.png" />
     <Content Include="Content\images\purchase.png" />
+    <Content Include="Content\images\purchasing.png" />
     <Content Include="Content\images\quit.png" />
     <Content Include="Content\images\qywx.png" />
     <Content Include="Content\images\rc.png" />
@@ -1137,6 +1142,7 @@
     <Content Include="Content\images\xc.png" />
     <Content Include="Content\images\xd.png" />
     <Content Include="Content\login.css" />
+    <Content Include="Content\prettyPhoto.css" />
     <Content Include="Content\select2.min.css" />
     <Content Include="Content\skins\all.css" />
     <Content Include="Content\skins\flat\aero%402x.png" />
@@ -1472,13 +1478,17 @@
     <Content Include="Scripts\echarts.simple.min.js" />
     <Content Include="Scripts\html5shiv.min.js" />
     <Content Include="Scripts\icheck.js" />
+    <Content Include="Scripts\ICqywxJs3.js" />
     <Content Include="Scripts\ICqywxJs2.js" />
     <Content Include="Scripts\ICqywxJs.js" />
+    <Content Include="Scripts\jquery.prettyPhoto.js" />
+    <Content Include="Scripts\jquery.prettyPhoto_full.js" />
     <Content Include="Scripts\jweixin-1.2.0.js" />
     <Content Include="Scripts\myDownloaderPro.js" />
     <Content Include="Scripts\myItemsSelecter.js" />
     <Content Include="Scripts\myUploaderSim.js" />
     <Content Include="Scripts\myK3ItemSelecter.js" />
+    <Content Include="Scripts\myInputDialog.js" />
     <Content Include="Scripts\myUserSelecter.js" />
     <Content Include="Scripts\myUploaderPro.js" />
     <Content Include="Scripts\myUploader.js" />
@@ -1803,6 +1813,9 @@
     <Content Include="Views\ApplyExtra\FXGuardScanResult.cshtml" />
     <Content Include="Views\ApplyExtra\CheckMyScannedList.cshtml" />
     <Content Include="Views\Report\FXSummary.cshtml" />
+    <Content Include="Views\Others\MarketingReport.cshtml" />
+    <Content Include="Views\Others\PurchasingReport.cshtml" />
+    <Content Include="Views\Others\AccountingReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

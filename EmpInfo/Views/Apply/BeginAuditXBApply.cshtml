@@ -42,6 +42,7 @@
     
     <script src="@Url.Content("~/Scripts/webuploader.min.js")"></script>
     <script src="@Url.Content("~/Scripts/myUploaderPro.js")"></script>
+    <script src="@Url.Content("~/Scripts/myInputDialog.js")"></script>
 
     <script>
         $(function () {
@@ -220,82 +221,97 @@
 
     @if(bam.stepName.Contains("采购部接单")){
         <script>
-            setTimeout(function(){
-            $(function(){
-                $.getScript("@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")",function(){                
-                    $("#tb").bootstrapTable({
-                        data:@Html.Raw(itemsJson),
-                        striped: true,
-                        clickToSelect: true,
-                        idField: "id",
-                        uniqueId: "id",
-                        columns: [
-                            {
-                                radio: true
-                            },
-                            {
-                                field: "supplier_name",
-                                title: "供应商名称"
-                            }
-                        ]
-                    });
-                    $("#addBt").on("click",function(){
-                        openInputDialog("请输入供应商名称",
-                            function(content){
-                                $.post("../ApplyExtra/AddXASpplier",{sysNo:"@bam.sysNum",supplierName:content},function(data){
-                                    if(data.suc){
-                                        $("#tb").bootstrapTable('append', JSON.parse(data.extra));
-                                    }else{
-                                        toastr.error(data.msg);
-                                    }
-                                });
-                            }, "新增供应商");
-                    });
-
-                    $("#editBt").on("click",function(){
-                        var rows = $('#tb').bootstrapTable('getSelections');
-                        if (rows.length == 0) {
-                            toastr.error("请先选择一行后再修改");
-                            return;
+    setTimeout(function(){
+        $(function(){
+            $.getScript("@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")",function(){
+                $("#tb").bootstrapTable({
+                    data:@Html.Raw(itemsJson),
+                    striped: true,
+                    clickToSelect: true,
+                    idField: "id",
+                    uniqueId: "id",
+                    columns: [
+                        {
+                            radio: true
+                        },
+                        {
+                            field: "supplier_name",
+                            title: "供应商名称"
                         }
-                        var row=rows[0];
-                        console.log(row);
-                        openInputDialog("请输入新的供应商名称",
-                            function(content){
-                                $.post("../ApplyExtra/UpdateXASupplierName",{id:row.id,supplierName:content},function(data){
-                                    if(data.suc){
-                                        $("#tb").bootstrapTable('updateByUniqueId',{
-                                            id:row.id,
-                                            row:{supplier_name:content}
-                                        });
-                                    }else{
-                                        toastr.error(data.msg);
-                                    }
-                                });
-                            }, "修改供应商", "取消", "确认",row.supplier_name);
-                    });
+                    ]
+                });
+                $("#addBt").on("click",function(){
 
-                    $("#removeBt").on("click",function(){
-                        var rows = $('#tb').bootstrapTable('getSelections');
-                        if (rows.length == 0) {
-                            toastr.error("请先选择一行后再删除");
-                            return;
-                        }
-                        var row=rows[0];
-
-                        openConfirmDialog("确认要删除此供应商吗", function () {
-                            $.post("../ApplyExtra/RemoveXASupplier",{id:row.id},function(data){
+                    var dialog = $.inputDialog({
+                        title:"新增供应商",
+                        controls:[{ text: "供应商", name: "supplier", defaultValue: "", placeholder: "请输入供应商名称" }],
+                        callback: function (result) {
+                            var v=result.supplier;
+                            $.post("../ApplyExtra/AddXASpplier",{sysNo:"@bam.sysNum",supplierName:v},function(data){
                                 if(data.suc){
-                                    $("#tb").bootstrapTable('removeByUniqueId',row.id);
+                                    dialog.close();
+                                    $("#tb").bootstrapTable('append', JSON.parse(data.extra));
                                 }else{
                                     toastr.error(data.msg);
                                 }
                             });
+                            return false;
+                        }
+                    });
+
+                });
+
+                $("#editBt").on("click",function(){
+                    var rows = $('#tb').bootstrapTable('getSelections');
+                    if (rows.length == 0) {
+                        toastr.error("请先选择一行后再修改");
+                        return;
+                    }
+                    var row=rows[0];
+                    console.log(row);
+
+                    var dialog = $.inputDialog({
+                        title:"修改供应商",
+                        controls:[{ text: "供应商", name: "supplier", defaultValue: row.supplier_name, placeholder: "请输入供应商名称" }],
+                        callback: function (result) {
+                            var v=result.supplier;
+                            $.post("../ApplyExtra/UpdateXASupplierName",{id:row.id,supplierName:v},function(data){
+                                if(data.suc){
+                                    dialog.close();
+                                    $("#tb").bootstrapTable('updateByUniqueId',{
+                                        id:row.id,
+                                        row:{supplier_name:v}
+                                    });
+                                }else{
+                                    toastr.error(data.msg);
+                                }
+                            });
+                            return false;
+                        }
+                    });
+                });
+
+                $("#removeBt").on("click",function(){
+                    var rows = $('#tb').bootstrapTable('getSelections');
+                    if (rows.length == 0) {
+                        toastr.error("请先选择一行后再删除");
+                        return;
+                    }
+                    var row=rows[0];
+
+                    openConfirmDialog("确认要删除此供应商吗", function () {
+                        $.post("../ApplyExtra/RemoveXASupplier",{id:row.id},function(data){
+                            if(data.suc){
+                                $("#tb").bootstrapTable('removeByUniqueId',row.id);
+                            }else{
+                                toastr.error(data.msg);
+                            }
                         });
                     });
                 });
             });
-            },500);
+        });
+    },500);
         </script>
     }
     else if (bam.stepName.Contains("采购部报价")) {
@@ -333,23 +349,26 @@
                         }
                         var row=rows[0];
                         console.log(row);
-                        openInputDialog("请输入价钱",
-                            function(content){
-                                if(!utils.testIsFloat(content,2)){
-                                    toastr.error("价钱请输入数字，最多支持2位小数");
-                                    return;
-                                }
-                                $.post("../ApplyExtra/UpdateXASupplierPrice",{id:row.id,price:content},function(data){
+
+                        var dialog = $.inputDialog({
+                            title:"价钱输入",
+                            controls:[{ text: "价钱", name: "price", defaultValue: row.price, placeholder: "价钱请输入数字，最多支持2位小数" }],
+                            callback: function (result) {
+                                var v=result.price;
+                                $.post("../ApplyExtra/UpdateXASupplierPrice",{id:row.id,price:v},function(data){
                                     if(data.suc){
+                                        dialog.close();
                                         $("#tb2").bootstrapTable('updateByUniqueId',{
                                             id:row.id,
-                                            row:{price:content}
+                                            row:{price:v}
                                         });
                                     }else{
                                         toastr.error(data.msg);
                                     }
                                 });
-                            }, row.supplier_name, "取消", "确认",row.price);
+                                return false;
+                            }
+                        });
 
                     });
                 });
@@ -532,5 +551,4 @@
 @section Modal {
     @Html.Partial("_MessageDialog")
     @Html.Partial("_ConfirmDialog")
-    @Html.Partial("_InputDialog")
 }

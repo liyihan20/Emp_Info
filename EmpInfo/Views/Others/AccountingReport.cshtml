@@ -1,0 +1,130 @@
+﻿@section CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" />
+}
+@section Scripts {
+    @*加入以下js，使IE8支持datetimepicker组件*@
+    <script>
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function (elt /*, from*/) {
+                var len = this.length >>> 0;
+
+                var from = Number(arguments[1]) || 0;
+                from = (from < 0)
+                     ? Math.ceil(from)
+                     : Math.floor(from);
+                if (from < 0)
+                    from += len;
+
+                for (; from < len; from++) {
+                    if (from in this &&
+                        this[from] === elt)
+                        return from;
+                }
+                return -1;
+            };
+        }
+    </script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.zh-CN.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/bootstrap-table.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table/locale/bootstrap-table-zh-CN.min.js")"></script>
+    <script>
+    var currentTr;
+    $(function () {
+        $(".form_date").datetimepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            todayBtn: true,
+            startView: 2,
+            minView: 2
+        });
+
+        $("#checkBt").on("click", function () {
+            $('#checkBt').button("loading");
+            $.post("@Url.Content("~/Others/GetAccountingReportData")", {
+                fromDate: $("#fromDate").val(),
+                toDate: $("#toDate").val()
+            }, function (result) {
+                $('#checkBt').button("reset");
+
+                if (!result.suc) {
+                    toastr.error("数据库繁忙，读取失败，请稍后重试");
+                    return;
+                }
+                var data = JSON.parse(result.extra);
+                if (data.length == 0) {
+                    toastr.error("当前时间段查无记录");
+                } else {
+                    $('#check_tb').bootstrapTable('load', data);
+                    toastr.success("已成功加载数据");
+                }
+            });
+
+        });
+    });
+
+        $("#check_tb").bootstrapTable({
+            striped: true,
+            mobileResponsive: true,
+            pagination: true,
+            pageSize: 40,
+            pageList: [20, 40, 60, 100],
+            search:true,
+            columns: [
+                {
+                    field: "公司",
+                    title: "公司"
+                }, {
+                    field: "币别",
+                    title: "币别"
+                }, {
+                    field: "付款金额",
+                    title: "付款金额",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseDecimalToThousandBit(value);
+                    }
+                }
+            ]
+        });
+
+    </script>
+
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <ol class="breadcrumb" style="margin:0;padding:0; background-color:transparent;">
+            <li><span class="glyphicon glyphicon-hand-right"></span></li>
+            <li><a href="@Url.Content("~/Home/Index")">主页</a></li>
+            <li><a href="@Url.Content("~/Home/WorkGroupIndex")">智慧办公</a></li>
+            <li class="active">会计部付款汇总查询</li>
+        </ol>
+    </div>
+    <div class="panel-body">
+        <div class="row" style="margin-bottom:20px;">
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                开始查询日期:
+                <div class="input-group date form_date" style="margin:6px 0;" id="fromDatePicker1">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    <input class="form-control" type="text" id="fromDate" name="fromDate" placeholder="请输入起始日期" value="@DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd")" readonly />
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                结束查询日期:
+                <div class="input-group date form_date" style="margin:6px 0;" id="toDatePicker1">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    <input class="form-control" type="text" id="toDate" name="toDate" placeholder="请输入结束日期" value="@DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd")" readonly />
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-block btn-primary" id="checkBt" data-loading-text="正在查询，请稍等..."><i class="fa fa-search"></i> 搜索</button>
+
+        <table id="check_tb"></table>
+
+    </div>
+</div>
+
+

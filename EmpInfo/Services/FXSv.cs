@@ -193,6 +193,9 @@ namespace EmpInfo.Services
             else if (stepName.Contains("返厂确认")) {
                 bill.out_status = "已返厂已确认";
             }
+            else if (stepName.Contains("接收确认")) {
+                bill.out_status = "已放行已接收";
+            }
 
             string formJson = JsonConvert.SerializeObject(bill);
             FlowSvrSoapClient flow = new FlowSvrSoapClient();

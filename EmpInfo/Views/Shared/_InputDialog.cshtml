@@ -1,4 +1,5 @@
-﻿@{
+﻿@*不再使用此文件，已用jquery 插件替代 myInputDialog.js*@
+@{
     Layout = null;
 }
 
@@ -24,7 +25,8 @@
 <script>
     //打开信息输入对话框，content是提示内容，callback是点击确认之后的回调方法
     var itcb;
-    function openInputDialog(inputTip, callback, title, cancelText, confirmText,content) {
+    var modalAutoClose = true; //是否confirm后自动关闭。如果需要使用异步post等操作，需设置为false，然后手动关闭；否则自动关闭，return false时不关闭。
+    function openInputDialog(inputTip, callback, title, cancelText, confirmText,content,autoclose) {
         $("#it_text_title").html(title ? title : "信息输入");
         $("#it_text_cancel").html(cancelText ? cancelText : "取消");
         $("#it_text_confirm").html(confirmText ? confirmText : "确定");
@@ -33,16 +35,27 @@
         $("#inputModal").modal("show");
         $("#input_tip").html(inputTip);
         itcb = callback;
+        if (autoclose == false) modalAutoClose = false;
+        return $("#inputModal");
     }
     $(function () {
+        $("#it_input_content").keyup(function () {
+            if (event.keyCode == 13) {
+                $("#it_bt_confirm").trigger("click");
+            }
+        });
         $("#it_bt_confirm").on("click", function () {
             var content = $("#it_input_content").val();
             if ($.trim(content) == "") {
                 toastr.error("请先输入内容");
                 return;
             }
-            $("#inputModal").modal("hide");
-            itcb(content);
+            var result = itcb(content);
+            if (result == false) return; //同步流程return false时不关闭
+
+            if (modalAutoClose) {
+                $("#inputModal").modal("hide");
+            }
         });
     });
 </script>

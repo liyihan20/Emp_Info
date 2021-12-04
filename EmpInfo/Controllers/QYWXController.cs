@@ -156,6 +156,10 @@ namespace EmpInfo.Controllers
 
             return View();
         }
+        
+        #endregion
+
+        #region 扫描放行条
 
         //扫描放行条二维码进入系统查看放行条详情
         public ActionResult ScanFx(string code)
@@ -240,16 +244,16 @@ namespace EmpInfo.Controllers
         
         public JsonResult GetConfigParam(string url)
         {
+            QywxJsConfigParam p;
+            try {
             QywxApiSrvSoapClient wx = new QywxApiSrvSoapClient();
 
-            QywxJsConfigParam p = new QywxJsConfigParam();
+            p = new QywxJsConfigParam();
             p.timestamp = MyUtils.GetTimeStamp();
             p.appId = APPID;
             p.nonceStr = MyUtils.CreateValidateNumber(8);
             //p.debug = "false";
-
-            try {
-                p.signature = wx.GetSignature(SECRET, p.nonceStr, p.timestamp, url);
+            p.signature = wx.GetSignature(SECRET, p.nonceStr, p.timestamp, url);
             }
             catch (Exception ex) {
                 return Json(new SimpleResultModel(false, ex.Message));

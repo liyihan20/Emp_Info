@@ -12,13 +12,12 @@ namespace EmpInfo.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class ei_xaApplySupplier
+    public partial class ei_selectUserLog
     {
         public int id { get; set; }
-        public string sys_no { get; set; }
-        public string supplier_name { get; set; }
-        public Nullable<decimal> price { get; set; }
-        public bool is_bidder { get; set; }
-        public Nullable<int> tax_rate { get; set; }
+        public string user_no { get; set; }
+        public string select_user_no { get; set; }
+        public string select_user_name { get; set; }
+        public System.DateTime select_time { get; set; }
     }
 }

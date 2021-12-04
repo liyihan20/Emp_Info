@@ -392,6 +392,11 @@ namespace EmpInfo.Controllers
             return Json(new K3Sv(account).GetK3BusStockBill(billNo));
         }
 
+        public JsonResult SearchK3Supplier(string searchValue)
+        {
+            return Json(new K3Sv().SearchK3Supplier(searchValue));
+        }
+
         public JsonResult GetOuterPeopleInfo(string code)
         {
             var result = db.Database.SqlQuery<FXOuterPeopleInfoModel>("select FName,FPhone,FCodeId,FCarNo,FNO from t_Wx_External_Order where FStatus in ('已审批','已入厂') and FBillNo ='" + code + "'").FirstOrDefault();
@@ -403,6 +408,52 @@ namespace EmpInfo.Controllers
 
             return Json(new SimpleResultModel(true, "已成功查询到放行人信息", JsonConvert.SerializeObject(result)));
         }
+
+        #region 记录本人已选择过的公司员工，用于选择人员模块
+
+        public JsonResult GetSelectedUser()
+        {
+            var users = (from s in db.ei_selectUserLog
+                         join v in db.vw_ei_simple_users on s.select_user_no equals v.card_number
+                         where (s.user_no==userInfo.cardNo) && (v.dep_name != null || v.card_number.StartsWith("GN"))
+                         orderby s.select_time descending
+                         select new
+                         {
+                             s.select_user_name,
+                             s.select_user_no,
+                             select_user_dept = v.short_dep_name
+                         }).Take(10).ToList();
+            return Json(users);
+        }
+
+        public JsonResult RecordSelectedUser(string selectInfos)
+        {
+            var selectedUser = selectInfos.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var su in selectedUser) {
+                var cardNumber = GetUserCardByNameAndCardNum(su);
+                var userName = GetUserNameByNameAndCardNum(su);
+
+                var user = db.ei_selectUserLog.Where(s => s.user_no == userInfo.cardNo && s.select_user_no == cardNumber).FirstOrDefault();
+                if (user == null) {
+                    user = new ei_selectUserLog()
+                    {
+                        user_no = userInfo.cardNo,
+                        select_user_no = cardNumber,
+                        select_user_name = userName,
+                        select_time = DateTime.Now
+                    };
+                    db.ei_selectUserLog.Add(user);
+                }
+                else {
+                    user.select_time = DateTime.Now;
+                }
+            }
+            db.SaveChanges();
+
+            return Json(new SimpleResultModel(true));
+        }
+
+        #endregion
 
         public string test()
         {

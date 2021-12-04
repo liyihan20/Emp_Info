@@ -43,6 +43,15 @@
         $(ulList).on("click", "a", function () {
             var fileName = $(this).attr("data-fd");
             var url = utils.GetDownloadRoute(opts.sysNum) + fileName;
+
+            //if ($.prettyPhoto) {
+            //    if ((/(\.gif|\.jpg|\.jpeg|\.bmp|\.png)$/).test(fileName)) {
+            //        $.fn.prettyPhoto({ social_tools: "", allow_resize: true,allow_expand:true });
+            //        $.prettyPhoto.open(url, '', '');
+            //        return;
+            //    }
+            //}
+
             window.open(url);
         });
 

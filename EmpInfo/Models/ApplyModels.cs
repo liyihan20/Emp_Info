@@ -340,11 +340,13 @@ namespace EmpInfo.Models
         public string sysNo { get; set; }
         public string classification { get; set; }
         public string applierName { get; set; }
-        public DateTime fromDate { get; set; }
-        public DateTime toDate { get; set; }
+        public DateTime? fromDate { get; set; }
+        public DateTime? toDate { get; set; }
         public string projectName { get; set; }
         public string deptName { get; set; }
         public string currentNode { get; set; }
+        public DateTime? confirmFromDate { get; set; }
+        public DateTime? confirmToDate { get; set; }
     }
 
     public class XASummaryDetailModel
