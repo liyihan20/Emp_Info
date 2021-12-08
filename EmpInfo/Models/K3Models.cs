@@ -51,7 +51,6 @@ namespace EmpInfo.Models
         public string item_name { get; set; }
         public string item_model { get; set; }
         public string unit_name { get; set; }
-
     }
     public class K3BomInfo
     {
@@ -64,5 +63,13 @@ namespace EmpInfo.Models
         public decimal per_qty { get; set; }
     }
 
+    public class K3OutStock
+    {
+        public string item_no { get; set; }
+        public string item_name { get; set; }
+        public string item_model { get; set; }
+        public decimal item_qty { get; set; }
+        public string item_unit { get; set; }
+    }
 
 }

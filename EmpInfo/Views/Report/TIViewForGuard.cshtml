@@ -137,20 +137,26 @@
                 },
                 {
                     field: "sys_no",
-                    title: "流水号"
-                }, {
+                    title: "流水号",
+                    formatter: function (value, row, index, field) {
+                        return value.split("-")[2];
+                    }
+                },
+                {
                     field: "ex_company",
                     title: "货运公司"
-                }, {
-                    field: "in_day",
-                    title: "进厂日期",
-                    formatter: function (value, row, index, field) {
-                        return utils.parseTDate(row.in_day);
-                    }
-                }, {
-                    field: "in_timespan",
-                    title: "进厂时间"
-                }, {
+                },
+                //{
+                //    field: "in_day",
+                //    title: "进厂日期",
+                //    formatter: function (value, row, index, field) {
+                //        return utils.parseTDate(row.in_day);
+                //    }
+                //}, {
+                //    field: "in_timespan",
+                //    title: "进厂时间"
+                //},
+                {
                     field: "driver_name",
                     title: "司机姓名"
                 }, {
@@ -175,21 +181,21 @@
                         }
                         return { css: { color: textColor } };
                     }
+                },
+                {
+                    field: "in_time",
+                    title: "进厂时间",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value,true);
+                    }
+                },
+                {
+                    field: "out_time",
+                    title: "出厂时间",
+                    formatter: function (value, row, index, field) {
+                        return utils.parseTDate(value, true);
+                    }
                 }
-                //{
-                //    field: "in_time",
-                //    title: "进厂时间",
-                //    formatter: function (value, row, index, field) {
-                //        return utils.parseTDate(value,true);
-                //    }
-                //},
-                //{
-                //    field: "out_time",
-                //    title: "出厂时间",
-                //    formatter: function (value, row, index, field) {
-                //        return utils.parseTDate(value, true);
-                //    }
-                //}
             ],
             rowStyle: function (row, index) {
                 return { css: { cursor: 'pointer' } };
@@ -226,8 +232,7 @@
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                     <input class="form-control" type="text" id="toDate" name="toDate" readonly value="@DateTime.Now.ToString("yyyy-MM-dd")" />
                 </div>
-            </div>
-            
+            </div>            
         </div>
         <div>
             <button class="btn btn-block btn-primary" id="checkBt" data-loading-text="搜索中..."><i class="fa fa-search"></i> 搜索</button>
@@ -235,11 +240,11 @@
 
         <div class="panel panel-default" style="margin-top:20px;">
             <div class="panel-body">
-                <button class="btn btn-lg btn-success" id="inBt" style="padding:8px 24px;margin-right:24px;"><i class="fa fa-sign-in"></i> 进厂</button>
-                <button class="btn btn-lg btn-danger" id="outBt" style="padding:8px 24px;"><i class="fa fa-sign-out"></i> 出厂</button>
-            </div>
+                @*<button class="btn btn-lg btn-success" id="inBt" style="padding:8px 24px;margin-right:24px;"><i class="fa fa-sign-in"></i> 进厂</button>
+                <button class="btn btn-lg btn-danger" id="outBt" style="padding:8px 24px;"><i class="fa fa-sign-out"></i> 出厂</button>*@            
 
-            <table id="check_tb" style="font-size:16px;"></table>
+                <table id="check_tb"></table>
+            </div>
         </div>
     </div>
 </div>

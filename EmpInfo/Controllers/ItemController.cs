@@ -387,9 +387,10 @@ namespace EmpInfo.Controllers
             return Json(new K3Sv(account).GetK3BusPO(po));
         }
 
-        public JsonResult GetK3BusStockBill(string account, string billNo)
+        //放行流程中的委外物品业务，需要读取k3的委外出库单
+        public JsonResult GetK3StockBill28(string account, string billNo)
         {
-            return Json(new K3Sv(account).GetK3BusStockBill(billNo));
+            return Json(new K3Sv(account).GetK3StockBill28(billNo));
         }
 
         public JsonResult SearchK3Supplier(string searchValue)

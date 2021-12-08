@@ -328,7 +328,7 @@
                     @h.take_out_people_type
                 </span>
             </div>
-            if (h.take_out_people_type != "申请人") {
+            if (!string.IsNullOrEmpty(h.take_out_people_name)) {
                 <div class="b-div">
                     <span class="b-label">
                         带出人姓名:

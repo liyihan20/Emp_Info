@@ -86,18 +86,19 @@ namespace EmpInfo.Services
             return db.Database.SqlQuery<POInfoModel>(sql, poNumber).ToList();
         }
 
-        //获取事业部的委外加工出库单信息
-        public List<POInfoModel> GetK3BusStockBill(string billNumber)
+        //获取K3委外加工出库单信息
+        public List<K3OutStock> GetK3StockBill28(string billNumber)
         {
-            string sql = @"select t3.fname as item_name,t3.fmodel as item_modual,t2.FAuxQty as qty,t4.FName as unit_name
+            string sql = @"select t3.fname as item_name,t3.fmodel as item_model,sum(t2.FAuxQty) as item_qty,t4.FName as item_unit
                         from {db}.dbo.ICStockBill t1
                         inner join {db}.dbo.ICStockBillEntry t2 on t1.finterid = t2.finterid
                         inner join {db}.dbo.t_icitem t3 on t2.fitemid = t3.fitemid
                         inner join {db}.dbo.t_MeasureUnit t4 on t2.FUnitID = t4.FItemID
-                        where t1.FTranType = 28 and t1.FCancellation = 0 and t1.FBillNo = {0}";
+                        where t1.FTranType = 28 and t1.FCancellation = 0 and t1.FStatus = 1 and t1.FDate>=DATEADD(MONTH,-3,GETDATE()) and t1.FBillNo = {0}
+                        group by t3.fname,t3.fmodel,t4.FName";
             sql = sql.Replace("{db}", GetConnStr());
 
-            var list = db.Database.SqlQuery<POInfoModel>(sql, billNumber).ToList();
+            var list = db.Database.SqlQuery<K3OutStock>(sql, billNumber).ToList();
 
             return list;
         }
